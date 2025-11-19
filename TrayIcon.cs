@@ -121,7 +121,7 @@ public class NativeTrayIcon : IDisposable
         DestroyWindow(_hWnd);
     }
 
-    /// <summary>
+    /// <summary> 
     /// Fai partire un loop di lettura eventi per non far chiudere il programma
     /// </summary>
     public void LoopEvent()

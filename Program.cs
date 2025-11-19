@@ -31,7 +31,7 @@ internal static class Program
             trayIcon.Dispose();
             Window.Close();
         };
-        
+         
 
         // Avvia il render ed il loop
         Rendering.Init();
