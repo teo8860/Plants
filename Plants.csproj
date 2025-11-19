@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <OutputType>WinExe</OutputType>
+	  <TargetFramework>net9.0</TargetFramework>
+	  <UseWindowsForms>false</UseWindowsForms>
+
+
+
+	  <PublishSingleFile>true</PublishSingleFile>
+	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	  <SelfContained>true</SelfContained>
+	  <PublishTrimmed>true</PublishTrimmed>
+  </PropertyGroup>
+
+
+
+	<PropertyGroup>
+		<ApplicationIcon>assets\icon.ico</ApplicationIcon>
+
+	</PropertyGroup>
+
+
+
+	<ItemGroup>
+	  <Compile Remove="dist\**" />
+	  <EmbeddedResource Include="assets\icon.ico" />
+	  <None Remove="dist\**" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Remove="build.bat" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="NotificationIconSharp" Version="1.0.1" />
+	  <PackageReference Include="Raylib-CSharp" Version="4.0.2" />
+	  <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
+	</ItemGroup>
+
+
+</Project>
