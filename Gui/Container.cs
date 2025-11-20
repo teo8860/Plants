@@ -41,6 +41,12 @@ public class GuiBar: GameElement
         fillLevel = value;
     }
 
+    public float GetValue()
+    {
+        return fillLevel;
+    }
+
+
     public override void Update()
     {
         

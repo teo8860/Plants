@@ -36,10 +36,15 @@ public static class Game
 
     }
 
+    public static void RestartIdratazione()
+    {
+        Game.pianta.Idratazione = 0;
+        Game.gui_idratazione.SetValue(0);
+    }
 
     public static void SetIdratazione(float value)
     {
-        Game.pianta.Idratazione += 0.01f;
+        Game.pianta.Idratazione += value;
         Game.gui_idratazione.SetValue(RayMath.Clamp( Game.pianta.Idratazione, 0.0f, 1.0f));
     }
 }
