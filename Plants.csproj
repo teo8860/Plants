@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <OutputType>WinExe</OutputType>
+	  <OutputType>Exe</OutputType>
 	  <TargetFramework>net9.0</TargetFramework>
 	  <UseWindowsForms>false</UseWindowsForms>
 
@@ -16,7 +16,7 @@
 
 
 	<PropertyGroup>
-		<ApplicationIcon>assets\icon.ico</ApplicationIcon>
+		<ApplicationIcon>Assets\icon.ico</ApplicationIcon>
 
 	</PropertyGroup>
 
@@ -24,11 +24,13 @@
 
 	<ItemGroup>
 	  <Compile Remove="dist\**" />
-	  <EmbeddedResource Include="assets\icon.ico" />
+	  <EmbeddedResource Include="Assets\icon.ico" />
 	  <None Remove="dist\**" />
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <None Remove=".gitattributes" />
+	  <None Remove=".gitignore" />
 	  <None Remove="build.bat" />
 	</ItemGroup>
 

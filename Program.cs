@@ -1,4 +1,5 @@
 ﻿using NotificationIconSharp;
+using Plants;
 using Raylib_CSharp.Windowing;
 using System;
 using System.Drawing;
@@ -13,6 +14,17 @@ internal static class Program
 
     
     public static void Main()
+    {
+        //SetupIcon();
+         
+
+        // Avvia il render ed il loop
+        Game.Init();
+        Rendering.Init();
+
+    }
+
+    private static void SetupIcon()
     {
         // Carica icona nella barra delle applicazioni
         Icon icon = Utility.LoadIconFromEmbedded("icon.ico", "assets");
@@ -31,20 +43,13 @@ internal static class Program
             trayIcon.Dispose();
             Window.Close();
         };
-         
-
-        // Avvia il render ed il loop
-        Rendering.Init();
+        
         trayIcon.LoopEvent();
-
        
         AppDomain.CurrentDomain.ProcessExit += (s, e) =>
         {
             trayIcon.Dispose();
         };
-
     }
-
-   
 }
 
