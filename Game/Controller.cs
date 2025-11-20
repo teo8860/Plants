@@ -18,6 +18,8 @@ public class Controller: GameElement
             Game.innaffiatoio.EmitParticle(mouse);
 
             Game.SetIdratazione(0.01f);
+
+            Game.pianta.Annaffia();
         }
     }
 

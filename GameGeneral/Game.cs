@@ -39,7 +39,7 @@ public static class Game
 
     public static void SetIdratazione(float value)
     {
-        Game.pianta.idratazione += 0.01f;
-        Game.gui_idratazione.SetValue(RayMath.Clamp( Game.pianta.idratazione, 0.0f, 1.0f));
+        Game.pianta.Idratazione += 0.01f;
+        Game.gui_idratazione.SetValue(RayMath.Clamp( Game.pianta.Idratazione, 0.0f, 1.0f));
     }
 }
