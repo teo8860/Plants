@@ -68,7 +68,7 @@ public class Plant : GameElement
     {
         Vector2 ultimoPunto = puntiSpline[^1];
         float nuovoX = Math.Clamp(ultimoPunto.X + random.Next(-50, 50), 0, GameProperties.screenWidth);
-        float nuovoY = Math.Clamp(ultimoPunto.Y - random.Next(30, 70), 0, GameProperties.screenHeight + offsetY);
+        float nuovoY = ultimoPunto.Y - random.Next(30, 70);
 
         puntiSpline.Add(new Vector2(nuovoX, nuovoY));
     }
