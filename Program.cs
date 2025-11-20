@@ -23,7 +23,7 @@ internal static class Program
            Window.ClearState(ConfigFlags.HiddenWindow);
            var m = MouseHelper.GetMousePosition();
 
-           Window.SetPosition(m.X-100, m.Y-400);
+           Window.SetPosition((int)m.X-100, (int)m.Y-400);
         };
 
         trayIcon.OnExit  += () =>

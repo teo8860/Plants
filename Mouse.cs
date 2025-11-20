@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Drawing;
+using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Plants;
 
@@ -16,9 +18,10 @@ public static class MouseHelper
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool GetCursorPos(out POINT lpPoint);
 
-    public static POINT GetMousePosition()
+    public static Vector2 GetMousePosition()
     {
         GetCursorPos(out POINT point);
-        return point;
+        return new Vector2(point.X, point.Y);
     }
+
 }
