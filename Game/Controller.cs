@@ -28,5 +28,14 @@ public class Controller: GameElement
         {
             Game.pianta.Reset();
         }
+
+        if (Input.IsKeyDown(KeyboardKey.Down))
+        {
+            Game.pianta.Scorri(-10); 
+        }
+        else if (Input.IsKeyDown(KeyboardKey.Up))
+        {
+            Game.pianta.Scorri(10);
+        }
     }
 }

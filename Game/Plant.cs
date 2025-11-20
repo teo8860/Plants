@@ -1,4 +1,5 @@
 ﻿using Raylib_CSharp.Rendering;
+using Raylib_CSharp.Colors;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -59,6 +60,13 @@ public class Plant : GameElement
         GeneraPuntoIniziale();
     }
 
+    public void Scorri(float delta)
+    {
+        if (offsetY + delta > 0) { 
+            offsetY = offsetY + delta;
+        }
+    }
+
     private void GeneraPuntoIniziale()
     {
         puntiSpline.Add(new Vector2(Posizione.X * GameProperties.screenWidth, GameProperties.screenHeight - Posizione.Y * GameProperties.screenHeight));
@@ -77,12 +85,16 @@ public class Plant : GameElement
     {
         for (int i = 0; i < puntiSpline.Count - 1; i++)
         {
-            Graphics.DrawLine((int)puntiSpline[i].X, (int)(puntiSpline[i].Y + offsetY), (int)puntiSpline[i + 1].X, (int)(puntiSpline[i + 1].Y + offsetY), Raylib_CSharp.Colors.Color.Green);
+            float spessore = 4 + (i / 10); 
+            var coloreLinea = spessore > 10 ? Color.Brown : Color.Green;
+
+            Graphics.DrawLine((int)puntiSpline[i].X, (int)(puntiSpline[i].Y + offsetY), (int)puntiSpline[i + 1].X, (int)(puntiSpline[i + 1].Y + offsetY), coloreLinea);
         }
 
-        foreach (var punto in puntiSpline)
+        for (int i = 0; i < puntiSpline.Count; i++)
         {
-            Graphics.DrawCircle((int)punto.X, (int)(punto.Y + offsetY), 4, Raylib_CSharp.Colors.Color.Maroon);
+            float spessore = 4 + (i / 10);
+            Graphics.DrawCircle((int)puntiSpline[i].X, (int)(puntiSpline[i].Y + offsetY), spessore, Color.Maroon);
         }
     }
 }
