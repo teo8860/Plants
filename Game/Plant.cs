@@ -16,7 +16,7 @@ public class Plant : GameElement
     private List<Vector2> puntiSpline = new(); 
     private Random random = new();
     public float offsetY = 0;
-    private const int MargineMinimo = 20;
+    private const int MargineMinimo = 40;
 
     public Plant()
     {
@@ -27,7 +27,7 @@ public class Plant : GameElement
     public void PosizionaAlCentroInBasso()
     {
         float centroX = 0.5f;
-        float bassoY = 0.1f;
+        float bassoY = 0.04f;
         Posizione = (centroX, bassoY);
     }
 
@@ -63,7 +63,7 @@ public class Plant : GameElement
 
     public void Scorri(float delta)
     {
-        if (offsetY + delta > 0) { 
+        if (offsetY + delta >= 0) { 
             offsetY = offsetY + delta;
         }
     }
