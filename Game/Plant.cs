@@ -26,8 +26,8 @@ public class Plant : GameElement
 
     public void PosizionaAlCentroInBasso()
     {
-        float centroX = 0.5f; 
-        float bassoY = 0.1f; 
+        float centroX = 0.5f;
+        float bassoY = 0.1f;
         Posizione = (centroX, bassoY);
     }
 
@@ -70,7 +70,28 @@ public class Plant : GameElement
 
     private void GeneraPuntoIniziale()
     {
-        puntiSpline.Add(new Vector2(Posizione.X * GameProperties.screenWidth, GameProperties.screenHeight - Posizione.Y * GameProperties.screenHeight));
+        puntiSpline.Clear();
+
+        puntiSpline.Add(new Vector2(
+            Posizione.X * GameProperties.screenWidth,
+            GameProperties.screenHeight - Posizione.Y * GameProperties.screenHeight
+        ));
+
+        float secondoX = Math.Clamp(
+            puntiSpline[0].X + random.Next(-50, 50),
+            MargineMinimo,
+            GameProperties.screenWidth - MargineMinimo
+        );
+        float secondoY = puntiSpline[0].Y - random.Next(30, 70);
+        puntiSpline.Add(new Vector2(secondoX, secondoY));
+
+        float terzoX = Math.Clamp(
+            puntiSpline[1].X + random.Next(-50, 50),
+            MargineMinimo,
+            GameProperties.screenWidth - MargineMinimo
+        );
+        float terzoY = puntiSpline[1].Y - random.Next(30, 70);
+        puntiSpline.Add(new Vector2(terzoX, terzoY));
     }
 
     private void GeneraPuntoCasuale()
@@ -84,20 +105,24 @@ public class Plant : GameElement
 
     public override void Draw()
     {
-        int totalLines = puntiSpline.Count - 1;
-
-        for (int i = 0; i < totalLines; i++)
+        if (puntiSpline.Count >= 4) 
         {
+            Span<Vector2> puntiConOffset = stackalloc Vector2[puntiSpline.Count];
 
-            float spessore = 8 + ((totalLines - i) / 5); 
-
-            for (float offset = -spessore / 2; offset <= spessore / 2; offset += 1.0f)
+            for (int i = 0; i < puntiSpline.Count; i++)
             {
-                Graphics.DrawLine(
-                    (int)(puntiSpline[i].X + offset), (int)(puntiSpline[i].Y + offsetY),
-                    (int)(puntiSpline[i + 1].X + offset), (int)(puntiSpline[i + 1].Y + offsetY),
-                    Color.Green
+                puntiConOffset[i] = new Vector2(
+                    puntiSpline[i].X,
+                    puntiSpline[i].Y + offsetY
                 );
+            }
+
+            for (int i = 0; i < puntiSpline.Count - 3; i++)
+            {
+                float spessore = 8 + ((puntiSpline.Count - i) / 5); 
+
+                Span<Vector2> segmento = puntiConOffset.Slice(i, 4);
+                Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
             }
         }
     }

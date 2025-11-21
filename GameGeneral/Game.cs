@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Plants;
 
@@ -16,6 +17,8 @@ public static class Game
     public static Plant pianta;
 
     public static GuiBar gui_idratazione;
+
+    public static Timer Timer;
 
 
     public static void Init()
@@ -34,6 +37,8 @@ public static class Game
             height: 90
         );
 
+        SetTimer();
+
     }
 
     public static void RestartIdratazione()
@@ -47,4 +52,22 @@ public static class Game
         Game.pianta.Idratazione += value;
         Game.gui_idratazione.SetValue(RayMath.Clamp( Game.pianta.Idratazione, 0.0f, 1.0f));
     }
+    public static void SetTimer()
+    {
+        Timer = new Timer(5000); 
+        Timer.Elapsed += OnTimedEvent;
+        Timer.AutoReset = true;
+        Timer.Enabled = true;
+    }
+
+    private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+    {
+        if (Game.pianta.Idratazione > 0.0f)
+        { 
+            Game.pianta.Idratazione += -0.025f;
+            Game.gui_idratazione.SetValue(RayMath.Clamp(Game.pianta.Idratazione, 0.0f, 1.0f));
+            Game.pianta.Annaffia();
+        }
+    }
+
 }
