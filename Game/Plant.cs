@@ -15,7 +15,8 @@ public class Plant : GameElement
 
     private List<Vector2> puntiSpline = new(); 
     private Random random = new();
-    private float offsetY = 0;
+    public float offsetY = 0;
+    private const int MargineMinimo = 20;
 
     public Plant()
     {
@@ -75,7 +76,7 @@ public class Plant : GameElement
     private void GeneraPuntoCasuale()
     {
         Vector2 ultimoPunto = puntiSpline[^1];
-        float nuovoX = Math.Clamp(ultimoPunto.X + random.Next(-50, 50), 0, GameProperties.screenWidth);
+        float nuovoX = Math.Clamp(ultimoPunto.X + random.Next(-50, 50), MargineMinimo, GameProperties.screenWidth - MargineMinimo);
         float nuovoY = ultimoPunto.Y - random.Next(30, 70);
 
         puntiSpline.Add(new Vector2(nuovoX, nuovoY));
@@ -83,18 +84,21 @@ public class Plant : GameElement
 
     public override void Draw()
     {
-        for (int i = 0; i < puntiSpline.Count - 1; i++)
-        {
-            float spessore = 4 + (i / 10); 
-            var coloreLinea = spessore > 10 ? Color.Brown : Color.Green;
+        int totalLines = puntiSpline.Count - 1;
 
-            Graphics.DrawLine((int)puntiSpline[i].X, (int)(puntiSpline[i].Y + offsetY), (int)puntiSpline[i + 1].X, (int)(puntiSpline[i + 1].Y + offsetY), coloreLinea);
-        }
-
-        for (int i = 0; i < puntiSpline.Count; i++)
+        for (int i = 0; i < totalLines; i++)
         {
-            float spessore = 4 + (i / 10);
-            Graphics.DrawCircle((int)puntiSpline[i].X, (int)(puntiSpline[i].Y + offsetY), spessore, Color.Maroon);
+
+            float spessore = 8 + ((totalLines - i) / 5); 
+
+            for (float offset = -spessore / 2; offset <= spessore / 2; offset += 1.0f)
+            {
+                Graphics.DrawLine(
+                    (int)(puntiSpline[i].X + offset), (int)(puntiSpline[i].Y + offsetY),
+                    (int)(puntiSpline[i + 1].X + offset), (int)(puntiSpline[i + 1].Y + offsetY),
+                    Color.Green
+                );
+            }
         }
     }
 }
