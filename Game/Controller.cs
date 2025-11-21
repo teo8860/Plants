@@ -18,8 +18,9 @@ public class Controller: GameElement
 
             Game.innaffiatoio.EmitParticle(mouse);
 
-            Game.SetIdratazione(0.05f);
-            Game.pianta.Annaffia();
+            if (Game.pianta.Idratazione <= 1.0f)
+                Game.SetIdratazione(0.05f);
+            
         }
 
         if (Input.IsMouseButtonDown(MouseButton.Left))

@@ -64,8 +64,7 @@ public static class Game
     {
         if (Game.pianta.Idratazione > 0.0f)
         { 
-            Game.pianta.Idratazione += -0.025f;
-            Game.gui_idratazione.SetValue(RayMath.Clamp(Game.pianta.Idratazione, 0.0f, 1.0f));
+            Game.SetIdratazione(-0.025f);
             Game.pianta.Annaffia();
         }
     }
