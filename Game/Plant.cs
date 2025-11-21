@@ -77,13 +77,8 @@ public class Plant : GameElement
             GameProperties.screenHeight - Posizione.Y * GameProperties.screenHeight
         ));
 
-        float secondoX = Math.Clamp(
-            puntiSpline[0].X + random.Next(-50, 50),
-            MargineMinimo,
-            GameProperties.screenWidth - MargineMinimo
-        );
-        float secondoY = puntiSpline[0].Y - random.Next(30, 70);
-        puntiSpline.Add(new Vector2(secondoX, secondoY));
+        puntiSpline.Add(new Vector2(Posizione.X * GameProperties.screenWidth,
+            GameProperties.screenHeight - Posizione.Y * GameProperties.screenHeight));
 
         float terzoX = Math.Clamp(
             puntiSpline[1].X + random.Next(-50, 50),
