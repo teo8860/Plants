@@ -2,7 +2,9 @@
 using Raylib_CSharp;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Rendering;
+using Raylib_CSharp.Transformations;
 using System;
+using System.ComponentModel.Design;
 
 
 namespace Plants;
@@ -21,8 +23,11 @@ public class GuiBar: GameElement
     private float fillLevel;
     private Color waterColor;
     private Color borderColor;
+    private Color glass;
+    private bool text;
 
-    public GuiBar(int x, int y, int width, int height)
+
+    public GuiBar(int x, int y, int width, int height, bool Active)
     {
         container = new containerSize
         {
@@ -33,7 +38,9 @@ public class GuiBar: GameElement
         };
         fillLevel = 0.0f;
         waterColor = Color.Blue;
-        borderColor = Color.Black;
+        borderColor = Color.DarkGray;
+        glass = Color.Beige;
+        text = Active;
     }
 
     public void SetValue(float value)
@@ -59,24 +66,31 @@ public class GuiBar: GameElement
         float containerBottomY = container.Y + container.Height;
         float waterY = containerBottomY - waterHeight;
 
-        Graphics.DrawRectangle(
-            container.X,
-            (int)waterY,
-            container.Width,
-            (int)waterHeight,
+        Graphics.DrawRectangleRounded(
+             new Rectangle(container.X, container.Y, container.Width, container.Height),
+             0.2f,
+             16,
+             glass
+         );
+
+        Graphics.DrawRectangleRounded(
+            new Rectangle(container.X, waterY, container.Width, waterHeight),
+            0.2f,
+            16,
             waterColor
         );
 
-        Graphics.DrawRectangleLines(
-            container.X,
-            container.Y,
-            container.Width,
-            container.Height,
+        Graphics.DrawRectangleRoundedLines(
+            new Rectangle(container.X, container.Y, container.Width, container.Height),
+            1.0f,
+            16,
+            2,
             borderColor
         );
 
-        string text = $"{fillLevel * 100:F0}%";
-        Graphics.DrawText(text, container.X, container.Y + container.Height + 5, 10, Color.Black);
+        if (!text) return;
+        string testo = $"{fillLevel * 100:F0}%";
+        Graphics.DrawText(testo, container.X, container.Y + container.Height + 5, 10, Color.Black);
     }
 }
 

@@ -15,7 +15,6 @@ public class Plant : GameElement
 
     private List<Vector2> puntiSpline = new(); 
     private Random random = new();
-    public float offsetY = 0;
     private const int MargineMinimo = 40;
 
     public Plant()
@@ -39,9 +38,9 @@ public class Plant : GameElement
             GeneraPuntoCasuale();
 
             Vector2 ultimoPunto = puntiSpline[^1];
-            if (ultimoPunto.Y + offsetY < 100) 
+            if (ultimoPunto.Y + Game.controller.offsetY < 100) 
             {
-                offsetY += 50;
+                Game.controller.offsetY += 50;
             }
         }
     }
@@ -56,16 +55,9 @@ public class Plant : GameElement
     {
         Idratazione = 0;
         Altezza = 1.0f;
-        offsetY = 0;
+        Game.controller.offsetY = 0;
         puntiSpline.Clear();
         GeneraPuntoIniziale();
-    }
-
-    public void Scorri(float delta)
-    {
-        if (offsetY + delta >= 0) { 
-            offsetY = offsetY + delta;
-        }
     }
 
     private void GeneraPuntoIniziale()
@@ -108,7 +100,7 @@ public class Plant : GameElement
             {
                 puntiConOffset[i] = new Vector2(
                     puntiSpline[i].X,
-                    puntiSpline[i].Y + offsetY
+                    puntiSpline[i].Y + Game.controller.offsetY
                 );
             }
 

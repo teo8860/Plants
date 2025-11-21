@@ -17,6 +17,9 @@ public static class Game
     public static Plant pianta;
 
     public static GuiBar gui_idratazione;
+    public static GuiBar gui_temperatura;
+    public static GuiBar gui_cibo;
+
 
     public static Timer Timer;
 
@@ -31,10 +34,27 @@ public static class Game
         controller = new Controller();
 
         gui_idratazione = new GuiBar(
-            x: 170,
+            x: 180,
             y: 5,
             width: 15,
-            height: 90
+            height: 90,
+            Active: true
+        );
+
+        gui_temperatura = new GuiBar(
+            x: 155,
+            y: 5,
+            width: 15,
+            height: 90,
+            Active: false
+        );
+
+        gui_cibo = new GuiBar(
+            x: 130,
+            y: 5,
+            width: 15,
+            height: 90,
+            Active: true
         );
 
         SetTimer();

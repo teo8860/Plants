@@ -9,6 +9,8 @@ namespace Plants;
 
 public class Controller: GameElement
 {
+    public float offsetY = 0;
+
     public override void Update()
     {
         Vector2 mouse = Input.GetMousePosition();
@@ -30,11 +32,19 @@ public class Controller: GameElement
 
         if (Input.IsKeyDown(KeyboardKey.Down))
         {
-            Game.pianta.Scorri(-50); 
+            Scorri(-50); 
         }
         else if (Input.IsKeyDown(KeyboardKey.Up))
         {
-            Game.pianta.Scorri(50);
+            Scorri(50);
         }
     }
+    public void Scorri(float delta)
+    {
+        if (offsetY + delta >= 0)
+        {
+            offsetY = offsetY + delta;
+        }
+    }
+
 }
