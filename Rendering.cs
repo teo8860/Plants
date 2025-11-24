@@ -12,7 +12,6 @@ internal class Rendering
 
     public static void Init()
     {
-        Window.Init(GameProperties.screenWidth, GameProperties.screenHeight, "Plants");
         Raylib.SetConfigFlags(ConfigFlags.Msaa4XHint);
         Time.SetTargetFPS(60);
 

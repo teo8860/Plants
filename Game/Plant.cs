@@ -24,7 +24,7 @@ public class Plant : GameElement
     private int contatorePuntiPerRamo = 0; 
     private Texture2D textureFoglia; 
     private bool textureCaricata = false;
-
+     
     public Plant()
     {
         PosizionaAlCentroInBasso();
@@ -32,10 +32,9 @@ public class Plant : GameElement
 
         try
         {
+            Image fogliaImage = Image.Load("C:/Dev/Plants/Resources/leaf.png");
 
-            Image fogliaImage = Image.Load("../Resources/leaf.png");
-
-            fogliaImage.Resize(60, 60);
+            fogliaImage.Resize(100, 100);
 
             textureFoglia = Texture2D.LoadFromImage(fogliaImage);
 
@@ -240,7 +239,7 @@ public class Ramo
             Graphics.DrawLineEx(pStart, pEnd, spessoreAttuale, Color.DarkGreen);
 
             Vector2 midPoint = (pStart + pEnd) / 2.0f;
-            //haTexture (non funziona, controllare perchè)
+
             if (haTexture && textureFoglia.Width > 0 && textureFoglia.Height > 0)
             {
 

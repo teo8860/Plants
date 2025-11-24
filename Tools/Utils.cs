@@ -22,5 +22,4 @@ internal class Utility
 
        return new Icon(stream);
     }
-
 }

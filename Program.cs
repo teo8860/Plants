@@ -16,8 +16,8 @@ internal static class Program
     public static void Main()
     {
         //SetupIcon();
-         
 
+        Window.Init(GameProperties.screenWidth, GameProperties.screenHeight, "Plants");
         // Avvia il render ed il loop
         Game.Init();
         Rendering.Init();
