@@ -22,7 +22,6 @@ public class Controller: GameElement
 
             if (Game.pianta.Idratazione <= 1.0f)
                 Game.SetIdratazione(0.05f);
-            
         }
 
         if (Input.IsMouseButtonDown(MouseButton.Left))

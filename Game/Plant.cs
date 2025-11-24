@@ -1,9 +1,11 @@
-﻿using Raylib_CSharp.Rendering;
+﻿using Raylib_CSharp;
 using Raylib_CSharp.Colors;
+using Raylib_CSharp.Rendering;
+using Raylib_CSharp.Textures;
+using Raylib_CSharp.Transformations;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Raylib_CSharp;
 
 namespace Plants;
 
@@ -17,10 +19,26 @@ public class Plant : GameElement
     private Random random = new();
     private const int MargineMinimo = 40;
 
+    private List<Ramo> rami = new(); 
+    private int contatorePuntiPerRamo = 0; 
+    private Texture2D textureFoglia; 
+    private bool textureCaricata = false;
+
     public Plant()
     {
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
+
+        try
+        {
+            textureFoglia = Texture2D.Load("Resources/leaf.png");
+            textureCaricata = true;
+        }
+        catch
+        {
+            Console.WriteLine("Impossibile caricare texture foglia. Assicurati che il percorso sia corretto.");
+        }
+
     }
 
     public void PosizionaAlCentroInBasso()
@@ -37,11 +55,44 @@ public class Plant : GameElement
             Altezza += incremento;
             GeneraPuntoCasuale();
 
+            contatorePuntiPerRamo++;
+            if (contatorePuntiPerRamo == 5)
+            {
+                Vector2 puntoAttacco = puntiSpline[^2];
+
+                bool vaADestra;
+
+                float margineSicurezza = 100f;
+
+                if (puntoAttacco.X < margineSicurezza)
+                {
+                    vaADestra = true;
+                }
+                else if (puntoAttacco.X > GameProperties.screenWidth - margineSicurezza)
+                {
+                    vaADestra = false;
+                }
+                else
+                {
+                    vaADestra = random.Next(0, 2) == 0;
+                }
+
+                rami.Add(new Ramo(puntoAttacco, vaADestra, random, textureFoglia, textureCaricata));
+
+                contatorePuntiPerRamo = 0;
+            }
+
+            foreach (var ramo in rami)
+            {
+                ramo.Cresci();
+            }
+
             Vector2 ultimoPunto = puntiSpline[^1];
-            if (ultimoPunto.Y + Game.controller.offsetY < 100) 
+            if (ultimoPunto.Y + Game.controller.offsetY < 100)
             {
                 Game.controller.offsetY += 50;
             }
+
         }
     }
 
@@ -57,6 +108,7 @@ public class Plant : GameElement
         Altezza = 1.0f;
         Game.controller.offsetY = 0;
         puntiSpline.Clear();
+        rami.Clear();
         GeneraPuntoIniziale();
     }
 
@@ -111,6 +163,99 @@ public class Plant : GameElement
                 Span<Vector2> segmento = puntiConOffset.Slice(i, 4);
                 Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
             }
+
+
+        }
+        foreach (var ramo in rami)
+        {
+            ramo.Draw(Game.controller.offsetY);
+        }
+    }
+}
+public class Ramo
+{
+    private List<Vector2> punti = new();
+    private bool vaADestra;
+    private Random random;
+
+    private int crescitaAttuale = 0;
+    private const int MaxCrescita = 5;
+
+    private float spessoreAttuale = 2.0f; 
+    private const float IncrementoSpessore = 1.5f;
+
+    private Texture2D textureFoglia;
+    private bool haTexture;
+
+    public Ramo(Vector2 puntoIniziale, bool direzioneDestra, Random sharedRandom, Texture2D tex, bool texCaricata)
+    {
+        vaADestra = direzioneDestra;
+        random = sharedRandom;
+        textureFoglia = tex;
+        haTexture = texCaricata;
+
+        punti.Add(puntoIniziale);
+    }
+
+    public void Cresci()
+    {
+        if (crescitaAttuale >= MaxCrescita) return;
+
+        Vector2 ultimoPunto = punti[^1];
+
+        float deltaX = random.Next(25, 25) * (vaADestra ? 1 : -1);
+        float deltaY = -random.Next(5, 25);
+
+        Vector2 nuovoPunto = new Vector2(ultimoPunto.X + deltaX, ultimoPunto.Y + deltaY);
+        punti.Add(nuovoPunto);
+
+        spessoreAttuale += IncrementoSpessore;
+        crescitaAttuale++;
+    }
+
+    public void Draw(float offsetY)
+    {
+        if (punti.Count < 2) return;
+
+        Span<Vector2> puntiOffset = stackalloc Vector2[punti.Count];
+        for (int i = 0; i < punti.Count; i++)
+        {
+            puntiOffset[i] = new Vector2(punti[i].X, punti[i].Y + offsetY);
+        }
+
+        for (int i = 0; i < punti.Count - 1; i++)
+        {
+            Vector2 pStart = puntiOffset[i];
+            Vector2 pEnd = puntiOffset[i + 1];
+
+            Graphics.DrawLineEx(pStart, pEnd, spessoreAttuale, Color.DarkGreen);
+
+            Vector2 midPoint = (pStart + pEnd) / 2.0f;
+            //haTexture (non funziona, controllare perchè)
+            if (false)
+            {
+
+                float deltaY = pEnd.Y - pStart.Y;
+                float deltaX = pEnd.X - pStart.X;
+                float rotazione = MathF.Atan2(deltaY, deltaX) * (180.0f / MathF.PI);
+
+                float scala = 0.4f;
+
+                Rectangle source = new Rectangle(0, 0, textureFoglia.Width, textureFoglia.Height);
+                Rectangle dest = new Rectangle(midPoint.X, midPoint.Y, textureFoglia.Width * scala, textureFoglia.Height * scala);
+                Vector2 origin = new Vector2((textureFoglia.Width * scala) / 2, (textureFoglia.Height * scala) / 2);
+
+                Graphics.DrawTexturePro(textureFoglia, source, dest, origin, rotazione, Color.White);
+            }
+            else
+            {
+                Graphics.DrawCircleV(midPoint, 8, Color.Lime);
+            }
+        }
+
+        for (int i = 0; i < punti.Count; i++)
+        {
+            Graphics.DrawCircleV(puntiOffset[i], spessoreAttuale / 2, Color.DarkGreen);
         }
     }
 }

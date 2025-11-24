@@ -29,9 +29,9 @@ public static class Game
         innaffiatoio = new Water();
         innaffiatoio.Initialize(GameProperties.screenWidth, GameProperties.screenHeight);
 
-        pianta = new Plant();
-
         controller = new Controller();
+
+        pianta = new Plant();
 
         gui_idratazione = new GuiBar(
             x: 180,
