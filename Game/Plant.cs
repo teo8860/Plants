@@ -1,5 +1,6 @@
 ﻿using Raylib_CSharp;
 using Raylib_CSharp.Colors;
+using Raylib_CSharp.Images;
 using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Textures;
 using Raylib_CSharp.Transformations;
@@ -31,7 +32,15 @@ public class Plant : GameElement
 
         try
         {
-            textureFoglia = Texture2D.Load("Resources/leaf.png");
+
+            Image fogliaImage = Image.Load("../Resources/leaf.png");
+
+            fogliaImage.Resize(60, 60);
+
+            textureFoglia = Texture2D.LoadFromImage(fogliaImage);
+
+            fogliaImage.Unload();
+
             textureCaricata = true;
         }
         catch
@@ -232,20 +241,36 @@ public class Ramo
 
             Vector2 midPoint = (pStart + pEnd) / 2.0f;
             //haTexture (non funziona, controllare perchè)
-            if (false)
+            if (haTexture && textureFoglia.Width > 0 && textureFoglia.Height > 0)
             {
 
                 float deltaY = pEnd.Y - pStart.Y;
                 float deltaX = pEnd.X - pStart.X;
-                float rotazione = MathF.Atan2(deltaY, deltaX) * (180.0f / MathF.PI);
+                float rotazioneBase = MathF.Atan2(deltaY, deltaX) * (180.0f / MathF.PI);
+
+                float flipLato = (random.Next(0, 2) == 0) ? 1.0f : -1.0f;
+
+                float rotazioneCasuale = (float)random.NextDouble() * 40f - 20f;
+                float rotazioneFinale = rotazioneBase + rotazioneCasuale;
+
+                float angoloPerpendicolareRad = (rotazioneBase + 90) * (MathF.PI / 180.0f);
+
+                float scostamentoCasuale = (float)random.NextDouble() * 5f + 5f;
+
+                Vector2 offset = new Vector2(
+                    MathF.Cos(angoloPerpendicolareRad) * scostamentoCasuale * flipLato,
+                    MathF.Sin(angoloPerpendicolareRad) * scostamentoCasuale * flipLato
+                );
+
+                Vector2 posizioneFinale = midPoint + offset;
 
                 float scala = 0.4f;
 
                 Rectangle source = new Rectangle(0, 0, textureFoglia.Width, textureFoglia.Height);
-                Rectangle dest = new Rectangle(midPoint.X, midPoint.Y, textureFoglia.Width * scala, textureFoglia.Height * scala);
+                Rectangle dest = new Rectangle(posizioneFinale.X, posizioneFinale.Y, textureFoglia.Width * scala, textureFoglia.Height * scala);
                 Vector2 origin = new Vector2((textureFoglia.Width * scala) / 2, (textureFoglia.Height * scala) / 2);
 
-                Graphics.DrawTexturePro(textureFoglia, source, dest, origin, rotazione, Color.White);
+                Graphics.DrawTexturePro(textureFoglia, source, dest, origin, rotazioneFinale, Color.White);
             }
             else
             {
