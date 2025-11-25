@@ -195,6 +195,12 @@ public class Ramo
     private Texture2D textureFoglia;
     private bool haTexture;
 
+    private const int FogliePerSegmento = 1;
+    private List<(float Scostamento, float Rotazione, float Flip, Vector2 PosizioneRelativa)> parametriFoglie = new();
+    private bool foglieGenerate = false;
+
+    private float puntoInizialeX;
+
     public Ramo(Vector2 puntoIniziale, bool direzioneDestra, Random sharedRandom, Texture2D tex, bool texCaricata)
     {
         vaADestra = direzioneDestra;
@@ -203,6 +209,8 @@ public class Ramo
         haTexture = texCaricata;
 
         punti.Add(puntoIniziale);
+        puntoInizialeX = puntoIniziale.X;
+
     }
 
     public void Cresci()
@@ -211,14 +219,62 @@ public class Ramo
 
         Vector2 ultimoPunto = punti[^1];
 
-        float deltaX = random.Next(25, 25) * (vaADestra ? 1 : -1);
-        float deltaY = -random.Next(5, 25);
+        float deltaX = random.Next(5, 25) * (vaADestra ? 1 : -1);
+        float deltaY = -random.Next(25, 25);
 
         Vector2 nuovoPunto = new Vector2(ultimoPunto.X + deltaX, ultimoPunto.Y + deltaY);
         punti.Add(nuovoPunto);
 
         spessoreAttuale += IncrementoSpessore;
         crescitaAttuale++;
+
+        GeneraParametriFoglia();
+    }
+
+    private void GeneraParametriFoglia()
+    {
+        if (punti.Count >= 2)
+        {
+            float centroSchermoX = GameProperties.screenWidth / 2.0f;
+
+            const float MargineSicurezza = 80.0f;
+
+            float flip;
+
+            if (puntoInizialeX < centroSchermoX - MargineSicurezza)
+            {
+                flip = -1.0f;
+            }
+            else if (puntoInizialeX > centroSchermoX + MargineSicurezza)
+            {
+                flip = 1.0f;
+            }
+            else
+            {
+                if (puntoInizialeX < centroSchermoX)
+                {
+                    flip = -1.0f;
+                }
+                else
+                {
+                    flip = 1.0f;
+                }
+            }
+
+            float rotazioneCasuale = (float)random.NextDouble() * 40f - 20f;
+            float scostamentoCasuale = (float)random.NextDouble() * 5f + 5f;
+            float posizioneRelativa = 0.5f;
+
+            if (Math.Abs(puntoInizialeX - centroSchermoX) <= MargineSicurezza)
+            {
+                if (random.NextDouble() < 0.2)
+                {
+                    flip *= -1.0f;
+                }
+            }
+
+            parametriFoglie.Add((scostamentoCasuale, rotazioneCasuale, flip, new Vector2(posizioneRelativa, 0)));
+        }
     }
 
     public void Draw(float offsetY)
@@ -238,41 +294,39 @@ public class Ramo
 
             Graphics.DrawLineEx(pStart, pEnd, spessoreAttuale, Color.DarkGreen);
 
-            Vector2 midPoint = (pStart + pEnd) / 2.0f;
-
             if (haTexture && textureFoglia.Width > 0 && textureFoglia.Height > 0)
             {
+                var paramsFoglia = parametriFoglie[i];
+                float scala = 0.4f;
+
+                Vector2 posizioneRamo = Vector2.Lerp(pStart, pEnd, paramsFoglia.PosizioneRelativa.X);
 
                 float deltaY = pEnd.Y - pStart.Y;
                 float deltaX = pEnd.X - pStart.X;
                 float rotazioneBase = MathF.Atan2(deltaY, deltaX) * (180.0f / MathF.PI);
 
-                float flipLato = (random.Next(0, 2) == 0) ? 1.0f : -1.0f;
-
-                float rotazioneCasuale = (float)random.NextDouble() * 40f - 20f;
-                float rotazioneFinale = rotazioneBase + rotazioneCasuale;
-
                 float angoloPerpendicolareRad = (rotazioneBase + 90) * (MathF.PI / 180.0f);
 
-                float scostamentoCasuale = (float)random.NextDouble() * 5f + 5f;
-
                 Vector2 offset = new Vector2(
-                    MathF.Cos(angoloPerpendicolareRad) * scostamentoCasuale * flipLato,
-                    MathF.Sin(angoloPerpendicolareRad) * scostamentoCasuale * flipLato
+                    MathF.Cos(angoloPerpendicolareRad) * paramsFoglia.Scostamento * paramsFoglia.Flip,
+                    MathF.Sin(angoloPerpendicolareRad) * paramsFoglia.Scostamento * paramsFoglia.Flip
                 );
 
-                Vector2 posizioneFinale = midPoint + offset;
+                Vector2 posizioneFinale = posizioneRamo + offset;
+                float rotazioneFinale = rotazioneBase + paramsFoglia.Rotazione;
 
-                float scala = 0.4f;
+                float originX = (textureFoglia.Width * scala) / 2;
+                float originY = (textureFoglia.Height * scala) * 0.8f;
+                Vector2 origin = new Vector2(originX, originY);
 
                 Rectangle source = new Rectangle(0, 0, textureFoglia.Width, textureFoglia.Height);
                 Rectangle dest = new Rectangle(posizioneFinale.X, posizioneFinale.Y, textureFoglia.Width * scala, textureFoglia.Height * scala);
-                Vector2 origin = new Vector2((textureFoglia.Width * scala) / 2, (textureFoglia.Height * scala) / 2);
 
                 Graphics.DrawTexturePro(textureFoglia, source, dest, origin, rotazioneFinale, Color.White);
             }
             else
             {
+                Vector2 midPoint = (pStart + pEnd) / 2.0f;
                 Graphics.DrawCircleV(midPoint, 8, Color.Lime);
             }
         }
