@@ -219,8 +219,8 @@ public class Ramo
 
         Vector2 ultimoPunto = punti[^1];
 
-        float deltaX = random.Next(5, 25) * (vaADestra ? 1 : -1);
-        float deltaY = -random.Next(25, 25);
+        float deltaX = random.Next(20, 20) * (vaADestra ? 1 : -1);
+        float deltaY = -random.Next(10, 15);
 
         Vector2 nuovoPunto = new Vector2(ultimoPunto.X + deltaX, ultimoPunto.Y + deltaY);
         punti.Add(nuovoPunto);
@@ -297,7 +297,7 @@ public class Ramo
             if (haTexture && textureFoglia.Width > 0 && textureFoglia.Height > 0)
             {
                 var paramsFoglia = parametriFoglie[i];
-                float scala = 0.4f;
+                float scala = 0.45f;
 
                 Vector2 posizioneRamo = Vector2.Lerp(pStart, pEnd, paramsFoglia.PosizioneRelativa.X);
 
@@ -316,11 +316,11 @@ public class Ramo
                 float rotazioneFinale = rotazioneBase + paramsFoglia.Rotazione;
 
                 float originX = (textureFoglia.Width * scala) / 2;
-                float originY = (textureFoglia.Height * scala) * 0.8f;
+                float originY = 30;
                 Vector2 origin = new Vector2(originX, originY);
 
-                Rectangle source = new Rectangle(0, 0, textureFoglia.Width, textureFoglia.Height);
-                Rectangle dest = new Rectangle(posizioneFinale.X, posizioneFinale.Y, textureFoglia.Width * scala, textureFoglia.Height * scala);
+                Rectangle source = new Rectangle(0, 0, textureFoglia.Width, 59);
+                Rectangle dest = new Rectangle(posizioneFinale.X, posizioneFinale.Y, textureFoglia.Width * scala, 30);
 
                 Graphics.DrawTexturePro(textureFoglia, source, dest, origin, rotazioneFinale, Color.White);
             }
