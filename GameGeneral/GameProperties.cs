@@ -8,6 +8,6 @@ namespace Plants;
 
 internal static class GameProperties
 {
-    public static int screenWidth = 200;
-    public static int screenHeight = 400;
+    public static int screenWidth = 400;
+    public static int screenHeight = 500;
 }

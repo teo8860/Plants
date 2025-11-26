@@ -12,6 +12,7 @@ namespace Plants;
 
 public class Plant : GameElement
 {
+ 
     public float Idratazione = 0;
     public float Altezza = 1.0f;
     public (float X, float Y) Posizione = (0, 0);
@@ -32,7 +33,7 @@ public class Plant : GameElement
 
         try
         {
-            Image fogliaImage = Image.Load("C:/Dev/Plants/Resources/leaf.png");
+            Image fogliaImage = Utility.LoadImageFromEmbedded("leaf.png", "Assets");
 
             fogliaImage.Resize(100, 100);
 
@@ -152,6 +153,7 @@ public class Plant : GameElement
 
     public override void Draw()
     {
+
         if (puntiSpline.Count >= 4) 
         {
             Span<Vector2> puntiConOffset = stackalloc Vector2[puntiSpline.Count];
@@ -297,7 +299,7 @@ public class Ramo
             if (haTexture && textureFoglia.Width > 0 && textureFoglia.Height > 0)
             {
                 var paramsFoglia = parametriFoglie[i];
-                float scala = 0.45f;
+                float scala = 0.8f;
 
                 Vector2 posizioneRamo = Vector2.Lerp(pStart, pEnd, paramsFoglia.PosizioneRelativa.X);
 
@@ -305,7 +307,7 @@ public class Ramo
                 float deltaX = pEnd.X - pStart.X;
                 float rotazioneBase = MathF.Atan2(deltaY, deltaX) * (180.0f / MathF.PI);
 
-                float angoloPerpendicolareRad = (rotazioneBase + 90) * (MathF.PI / 180.0f);
+                float angoloPerpendicolareRad = (rotazioneBase ) * (MathF.PI / 180.0f);
 
                 Vector2 offset = new Vector2(
                     MathF.Cos(angoloPerpendicolareRad) * paramsFoglia.Scostamento * paramsFoglia.Flip,
@@ -316,13 +318,13 @@ public class Ramo
                 float rotazioneFinale = rotazioneBase + paramsFoglia.Rotazione;
 
                 float originX = (textureFoglia.Width * scala) / 2;
-                float originY = 30;
+                float originY = 0;
                 Vector2 origin = new Vector2(originX, originY);
 
-                Rectangle source = new Rectangle(0, 0, textureFoglia.Width, 59);
-                Rectangle dest = new Rectangle(posizioneFinale.X, posizioneFinale.Y, textureFoglia.Width * scala, 30);
+                Rectangle source = new Rectangle(0, 0, textureFoglia.Width, textureFoglia.Height);
+                Rectangle dest = new Rectangle(posizioneFinale.X, posizioneFinale.Y, textureFoglia.Width * scala, textureFoglia.Height * scala);
 
-                Graphics.DrawTexturePro(textureFoglia, source, dest, origin, rotazioneFinale, Color.White);
+                Graphics.DrawTexturePro(textureFoglia, source, dest, origin, rotazioneBase, Color.White);
             }
             else
             {
