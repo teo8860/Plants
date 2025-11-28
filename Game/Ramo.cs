@@ -1,0 +1,164 @@
+﻿using Raylib_CSharp.Colors;
+using Raylib_CSharp.Rendering;
+using Raylib_CSharp.Textures;
+using Raylib_CSharp.Transformations;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Plants;
+
+public class Ramo
+{
+    private List<Vector2> punti = new();
+    private bool vaADestra;
+    private Random random;
+
+    private int crescitaAttuale = 0;
+    private const int MaxCrescita = 5;
+
+    private float spessoreAttuale = 2.0f; 
+    private const float IncrementoSpessore = 1.5f;
+
+    private bool haTexture;
+
+    private const int FogliePerSegmento = 1;
+    private List<(float Scostamento, float Rotazione, float Flip, Vector2 PosizioneRelativa)> parametriFoglie = new();
+    private bool foglieGenerate = false;
+
+    private float puntoInizialeX;
+
+    private int scaleX = new Random().Next(100) > 50 ? 1 : -1;
+
+    public Ramo(Vector2 puntoIniziale, bool direzioneDestra, Random sharedRandom,  bool texCaricata)
+    {
+        vaADestra = direzioneDestra;
+        random = sharedRandom;
+        haTexture = texCaricata;
+
+        punti.Add(puntoIniziale);
+        puntoInizialeX = puntoIniziale.X;
+
+    }
+
+    public void Cresci()
+    {
+        if (crescitaAttuale >= MaxCrescita) return;
+
+        Vector2 ultimoPunto = punti[^1];
+
+        float deltaX = random.Next(20, 20) * (vaADestra ? 1 : -1);
+        float deltaY = -random.Next(10, 15);
+
+        Vector2 nuovoPunto = new Vector2(ultimoPunto.X + deltaX, ultimoPunto.Y + deltaY);
+        punti.Add(nuovoPunto);
+
+        spessoreAttuale += IncrementoSpessore;
+        crescitaAttuale++;
+
+        GeneraParametriFoglia();
+    }
+
+    private void GeneraParametriFoglia()
+    {
+        if (punti.Count >= 2)
+        {
+            float centroSchermoX = GameProperties.screenWidth / 2.0f;
+
+            const float MargineSicurezza = 80.0f;
+
+            float flip;
+
+            if (puntoInizialeX < centroSchermoX - MargineSicurezza)
+            {
+                flip = -1.0f;
+            }
+            else if (puntoInizialeX > centroSchermoX + MargineSicurezza)
+            {
+                flip = 1.0f;
+            }
+            else
+            {
+                if (puntoInizialeX < centroSchermoX)
+                {
+                    flip = -1.0f;
+                }
+                else
+                {
+                    flip = 1.0f;
+                }
+            }
+
+            float rotazioneCasuale = (float)random.NextDouble() * 40f - 20f;
+            float scostamentoCasuale = (float)random.NextDouble() * 5f + 5f;
+            float posizioneRelativa = 0.5f;
+
+            if (Math.Abs(puntoInizialeX - centroSchermoX) <= MargineSicurezza)
+            {
+                if (random.NextDouble() < 0.2)
+                {
+                    flip *= -1.0f;
+                }
+            }
+
+            parametriFoglie.Add((scostamentoCasuale, rotazioneCasuale, flip, new Vector2(posizioneRelativa, 0)));
+        }
+    }
+
+    public void Draw(float offsetY)
+    {
+        if (punti.Count < 2) return;
+
+        Span<Vector2> puntiOffset = stackalloc Vector2[punti.Count];
+        for (int i = 0; i < punti.Count; i++)
+        {
+            puntiOffset[i] = new Vector2(punti[i].X, punti[i].Y + offsetY);
+        }
+
+        Sprite sprite = AssetLoader.spriteLeaf;
+
+        for (int i = 0; i < punti.Count - 1; i++)
+        {
+            Vector2 pStart = puntiOffset[i];
+            Vector2 pEnd = puntiOffset[i + 1];
+
+            Graphics.DrawLineEx(pStart, pEnd, spessoreAttuale, Color.DarkGreen);
+            int w = sprite.texture.Width;
+            int h = sprite.texture.Height;
+
+            if (haTexture && w > 0 && h > 0)
+            {
+                var paramsFoglia = parametriFoglie[i];
+                float scala = 0.8f;
+
+                Vector2 posizioneRamo = Vector2.Lerp(pStart, pEnd, paramsFoglia.PosizioneRelativa.X);
+
+                float deltaY = pEnd.Y - pStart.Y;
+                float deltaX = pEnd.X - pStart.X;
+                float rotazioneBase = MathF.Atan2(deltaY, deltaX) * (180.0f / MathF.PI);
+
+                float angoloPerpendicolareRad = (rotazioneBase ) * (MathF.PI / 180.0f);
+
+                Vector2 offset = new Vector2(
+                    MathF.Cos(angoloPerpendicolareRad) * paramsFoglia.Scostamento * paramsFoglia.Flip,
+                    MathF.Sin(angoloPerpendicolareRad) * paramsFoglia.Scostamento * paramsFoglia.Flip
+                );
+
+                Vector2 posizioneFinale = posizioneRamo + offset;
+                float rotazioneFinale = rotazioneBase + paramsFoglia.Rotazione;
+
+                GameFunctions.DrawSprite(sprite, posizioneFinale, rotazioneFinale, new Vector2(1,1));
+            }
+            else
+            {
+                Vector2 midPoint = (pStart + pEnd) / 2.0f;
+                Graphics.DrawCircleV(midPoint, 8, Color.Lime);
+            }
+        }
+
+        for (int i = 0; i < punti.Count; i++)
+        {
+            Graphics.DrawCircleV(puntiOffset[i], spessoreAttuale / 2, Color.DarkGreen);
+        }
+    }
+}

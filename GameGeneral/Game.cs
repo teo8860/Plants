@@ -15,12 +15,16 @@ public static class Game
     public static GuiBar gui_temperatura;
     public static GuiBar gui_cibo;
 
+    public static GuiButton gui_button;
+
 
     public static Timer Timer;
 
 
     public static void Init()
     {
+        AssetLoader.LoadAll();
+
         innaffiatoio = new Water();
         innaffiatoio.Initialize(GameProperties.screenWidth, GameProperties.screenHeight);
 
@@ -29,7 +33,7 @@ public static class Game
         pianta = new Plant();
 
         gui_idratazione = new GuiBar(
-            x: 180,
+            x: GameProperties.screenWidth-30,
             y: 5,
             width: 15,
             height: 90,
@@ -37,7 +41,7 @@ public static class Game
         );
 
         gui_temperatura = new GuiBar(
-            x: 155,
+            x: GameProperties.screenWidth-55,
             y: 5,
             width: 15,
             height: 90,
@@ -45,11 +49,20 @@ public static class Game
         );
 
         gui_cibo = new GuiBar(
-            x: 130,
+            x: GameProperties.screenWidth-80,
             y: 5,
             width: 15,
             height: 90,
             Active: true
+        );
+        
+        gui_button = new GuiButton(
+            x: 10,
+            y: 10,
+            width: 100,
+            height: 30,
+            text: "true",
+            OnClick: ()=> SetIdratazione(0.1f)
         );
 
         SetTimer();
