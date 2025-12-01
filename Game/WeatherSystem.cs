@@ -207,6 +207,13 @@ public class WeatherSystem : GameElement
         {
             Graphics.DrawRectangle(0, 0, screenWidth, screenHeight,
                 new Color(255, 255, 255, 100));
+
+            Graphics.DrawLineEx(
+                new Vector2(random.Next(0, screenWidth),0),
+                new Vector2(random.Next(0, screenWidth), screenHeight),
+                2.0f,
+                Color.Gold
+            );
         }
     }
 
