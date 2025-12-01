@@ -21,8 +21,13 @@ public static class Game
 
     public static WeatherParticleSystem weatherSystem;
 
+    public static bool cambiaPhase = false;
+
     public static Timer Timer;
 
+    public static Timer TimerFase;
+
+    public static DayPhase Phase;
 
     public static void Init()
     {
@@ -77,12 +82,22 @@ public static class Game
             y: 50,
             width: 100,
             height: 30,
+            text: "Cambia fase",
+            OnClick: () => cambiaPhase = true
+        );
+
+        gui_cambiameteo = new GuiButton(
+            x: 10,
+            y: 90,
+            width: 100,
+            height: 30,
             text: "Cambia meteo",
             OnClick: () => MeteoManager.ForceWeatherChange() //MeteoManager.SetWeather(Weather.Snowy)
         );
 
         SetTimer();
 
+        SetTimerFase();
     }
 
     public static void RestartIdratazione()
@@ -111,6 +126,20 @@ public static class Game
             Game.SetIdratazione(-0.025f);
             Game.pianta.Annaffia();
         }
+    }
+
+    public static void SetTimerFase()
+    {
+        TimerFase = new Timer(3600000);
+        TimerFase.Elapsed += OnTimedEventFase;
+        TimerFase.AutoReset = true;
+        TimerFase.Enabled = true;
+    }
+
+    private static void OnTimedEventFase(Object source, ElapsedEventArgs e)
+    {
+        Phase = FaseGiorno.GetCurrentPhase();
+
     }
 
 }

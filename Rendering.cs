@@ -30,7 +30,13 @@ internal class Rendering
 
             Graphics.BeginDrawing();
 
-            DayPhase currentPhase = FaseGiorno.GetCurrentPhase();
+            if (Game.cambiaPhase)
+            {
+                Game.Phase = FaseGiorno.ChangeDayPhase();
+                Game.cambiaPhase = false;
+            }
+
+            DayPhase currentPhase = Game.Phase;
             Weather currentWeather = MeteoManager.GetCurrentWeather();
 
             DrawBackground(currentPhase, currentWeather);

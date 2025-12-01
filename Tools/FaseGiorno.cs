@@ -63,6 +63,34 @@ namespace Plants
             else
                 return DayPhase.Evening;
         }
+
+        public static DayPhase ChangeDayPhase()
+        {
+            DayPhase newPhase = Game.Phase;
+
+            switch (newPhase)
+            {
+                case DayPhase.Night:
+                    return DayPhase.Dawn;
+                    
+                case DayPhase.Dawn:
+                    return DayPhase.Morning;
+                    
+                case DayPhase.Morning:
+                    return DayPhase.Afternoon;
+                    
+                case DayPhase.Afternoon:
+                    return DayPhase.Dusk;
+                    
+                case DayPhase.Dusk:
+                    return DayPhase.Evening;
+
+                case DayPhase.Evening:
+                    return DayPhase.Night;
+            }        
+            return DayPhase.Evening;
+        }
+
     }
 
     public static class MeteoManager
