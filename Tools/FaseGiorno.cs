@@ -136,9 +136,9 @@ namespace Plants
                 case Weather.Sunny:
                     int sunnyRoll = random.Next(100);
                     if (sunnyRoll < 60) newWeather = Weather.Sunny;      
-                    else if (sunnyRoll < 90) newWeather = Weather.Cloudy;
-                    else if (sunnyRoll < 95) newWeather = Weather.Rainy;
-                    else if (sunnyRoll < 100) newWeather = Weather.Snowy;
+                    else if (sunnyRoll < 80) newWeather = Weather.Cloudy;
+                    else if (sunnyRoll < 90) newWeather = Weather.Rainy;
+                    else if (sunnyRoll < 95) newWeather = Weather.Snowy;
                     else newWeather = Weather.Foggy;                      
                     break;
 
@@ -148,7 +148,6 @@ namespace Plants
                     else if (cloudyRoll < 60) newWeather = Weather.Cloudy;
                     else if (cloudyRoll < 85) newWeather = Weather.Rainy; 
                     else if (cloudyRoll < 95) newWeather = Weather.Stormy; 
-                    else if (cloudyRoll < 100) newWeather = Weather.Snowy;
                     else newWeather = Weather.Foggy;                    
                     break;
 
@@ -184,8 +183,8 @@ namespace Plants
                     if (snowyRoll < 50) newWeather = Weather.Snowy;     
                     else if (snowyRoll < 80) newWeather = Weather.Cloudy;
                     else if (snowyRoll < 90) newWeather = Weather.Rainy;  
-                    else if (snowyRoll < 100) newWeather = Weather.Sunny;
-                    else newWeather = Weather.Foggy;                      
+                    else if (snowyRoll < 95) newWeather = Weather.Foggy;
+                    else newWeather = Weather.Sunny;                      
                     break;
             }
 
@@ -199,27 +198,6 @@ namespace Plants
         public static void ForceWeatherChange()
         {
             ChangeWeatherRandomly();
-        }
-
-        public static string GetWeatherDescription()
-        {
-            switch (currentWeather)
-            {
-                case Weather.Sunny:
-                    return "Soleggiato";
-                case Weather.Cloudy:
-                    return "Nuvoloso";
-                case Weather.Rainy:
-                    return "Pioggia";
-                case Weather.Stormy:
-                    return "Tempesta";
-                case Weather.Foggy:
-                    return "Nebbioso";
-                case Weather.Snowy:
-                    return "Neve";
-                default:
-                    return "Sconosciuto";
-            }
         }
     }
 }
