@@ -44,12 +44,13 @@ internal class Rendering
             if (Game.controller.offsetY <= 49) { 
                 Graphics.DrawRectangle(0, GameProperties.screenHeight - 70, GameProperties.screenWidth, GameProperties.screenHeight, Color.DarkGreen);
             }
+
+            Game.weatherSystem.UpdateAndDrawWeather(currentWeather);
+
             foreach (var item in elements)
             {
                 item.Draw();
             }
-
-            Game.weatherSystem.UpdateAndDrawWeather(currentWeather);
 
             Graphics.EndDrawing();
         }
