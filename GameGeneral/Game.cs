@@ -78,7 +78,7 @@ public static class Game
             width: 100,
             height: 30,
             text: "Cambia meteo",
-            OnClick: () => MeteoManager.ForceWeatherChange()
+            OnClick: () => MeteoManager.ForceWeatherChange() //MeteoManager.SetWeather(Weather.Snowy)
         );
 
         SetTimer();

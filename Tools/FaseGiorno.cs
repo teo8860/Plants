@@ -108,7 +108,9 @@ namespace Plants
                 case Weather.Sunny:
                     int sunnyRoll = random.Next(100);
                     if (sunnyRoll < 60) newWeather = Weather.Sunny;      
-                    else if (sunnyRoll < 90) newWeather = Weather.Cloudy; 
+                    else if (sunnyRoll < 90) newWeather = Weather.Cloudy;
+                    else if (sunnyRoll < 95) newWeather = Weather.Rainy;
+                    else if (sunnyRoll <= 100) newWeather = Weather.Snowy;
                     else newWeather = Weather.Foggy;                      
                     break;
 
@@ -117,6 +119,8 @@ namespace Plants
                     if (cloudyRoll < 40) newWeather = Weather.Sunny;    
                     else if (cloudyRoll < 60) newWeather = Weather.Cloudy;
                     else if (cloudyRoll < 85) newWeather = Weather.Rainy; 
+                    else if (cloudyRoll < 95) newWeather = Weather.Stormy; 
+                    else if (cloudyRoll <= 100) newWeather = Weather.Snowy;
                     else newWeather = Weather.Foggy;                    
                     break;
 
@@ -125,6 +129,7 @@ namespace Plants
                     if (rainyRoll < 50) newWeather = Weather.Rainy;     
                     else if (rainyRoll < 75) newWeather = Weather.Cloudy; 
                     else if (rainyRoll < 90) newWeather = Weather.Stormy; 
+                    else if (rainyRoll <= 100) newWeather = Weather.Snowy;
                     else newWeather = Weather.Sunny;                      
                     break;
 
@@ -132,6 +137,7 @@ namespace Plants
                     int stormyRoll = random.Next(100);
                     if (stormyRoll < 40) newWeather = Weather.Stormy;    
                     else if (stormyRoll < 80) newWeather = Weather.Rainy; 
+                    else if (stormyRoll < 90) newWeather = Weather.Snowy; 
                     else newWeather = Weather.Cloudy;                     
                     break;
 
@@ -139,13 +145,18 @@ namespace Plants
                     int foggyRoll = random.Next(100);
                     if (foggyRoll < 40) newWeather = Weather.Foggy;      
                     else if (foggyRoll < 70) newWeather = Weather.Cloudy; 
+                    else if (foggyRoll < 90) newWeather = Weather.Rainy;  
+                    else if (foggyRoll < 95) newWeather = Weather.Stormy;
+                    else if (foggyRoll <= 100) newWeather = Weather.Snowy;
                     else newWeather = Weather.Sunny;                     
                     break;
 
                 case Weather.Snowy:
                     int snowyRoll = random.Next(100);
                     if (snowyRoll < 50) newWeather = Weather.Snowy;     
-                    else if (snowyRoll < 80) newWeather = Weather.Cloudy; 
+                    else if (snowyRoll < 80) newWeather = Weather.Cloudy;
+                    else if (snowyRoll < 90) newWeather = Weather.Rainy;  
+                    else if (snowyRoll <= 100) newWeather = Weather.Sunny;
                     else newWeather = Weather.Foggy;                      
                     break;
             }
