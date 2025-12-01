@@ -1,4 +1,5 @@
 ﻿using Raylib_CSharp;
+using Raylib_CSharp.Windowing;
 using System;
 using System.Timers;
 
@@ -15,8 +16,10 @@ public static class Game
     public static GuiBar gui_temperatura;
     public static GuiBar gui_cibo;
 
-    public static GuiButton gui_button;
+    public static GuiButton gui_annaffia;
+    public static GuiButton gui_cambiameteo;
 
+    public static WeatherParticleSystem weatherSystem;
 
     public static Timer Timer;
 
@@ -27,6 +30,10 @@ public static class Game
 
         innaffiatoio = new Water();
         innaffiatoio.Initialize(GameProperties.screenWidth, GameProperties.screenHeight);
+
+
+        weatherSystem = new WeatherParticleSystem();
+        weatherSystem.Initialize(Window.GetScreenWidth(), Window.GetScreenHeight());
 
         controller = new Controller();
 
@@ -56,13 +63,22 @@ public static class Game
             Active: true
         );
 
-        gui_button = new GuiButton(
+        gui_annaffia = new GuiButton(
             x: 10,
             y: 10,
             width: 100,
             height: 30,
             text: "Annaffiatoio",
             OnClick: () => Game.pianta.attivo = !Game.pianta.attivo
+        );
+
+        gui_cambiameteo = new GuiButton(
+            x: 10,
+            y: 50,
+            width: 100,
+            height: 30,
+            text: "Cambia meteo",
+            OnClick: () => MeteoManager.ForceWeatherChange()
         );
 
         SetTimer();

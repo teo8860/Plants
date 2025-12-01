@@ -12,7 +12,17 @@ namespace Plants
         Evening     // 20:00 - 23:59
     }
 
-    public static class FaseGiorno 
+    public enum Weather
+    {
+        Sunny,      // Soleggiato
+        Cloudy,     // Nuvoloso
+        Rainy,      // Pioggia
+        Stormy,     // Tempesta
+        Foggy,      // Nebbioso
+        Snowy       // Neve
+    }
+
+    public static class FaseGiorno
     {
         public static DayPhase GetCurrentPhase()
         {
@@ -22,7 +32,6 @@ namespace Plants
         public static DayPhase GetPhaseFromTime(DateTime time)
         {
             int hour = time.Hour;
-
             if (hour >= 0 && hour < 6)
                 return DayPhase.Night;
             else if (hour >= 6 && hour < 8)
@@ -41,7 +50,6 @@ namespace Plants
         {
             if (hour < 0 || hour > 23)
                 throw new ArgumentException("L'ora deve essere tra 0 e 23");
-
             if (hour >= 0 && hour < 6)
                 return DayPhase.Night;
             else if (hour >= 6 && hour < 8)
@@ -55,5 +63,124 @@ namespace Plants
             else
                 return DayPhase.Evening;
         }
-    }  
+    }
+
+    public static class MeteoManager
+    {
+        private static Weather currentWeather = Weather.Sunny;
+        private static Random random = new Random();
+        private static DateTime lastWeatherChange = DateTime.Now;
+        private static int weatherDurationMinutes = 30;
+
+        public static Weather GetCurrentWeather()
+        {
+            UpdateWeatherIfNeeded();
+            return currentWeather;
+        }
+
+        public static void SetWeather(Weather weather)
+        {
+            currentWeather = weather;
+            lastWeatherChange = DateTime.Now;
+        }
+
+        public static void SetWeatherDuration(int minutes)
+        {
+            weatherDurationMinutes = minutes;
+        }
+
+        private static void UpdateWeatherIfNeeded()
+        {
+            TimeSpan timeSinceChange = DateTime.Now - lastWeatherChange;
+
+            if (timeSinceChange.TotalMinutes >= weatherDurationMinutes)
+            {
+                ChangeWeatherRandomly();
+            }
+        }
+
+        private static void ChangeWeatherRandomly()
+        {
+            Weather newWeather = currentWeather;
+
+            switch (currentWeather)
+            {
+                case Weather.Sunny:
+                    int sunnyRoll = random.Next(100);
+                    if (sunnyRoll < 60) newWeather = Weather.Sunny;      
+                    else if (sunnyRoll < 90) newWeather = Weather.Cloudy; 
+                    else newWeather = Weather.Foggy;                      
+                    break;
+
+                case Weather.Cloudy:
+                    int cloudyRoll = random.Next(100);
+                    if (cloudyRoll < 40) newWeather = Weather.Sunny;    
+                    else if (cloudyRoll < 60) newWeather = Weather.Cloudy;
+                    else if (cloudyRoll < 85) newWeather = Weather.Rainy; 
+                    else newWeather = Weather.Foggy;                    
+                    break;
+
+                case Weather.Rainy:
+                    int rainyRoll = random.Next(100);
+                    if (rainyRoll < 50) newWeather = Weather.Rainy;     
+                    else if (rainyRoll < 75) newWeather = Weather.Cloudy; 
+                    else if (rainyRoll < 90) newWeather = Weather.Stormy; 
+                    else newWeather = Weather.Sunny;                      
+                    break;
+
+                case Weather.Stormy:
+                    int stormyRoll = random.Next(100);
+                    if (stormyRoll < 40) newWeather = Weather.Stormy;    
+                    else if (stormyRoll < 80) newWeather = Weather.Rainy; 
+                    else newWeather = Weather.Cloudy;                     
+                    break;
+
+                case Weather.Foggy:
+                    int foggyRoll = random.Next(100);
+                    if (foggyRoll < 40) newWeather = Weather.Foggy;      
+                    else if (foggyRoll < 70) newWeather = Weather.Cloudy; 
+                    else newWeather = Weather.Sunny;                     
+                    break;
+
+                case Weather.Snowy:
+                    int snowyRoll = random.Next(100);
+                    if (snowyRoll < 50) newWeather = Weather.Snowy;     
+                    else if (snowyRoll < 80) newWeather = Weather.Cloudy; 
+                    else newWeather = Weather.Foggy;                      
+                    break;
+            }
+
+            if (newWeather != currentWeather)
+            {
+                currentWeather = newWeather;
+                lastWeatherChange = DateTime.Now;
+            }
+        }
+
+        public static void ForceWeatherChange()
+        {
+            ChangeWeatherRandomly();
+        }
+
+        public static string GetWeatherDescription()
+        {
+            switch (currentWeather)
+            {
+                case Weather.Sunny:
+                    return "Soleggiato";
+                case Weather.Cloudy:
+                    return "Nuvoloso";
+                case Weather.Rainy:
+                    return "Pioggia";
+                case Weather.Stormy:
+                    return "Tempesta";
+                case Weather.Foggy:
+                    return "Nebbioso";
+                case Weather.Snowy:
+                    return "Neve";
+                default:
+                    return "Sconosciuto";
+            }
+        }
+    }
 }
