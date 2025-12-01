@@ -19,7 +19,7 @@ public static class Game
     public static GuiButton gui_annaffia;
     public static GuiButton gui_cambiameteo;
 
-    public static WeatherParticleSystem weatherSystem;
+    public static WeatherSystem weatherSystem;
 
     public static bool cambiaPhase = false;
 
@@ -37,7 +37,7 @@ public static class Game
         innaffiatoio.Initialize(GameProperties.screenWidth, GameProperties.screenHeight);
 
 
-        weatherSystem = new WeatherParticleSystem();
+        weatherSystem = new WeatherSystem();
         weatherSystem.Initialize(Window.GetScreenWidth(), Window.GetScreenHeight());
 
         controller = new Controller();

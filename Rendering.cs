@@ -8,7 +8,7 @@ namespace Plants;
 
 internal class Rendering
 {
-    private static WeatherParticleSystem weatherSystem;
+    private static WeatherSystem weatherSystem;
 
     public static void Init()
     {
