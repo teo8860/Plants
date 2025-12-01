@@ -113,7 +113,7 @@ public class WeatherParticleSystem : GameElement
                 newParticle.alive = true;
                 newParticle.radius = 2.0f;
                 newParticle.color = new Color(173, 216, 230, heavy ? (byte)180 : (byte)120);
-                newParticle.velocity = new Vector2(-2, heavy ? 12 : 8);
+                newParticle.velocity = new Vector2(0, heavy ? 12 : 8);
             }
         }
 
