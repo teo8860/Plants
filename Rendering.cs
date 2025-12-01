@@ -35,15 +35,15 @@ internal class Rendering
 
             DrawBackground(currentPhase, currentWeather);
 
+            if (Game.controller.offsetY <= 49) { 
+                Graphics.DrawRectangle(0, GameProperties.screenHeight - 70, GameProperties.screenWidth, GameProperties.screenHeight, Color.DarkGreen);
+            }
             foreach (var item in elements)
             {
                 item.Draw();
             }
 
             Game.weatherSystem.UpdateAndDrawWeather(currentWeather);
-
-            Graphics.DrawText($"Fase: {currentPhase} | Meteo: {MeteoManager.GetWeatherDescription()}",
-                10, 470, 20, Color.White);
 
             Graphics.EndDrawing();
         }

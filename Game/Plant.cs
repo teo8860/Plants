@@ -80,7 +80,7 @@ public class Plant : GameElement
             }
 
             Vector2 ultimoPunto = puntiSpline[^1];
-            if (ultimoPunto.Y + Game.controller.offsetY < 100)
+            if (ultimoPunto.Y + Game.controller.offsetY <= 100)
             {
                 Game.controller.offsetY += 50;
             }
