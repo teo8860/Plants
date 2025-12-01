@@ -80,7 +80,7 @@ public class GuiBar: GameElement
             waterColor
         );
 
-        Graphics.DrawRectangleRoundedLines(
+        Graphics.DrawRectangleRoundedLinesEx(
             new Rectangle(container.X, container.Y, container.Width, container.Height),
             1.0f,
             16,

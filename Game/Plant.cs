@@ -23,7 +23,9 @@ public class Plant : GameElement
     private List<Ramo> rami = new(); 
     private int contatorePuntiPerRamo = 0; 
     private bool textureCaricata = false;
-     
+    
+    public bool attivo = false;
+
     public Plant()
     {
         PosizionaAlCentroInBasso();
@@ -151,7 +153,7 @@ public class Plant : GameElement
             {
                 float spessore = 8 + ((puntiSpline.Count - i) / 5); 
 
-                if(i+4 < puntiConOffset.Length)
+                if(i+4 <= puntiConOffset.Length)
                 {
                     Span<Vector2> segmento = puntiConOffset.Slice(i, 4);
                     Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);

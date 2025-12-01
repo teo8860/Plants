@@ -32,8 +32,8 @@ public class GuiButton: GameElement
             Width = width,
             Height = height
         };
-        fillColor = Color.Blue;
-        borderColor = Color.DarkGray;
+        fillColor = Color.Gold;
+        borderColor = Color.Black;
         this.text = text;
         this.OnClick = OnClick;
     }
@@ -61,7 +61,7 @@ public class GuiButton: GameElement
             fillColor
         );
 
-        Graphics.DrawRectangleRoundedLines(
+        Graphics.DrawRectangleRoundedLinesEx(
             new Rectangle(container.X, container.Y, container.Width, container.Height),
             0.2f,
             16,
@@ -76,11 +76,11 @@ public class GuiButton: GameElement
 
         if (text != null && text != "")
         {
-            Vector2 textSize = TextManager.MeasureTextEx(Font.GetDefault(), text, 12, 0);
+            Vector2 textSize = TextManager.MeasureTextEx(Font.GetDefault(), text, 14, 0);
             int xx = (int)(container.X + (container.Width /2) - (textSize.X/2));
             int yy = (int)(container.Y + (container.Height /2)- (textSize.Y/2));
 
-            Graphics.DrawText(text, xx, yy, 10, Color.White);
+            Graphics.DrawText(text, xx, yy, 12, Color.Black);
         }
      }
 }

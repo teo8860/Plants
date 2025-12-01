@@ -55,14 +55,14 @@ public static class Game
             height: 90,
             Active: true
         );
-        
+
         gui_button = new GuiButton(
             x: 10,
             y: 10,
             width: 100,
             height: 30,
-            text: "true",
-            OnClick: ()=> SetIdratazione(0.1f)
+            text: "Annaffiatoio",
+            OnClick: () => Game.pianta.attivo = !Game.pianta.attivo
         );
 
         SetTimer();
