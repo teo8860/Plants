@@ -195,7 +195,7 @@ public class WeatherSystem : GameElement
             lightningTimer = 0f;
         }
 
-        if (showLightning && lightningTimer > 0.1f)
+        if (showLightning && lightningTimer > 0.2f)
         {
             showLightning = false;
         }
@@ -205,15 +205,20 @@ public class WeatherSystem : GameElement
     {
         if (showLightning)
         {
-            Graphics.DrawRectangle(0, 0, screenWidth, screenHeight,
-                new Color(255, 255, 255, 100));
-
-            Graphics.DrawLineEx(
-                new Vector2(random.Next(0, screenWidth),0),
-                new Vector2(random.Next(0, screenWidth), screenHeight),
-                2.0f,
-                Color.Gold
-            );
+            if (lightningTimer <= 0.1f)
+            {
+                Graphics.DrawRectangle(0, 0, screenWidth, screenHeight,
+                    new Color(255, 255, 255, 150));
+            }
+            else
+            {
+                Graphics.DrawLineEx(
+                    new Vector2(random.Next(0, screenWidth), 0),
+                    new Vector2(random.Next(0, screenWidth), screenHeight),
+                    2.0f,
+                    Color.Gold
+                );
+            }
         }
     }
 
