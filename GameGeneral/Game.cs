@@ -33,7 +33,7 @@ public static class Game
     {
         AssetLoader.LoadAll();
 
-        innaffiatoio = new Water();
+        innaffiatoio = GameElement.Create<Water>(-100);
         innaffiatoio.Initialize(GameProperties.screenWidth, GameProperties.screenHeight);
 
 
@@ -98,6 +98,7 @@ public static class Game
         SetTimer();
 
         SetTimerFase();
+        Phase = FaseGiorno.GetCurrentPhase();
     }
 
     public static void RestartIdratazione()

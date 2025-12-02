@@ -17,7 +17,7 @@ public class Controller: GameElement
         
         if(Input.IsMouseButtonDown(MouseButton.Right))
         {
-
+           
             Game.innaffiatoio.EmitParticle(mouse);
 
             if (Game.pianta.Idratazione <= 1.0f && Game.pianta.attivo)

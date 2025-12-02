@@ -28,6 +28,8 @@ internal class Rendering
                 item.Update();
             }
 
+            elements.Sort((GameElement a, GameElement b)=> b.depth - a.depth);
+
             Graphics.BeginDrawing();
 
             if (Game.cambiaPhase)

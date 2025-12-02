@@ -80,7 +80,7 @@ public class GuiBar: GameElement
             waterColor
         );
 
-        Graphics.DrawRectangleRoundedLinesEx(
+        Graphics.DrawRectangleRoundedLines(
             new Rectangle(container.X, container.Y, container.Width, container.Height),
             1.0f,
             16,
@@ -90,6 +90,13 @@ public class GuiBar: GameElement
 
         if (!text) return;
         string testo = $"{fillLevel * 100:F0}%";
+
+        
+        Graphics.DrawText(testo, container.X-1, container.Y + container.Height + 5, 10, Color.White);
+        Graphics.DrawText(testo, container.X+1, container.Y + container.Height + 5, 10, Color.White);
+        Graphics.DrawText(testo, container.X, container.Y + container.Height + 5-1, 10, Color.White);
+        Graphics.DrawText(testo, container.X, container.Y + container.Height + 5+1, 10, Color.White);
+
         Graphics.DrawText(testo, container.X, container.Y + container.Height + 5, 10, Color.Black);
     }
 }
