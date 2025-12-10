@@ -11,10 +11,9 @@ namespace Plants;
 
 public class Plant : GameElement
 {
- 
     public float Idratazione = 0;
     public float Altezza = 1.0f;
-    public (float X, float Y) Posizione = (0, 0);
+    public Vector2 Posizione = new(0,0);
 
     private List<Vector2> puntiSpline = new(); 
     private Random random = new();
@@ -30,14 +29,13 @@ public class Plant : GameElement
     {
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
-
     }
 
     public void PosizionaAlCentroInBasso()
     {
         float centroX = 0.5f;
         float bassoY = 0.04f;
-        Posizione = (centroX, bassoY);
+        Posizione = new (GameProperties.screenWidth/2, GameProperties.screenHeight-GameProperties.groundPosition);
     }
 
     public void Crescita(float incremento)
@@ -108,13 +106,9 @@ public class Plant : GameElement
     {
         puntiSpline.Clear();
 
-        puntiSpline.Add(new Vector2(
-            Posizione.X * GameProperties.screenWidth,
-            GameProperties.screenHeight - Posizione.Y * GameProperties.screenHeight
-        ));
+        puntiSpline.Add(new Vector2(Posizione.X, Posizione.Y));
 
-        puntiSpline.Add(new Vector2(Posizione.X * GameProperties.screenWidth,
-            GameProperties.screenHeight - Posizione.Y * GameProperties.screenHeight));
+        puntiSpline.Add(new Vector2(Posizione.X, Posizione.Y));
 
         float terzoX = Math.Clamp(
             puntiSpline[1].X + random.Next(-50, 50),
@@ -136,7 +130,6 @@ public class Plant : GameElement
 
     public override void Draw()
     {
-
         if (puntiSpline.Count >= 4) 
         {
             Span<Vector2> puntiConOffset = stackalloc Vector2[puntiSpline.Count];
@@ -162,9 +155,12 @@ public class Plant : GameElement
 
 
         }
+        
         foreach (var ramo in rami)
         {
             ramo.Draw(Game.controller.offsetY);
         }
+
+        Graphics.DrawEllipse((int)Posizione.X, (int)((int)Posizione.Y+10+ Game.controller.offsetY), 15, 25, Color.DarkBrown);
     }
 }

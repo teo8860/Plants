@@ -1,65 +1,28 @@
-﻿using Raylib_CSharp;
+﻿using Plants;
+using Raylib_CSharp;
 using Raylib_CSharp.Colors;
+using Raylib_CSharp.Interact;
 using Raylib_CSharp.Rendering;
-using Raylib_CSharp.Windowing;
-using System;
+using System.Numerics;
 
 namespace Plants;
 
-internal class Rendering
+
+
+public class Background: GameElement
 {
-    private static WeatherSystem weatherSystem;
 
-    public static void Init()
+    public override void Update()
     {
-        Raylib.SetConfigFlags(ConfigFlags.Msaa4XHint);
-        Time.SetTargetFPS(60);
+        
 
-        while (true)
-        {
-            if (Window.ShouldClose())
-            {
-                Window.Close();
-            }
-
-            var elements = GameElement.GetList();
-            foreach (var item in elements)
-            {
-                item.Update();
-            }
-
-            elements.Sort((GameElement a, GameElement b)=> b.depth - a.depth);
-
-            Graphics.BeginDrawing();
-
-            if (Game.cambiaPhase)
-            {
-                Game.Phase = FaseGiorno.ChangeDayPhase();
-                Game.cambiaPhase = false;
-            }
-
-            DayPhase currentPhase = Game.Phase;
-            Weather currentWeather = MeteoManager.GetCurrentWeather();
-
-            DrawBackground(currentPhase, currentWeather);
-
-            if (Game.controller.offsetY <= 49) { 
-                Graphics.DrawRectangle(0, GameProperties.screenHeight - 70, GameProperties.screenWidth, GameProperties.screenHeight, Color.DarkGreen);
-            }
-
-            Game.weatherSystem.UpdateAndDrawWeather(currentWeather);
-
-            foreach (var item in elements)
-            {
-                item.Draw();
-            }
-
-            Graphics.EndDrawing();
-        }
     }
 
-    private static void DrawBackground(DayPhase phase, Weather weather)
+    public override void Draw()
     {
+        DayPhase phase = Game.Phase;
+        Weather weather = MeteoManager.GetCurrentWeather();
+
         Color baseColor;
 
         switch (phase)
@@ -109,7 +72,7 @@ internal class Rendering
         Graphics.ClearBackground(baseColor);
     }
 
-    private static Color DarkenColor(Color color, float factor)
+    private Color DarkenColor(Color color, float factor)
     {
         return new Color(
             (byte)(color.R * factor),

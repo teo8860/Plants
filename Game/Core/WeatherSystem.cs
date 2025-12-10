@@ -45,9 +45,9 @@ public class WeatherSystem : GameElement
         return null;
     }
 
-    public void UpdateAndDrawWeather(Weather weather)
+    public override void Draw()
     {
-        switch (weather)
+        switch (MeteoManager.GetCurrentWeather())
         {
             case Weather.Cloudy:
                 DrawClouds();
@@ -71,6 +71,8 @@ public class WeatherSystem : GameElement
                 break;
         }
     }
+
+
 
     private void UpdateRain(bool heavy)
     {

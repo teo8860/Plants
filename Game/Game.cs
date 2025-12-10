@@ -18,7 +18,9 @@ public static class Game
 
     public static GuiButton gui_annaffia;
     public static GuiButton gui_cambiameteo;
-
+    
+    public static Background background;
+    public static Ground ground;
     public static WeatherSystem weatherSystem;
 
     public static bool cambiaPhase = false;
@@ -33,6 +35,9 @@ public static class Game
     {
         AssetLoader.LoadAll();
 
+        background = GameElement.Create<Background>(100);
+        ground = GameElement.Create<Ground>(100);
+
         innaffiatoio = GameElement.Create<Water>(-100);
         innaffiatoio.Initialize(GameProperties.screenWidth, GameProperties.screenHeight);
 
@@ -43,6 +48,8 @@ public static class Game
         controller = new Controller();
 
         pianta = new Plant();
+
+       GameElement.Create<GuiScrollbar>(100);
 
         gui_idratazione = new GuiBar(
             x: GameProperties.screenWidth-30,
@@ -69,7 +76,7 @@ public static class Game
         );
 
         gui_annaffia = new GuiButton(
-            x: 10,
+            x: 40,
             y: 10,
             width: 100,
             height: 30,
@@ -78,7 +85,7 @@ public static class Game
         );
 
         gui_cambiameteo = new GuiButton(
-            x: 10,
+            x: 40,
             y: 50,
             width: 100,
             height: 30,
@@ -87,7 +94,7 @@ public static class Game
         );
 
         gui_cambiameteo = new GuiButton(
-            x: 10,
+            x: 40,
             y: 90,
             width: 100,
             height: 30,

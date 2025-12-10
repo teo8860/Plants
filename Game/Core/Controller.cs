@@ -1,6 +1,7 @@
 ﻿using Plants;
 using Raylib_CSharp;
 using Raylib_CSharp.Interact;
+using System;
 using System.Numerics;
 
 namespace Plants;
@@ -10,9 +11,16 @@ namespace Plants;
 public class Controller: GameElement
 {
     public float offsetY = 0;
+    public float scrollMultiply = 0;
 
     public override void Update()
     {
+        if (Game.cambiaPhase)
+        {
+            Game.Phase = FaseGiorno.ChangeDayPhase();
+            Game.cambiaPhase = false;
+        }
+
         Vector2 mouse = Input.GetMousePosition();
         
         if(Input.IsMouseButtonDown(MouseButton.Right))
@@ -31,21 +39,28 @@ public class Controller: GameElement
             //Game.pianta.Reset();
         }
 
+        if (Input.IsKeyPressed(KeyboardKey.Down) || Input.IsKeyPressed(KeyboardKey.Up))
+        {
+            scrollMultiply = 1;
+        }
+        
         if (Input.IsKeyDown(KeyboardKey.Down))
         {
-            Scorri(-50); 
+            scrollMultiply += 0.1f;
+            Scorri(-50*scrollMultiply); 
         }
         else if (Input.IsKeyDown(KeyboardKey.Up))
         {
-            Scorri(50);
+            scrollMultiply += 0.1f;
+            Scorri(50*scrollMultiply);
         }
     }
+
+
     public void Scorri(float delta)
     {
-        if (offsetY + delta >= 0)
-        {
-            offsetY = offsetY + delta;
-        }
+            offsetY = Math.Clamp(offsetY + delta, 0, 100000);
+        
     }
 
 }
