@@ -3,6 +3,7 @@ using Raylib_CSharp;
 using Raylib_CSharp.Interact;
 using System;
 using System.Numerics;
+using System.Xml.Linq;
 
 namespace Plants;
 
@@ -26,12 +27,15 @@ public class Controller: GameElement
         if(Input.IsMouseButtonDown(MouseButton.Right))
         {
            
-            Game.innaffiatoio.EmitParticle(mouse);
-
-            if (Game.pianta.Idratazione <= 1.0f && Game.pianta.attivo)
-                Game.SetIdratazione(0.05f);
-
-                //Game.pianta.Annaffia();
+            if (Game.pianta.attivo)
+            {
+                Game.innaffiatoio.EmitParticle(mouse);
+                if (Game.pianta.Idratazione <= 1.0f)
+                {
+                    Game.SetIdratazione(0.05f);
+                }
+            }
+            //Game.pianta.Annaffia();
         }
 
         if (Input.IsMouseButtonDown(MouseButton.Left))
