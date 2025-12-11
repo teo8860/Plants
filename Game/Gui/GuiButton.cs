@@ -22,6 +22,11 @@ public class GuiButton: GameElement
     private string text;
     private Sprite image;
     private Action  OnClick;
+    public Color HoverColor  = new Color(255, 220, 100, 255);
+    public Color PressedColor = new Color(200, 160, 50, 255);
+    private bool isHovered = false;
+    private bool isPressed = false;
+    private bool isActive = false;
 
     public GuiButton(int x, int y, int width, int height, string text,Action  OnClick)
     {
@@ -42,23 +47,39 @@ public class GuiButton: GameElement
 
     public override void Update()
     {
-        if (Input.IsMouseButtonPressed(MouseButton.Left))
+        int mx = Input.GetMouseX();
+        int my = Input.GetMouseY();
+
+        isHovered = mx >= container.X && mx <= container.X + container.Width && my >= container.Y && my <= container.Y + container.Height;
+
+        if (isHovered)
         {
-            if(Input.GetMouseX() > container.X && Input.GetMouseY() > container.Y && Input.GetMouseX() < container.X+container.Width && Input.GetMouseY() < container.Y+container.Height)
+            if (Input.IsMouseButtonPressed(MouseButton.Left))
             {
-                OnClick();
+                isPressed = true;
             }
+
+            if (Input.IsMouseButtonReleased(MouseButton.Left) && isPressed)
+            {
+                OnClick?.Invoke();
+                isPressed = false;
+                isActive = !isActive;
+            }
+        }
+        else
+        {
+            isPressed = false;
         }
     }
 
     public override void Draw()
     {
-
+        Color Color = isPressed ? PressedColor : (isHovered ? HoverColor : fillColor);
         Graphics.DrawRectangleRounded(
             new Rectangle(container.X, container.Y, container.Width, container.Height),
             0.2f,
             16,
-            fillColor
+            Color
         );
 
         Graphics.DrawRectangleRoundedLines(
@@ -75,10 +96,18 @@ public class GuiButton: GameElement
         }
 
         if (text != null && text != "")
-        {
+        {           
             Vector2 textSize = TextManager.MeasureTextEx(Font.GetDefault(), text, 14, 0);
             int xx = (int)(container.X + (container.Width /2) - (textSize.X/2));
             int yy = (int)(container.Y + (container.Height /2)- (textSize.Y/2));
+
+            Sprite spriteCheck = AssetLoader.spriteCheck;
+            Sprite spriteCross = AssetLoader.spriteCross;
+
+            if (isActive)
+                GameFunctions.DrawSprite(spriteCheck, new Vector2(xx - 5, yy),0f, new Vector2(1, 1));
+            else
+                GameFunctions.DrawSprite(spriteCross, new Vector2(xx - 5, yy), 0f, new Vector2(1, 1));
 
             Graphics.DrawText(text, xx, yy, 12, Color.Black);
         }

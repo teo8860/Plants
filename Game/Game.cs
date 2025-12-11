@@ -78,7 +78,7 @@ public static class Game
         gui_annaffia = new GuiButton(
             x: 40,
             y: 10,
-            width: 100,
+            width: 125,
             height: 30,
             text: "Annaffiatoio",
             OnClick: () => Game.pianta.attivo = !Game.pianta.attivo
@@ -87,7 +87,7 @@ public static class Game
         gui_cambiameteo = new GuiButton(
             x: 40,
             y: 50,
-            width: 100,
+            width: 125,
             height: 30,
             text: "Cambia fase",
             OnClick: () => cambiaPhase = true
@@ -96,7 +96,7 @@ public static class Game
         gui_cambiameteo = new GuiButton(
             x: 40,
             y: 90,
-            width: 100,
+            width: 125,
             height: 30,
             text: "Cambia meteo",
             OnClick: () => MeteoManager.ForceWeatherChange() //MeteoManager.SetWeather(Weather.Snowy)
