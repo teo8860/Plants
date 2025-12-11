@@ -81,7 +81,8 @@ public static class Game
             width: 125,
             height: 30,
             text: "Annaffiatoio",
-            OnClick: () => Game.pianta.attivo = !Game.pianta.attivo
+            OnClick: () => Game.pianta.attivo = !Game.pianta.attivo,
+            mark: true
         );
 
         gui_cambiameteo = new GuiButton(
@@ -90,7 +91,8 @@ public static class Game
             width: 125,
             height: 30,
             text: "Cambia fase",
-            OnClick: () => cambiaPhase = true
+            OnClick: () => cambiaPhase = true,
+            mark: false
         );
 
         gui_cambiameteo = new GuiButton(
@@ -99,7 +101,8 @@ public static class Game
             width: 125,
             height: 30,
             text: "Cambia meteo",
-            OnClick: () => MeteoManager.ForceWeatherChange() //MeteoManager.SetWeather(Weather.Snowy)
+            OnClick: () => MeteoManager.ForceWeatherChange(), //MeteoManager.SetWeather(Weather.Snowy)
+            mark: false
         );
 
         SetTimer();

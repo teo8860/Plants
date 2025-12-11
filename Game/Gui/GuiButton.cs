@@ -8,6 +8,7 @@ using Raylib_CSharp.Transformations;
 using System;
 using System.ComponentModel.Design;
 using System.Numerics;
+using System.Reflection;
 
 
 namespace Plants;
@@ -22,13 +23,14 @@ public class GuiButton: GameElement
     private string text;
     private Sprite image;
     private Action  OnClick;
+    private bool Mark = false;
     public Color HoverColor  = new Color(255, 220, 100, 255);
     public Color PressedColor = new Color(200, 160, 50, 255);
     private bool isHovered = false;
     private bool isPressed = false;
     private bool isActive = false;
 
-    public GuiButton(int x, int y, int width, int height, string text,Action  OnClick)
+    public GuiButton(int x, int y, int width, int height, string text, Action OnClick, bool mark)
     {
         container = new containerSize
         {
@@ -41,6 +43,7 @@ public class GuiButton: GameElement
         borderColor = Color.Black;
         this.text = text;
         this.OnClick = OnClick;
+        Mark = mark;
     }
 
  
@@ -103,12 +106,13 @@ public class GuiButton: GameElement
 
             Sprite spriteCheck = AssetLoader.spriteCheck;
             Sprite spriteCross = AssetLoader.spriteCross;
-
-            if (isActive)
-                GameFunctions.DrawSprite(spriteCheck, new Vector2(xx - 5, yy),0f, new Vector2(1, 1));
-            else
-                GameFunctions.DrawSprite(spriteCross, new Vector2(xx - 5, yy), 0f, new Vector2(1, 1));
-
+            if (Mark)
+            {
+                if (isActive)
+                    GameFunctions.DrawSprite(spriteCheck, new Vector2(xx - 6, yy + 11), 0f, new Vector2(0.6f, 0.6f));
+                else
+                    GameFunctions.DrawSprite(spriteCross, new Vector2(xx - 6, yy + 13), 0f, new Vector2(0.6f, 0.6f));
+            }
             Graphics.DrawText(text, xx, yy, 12, Color.Black);
         }
      }
