@@ -34,12 +34,12 @@ public class WeatherSystem : GameElement
         screenHeight = height;
     }
 
-    private Particle AddToBuffer(CircularBuffer buffer)
+    private ParticleData AddToBuffer(CircularBuffer buffer)
     {
-        if ((buffer.head + 1) % CircularBuffer.MAX_PARTICLES != buffer.tail)
+        if ((buffer.head + 1) % buffer.MAX_PARTICLES != buffer.tail)
         {
-            Particle particle = buffer.buffer[buffer.head];
-            buffer.head = (buffer.head + 1) % CircularBuffer.MAX_PARTICLES;
+            ParticleData particle = buffer.buffer[buffer.head];
+            buffer.head = (buffer.head + 1) % buffer.MAX_PARTICLES;
             return particle;
         }
         return null;
@@ -80,7 +80,7 @@ public class WeatherSystem : GameElement
 
         for (int I = 0; I < particlesToSpawn; I++)
         {
-            Particle newParticle = AddToBuffer(rainBuffer);
+            ParticleData newParticle = AddToBuffer(rainBuffer);
             if (newParticle != null)
             {
                 newParticle.position = new Vector2(random.Next(0, screenWidth), -10);
@@ -94,7 +94,7 @@ public class WeatherSystem : GameElement
         int i = rainBuffer.tail;
         while (i != rainBuffer.head)
         {
-            Particle p = rainBuffer.buffer[i];
+            ParticleData p = rainBuffer.buffer[i];
             if (p.alive)
             {
                 p.position += p.velocity;
@@ -104,12 +104,12 @@ public class WeatherSystem : GameElement
                     p.alive = false;
                 }
             }
-            i = (i + 1) % CircularBuffer.MAX_PARTICLES;
+            i = (i + 1) % rainBuffer.MAX_PARTICLES;
         }
 
         while (rainBuffer.tail != rainBuffer.head && !rainBuffer.buffer[rainBuffer.tail].alive)
         {
-            rainBuffer.tail = (rainBuffer.tail + 1) % CircularBuffer.MAX_PARTICLES;
+            rainBuffer.tail = (rainBuffer.tail + 1) % rainBuffer.MAX_PARTICLES;
         }
     }
 
@@ -118,7 +118,7 @@ public class WeatherSystem : GameElement
         int i = rainBuffer.tail;
         while (i != rainBuffer.head)
         {
-            Particle p = rainBuffer.buffer[i];
+            ParticleData p = rainBuffer.buffer[i];
             if (p.alive)
             {
                 Graphics.DrawLine(
@@ -129,7 +129,7 @@ public class WeatherSystem : GameElement
                     p.color
                 );
             }
-            i = (i + 1) % CircularBuffer.MAX_PARTICLES;
+            i = (i + 1) % rainBuffer.MAX_PARTICLES;
         }
     }
 
@@ -137,7 +137,7 @@ public class WeatherSystem : GameElement
     {
         for (int I = 0; I < 3; I++)
         {
-            Particle newParticle = AddToBuffer(snowBuffer);
+            ParticleData newParticle = AddToBuffer(snowBuffer);
             if (newParticle != null)
             {
                 newParticle.position = new Vector2(random.Next(0, screenWidth), -10);
@@ -152,7 +152,7 @@ public class WeatherSystem : GameElement
         int i = snowBuffer.tail;
         while (i != snowBuffer.head)
         {
-            Particle p = snowBuffer.buffer[i];
+            ParticleData p = snowBuffer.buffer[i];
             if (p.alive)
             {
                 p.lifetime += 0.016f;
@@ -164,12 +164,12 @@ public class WeatherSystem : GameElement
                     p.alive = false;
                 }
             }
-            i = (i + 1) % CircularBuffer.MAX_PARTICLES;
+            i = (i + 1) % snowBuffer.MAX_PARTICLES;
         }
 
         while (snowBuffer.tail != snowBuffer.head && !snowBuffer.buffer[snowBuffer.tail].alive)
         {
-            snowBuffer.tail = (snowBuffer.tail + 1) % CircularBuffer.MAX_PARTICLES;
+            snowBuffer.tail = (snowBuffer.tail + 1) % snowBuffer.MAX_PARTICLES;
         }
     }
 
@@ -178,12 +178,12 @@ public class WeatherSystem : GameElement
         int i = snowBuffer.tail;
         while (i != snowBuffer.head)
         {
-            Particle p = snowBuffer.buffer[i];
+            ParticleData p = snowBuffer.buffer[i];
             if (p.alive)
             {
                 Graphics.DrawCircleV(p.position, p.radius, p.color);
             }
-            i = (i + 1) % CircularBuffer.MAX_PARTICLES;
+            i = (i + 1) % snowBuffer.MAX_PARTICLES;
         }
     }
 

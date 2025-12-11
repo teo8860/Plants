@@ -111,19 +111,19 @@ public class Plant : GameElement
         puntiSpline.Add(new Vector2(Posizione.X, Posizione.Y));
 
         float terzoX = Math.Clamp(
-            puntiSpline[1].X + random.Next(-50, 50),
+            puntiSpline[1].X + random.Next(-15, 15),
             MargineMinimo,
             GameProperties.screenWidth - MargineMinimo
         );
-        float terzoY = puntiSpline[1].Y - random.Next(30, 70);
+        float terzoY = puntiSpline[1].Y - random.Next(30, 50);
         puntiSpline.Add(new Vector2(terzoX, terzoY));
     }
 
     private void GeneraPuntoCasuale()
     {
         Vector2 ultimoPunto = puntiSpline[^1];
-        float nuovoX = Math.Clamp(ultimoPunto.X + random.Next(-50, 50), MargineMinimo, GameProperties.screenWidth - MargineMinimo);
-        float nuovoY = ultimoPunto.Y - random.Next(30, 70);
+        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15,15), MargineMinimo, GameProperties.screenWidth - MargineMinimo);
+        float nuovoY = ultimoPunto.Y - Raylib.GetRandomValue(30, 50);
 
         puntiSpline.Add(new Vector2(nuovoX, nuovoY));
     }

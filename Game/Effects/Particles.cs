@@ -8,42 +8,47 @@ using System.Numerics;
 
 namespace Plants;
 
-public class Particle
+public class ParticleData
 {
     public Vector2 position;
     public Vector2 velocity;
-    public float radius;
+    public Vector2 gravity_min;
+    public Vector2 gravity_max;
+    public Sprite image;
     public Color color;
+    public float radius;
     public bool alive;
-    public float lifetime;
+    public float lifetime = -1;
 }
 
 public class CircularBuffer
 {
-    public const int MAX_PARTICLES = 3000;
+    public int MAX_PARTICLES = 3000;
     public int head;
     public int tail;
-    public Particle[] buffer = new Particle[MAX_PARTICLES];
+    public ParticleData[] buffer;
 
-    public CircularBuffer()
+    public CircularBuffer(int max_particle = 3000)
     {
-        for (int i = 0; i < MAX_PARTICLES; i++)
+        this.MAX_PARTICLES = max_particle;
+        this.buffer = new ParticleData[MAX_PARTICLES];
+
+        for (int i = 0; i < max_particle; i++)
         {
-            buffer[i] = new Particle();
+            buffer[i] = new ParticleData();
         }
     }
 }
 
-public class Water : GameElement
+
+public class Particle : GameElement
 {
     private readonly Random random = new Random();
     private CircularBuffer buffer;
     private int screenWidth;
     private int screenHeight;
+    public ParticleData defaultData;
 
-    public Water()
-    {
-    }
 
     public void Initialize(int width, int height)
     {
@@ -52,12 +57,12 @@ public class Water : GameElement
         buffer = new CircularBuffer();
     }
 
-    private Particle AddToCircularBuffer()
+    private ParticleData AddToCircularBuffer()
     {
-        if ((buffer.head + 1) % CircularBuffer.MAX_PARTICLES != buffer.tail)
+        if ((buffer.head + 1) % this.buffer.MAX_PARTICLES != buffer.tail)
         {
-            Particle particle = buffer.buffer[buffer.head];
-            buffer.head = (buffer.head + 1) % CircularBuffer.MAX_PARTICLES;
+            ParticleData particle = buffer.buffer[buffer.head];
+            buffer.head = (buffer.head + 1) % this.buffer.MAX_PARTICLES;
             return particle;
         }
         return null;
@@ -65,19 +70,18 @@ public class Water : GameElement
 
     public void EmitParticle(Vector2 emitterPosition)
     {
-        Particle newParticle = AddToCircularBuffer();
+        ParticleData newParticle = AddToCircularBuffer();
         if (newParticle != null)
         {
             newParticle.position = emitterPosition;
             newParticle.alive = true;
-            newParticle.radius = 5.0f;
-            newParticle.color = Color.Blue;
-            float speed = random.Next(8) / 5.0f;
-            float direction = random.Next(360);
-            newParticle.velocity = new Vector2(
-                speed * MathF.Cos(direction * RayMath.Deg2Rad),
-                speed * MathF.Sin(direction * RayMath.Deg2Rad)
-            );
+            
+            newParticle.lifetime = this.defaultData.lifetime;
+            newParticle.radius = this.defaultData.radius;
+            newParticle.color = this.defaultData.color;
+            newParticle.velocity = this.defaultData.velocity;
+            newParticle.gravity_min = this.defaultData.gravity_min;
+            newParticle.gravity_max = this.defaultData.gravity_max;
         }
     }
 
@@ -86,10 +90,24 @@ public class Water : GameElement
         int i = buffer.tail;
         while (i != buffer.head)
         {
-            Particle p = buffer.buffer[i];
+            ParticleData p = buffer.buffer[i];
+
+            if(p.lifetime > 0)
+                p.lifetime -= 1;
+
+            if(p.lifetime == 0)
+            {
+                p.lifetime = -1;
+                p.alive = false;
+                continue;
+            }
+
+            p.velocity.X += RandomUtils.RandomFloat(p.gravity_min.X, p.gravity_max.X);
+            p.velocity.Y += RandomUtils.RandomFloat(p.gravity_min.Y, p.gravity_max.Y);
+
             p.position.X += p.velocity.X;
-            p.velocity.Y += 0.2f;
             p.position.Y += p.velocity.Y;
+
             Vector2 center = p.position;
             float radius = p.radius;
             if (center.X < -radius || center.X > screenWidth + radius ||
@@ -97,11 +115,12 @@ public class Water : GameElement
             {
                 p.alive = false;
             }
-            i = (i + 1) % CircularBuffer.MAX_PARTICLES;
+            i = (i + 1) % this.buffer.MAX_PARTICLES;
         }
+
         while (buffer.tail != buffer.head && !buffer.buffer[buffer.tail].alive)
         {
-            buffer.tail = (buffer.tail + 1) % CircularBuffer.MAX_PARTICLES;
+            buffer.tail = (buffer.tail + 1) % this.buffer.MAX_PARTICLES;
         }
     }
 
@@ -110,12 +129,19 @@ public class Water : GameElement
         int i = buffer.tail;
         while (i != buffer.head)
         {
-            Particle p = buffer.buffer[i];
+            ParticleData p = buffer.buffer[i];
             if (p.alive)
             {
-                Graphics.DrawCircleV(p.position, p.radius, p.color);
+                if(p.image != null)
+                {
+                    GameFunctions.DrawSprite(p.image, p.position, 0, 1);
+                }
+                else
+                {
+                    Graphics.DrawCircleV(p.position, p.radius, p.color);
+                }
             }
-            i = (i + 1) % CircularBuffer.MAX_PARTICLES;
+            i = (i + 1) % this.buffer.MAX_PARTICLES;
         }
     }
 }
