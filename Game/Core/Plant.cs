@@ -35,7 +35,7 @@ public class Plant : GameElement
     {
         float centroX = 0.5f;
         float bassoY = 0.04f;
-        Posizione = new (GameProperties.screenWidth/2, GameProperties.screenHeight-GameProperties.groundPosition);
+        Posizione = new (GameProperties.windowWidth/2, GameProperties.windowHeight-GameProperties.groundPosition);
     }
 
     public void Crescita(float incremento)
@@ -58,7 +58,7 @@ public class Plant : GameElement
                 {
                     vaADestra = true;
                 }
-                else if (puntoAttacco.X > GameProperties.screenWidth - margineSicurezza)
+                else if (puntoAttacco.X > GameProperties.windowWidth - margineSicurezza)
                 {
                     vaADestra = false;
                 }
@@ -113,7 +113,7 @@ public class Plant : GameElement
         float terzoX = Math.Clamp(
             puntiSpline[1].X + random.Next(-15, 15),
             MargineMinimo,
-            GameProperties.screenWidth - MargineMinimo
+            GameProperties.windowWidth - MargineMinimo
         );
         float terzoY = puntiSpline[1].Y - random.Next(30, 50);
         puntiSpline.Add(new Vector2(terzoX, terzoY));
@@ -122,7 +122,7 @@ public class Plant : GameElement
     private void GeneraPuntoCasuale()
     {
         Vector2 ultimoPunto = puntiSpline[^1];
-        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15,15), MargineMinimo, GameProperties.screenWidth - MargineMinimo);
+        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15,15), MargineMinimo, GameProperties.windowWidth - MargineMinimo);
         float nuovoY = ultimoPunto.Y - Raylib.GetRandomValue(30, 50);
 
         puntiSpline.Add(new Vector2(nuovoX, nuovoY));

@@ -41,6 +41,7 @@ public class GuiBar: GameElement
         borderColor = Color.DarkGray;
         glass = Color.Beige;
         text = Active;
+        this.guiLayer = true;
     }
 
     public void SetValue(float value)

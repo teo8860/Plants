@@ -8,7 +8,7 @@ public class Water : Particle
     public Water()
     {
         this.defaultData = new();
-        this.defaultData.radius = 5.5f;
+        this.defaultData.radius = 8.5f;
         this.defaultData.color = Color.Blue;
         
         this.defaultData.gravity_min.X = -0.2f;

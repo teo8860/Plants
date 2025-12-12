@@ -44,6 +44,8 @@ public class GuiButton: GameElement
         this.text = text;
         this.OnClick = OnClick;
         Mark = mark;
+
+        this.guiLayer = true;
     }
 
  

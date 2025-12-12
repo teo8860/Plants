@@ -63,7 +63,7 @@ public class Ramo
     {
         if (punti.Count >= 2)
         {
-            float centroSchermoX = GameProperties.screenWidth / 2.0f;
+            float centroSchermoX = GameProperties.windowWidth / 2.0f;
 
             const float MargineSicurezza = 80.0f;
 

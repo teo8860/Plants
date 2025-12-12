@@ -39,7 +39,7 @@ public static class Game
         ground = GameElement.Create<Ground>(100);
 
         innaffiatoio = GameElement.Create<Water>(-100);
-        innaffiatoio.Initialize(GameProperties.screenWidth, GameProperties.screenHeight);
+        innaffiatoio.Initialize(GameProperties.windowWidth, GameProperties.windowHeight);
 
 
         weatherSystem = new WeatherSystem();
@@ -52,7 +52,7 @@ public static class Game
        GameElement.Create<GuiScrollbar>(100);
 
         gui_idratazione = new GuiBar(
-            x: GameProperties.screenWidth-30,
+            x: GameProperties.windowWidth-30,
             y: 5,
             width: 15,
             height: 90,
@@ -60,7 +60,7 @@ public static class Game
         );
 
         gui_temperatura = new GuiBar(
-            x: GameProperties.screenWidth-55,
+            x: GameProperties.windowWidth-55,
             y: 5,
             width: 15,
             height: 90,
@@ -68,7 +68,7 @@ public static class Game
         );
 
         gui_cibo = new GuiBar(
-            x: GameProperties.screenWidth-80,
+            x: GameProperties.windowWidth-80,
             y: 5,
             width: 15,
             height: 90,

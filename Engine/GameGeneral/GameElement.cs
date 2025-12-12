@@ -13,6 +13,7 @@ public class GameElement
     public static List<GameElement> elementList = new();
 
     public int depth = 0;
+    public bool guiLayer = false;
 
     public static List<GameElement> GetList()
     {
