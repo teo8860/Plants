@@ -31,6 +31,11 @@ public static class Game
 
     public static DayPhase Phase;
 
+    public static GuiStatsPanel statsPanel;
+    public static GuiButton gui_cambiaMondo;
+
+    public static OxygenSystem oxygenSystem;
+
     public static void Init()
     {
         AssetLoader.LoadAll();
@@ -104,6 +109,25 @@ public static class Game
             OnClick: () => MeteoManager.ForceWeatherChange(), //MeteoManager.SetWeather(Weather.Snowy)
             mark: false
         );
+
+        statsPanel = new GuiStatsPanel(GameProperties.windowWidth - 143, GameProperties.windowHeight - 145);
+
+        gui_cambiaMondo = new GuiButton(
+            x: 40,
+            y: 130,
+            width: 125,
+            height: 30,
+            text: "Cambia mondo",
+            OnClick: () =>
+            {
+                var mondo = pianta.MondoCorrente;
+                mondo = mondo == WorldType.Terra ? WorldType.Luna : WorldType.Terra;
+                pianta.MondoCorrente = mondo;
+            },
+            mark: false
+        );
+
+        oxygenSystem = new OxygenSystem();
 
         SetTimer();
 

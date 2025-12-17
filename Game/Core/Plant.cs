@@ -25,6 +25,11 @@ public class Plant : GameElement
     
     public bool attivo = false;
 
+    public WorldType MondoCorrente = WorldType.Terra;
+    Weather Weather = MeteoManager.GetCurrentWeather();
+    DayPhase Fase = Game.Phase;
+    public PlantStats Stats = new PlantStats();
+
     public Plant()
     {
         PosizionaAlCentroInBasso();
@@ -38,11 +43,23 @@ public class Plant : GameElement
         Posizione = new (GameProperties.windowWidth/2, GameProperties.windowHeight-GameProperties.groundPosition);
     }
 
+    public float GetCrescitaRate()
+    {
+        float base_rate = (Stats.Idratazione + Stats.Metabolismo + Stats.Ossigeno) / 3f;
+        float world_rate = base_rate * WorldModifiers.GetModifiers(MondoCorrente).GrowthRateMultiplier;
+
+        if (Stats.Salute < 0.5f)
+            world_rate *= Stats.Salute;
+
+        return Math.Max(0, world_rate);
+    }
+
     public void Crescita(float incremento)
     {
-        if (incremento > 0)
+        float crescitaEffettiva = incremento * GetCrescitaRate();
+        if (crescitaEffettiva > 0.01f)
         {
-            Altezza += incremento;
+            Altezza += crescitaEffettiva;
             GeneraPuntoCasuale();
 
             contatorePuntiPerRamo++;
@@ -126,6 +143,53 @@ public class Plant : GameElement
         float nuovoY = ultimoPunto.Y - Raylib.GetRandomValue(30, 50);
 
         puntiSpline.Add(new Vector2(nuovoX, nuovoY));
+    }
+
+    public override void Update()
+    {
+       
+        float consumoAcqua = 0.002f * WorldModifiers.GetModifiers(MondoCorrente).WaterConsumption;
+
+        if (Weather == Weather.Rainy && WorldModifiers.GetModifiers(MondoCorrente).IsMeteoOn == true)
+        {
+            Idratazione = Math.Min(1.0f, Idratazione + 0.005f);
+        }
+        else
+        {
+            Idratazione = Math.Max(0, Idratazione - consumoAcqua);
+        }
+
+        float energiaGuadagnata = 0f;
+
+        if (Fase == DayPhase.Morning || Fase == DayPhase.Afternoon)
+        {
+            energiaGuadagnata = 0.003f * WorldModifiers.GetModifiers(MondoCorrente).SolarMultiplier;
+
+            if (Weather == Weather.Foggy && WorldModifiers.GetModifiers(MondoCorrente).IsMeteoOn == true)
+                energiaGuadagnata *= 0.3f;
+        }
+        else if (Fase == DayPhase.Dawn || Fase == DayPhase.Dusk)
+        {
+            energiaGuadagnata = 0.001f * WorldModifiers.GetModifiers(MondoCorrente).SolarMultiplier;
+        }
+
+        else
+        {
+            energiaGuadagnata = -0.001f;
+        }
+
+        Stats.Metabolismo = Math.Clamp(Stats.Metabolismo + energiaGuadagnata, 0f, 1f);
+
+        if (WorldModifiers.GetModifiers(MondoCorrente).OxygenLevel < 0.5f)
+        {
+
+            Stats.Ossigeno = Math.Max(0, Stats.Ossigeno - 0.001f);
+        }
+        else
+        {
+            Stats.Ossigeno = 1.0f;
+        }
+
     }
 
     public override void Draw()

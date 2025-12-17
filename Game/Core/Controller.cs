@@ -66,5 +66,4 @@ public class Controller: GameElement
             offsetY = Math.Clamp(offsetY + delta, 0, 100000);
         
     }
-
 }
