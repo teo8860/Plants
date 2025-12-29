@@ -14,6 +14,10 @@ public class Controller: GameElement
     public float offsetY = 0;
     public float scrollMultiply = 0;
 
+    
+    
+    public bool annaffiatoioAttivo = false;
+
     public override void Update()
     {
         if (Game.cambiaPhase)
@@ -27,10 +31,10 @@ public class Controller: GameElement
         if(Input.IsMouseButtonDown(MouseButton.Right))
         {
            
-            if (Game.pianta.attivo)
+            if (annaffiatoioAttivo)
             {
                 Game.innaffiatoio.EmitParticle(mouse);
-                if (Game.pianta.Idratazione <= 1.0f)
+                if (Game.pianta.idratazione <= 1.0f)
                 {
                     Game.SetIdratazione(0.05f);
                 }

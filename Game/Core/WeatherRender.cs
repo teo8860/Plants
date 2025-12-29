@@ -6,9 +6,8 @@ using System.Numerics;
 
 namespace Plants;
 
-public class WeatherSystem : GameElement
+public class WeatherRender : GameElement
 {
-    private readonly Random random = new Random();
     private CircularBuffer rainBuffer;
     private CircularBuffer snowBuffer;
     private int screenWidth;
@@ -17,14 +16,14 @@ public class WeatherSystem : GameElement
     private bool showLightning = false;
     private float[] cloudOffsets = new float[3];
 
-    public WeatherSystem()
+    public WeatherRender()
     {
         rainBuffer = new CircularBuffer();
         snowBuffer = new CircularBuffer();
 
         for (int i = 0; i < cloudOffsets.Length; i++)
         {
-            cloudOffsets[i] = random.Next(0, 300);
+            cloudOffsets[i] = RandomHelper.Int(0, 300);
         }
     }
 
@@ -47,7 +46,7 @@ public class WeatherSystem : GameElement
 
     public override void Draw()
     {
-        switch (MeteoManager.GetCurrentWeather())
+        switch (WeatherManager.GetCurrentWeather())
         {
             case Weather.Cloudy:
                 DrawClouds();
@@ -83,7 +82,7 @@ public class WeatherSystem : GameElement
             ParticleData newParticle = AddToBuffer(rainBuffer);
             if (newParticle != null)
             {
-                newParticle.position = new Vector2(random.Next(0, screenWidth), -10);
+                newParticle.position = new Vector2(RandomHelper.Int(0, screenWidth), -10);
                 newParticle.alive = true;
                 newParticle.radius = 2.0f;
                 newParticle.color = new Color(173, 216, 230, heavy ? (byte)180 : (byte)120);
@@ -140,11 +139,11 @@ public class WeatherSystem : GameElement
             ParticleData newParticle = AddToBuffer(snowBuffer);
             if (newParticle != null)
             {
-                newParticle.position = new Vector2(random.Next(0, screenWidth), -10);
+                newParticle.position = new Vector2(RandomHelper.Int(0, screenWidth), -10);
                 newParticle.alive = true;
                 newParticle.radius = 3.0f;
                 newParticle.color = new Color(255, 255, 255, 200);
-                newParticle.velocity = new Vector2(0, 1 + random.Next(2));
+                newParticle.velocity = new Vector2(0, 1 + RandomHelper.Int(2));
                 newParticle.lifetime = 0;
             }
         }
@@ -191,7 +190,7 @@ public class WeatherSystem : GameElement
     {
         lightningTimer += Time.GetFrameTime();
 
-        if (lightningTimer > 3f && random.Next(100) < 2)
+        if (lightningTimer > 3f && RandomHelper.Int(100) < 2)
         {
             showLightning = true;
             lightningTimer = 0f;
@@ -215,8 +214,8 @@ public class WeatherSystem : GameElement
             else
             {
                 Graphics.DrawLineEx(
-                    new Vector2(random.Next(0, screenWidth), 0),
-                    new Vector2(random.Next(0, screenWidth), screenHeight),
+                    new Vector2(RandomHelper.Int(0, screenWidth), 0),
+                    new Vector2(RandomHelper.Int(0, screenWidth), screenHeight),
                     2.0f,
                     Color.Gold
                 );

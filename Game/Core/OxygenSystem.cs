@@ -9,9 +9,15 @@ public class OxygenSystem : GameElement
 {
     private float oxygenTankLevel = 1.0f;
 
+    public OxygenSystem()
+    {
+        this.guiLayer = true;
+    }
+
+
     public override void Update()
     {
-        if (Game.pianta.MondoCorrente == WorldType.Luna)
+        if (WorldManager.GetCurrentWorld() == WorldType.Luna)
         {
             if (Input.IsKeyDown(KeyboardKey.O) && oxygenTankLevel > 0)
             {
@@ -24,7 +30,7 @@ public class OxygenSystem : GameElement
 
     public override void Draw()
     {
-        if (Game.pianta.MondoCorrente == WorldType.Luna)
+        if (WorldManager.GetCurrentWorld() == WorldType.Luna)
         {
             Graphics.DrawText($"Tank O2: {oxygenTankLevel:P0}", 10, 200, 12, Color.SkyBlue);
             Graphics.DrawText("[O] Fornisci ossigeno", 10, 215, 10, Color.Gray);

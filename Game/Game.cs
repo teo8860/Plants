@@ -21,7 +21,7 @@ public static class Game
     
     public static Background background;
     public static Ground ground;
-    public static WeatherSystem weatherSystem;
+    public static WeatherRender weatherSystem;
 
     public static bool cambiaPhase = false;
 
@@ -47,7 +47,7 @@ public static class Game
         innaffiatoio.Initialize(GameProperties.windowWidth, GameProperties.windowHeight);
 
 
-        weatherSystem = new WeatherSystem();
+        weatherSystem = new WeatherRender();
         weatherSystem.Initialize(Window.GetScreenWidth(), Window.GetScreenHeight());
 
         controller = new Controller();
@@ -86,7 +86,7 @@ public static class Game
             width: 125,
             height: 30,
             text: "Annaffiatoio",
-            OnClick: () => Game.pianta.attivo = !Game.pianta.attivo,
+            OnClick: () => Game.controller.annaffiatoioAttivo = !Game.controller.annaffiatoioAttivo,
             mark: true
         );
 
@@ -106,7 +106,7 @@ public static class Game
             width: 125,
             height: 30,
             text: "Cambia meteo",
-            OnClick: () => MeteoManager.ForceWeatherChange(), //MeteoManager.SetWeather(Weather.Snowy)
+            OnClick: () => WeatherManager.ForceWeatherChange(), //MeteoManager.SetWeather(Weather.Snowy)
             mark: false
         );
 
@@ -120,9 +120,9 @@ public static class Game
             text: "Cambia mondo",
             OnClick: () =>
             {
-                var mondo = pianta.MondoCorrente;
+                var mondo = WorldManager.GetCurrentWorld();
                 mondo = mondo == WorldType.Terra ? WorldType.Luna : WorldType.Terra;
-                pianta.MondoCorrente = mondo;
+                WorldManager.SetCurrentWorld(mondo);
             },
             mark: false
         );
@@ -137,14 +137,14 @@ public static class Game
 
     public static void RestartIdratazione()
     {
-        Game.pianta.Idratazione = 0;
+        Game.pianta.idratazione = 0;
         Game.gui_idratazione.SetValue(0);
     }
 
     public static void SetIdratazione(float value)
     {
-        Game.pianta.Idratazione += value;
-        Game.gui_idratazione.SetValue(RayMath.Clamp( Game.pianta.Idratazione, 0.0f, 1.0f));
+        Game.pianta.idratazione += value;
+        Game.gui_idratazione.SetValue(RayMath.Clamp( Game.pianta.idratazione, 0.0f, 1.0f));
     }
     public static void SetTimer()
     {
@@ -156,7 +156,7 @@ public static class Game
 
     private static void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
-        if (Game.pianta.Idratazione > 0.0f)
+        if (Game.pianta.idratazione > 0.0f)
         { 
             Game.SetIdratazione(-0.025f);
             Game.pianta.Annaffia();

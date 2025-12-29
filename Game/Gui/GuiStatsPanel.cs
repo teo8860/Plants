@@ -28,7 +28,7 @@ public class GuiStatsPanel : GameElement
             0.2f, 16, bg
         );
 
-        Graphics.DrawText($"[{Game.pianta.MondoCorrente}]", x, y, 12, Color.Gold);
+        Graphics.DrawText($"[{WorldManager.GetCurrentWorld()}]", x, y, 12, Color.Gold);
 
         if (!expanded) return;
 

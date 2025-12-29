@@ -102,8 +102,8 @@ public class Particle : GameElement
                 continue;
             }
 
-            p.velocity.X += RandomUtils.RandomFloat(p.gravity_min.X, p.gravity_max.X);
-            p.velocity.Y += RandomUtils.RandomFloat(p.gravity_min.Y, p.gravity_max.Y);
+            p.velocity.X += RandomHelper.Float(p.gravity_min.X, p.gravity_max.X);
+            p.velocity.Y += RandomHelper.Float(p.gravity_min.Y, p.gravity_max.Y);
 
             p.position.X += p.velocity.X;
             p.position.Y += p.velocity.Y;
@@ -133,13 +133,9 @@ public class Particle : GameElement
             if (p.alive)
             {
                 if(p.image != null)
-                {
                     GameFunctions.DrawSprite(p.image, p.position, 0, 1);
-                }
                 else
-                {
                     Graphics.DrawCircleV(p.position, p.radius, p.color);
-                }
             }
             i = (i + 1) % this.buffer.MAX_PARTICLES;
         }

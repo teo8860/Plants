@@ -21,7 +21,7 @@ public class Background: GameElement
     public override void Draw()
     {
         DayPhase phase = Game.Phase;
-        Weather weather = MeteoManager.GetCurrentWeather();
+        Weather weather = WeatherManager.GetCurrentWeather();
 
         Color baseColor;
 

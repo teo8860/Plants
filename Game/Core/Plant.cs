@@ -11,42 +11,42 @@ namespace Plants;
 
 public class Plant : GameElement
 {
-    public float Idratazione = 0;
-    public float Altezza = 1.0f;
-    public Vector2 Posizione = new(0,0);
+
+    public float idratazione = 0;
+    public Vector2 posizione = new(0,0);
 
     private List<Vector2> puntiSpline = new(); 
-    private Random random = new();
-    private const int MargineMinimo = 40;
+    private const int margineMinimo = 40;
 
     private List<Ramo> rami = new(); 
     private int contatorePuntiPerRamo = 0; 
-    private bool textureCaricata = false;
-    
-    public bool attivo = false;
 
-    public WorldType MondoCorrente = WorldType.Terra;
-    Weather Weather = MeteoManager.GetCurrentWeather();
     DayPhase Fase = Game.Phase;
+
     public PlantStats Stats = new PlantStats();
 
     public Plant()
     {
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
+
+        for(int a = 0; a <100; a++)
+        {
+            Crescita();
+        }
     }
 
     public void PosizionaAlCentroInBasso()
     {
         float centroX = 0.5f;
         float bassoY = 0.04f;
-        Posizione = new (GameProperties.windowWidth/2, GameProperties.windowHeight-GameProperties.groundPosition);
+        posizione = new (GameProperties.windowWidth/2, GameProperties.windowHeight-GameProperties.groundPosition);
     }
 
     public float GetCrescitaRate()
     {
         float base_rate = (Stats.Idratazione + Stats.Metabolismo + Stats.Ossigeno) / 3f;
-        float world_rate = base_rate * WorldModifiers.GetModifiers(MondoCorrente).GrowthRateMultiplier;
+        float world_rate = base_rate * WorldManager.GetCurrentModifiers().GrowthRateMultiplier;
 
         if (Stats.Salute < 0.5f)
             world_rate *= Stats.Salute;
@@ -54,65 +54,68 @@ public class Plant : GameElement
         return Math.Max(0, world_rate);
     }
 
-    public void Crescita(float incremento)
+    public void Crescita()
     {
-        float crescitaEffettiva = incremento * GetCrescitaRate();
-        if (crescitaEffettiva > 0.01f)
+        GeneraPuntoCasuale();
+
+        contatorePuntiPerRamo++;
+        if (contatorePuntiPerRamo == 5)
         {
-            Altezza += crescitaEffettiva;
-            GeneraPuntoCasuale();
+            Vector2 puntoAttacco = puntiSpline[^2];
 
-            contatorePuntiPerRamo++;
-            if (contatorePuntiPerRamo == 5)
+            Direzione direction;
+
+            float margineSicurezza = 100f;
+
+            if (puntoAttacco.X < margineSicurezza)
             {
-                Vector2 puntoAttacco = puntiSpline[^2];
-
-                bool vaADestra;
-
-                float margineSicurezza = 100f;
-
-                if (puntoAttacco.X < margineSicurezza)
-                {
-                    vaADestra = true;
-                }
-                else if (puntoAttacco.X > GameProperties.windowWidth - margineSicurezza)
-                {
-                    vaADestra = false;
-                }
+                direction = Direzione.Destra;
+            }
+            else if (puntoAttacco.X > GameProperties.windowWidth - margineSicurezza)
+            {
+                direction = Direzione.Sinistra;
+            }
+            else
+            {
+                if(RandomHelper.Int(0, 2) == 0)
+                    direction = Direzione.Sinistra;
                 else
-                {
-                    vaADestra = random.Next(0, 2) == 0;
-                }
+                    direction = Direzione.Destra;
 
-                rami.Add(new Ramo(puntoAttacco, vaADestra, random, true));
-
-                contatorePuntiPerRamo = 0;
             }
 
-            foreach (var ramo in rami)
-            {
-                ramo.Cresci();
-            }
+            rami.Add(new Ramo(puntoAttacco, direction));
 
-            Vector2 ultimoPunto = puntiSpline[^1];
-            if (ultimoPunto.Y + Game.controller.offsetY <= 100)
-            {
-                Game.controller.offsetY += 50;
-            }
-
+            contatorePuntiPerRamo = 0;
         }
+
+        foreach (var ramo in rami)
+        {
+            ramo.Cresci();
+        }
+
+        Vector2 ultimoPunto = puntiSpline[^1];
+        if (ultimoPunto.Y + Game.controller.offsetY <= 100)
+        {
+            Game.controller.offsetY += 50;
+        }
+        
     }
 
     public void Annaffia()
     {
-        float incrementoCasuale = (float)random.NextDouble() * 0.5f + 0.1f; 
-        Crescita(incrementoCasuale);
+        float incrementoCasuale = RandomHelper.Float(0,1) * 0.5f + 0.1f; 
+
+        float crescitaEffettiva = incrementoCasuale * GetCrescitaRate();
+        if (crescitaEffettiva > 0.01f)
+        {
+            Crescita();
+        }
     }
 
     public void Reset()
     {
-        Idratazione = 0;
-        Altezza = 1.0f;
+        idratazione = 0;
         Game.controller.offsetY = 0;
         puntiSpline.Clear();
         rami.Clear();
@@ -123,23 +126,23 @@ public class Plant : GameElement
     {
         puntiSpline.Clear();
 
-        puntiSpline.Add(new Vector2(Posizione.X, Posizione.Y));
+        puntiSpline.Add(new Vector2(posizione.X, posizione.Y));
 
-        puntiSpline.Add(new Vector2(Posizione.X, Posizione.Y));
+        puntiSpline.Add(new Vector2(posizione.X, posizione.Y));
 
         float terzoX = Math.Clamp(
-            puntiSpline[1].X + random.Next(-15, 15),
-            MargineMinimo,
-            GameProperties.windowWidth - MargineMinimo
+            puntiSpline[1].X + RandomHelper.Int(-15, 15),
+            margineMinimo,
+            GameProperties.windowWidth - margineMinimo
         );
-        float terzoY = puntiSpline[1].Y - random.Next(30, 50);
+        float terzoY = puntiSpline[1].Y - RandomHelper.Int(30, 50);
         puntiSpline.Add(new Vector2(terzoX, terzoY));
     }
 
     private void GeneraPuntoCasuale()
     {
         Vector2 ultimoPunto = puntiSpline[^1];
-        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15,15), MargineMinimo, GameProperties.windowWidth - MargineMinimo);
+        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15,15), margineMinimo, GameProperties.windowWidth - margineMinimo);
         float nuovoY = ultimoPunto.Y - Raylib.GetRandomValue(30, 50);
 
         puntiSpline.Add(new Vector2(nuovoX, nuovoY));
@@ -147,30 +150,32 @@ public class Plant : GameElement
 
     public override void Update()
     {
-       
-        float consumoAcqua = 0.002f * WorldModifiers.GetModifiers(MondoCorrente).WaterConsumption;
+        Weather currentWeather = WeatherManager.GetCurrentWeather();
+        WorldModifier currentWorldModifier = WorldManager.GetCurrentModifiers();
 
-        if (Weather == Weather.Rainy && WorldModifiers.GetModifiers(MondoCorrente).IsMeteoOn == true)
+        float consumoAcqua = 0.002f * currentWorldModifier.WaterConsumption;
+
+        if (currentWeather == Weather.Rainy && currentWorldModifier.IsMeteoOn == true)
         {
-            Idratazione = Math.Min(1.0f, Idratazione + 0.005f);
+            idratazione = Math.Min(1.0f, idratazione + 0.005f);
         }
         else
         {
-            Idratazione = Math.Max(0, Idratazione - consumoAcqua);
+            idratazione = Math.Max(0, idratazione - consumoAcqua);
         }
 
         float energiaGuadagnata = 0f;
 
         if (Fase == DayPhase.Morning || Fase == DayPhase.Afternoon)
         {
-            energiaGuadagnata = 0.003f * WorldModifiers.GetModifiers(MondoCorrente).SolarMultiplier;
+            energiaGuadagnata = 0.003f * currentWorldModifier.SolarMultiplier;
 
-            if (Weather == Weather.Foggy && WorldModifiers.GetModifiers(MondoCorrente).IsMeteoOn == true)
+            if (currentWeather == Weather.Foggy && currentWorldModifier.IsMeteoOn == true)
                 energiaGuadagnata *= 0.3f;
         }
         else if (Fase == DayPhase.Dawn || Fase == DayPhase.Dusk)
         {
-            energiaGuadagnata = 0.001f * WorldModifiers.GetModifiers(MondoCorrente).SolarMultiplier;
+            energiaGuadagnata = 0.001f * currentWorldModifier.SolarMultiplier;
         }
 
         else
@@ -180,7 +185,7 @@ public class Plant : GameElement
 
         Stats.Metabolismo = Math.Clamp(Stats.Metabolismo + energiaGuadagnata, 0f, 1f);
 
-        if (WorldModifiers.GetModifiers(MondoCorrente).OxygenLevel < 0.5f)
+        if (currentWorldModifier.OxygenLevel < 0.5f)
         {
 
             Stats.Ossigeno = Math.Max(0, Stats.Ossigeno - 0.001f);
@@ -213,6 +218,10 @@ public class Plant : GameElement
                 if(i+4 <= puntiConOffset.Length)
                 {
                     Span<Vector2> segmento = puntiConOffset.Slice(i, 4);
+                    for(int o=0; o<segmento.Length; o++)
+                    {
+                        segmento[o].X += (float)Math.Sin(Time.GetTime());
+                    }
                     Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
                 }
             }
@@ -225,6 +234,6 @@ public class Plant : GameElement
             ramo.Draw(Game.controller.offsetY);
         }
 
-        Graphics.DrawEllipse((int)Posizione.X, (int)((int)Posizione.Y+10+ Game.controller.offsetY), 15, 25, Color.DarkBrown);
+        Graphics.DrawEllipse((int)posizione.X, (int)((int)posizione.Y+10+ Game.controller.offsetY), 15, 25, Color.DarkBrown);
     }
 }

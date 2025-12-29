@@ -13,7 +13,7 @@ namespace Plants;
 
 internal class Rendering
 {
-    private static WeatherSystem weatherSystem;
+    private static WeatherRender weatherSystem;
     
     static RenderTexture2D windowView = RenderTexture2D.Load(GameProperties.windowWidth, GameProperties.windowHeight);
     static RenderTexture2D screenView = RenderTexture2D.Load(GameProperties.viewWidth, GameProperties.viewHeight);
