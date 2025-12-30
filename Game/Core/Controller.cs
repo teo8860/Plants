@@ -35,6 +35,8 @@ public class Controller: GameElement
             if (annaffiatoioAttivo)
             {
                 Game.innaffiatoio.EmitParticle(mouse);
+                Game.pianta.proprieta.Annaffia(0.01f);
+                
             }
         }
         if (!Input.IsMouseButtonDown(MouseButton.Right))

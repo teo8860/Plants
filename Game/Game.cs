@@ -32,6 +32,7 @@ public static class Game
 
     public static OxygenSystem oxygenSystem;
 
+
     public static void Init()
     {
         AssetLoader.LoadAll();

@@ -8,6 +8,8 @@ namespace Plants
 {
     public class GameLogicPianta
     {
+        public int contatoreSecondi = 0;
+
         public const float CONSUMO_ACQUA_BASE = 0.002f;
         public const float CONSUMO_OSSIGENO_BASE = 0.001f;
         public const float RIGENERAZIONE_SALUTE_BASE = 0.001f;
@@ -66,11 +68,8 @@ namespace Plants
         public bool AggiornaIdratazione(WorldModifier worldMod, Weather meteo)
         {
             float consumo = CalcolaConsumoAcqua(worldMod);
-            if (Game.controller.annaffiatoioAttivo == true && Game.controller.isButtonRightPressed == true)
-            {
-                Annaffia(0.01f);
-            }
-            else if (worldMod.IsMeteoOn && meteo == Weather.Rainy)
+
+            if (worldMod.IsMeteoOn && meteo == Weather.Rainy)
             {
                 stats.Idratazione = Math.Min(1.0f, stats.Idratazione + 0.005f);
             }
@@ -81,9 +80,14 @@ namespace Plants
             Game.pianta.ControlloCrescita();
             if (IsDisidratata)
             {
-                float danno = (SOGLIA_DISIDRATAZIONE - stats.Idratazione) * 0.01f;
-                ApplicaDanno(danno, "disidratazione");
-                return true;
+                contatoreSecondi++;
+                if (contatoreSecondi == 5)
+                {
+                    float danno = (SOGLIA_DISIDRATAZIONE - stats.Idratazione) * 0.01f;
+                    ApplicaDanno(danno, "disidratazione");
+                    contatoreSecondi = 0;
+                    return true;
+                }
             }
 
             return false;

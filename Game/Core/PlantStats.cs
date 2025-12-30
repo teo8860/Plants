@@ -167,7 +167,7 @@ public class PlantStats
 {
 
     public float Salute = 1.0f;
-    public float Idratazione = 1.0f;
+    public float Idratazione = 0.0f;
     public float Ossigeno = 1.0f;
     public float Metabolismo = 1.0f;
 
