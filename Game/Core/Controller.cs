@@ -14,8 +14,6 @@ public class Controller: GameElement
     public float offsetY = 0;
     public float scrollMultiply = 0;
 
-    public GameLogicPianta logicPianta;
-
     public bool annaffiatoioAttivo = false;
     public bool isButtonRightPressed = false;
 

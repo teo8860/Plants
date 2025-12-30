@@ -21,7 +21,9 @@ internal class Rendering
     static Camera2D worldSpaceCamera = new();  // Game world camera
     static Camera2D screenSpaceCamera = new(); // Smoothing camera
 
-    
+    double previousTime = Time.GetTime();    // Previous time measure
+    double currentTime = 0.0;  
+    float deltaTime = 0.0f; 
 
     public static void Init()
     {
@@ -117,6 +119,8 @@ internal class Rendering
 
             Graphics.EndMode2D();
             Graphics.EndDrawing();
+         
+            //Console.WriteLine(1.0f / Time.GetFrameTime());
         }
     }
 
