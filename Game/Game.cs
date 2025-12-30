@@ -12,10 +12,6 @@ public static class Game
     public static Water innaffiatoio;
     public static Plant pianta;
 
-    public static GuiBar gui_idratazione;
-    public static GuiBar gui_temperatura;
-    public static GuiBar gui_cibo;
-
     public static GuiButton gui_annaffia;
     public static GuiButton gui_cambiameteo;
     
@@ -56,29 +52,7 @@ public static class Game
 
        GameElement.Create<GuiScrollbar>(100);
 
-        gui_idratazione = new GuiBar(
-            x: GameProperties.windowWidth-30,
-            y: 5,
-            width: 15,
-            height: 90,
-            Active: true
-        );
 
-        gui_temperatura = new GuiBar(
-            x: GameProperties.windowWidth-55,
-            y: 5,
-            width: 15,
-            height: 90,
-            Active: false
-        );
-
-        gui_cibo = new GuiBar(
-            x: GameProperties.windowWidth-80,
-            y: 5,
-            width: 15,
-            height: 90,
-            Active: true
-        );
 
         gui_annaffia = new GuiButton(
             x: 40,
@@ -110,7 +84,7 @@ public static class Game
             mark: false
         );
 
-        statsPanel = new GuiStatsPanel(GameProperties.windowWidth - 143, GameProperties.windowHeight - 145);
+        statsPanel = new GuiStatsPanel(GameProperties.windowWidth - 143, GameProperties.windowHeight - 487);
 
         gui_cambiaMondo = new GuiButton(
             x: 40,
@@ -135,20 +109,9 @@ public static class Game
         Phase = FaseGiorno.GetCurrentPhase();
     }
 
-    public static void RestartIdratazione()
-    {
-        Game.pianta.idratazione = 0;
-        Game.gui_idratazione.SetValue(0);
-    }
-
-    public static void SetIdratazione(float value)
-    {
-        Game.pianta.idratazione += value;
-        Game.gui_idratazione.SetValue(RayMath.Clamp( Game.pianta.idratazione, 0.0f, 1.0f));
-    }
     public static void SetTimer()
     {
-        Timer = new Timer(5000); 
+        Timer = new Timer(1000); 
         Timer.Elapsed += OnTimedEvent;
         Timer.AutoReset = true;
         Timer.Enabled = true;
@@ -156,11 +119,8 @@ public static class Game
 
     private static void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
-        if (Game.pianta.idratazione > 0.0f)
-        { 
-            Game.SetIdratazione(-0.025f);
-            Game.pianta.Annaffia();
-        }
+        Game.pianta.proprieta.AggiornaTutto(Game.Phase, WeatherManager.GetCurrentWeather(),
+           WorldManager.GetCurrentModifiers()); // da impostare la temperatura come parametro per ora fissa
     }
 
     public static void SetTimerFase()

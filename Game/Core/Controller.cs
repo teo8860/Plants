@@ -14,9 +14,10 @@ public class Controller: GameElement
     public float offsetY = 0;
     public float scrollMultiply = 0;
 
-    
-    
+    public GameLogicPianta logicPianta;
+
     public bool annaffiatoioAttivo = false;
+    public bool isButtonRightPressed = false;
 
     public override void Update()
     {
@@ -30,16 +31,15 @@ public class Controller: GameElement
         
         if(Input.IsMouseButtonDown(MouseButton.Right))
         {
-           
+            isButtonRightPressed = true;
             if (annaffiatoioAttivo)
             {
                 Game.innaffiatoio.EmitParticle(mouse);
-                if (Game.pianta.idratazione <= 1.0f)
-                {
-                    Game.SetIdratazione(0.05f);
-                }
             }
-            //Game.pianta.Annaffia();
+        }
+        if (!Input.IsMouseButtonDown(MouseButton.Right))
+        {
+            isButtonRightPressed = false;
         }
 
         if (Input.IsMouseButtonDown(MouseButton.Left))

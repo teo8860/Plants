@@ -12,7 +12,6 @@ namespace Plants;
 public class Plant : GameElement
 {
 
-    public float idratazione = 0;
     public Vector2 posizione = new(0,0);
 
     private List<Vector2> puntiSpline = new(); 
@@ -23,35 +22,44 @@ public class Plant : GameElement
 
     DayPhase Fase = Game.Phase;
 
+    public SeedType TipoSeme = SeedType.Normale;
+    public SeedBonus seedBonus = SeedBonus.Default;
+
     public PlantStats Stats = new PlantStats();
+
+    public GameLogicPianta proprieta;
 
     public Plant()
     {
+        proprieta = new GameLogicPianta();
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
-        for(int a = 0; a <100; a++)
+       /* for(int a = 0; a <100; a++)
         {
             Crescita();
         }
+       */
+        SetSeed(SeedType.Normale);
     }
+
+    public Plant(SeedType seedType)
+    {
+        SetSeed(seedType);
+    }
+
+    public void SetSeed(SeedType seedType)
+    {
+        TipoSeme = seedType;
+        seedBonus = SeedDataType.GetBonus(seedType);
+    }
+
 
     public void PosizionaAlCentroInBasso()
     {
         float centroX = 0.5f;
         float bassoY = 0.04f;
         posizione = new (GameProperties.windowWidth/2, GameProperties.windowHeight-GameProperties.groundPosition);
-    }
-
-    public float GetCrescitaRate()
-    {
-        float base_rate = (Stats.Idratazione + Stats.Metabolismo + Stats.Ossigeno) / 3f;
-        float world_rate = base_rate * WorldManager.GetCurrentModifiers().GrowthRateMultiplier;
-
-        if (Stats.Salute < 0.5f)
-            world_rate *= Stats.Salute;
-
-        return Math.Max(0, world_rate);
     }
 
     public void Crescita()
@@ -102,20 +110,20 @@ public class Plant : GameElement
         
     }
 
-    public void Annaffia()
+    public void ControlloCrescita()
     {
-        float incrementoCasuale = RandomHelper.Float(0,1) * 0.5f + 0.1f; 
+        float incrementoCasuale = RandomHelper.Float(0,1) * 0.5f + 0.1f;
 
-        float crescitaEffettiva = incrementoCasuale * GetCrescitaRate();
+        float crescitaEffettiva = incrementoCasuale * proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
         if (crescitaEffettiva > 0.01f)
         {
-            Crescita();
+            if (proprieta.TentaCrescita(WorldManager.GetCurrentModifiers()))
+                Crescita();
         }
     }
 
     public void Reset()
     {
-        idratazione = 0;
         Game.controller.offsetY = 0;
         puntiSpline.Clear();
         rami.Clear();
@@ -150,50 +158,6 @@ public class Plant : GameElement
 
     public override void Update()
     {
-        Weather currentWeather = WeatherManager.GetCurrentWeather();
-        WorldModifier currentWorldModifier = WorldManager.GetCurrentModifiers();
-
-        float consumoAcqua = 0.002f * currentWorldModifier.WaterConsumption;
-
-        if (currentWeather == Weather.Rainy && currentWorldModifier.IsMeteoOn == true)
-        {
-            idratazione = Math.Min(1.0f, idratazione + 0.005f);
-        }
-        else
-        {
-            idratazione = Math.Max(0, idratazione - consumoAcqua);
-        }
-
-        float energiaGuadagnata = 0f;
-
-        if (Fase == DayPhase.Morning || Fase == DayPhase.Afternoon)
-        {
-            energiaGuadagnata = 0.003f * currentWorldModifier.SolarMultiplier;
-
-            if (currentWeather == Weather.Foggy && currentWorldModifier.IsMeteoOn == true)
-                energiaGuadagnata *= 0.3f;
-        }
-        else if (Fase == DayPhase.Dawn || Fase == DayPhase.Dusk)
-        {
-            energiaGuadagnata = 0.001f * currentWorldModifier.SolarMultiplier;
-        }
-
-        else
-        {
-            energiaGuadagnata = -0.001f;
-        }
-
-        Stats.Metabolismo = Math.Clamp(Stats.Metabolismo + energiaGuadagnata, 0f, 1f);
-
-        if (currentWorldModifier.OxygenLevel < 0.5f)
-        {
-
-            Stats.Ossigeno = Math.Max(0, Stats.Ossigeno - 0.001f);
-        }
-        else
-        {
-            Stats.Ossigeno = 1.0f;
-        }
 
     }
 

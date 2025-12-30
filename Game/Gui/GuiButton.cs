@@ -13,6 +13,13 @@ using System.Reflection;
 
 namespace Plants;
 
+public struct containerSize
+{
+    public int X;
+    public int Y;
+    public int Width;
+    public int Height;
+}
 
 
 public class GuiButton: GameElement
