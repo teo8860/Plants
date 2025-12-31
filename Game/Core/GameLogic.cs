@@ -477,28 +477,6 @@ namespace Plants
             return Math.Max(0, velocita);
         }
 
-        public bool TentaCrescita(WorldModifier worldMod)
-        {
-            float velocita = CalcolaVelocitaCrescita(worldMod);
-
-            if (velocita <= 0.01f || stats.Altezza >= stats.AltezzaMassima)
-                return false;
-
-            float incrementoAltezza = CRESCITA_BASE * velocita;
-            stats.Altezza = Math.Min(stats.Altezza + incrementoAltezza, stats.AltezzaMassima);
-
-            if (stats.FoglieAttuali < FoglieMassime)
-            {
-                float probabilitaFoglia = velocita * 0.1f * (1f - (float)stats.FoglieAttuali / FoglieMassime);
-                if (RandomHelper.Float(0, 1) < probabilitaFoglia)
-                {
-                    stats.FoglieAttuali++;
-                }
-            }
-
-            return true;
-        }
-
 
         public float CalcolaProbabilitaPerdiaFoglia(Weather meteo)
         {

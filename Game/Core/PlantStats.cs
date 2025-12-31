@@ -181,7 +181,7 @@ public class PlantStats
     public float DropRateFoglie = 0.01f;
 
     public float Altezza = 0.0f;
-    public float AltezzaMassima = 100.0f;
+    public float AltezzaMassima = 100000000000000000000000000.0f;
 
     public bool Infestata = false;
     public float IntensitaInfestazione = 0.0f;
