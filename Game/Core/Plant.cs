@@ -14,13 +14,15 @@ public class Plant : GameElement
 
     public Vector2 posizione = new(0, 0);
 
-    private List<Vector2> puntiSpline = new();
+    public List<Vector2> puntiSpline = new();
     private const int margineMinimo = 40;
 
     private List<Ramo> rami = new();
     private List<Radice> radici = new();
     private int contatorePuntiPerRamo = 0;
     private int contatorePuntiPerRadice = 0;
+
+    public float spessore;
 
     DayPhase Fase = Game.Phase;
 
@@ -40,7 +42,7 @@ public class Plant : GameElement
         GeneraPuntoIniziale();
         
         // /* Test di crescita rapida
-        for(int a = 0; a <100; a++)
+        for(int a = 0; a <1000; a++)
         {
             Crescita();
         }
@@ -225,6 +227,7 @@ public class Plant : GameElement
 
     public override void Draw()
     {
+
         if (puntiSpline.Count >= 4)
         {
             Span<Vector2> puntiConOffset = stackalloc Vector2[puntiSpline.Count];
@@ -237,9 +240,14 @@ public class Plant : GameElement
                 );
             }
 
+            foreach (var ramo in rami)
+            {
+                ramo.Draw(Game.controller.offsetY);
+            }
+
             for (int i = 0; i < puntiSpline.Count - 3; i++)
             {
-                float spessore = 8 + ((puntiSpline.Count - i) / 5);
+                spessore = Math.Min(8 + ((puntiSpline.Count - i) / 5), 50);
 
                 if (i + 4 <= puntiConOffset.Length)
                 {
@@ -249,15 +257,13 @@ public class Plant : GameElement
                         segmento[o].X += (float)Math.Sin(Time.GetTime());
                     }
                     Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
+                    if (spessore > 10)
+                    { 
+                        Graphics.DrawSplineCatmullRom(segmento, spessore - 10, Color.DarkGreen);
+                    }
                 }
             }
 
-
-        }
-
-        foreach (var ramo in rami)
-        {
-            ramo.Draw(Game.controller.offsetY);
         }
 
         foreach (var radice in radici)
