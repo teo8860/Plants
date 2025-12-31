@@ -12,7 +12,7 @@ public static class Game
     public static Plant pianta;
 
     public static GuiToolbar toolbar;
-    
+
     public static Background background;
     public static Ground ground;
     public static WeatherRender weatherSystem;
@@ -58,7 +58,7 @@ public static class Game
     {
         toolbar = new GuiToolbar(40, 10, buttonSize: 36, spacing: 4);
         toolbar.depth = -50;
-        
+
         toolbar.SetIcons(
             AssetLoader.spriteArrowDown,
             AssetLoader.spriteArrowUp,
@@ -82,7 +82,7 @@ public static class Game
                 cambiaPhase = true;
             }
         );
-        
+
         toolbar.AddActionButton(
             AssetLoader.spriteWeatherOff,
             "Cambia Meteo",
@@ -90,7 +90,7 @@ public static class Game
                 WeatherManager.ForceWeatherChange();
             }
         );
-        
+
         toolbar.AddActionButton(
             AssetLoader.spriteWorldIcon,
             "Cambia Mondo",
@@ -113,7 +113,7 @@ public static class Game
     private static void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
         pianta.proprieta.AggiornaTutto(
-            Phase, 
+            Phase,
             WeatherManager.GetCurrentWeather(),
             WorldManager.GetCurrentModifiers()
         );

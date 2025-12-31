@@ -171,6 +171,7 @@ public class PlantStats
     public float Ossigeno = 1.0f;
     public float Metabolismo = 1.0f;
 
+    public float Temperatura = 20.0f;
     public float ResistenzaFreddo = 0.0f;
     public float ResistenzaCaldo = 0.0f;
     public float ResistenzaParassiti = 0.0f;
