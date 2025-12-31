@@ -38,12 +38,12 @@ public class Radice
 
         Vector2 ultimoPunto = punti[^1];
 
-        //direzione.X += RandomHelper.Int(-1,1);
-       // direzione.Y += RandomHelper.Int(1,1);
+        direzione.X += RandomHelper.Int(-2,2);
+        direzione.Y += RandomHelper.Int(1,1);
         Vector2 dir = direzione - ultimoPunto;
         dir = Vector2.Normalize(dir);
 
-        Vector2 nuovoPunto = ultimoPunto + dir * RandomHelper.Int(50, 80);
+        Vector2 nuovoPunto = ultimoPunto + dir * RandomHelper.Int(2, 6);
 
         punti.Add(nuovoPunto);
 
@@ -62,8 +62,6 @@ public class Radice
         {
             puntiOffset[i] = new Vector2(punti[i].X, punti[i].Y + offsetY);
         }
-
-        Sprite sprite = AssetLoader.spriteLeaf;
 
         for (int i = 0; i < punti.Count - 1; i++)
         {

@@ -42,7 +42,7 @@ public class Plant : GameElement
         GeneraPuntoIniziale();
         
         // /* Test di crescita rapida
-        for(int a = 0; a <1000; a++)
+        for(int a = 0; a <100; a++)
         {
             Crescita();
         }
@@ -139,7 +139,7 @@ public class Plant : GameElement
 
             Vector2 pos = posizione;
             pos.X += RandomHelper.Int(-45, 45);
-            pos.Y += RandomHelper.Int(30, 40);
+           pos.Y += RandomHelper.Int(90, 90);
 
             radici.Add(new Radice(puntoAttacco, pos));
 
