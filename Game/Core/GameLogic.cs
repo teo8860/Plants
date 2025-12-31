@@ -8,6 +8,7 @@ namespace Plants
 {
     public class GameLogicPianta
     {
+        private Plant pianta;
         public int contatoreSecondi = 0;
 
         public const float CONSUMO_ACQUA_BASE = 0.002f;
@@ -25,6 +26,11 @@ namespace Plants
         public const float TEMPERATURA_CALDA = 30.0f;
         public const float TEMPERATURA_TORRIDA = 38.0f;
 
+        public GameLogicPianta(Plant Pianta)
+        {
+            pianta = Pianta;
+        }
+
         private static readonly Dictionary<DayPhase, float> TemperatureBaseFase = new()
         {
             { DayPhase.Night, 8f },
@@ -35,8 +41,8 @@ namespace Plants
             { DayPhase.Evening, 14f }
         };
 
-        public SeedBonus bonus => Game.pianta.seedBonus;
-        public PlantStats stats => Game.pianta.Stats;
+        public SeedBonus bonus => pianta.seedBonus;
+        public PlantStats stats => pianta.Stats;
 
         public float VitalitaMax => 1.0f * bonus.Vitalita;
         public float ConsumoAcquaMult => bonus.Idratazione;
@@ -475,28 +481,6 @@ namespace Plants
             }
 
             return Math.Max(0, velocita);
-        }
-
-        public bool TentaCrescita(WorldModifier worldMod)
-        {
-            float velocita = CalcolaVelocitaCrescita(worldMod);
-
-            if (velocita <= 0.01f || stats.Altezza >= stats.AltezzaMassima)
-                return false;
-
-            float incrementoAltezza = CRESCITA_BASE * velocita;
-            stats.Altezza = Math.Min(stats.Altezza + incrementoAltezza, stats.AltezzaMassima);
-
-            if (stats.FoglieAttuali < FoglieMassime)
-            {
-                float probabilitaFoglia = velocita * 0.1f * (1f - (float)stats.FoglieAttuali / FoglieMassime);
-                if (RandomHelper.Float(0, 1) < probabilitaFoglia)
-                {
-                    stats.FoglieAttuali++;
-                }
-            }
-
-            return true;
         }
 
 

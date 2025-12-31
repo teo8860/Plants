@@ -12,15 +12,17 @@ namespace Plants;
 public class Plant : GameElement
 {
 
-    public Vector2 posizione = new(0,0);
+    public Vector2 posizione = new(0, 0);
 
-    private List<Vector2> puntiSpline = new(); 
+    public List<Vector2> puntiSpline = new();
     private const int margineMinimo = 40;
 
-    private List<Ramo> rami = new(); 
-    private List<Radice> radici = new(); 
-    private int contatorePuntiPerRamo = 0; 
+    private List<Ramo> rami = new();
+    private List<Radice> radici = new();
+    private int contatorePuntiPerRamo = 0;
     private int contatorePuntiPerRadice = 0;
+
+    public float spessore;
 
     DayPhase Fase = Game.Phase;
 
@@ -33,16 +35,18 @@ public class Plant : GameElement
 
     public Plant()
     {
-        proprieta = new GameLogicPianta();
+        proprieta = new GameLogicPianta(this);
+        SetSeed(SeedType.Normale);
+
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
-        /* Test di crescita rapida
-        for(int a = 0; a <100; a++)
+        
+        // /* Test di crescita rapida
+        for(int a = 0; a <1000; a++)
         {
             Crescita();
         }
-       */
-        SetSeed(SeedType.Normale);
+        // */
     }
 
     public Plant(SeedType seedType)
@@ -61,15 +65,43 @@ public class Plant : GameElement
     {
         float centroX = 0.5f;
         float bassoY = 0.04f;
-        posizione = new (GameProperties.windowWidth/2, GameProperties.windowHeight-GameProperties.groundPosition);
+        posizione = new(GameProperties.windowWidth / 2, GameProperties.windowHeight - GameProperties.groundPosition);
     }
 
     public void Crescita()
     {
-        GeneraPuntoCasuale();
+
+        float velocita = proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
+        float metabolismo = proprieta.MetabolismoEffettivo;
+
+        float incrementoBase = 30f + RandomHelper.Float(0, 20f);
+        float incrementoFinale = incrementoBase * metabolismo * (0.5f + velocita * 0.5f);
+
+        incrementoFinale = Math.Max(15f, incrementoFinale);
+
+        if (Stats.Altezza + incrementoFinale > Stats.AltezzaMassima)
+        {
+            incrementoFinale = Stats.AltezzaMassima - Stats.Altezza;
+        }
+
+        Stats.Altezza += incrementoFinale;
+
+        if (Stats.FoglieAttuali < proprieta.FoglieMassime)
+        {
+            float probabilitaFoglia = velocita * 0.15f * (1f - (float)Stats.FoglieAttuali / proprieta.FoglieMassime);
+            if (RandomHelper.Float(0, 1) < probabilitaFoglia)
+            {
+                Stats.FoglieAttuali++;
+            }
+        }
+
+        GeneraPuntoCasuale(incrementoFinale);
 
         contatorePuntiPerRamo++;
-        if (contatorePuntiPerRamo == 5)
+
+        int ramiMassimi = Math.Max(1, proprieta.FoglieMassime / 5);
+
+        if (contatorePuntiPerRamo >= 5 && rami.Count < ramiMassimi)
         {
             Vector2 puntoAttacco = puntiSpline[^2];
 
@@ -87,7 +119,7 @@ public class Plant : GameElement
             }
             else
             {
-                if(RandomHelper.Int(0, 2) == 0)
+                if (RandomHelper.Int(0, 2) == 0)
                     direction = Direzione.Sinistra;
                 else
                     direction = Direzione.Destra;
@@ -98,7 +130,7 @@ public class Plant : GameElement
             contatorePuntiPerRamo = 0;
         }
 
-        
+
         contatorePuntiPerRadice++;
         if (contatorePuntiPerRadice == 25)
         {
@@ -106,8 +138,8 @@ public class Plant : GameElement
             puntoAttacco.Y += 20;
 
             Vector2 pos = posizione;
-            pos.X += RandomHelper.Int(-45,45);
-            pos.Y += RandomHelper.Int(30,40);
+            pos.X += RandomHelper.Int(-45, 45);
+            pos.Y += RandomHelper.Int(30, 40);
 
             radici.Add(new Radice(puntoAttacco, pos));
 
@@ -119,7 +151,7 @@ public class Plant : GameElement
         {
             ramo.Cresci();
         }
-        
+
         foreach (var radice in radici)
         {
             radice.Cresci();
@@ -130,23 +162,20 @@ public class Plant : GameElement
         {
             Game.controller.offsetY += 50;
         }
-        
+
     }
 
     public void ControlloCrescita()
     {
+
         if (Stats.Altezza >= Stats.AltezzaMassima)
             return;
 
-        float incrementoCasuale = RandomHelper.Float(0, 1) * 0.5f + 0.1f;
-        float crescitaEffettiva = incrementoCasuale * proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
+        float velocita = proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
 
-        if (crescitaEffettiva > 0.01f)
+        if (velocita > 0.01f && RandomHelper.Float(0, 1) < velocita)
         {
-            if (proprieta.TentaCrescita(WorldManager.GetCurrentModifiers()))
-            {
-                Crescita();
-            }
+            Crescita();
         }
     }
 
@@ -155,6 +184,11 @@ public class Plant : GameElement
         Game.controller.offsetY = 0;
         puntiSpline.Clear();
         rami.Clear();
+        radici.Clear();
+
+        Stats.Altezza = 0;
+        Stats.FoglieAttuali = 0;
+
         GeneraPuntoIniziale();
     }
 
@@ -175,11 +209,13 @@ public class Plant : GameElement
         puntiSpline.Add(new Vector2(terzoX, terzoY));
     }
 
-    private void GeneraPuntoCasuale()
+    private void GeneraPuntoCasuale(float incrementoAltezza)
     {
         Vector2 ultimoPunto = puntiSpline[^1];
-        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15,15), margineMinimo, GameProperties.windowWidth - margineMinimo);
-        float nuovoY = ultimoPunto.Y - Raylib.GetRandomValue(30, 50);
+
+        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15, 15), margineMinimo, GameProperties.windowWidth - margineMinimo);
+
+        float nuovoY = ultimoPunto.Y - incrementoAltezza;
 
         puntiSpline.Add(new Vector2(nuovoX, nuovoY));
     }
@@ -191,7 +227,8 @@ public class Plant : GameElement
 
     public override void Draw()
     {
-        if (puntiSpline.Count >= 4) 
+
+        if (puntiSpline.Count >= 4)
         {
             Span<Vector2> puntiConOffset = stackalloc Vector2[puntiSpline.Count];
 
@@ -203,33 +240,36 @@ public class Plant : GameElement
                 );
             }
 
+            foreach (var ramo in rami)
+            {
+                ramo.Draw(Game.controller.offsetY);
+            }
+
             for (int i = 0; i < puntiSpline.Count - 3; i++)
             {
-                float spessore = 8 + ((puntiSpline.Count - i) / 5); 
+                spessore = Math.Min(8 + ((puntiSpline.Count - i) / 5), 50);
 
-                if(i+4 <= puntiConOffset.Length)
+                if (i + 4 <= puntiConOffset.Length)
                 {
                     Span<Vector2> segmento = puntiConOffset.Slice(i, 4);
-                    for(int o=0; o<segmento.Length; o++)
+                    for (int o = 0; o < segmento.Length; o++)
                     {
                         segmento[o].X += (float)Math.Sin(Time.GetTime());
                     }
                     Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
+                    if (spessore > 10)
+                    { 
+                        Graphics.DrawSplineCatmullRom(segmento, spessore - 10, Color.DarkGreen);
+                    }
                 }
             }
 
+        }
 
-        }
-        
-        foreach (var ramo in rami)
-        {
-            ramo.Draw(Game.controller.offsetY);
-        }
-        
         foreach (var radice in radici)
         {
             radice.Draw(Game.controller.offsetY);
         }
-        Graphics.DrawEllipse((int)posizione.X, (int)((int)posizione.Y+10+ Game.controller.offsetY), 15, 25, Color.DarkBrown);
+        Graphics.DrawEllipse((int)posizione.X, (int)((int)posizione.Y + 10 + Game.controller.offsetY), 15, 25, Color.DarkBrown);
     }
 }
