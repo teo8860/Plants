@@ -117,6 +117,7 @@ public static class Game
             WeatherManager.GetCurrentWeather(),
             WorldManager.GetCurrentModifiers()
         );
+        Console.WriteLine(pianta.proprieta.GetRiepilogo());
     }
 
     public static void SetTimerFase()

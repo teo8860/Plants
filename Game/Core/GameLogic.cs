@@ -417,5 +417,18 @@ namespace Plants
             stats.Infestata = false;
             stats.IntensitaInfestazione = 0f;
         }
+
+        public string GetRiepilogo()
+        {
+            return $"[{SeedDataType.GetName(Game.pianta.TipoSeme)}]\n" +
+                   $"Salute: {PercentualeSalute:P0}\n" +
+                   $"Idratazione: {stats.Idratazione:P0}\n" +
+                   $"Ossigeno: {stats.Ossigeno:P0}\n" +
+                   $"Metabolismo: {stats.Metabolismo:P0}\n" +
+                   $"Foglie: {stats.FoglieAttuali}/{FoglieMassime}\n" +
+                   $"Altezza: {stats.Altezza:F1}\n" +
+                   (stats.Infestata ? $"⚠ INFESTATA ({stats.IntensitaInfestazione:P0})\n" : "");
+        }
+
     }
 }
