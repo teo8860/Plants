@@ -29,10 +29,11 @@ public class Plant : GameElement
 
     public PlantStats Stats = new PlantStats();
 
-    public GameLogicPianta proprieta = new GameLogicPianta();
+    public GameLogicPianta proprieta;
 
     public Plant()
     {
+        proprieta = new GameLogicPianta(this);
         SetSeed(SeedType.Normale);
 
         PosizionaAlCentroInBasso();

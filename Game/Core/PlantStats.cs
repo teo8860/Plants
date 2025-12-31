@@ -176,12 +176,12 @@ public class PlantStats
     public float ResistenzaCaldo = 0.0f;
     public float ResistenzaParassiti = 0.0f;
 
-    public int FoglieBase = 50;
-    public int FoglieAttuali = 50;
+    public int FoglieBase = 50000000;
+    public int FoglieAttuali = 0;
     public float DropRateFoglie = 0.01f;
 
     public float Altezza = 0.0f;
-    public float AltezzaMassima = 100000000000000000000000000.0f;
+    public float AltezzaMassima = 1000000000000000.0f;
 
     public bool Infestata = false;
     public float IntensitaInfestazione = 0.0f;
