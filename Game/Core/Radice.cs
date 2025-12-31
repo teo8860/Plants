@@ -1,0 +1,77 @@
+﻿using Raylib_CSharp;
+using Raylib_CSharp.Colors;
+using Raylib_CSharp.Rendering;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Plants;
+
+
+
+public class Radice
+{
+    private List<Vector2> punti = new();
+    private Vector2 direzione;
+
+    private int crescitaAttuale = 0;
+    private const int maxCrescita = 30;
+    private int profondita = 0;
+
+    private float spessoreAttuale = 0.5f; 
+    private const float incrementoSpessore = 0.1f;
+
+    private Vector2 puntoIniziale;
+
+    private int scaleX = RandomHelper.Int(0,100) > 50 ? 1 : -1;
+
+    public Radice(Vector2 puntoIniziale, Vector2 direzione)
+    {
+        this.direzione = direzione;
+        this.punti.Add(puntoIniziale);
+        this.puntoIniziale = puntoIniziale;
+    }
+
+    public void Cresci()
+    {
+        if (crescitaAttuale >= maxCrescita) return;
+
+        Vector2 ultimoPunto = punti[^1];
+
+        //direzione.X += RandomHelper.Int(-1,1);
+       // direzione.Y += RandomHelper.Int(1,1);
+        Vector2 dir = direzione - ultimoPunto;
+        dir = Vector2.Normalize(dir);
+
+        Vector2 nuovoPunto = ultimoPunto + dir * RandomHelper.Int(50, 80);
+
+        punti.Add(nuovoPunto);
+
+        spessoreAttuale += incrementoSpessore;
+        crescitaAttuale++;
+    }
+
+
+    public void Draw(float offsetY)
+    {
+        if(punti.Count < 2)
+            return;
+
+        Span<Vector2> puntiOffset = stackalloc Vector2[punti.Count];
+        for (int i = 0; i < punti.Count; i++)
+        {
+            puntiOffset[i] = new Vector2(punti[i].X, punti[i].Y + offsetY);
+        }
+
+        Sprite sprite = AssetLoader.spriteLeaf;
+
+        for (int i = 0; i < punti.Count - 1; i++)
+        {
+            Vector2 pStart = puntiOffset[i];
+            Vector2 pEnd = puntiOffset[i + 1];
+
+               
+            Graphics.DrawLineEx(pStart, pEnd, spessoreAttuale, Color.White);
+        }
+    }
+}

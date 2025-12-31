@@ -18,7 +18,9 @@ public class Plant : GameElement
     private const int margineMinimo = 40;
 
     private List<Ramo> rami = new(); 
+    private List<Radice> radici = new(); 
     private int contatorePuntiPerRamo = 0; 
+    private int contatorePuntiPerRadice = 0;
 
     DayPhase Fase = Game.Phase;
 
@@ -35,11 +37,11 @@ public class Plant : GameElement
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
-       /* for(int a = 0; a <100; a++)
+        for(int a = 0; a <100; a++)
         {
             Crescita();
         }
-       */
+       
         SetSeed(SeedType.Normale);
     }
 
@@ -89,7 +91,6 @@ public class Plant : GameElement
                     direction = Direzione.Sinistra;
                 else
                     direction = Direzione.Destra;
-
             }
 
             rami.Add(new Ramo(puntoAttacco, direction));
@@ -97,9 +98,31 @@ public class Plant : GameElement
             contatorePuntiPerRamo = 0;
         }
 
+        
+        contatorePuntiPerRadice++;
+        if (contatorePuntiPerRadice == 25)
+        {
+            Vector2 puntoAttacco = posizione;
+            puntoAttacco.Y += 20;
+
+            Vector2 pos = posizione;
+            pos.X += RandomHelper.Int(-45,45);
+            pos.Y += RandomHelper.Int(30,40);
+
+            radici.Add(new Radice(puntoAttacco, pos));
+
+            contatorePuntiPerRadice = 0;
+        }
+
+
         foreach (var ramo in rami)
         {
             ramo.Cresci();
+        }
+        
+        foreach (var radice in radici)
+        {
+            radice.Cresci();
         }
 
         Vector2 ultimoPunto = puntiSpline[^1];
@@ -197,7 +220,11 @@ public class Plant : GameElement
         {
             ramo.Draw(Game.controller.offsetY);
         }
-
+        
+        foreach (var radice in radici)
+        {
+            radice.Draw(Game.controller.offsetY);
+        }
         Graphics.DrawEllipse((int)posizione.X, (int)((int)posizione.Y+10+ Game.controller.offsetY), 15, 25, Color.DarkBrown);
     }
 }
