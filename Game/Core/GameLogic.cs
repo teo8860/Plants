@@ -481,19 +481,22 @@ namespace Plants
         {
             float velocita = CalcolaVelocitaCrescita(worldMod);
 
-            if (velocita > 0.01f && stats.Altezza < stats.AltezzaMassima)
-            {
-                stats.Altezza += CRESCITA_BASE * velocita;
+            if (velocita <= 0.01f || stats.Altezza >= stats.AltezzaMassima)
+                return false;
 
-                if (stats.FoglieAttuali < FoglieMassime && RandomHelper.Float(0, 1) < velocita * 0.1f)
+            float incrementoAltezza = CRESCITA_BASE * velocita;
+            stats.Altezza = Math.Min(stats.Altezza + incrementoAltezza, stats.AltezzaMassima);
+
+            if (stats.FoglieAttuali < FoglieMassime)
+            {
+                float probabilitaFoglia = velocita * 0.1f * (1f - (float)stats.FoglieAttuali / FoglieMassime);
+                if (RandomHelper.Float(0, 1) < probabilitaFoglia)
                 {
                     stats.FoglieAttuali++;
                 }
-
-                return true;
             }
 
-            return false;
+            return true;
         }
 
 

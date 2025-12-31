@@ -36,12 +36,12 @@ public class Plant : GameElement
         proprieta = new GameLogicPianta();
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
-
+        /* Test di crescita rapida
         for(int a = 0; a <100; a++)
         {
             Crescita();
         }
-       
+       */
         SetSeed(SeedType.Normale);
     }
 
@@ -135,13 +135,18 @@ public class Plant : GameElement
 
     public void ControlloCrescita()
     {
-        float incrementoCasuale = RandomHelper.Float(0,1) * 0.5f + 0.1f;
+        if (Stats.Altezza >= Stats.AltezzaMassima)
+            return;
 
+        float incrementoCasuale = RandomHelper.Float(0, 1) * 0.5f + 0.1f;
         float crescitaEffettiva = incrementoCasuale * proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
+
         if (crescitaEffettiva > 0.01f)
         {
             if (proprieta.TentaCrescita(WorldManager.GetCurrentModifiers()))
+            {
                 Crescita();
+            }
         }
     }
 
