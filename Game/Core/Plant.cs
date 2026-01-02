@@ -42,7 +42,7 @@ public class Plant : GameElement
         GeneraPuntoIniziale();
         
         // /* Test di crescita rapida
-        for(int a = 0; a <100; a++)
+        for(int a = 0; a <1000; a++)
         {
             Crescita();
         }
@@ -156,11 +156,13 @@ public class Plant : GameElement
         {
             radice.Cresci();
         }
-
-
-        if (puntiSpline[^1].Y <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
-            Game.controller.Scorri(puntiSpline[^1].Y);
-
+        
+        if (puntiSpline.Count >= 3)
+        {
+            float deltaY = puntiSpline[^3].Y - puntiSpline[^2].Y; 
+            if (Game.controller.offsetY < Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
+                Game.controller.Scorri(deltaY);
+        }
     }
 
     public void ControlloCrescita()

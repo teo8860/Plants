@@ -3,27 +3,22 @@ using Raylib_CSharp;
 using Raylib_CSharp.Interact;
 using System;
 using System.Numerics;
-using System.Xml.Linq;
 
-namespace Plants;
-
-
-
-public class Controller: GameElement
+public class Controller : GameElement
 {
     public float offsetY = 0;
     public float offsetMinY = 0;
-    public int i = 0;
     public float offsetMaxY => Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier;
-    public float scrollMultiply = 0;
+
+    public float scrollSpeed = 1000f;  
+    public float scrollAcceleration = 5f;  
+    private float currentScrollSpeed = 0f;
 
     public bool annaffiatoioAttivo = false;
     public bool isButtonRightPressed = false;
 
     public override void Update()
     {
-        i = Game.pianta.puntiSpline.Count - 1;
-
         if (Game.cambiaPhase)
         {
             Game.Phase = FaseGiorno.ChangeDayPhase();
@@ -31,18 +26,17 @@ public class Controller: GameElement
         }
 
         Vector2 mouse = Input.GetMousePosition();
-        
-        if(Input.IsMouseButtonDown(MouseButton.Right))
+
+        if (Input.IsMouseButtonDown(MouseButton.Right))
         {
             isButtonRightPressed = true;
             if (annaffiatoioAttivo)
             {
                 Game.innaffiatoio.EmitParticle(mouse);
                 Game.pianta.proprieta.Annaffia(0.01f);
-                
             }
         }
-        if (!Input.IsMouseButtonDown(MouseButton.Right))
+        else
         {
             isButtonRightPressed = false;
         }
@@ -52,35 +46,28 @@ public class Controller: GameElement
             //Game.pianta.Reset();
         }
 
-        if (Input.IsKeyPressed(KeyboardKey.Down) || Input.IsKeyPressed(KeyboardKey.Up))
-        {
-            scrollMultiply = 1;
-        }
-        
+        float deltaTime = Time.GetFrameTime();
+
         if (Input.IsKeyDown(KeyboardKey.Down))
         {
-            if (offsetY >= offsetMinY)
-            {
-                i--;
-                scrollMultiply += 0.1f;
-                Scorri(-Game.pianta.puntiSpline[i].Y * scrollMultiply);
-            }
+            currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
+            Scorri(-currentScrollSpeed * deltaTime);
         }
         else if (Input.IsKeyDown(KeyboardKey.Up))
         {
-            if (offsetY <= offsetMaxY)
-            {
-                i++;
-                scrollMultiply += 0.1f;
-                Scorri(Game.pianta.puntiSpline[^i].Y * scrollMultiply);
-            }
+            currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
+            Scorri(currentScrollSpeed * deltaTime);
         }
-    }
+        else
+        {
+            currentScrollSpeed = scrollSpeed;
+        }
 
+        offsetY = Math.Clamp(offsetY, offsetMinY, offsetMaxY);
+    }
 
     public void Scorri(float delta)
     {
-            offsetY = offsetY + delta;
-        
+        offsetY += delta;
     }
 }
