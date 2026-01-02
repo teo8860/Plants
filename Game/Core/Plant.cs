@@ -157,11 +157,9 @@ public class Plant : GameElement
             radice.Cresci();
         }
 
-        Vector2 ultimoPunto = puntiSpline[^1];
-        if (ultimoPunto.Y + Game.controller.offsetY <= 100)
-        {
-            Game.controller.offsetY += 50;
-        }
+
+        if (puntiSpline[^1].Y <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
+            Game.controller.Scorri(puntiSpline[^1].Y);
 
     }
 
@@ -227,6 +225,7 @@ public class Plant : GameElement
 
     public override void Draw()
     {
+        float offsetY = Game.controller.offsetY;
 
         if (puntiSpline.Count >= 4)
         {
@@ -242,11 +241,19 @@ public class Plant : GameElement
 
             foreach (var ramo in rami)
             {
-                ramo.Draw(Game.controller.offsetY);
+                if (ramo.IsInView(offsetY))
+                    ramo.Draw(offsetY);
             }
 
             for (int i = 0; i < puntiSpline.Count - 3; i++)
             {
+
+                float segmentMinY = Math.Min(puntiSpline[i].Y, puntiSpline[i + 3].Y);
+                float segmentMaxY = Math.Max(puntiSpline[i].Y, puntiSpline[i + 3].Y);
+
+                if (!ViewCulling.IsRangeVisible(segmentMinY, segmentMaxY, offsetY))
+                    continue;
+
                 spessore = Math.Min(8 + ((puntiSpline.Count - i) / 5), 50);
 
                 if (i + 4 <= puntiConOffset.Length)
@@ -268,8 +275,12 @@ public class Plant : GameElement
 
         foreach (var radice in radici)
         {
-            radice.Draw(Game.controller.offsetY);
+            if (radice.IsInView(offsetY))
+                radice.Draw(offsetY);
         }
-        Graphics.DrawEllipse((int)posizione.X, (int)((int)posizione.Y + 10 + Game.controller.offsetY), 15, 25, Color.DarkBrown);
+        if (ViewCulling.IsYVisible(posizione.Y + 10, offsetY))
+        {
+            Graphics.DrawEllipse((int)posizione.X, (int)(posizione.Y + 10 + offsetY), 15, 25, Color.DarkBrown);
+        }
     }
 }

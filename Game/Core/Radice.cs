@@ -25,11 +25,15 @@ public class Radice
 
     private int scaleX = RandomHelper.Int(0,100) > 50 ? 1 : -1;
 
+    private float minY = float.MaxValue;
+    private float maxY = float.MinValue;
+
     public Radice(Vector2 puntoIniziale, Vector2 direzione)
     {
         this.direzione = direzione;
         this.punti.Add(puntoIniziale);
         this.puntoIniziale = puntoIniziale;
+        UpdateBounds();
     }
 
     public void Cresci()
@@ -49,6 +53,23 @@ public class Radice
 
         spessoreAttuale += incrementoSpessore;
         crescitaAttuale++;
+        UpdateBounds();
+    }
+
+    private void UpdateBounds()
+    {
+        minY = float.MaxValue;
+        maxY = float.MinValue;
+        foreach (var p in punti)
+        {
+            if (p.Y < minY) minY = p.Y;
+            if (p.Y > maxY) maxY = p.Y;
+        }
+    }
+
+    public bool IsInView(float offsetY)
+    {
+        return ViewCulling.IsRangeVisible(minY, maxY, offsetY);
     }
 
 

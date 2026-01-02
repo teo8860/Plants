@@ -50,11 +50,31 @@ public class Ramo
 
     private int scaleX = RandomHelper.Int(0, 100) > 50 ? 1 : -1;
 
+    private float minY = float.MaxValue;
+    private float maxY = float.MinValue;
+
     public Ramo(Vector2 puntoIniziale, Direzione direzione)
     {
         this.direzione = direzione;
         this.punti.Add(puntoIniziale);
         this.puntoIniziale = puntoIniziale;
+        UpdateBounds();
+    }
+
+    private void UpdateBounds()
+    {
+        minY = float.MaxValue;
+        maxY = float.MinValue;
+        foreach (var p in punti)
+        {
+            if (p.Y < minY) minY = p.Y;
+            if (p.Y > maxY) maxY = p.Y;
+        }
+    }
+
+    public bool IsInView(float offsetY)
+    {
+        return ViewCulling.IsRangeVisible(minY, maxY, offsetY);
     }
 
     public void Cresci()
@@ -72,6 +92,7 @@ public class Ramo
         crescitaAttuale++;
 
         GeneraParametriFoglia();
+        UpdateBounds();
     }
 
     private void GeneraParametriFoglia()

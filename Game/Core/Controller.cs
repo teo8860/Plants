@@ -12,6 +12,9 @@ namespace Plants;
 public class Controller: GameElement
 {
     public float offsetY = 0;
+    public float offsetMinY = 0;
+    public int i = 0;
+    public float offsetMaxY => Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier;
     public float scrollMultiply = 0;
 
     public bool annaffiatoioAttivo = false;
@@ -19,6 +22,8 @@ public class Controller: GameElement
 
     public override void Update()
     {
+        i = Game.pianta.puntiSpline.Count - 1;
+
         if (Game.cambiaPhase)
         {
             Game.Phase = FaseGiorno.ChangeDayPhase();
@@ -54,20 +59,28 @@ public class Controller: GameElement
         
         if (Input.IsKeyDown(KeyboardKey.Down))
         {
-            scrollMultiply += 0.1f;
-            Scorri(-50*scrollMultiply); 
+            if (offsetY >= offsetMinY)
+            {
+                i--;
+                scrollMultiply += 0.1f;
+                Scorri(-Game.pianta.puntiSpline[i].Y * scrollMultiply);
+            }
         }
         else if (Input.IsKeyDown(KeyboardKey.Up))
         {
-            scrollMultiply += 0.1f;
-            Scorri(50*scrollMultiply);
+            if (offsetY <= offsetMaxY)
+            {
+                i++;
+                scrollMultiply += 0.1f;
+                Scorri(Game.pianta.puntiSpline[^i].Y * scrollMultiply);
+            }
         }
     }
 
 
     public void Scorri(float delta)
     {
-            offsetY = Math.Clamp(offsetY + delta, 0, 100000);
+            offsetY = offsetY + delta;
         
     }
 }
