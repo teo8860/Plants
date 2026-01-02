@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Raylib_CSharp.Colors;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Plants;
@@ -69,6 +71,25 @@ public class WorldManager
     public static void SetCurrentWorld(WorldType world)
     {
         currentWorld = world;
+        switch (currentWorld)
+        {
+            case WorldType.Terra:
+        Game.ground.SetGroundWorld(
+                    Color.DarkGreen,
+                    Color.Brown,
+                    Color.DarkGray,
+                    Color.LightGray
+                );
+                break;
+            case WorldType.Luna:
+                Game.ground.SetGroundWorld(
+                    Color.DarkGray,
+                    Color.LightGray,
+                    Color.Red,
+                    Color.Orange
+                );
+                break;
+        }
     }
     public static WorldType GetCurrentWorld()
     {

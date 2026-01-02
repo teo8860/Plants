@@ -282,7 +282,8 @@ public class Plant : GameElement
         }
         if (ViewCulling.IsYVisible(posizione.Y + 10, offsetY))
         {
-            Graphics.DrawEllipse((int)posizione.X, (int)(posizione.Y + 10 + offsetY), 15, 25, Color.DarkBrown);
+           Graphics.DrawEllipse((int)posizione.X, (int)(posizione.Y + 10 + offsetY), 15, 25, Color.DarkBrown);
         }
+
     }
 }
