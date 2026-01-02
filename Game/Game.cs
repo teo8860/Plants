@@ -52,6 +52,7 @@ public static class Game
         SetTimer();
         SetTimerFase();
         Phase = FaseGiorno.GetCurrentPhase();
+        WorldManager.SetCurrentWorld(WorldType.Terra);
     }
 
     private static void InitToolbar()
@@ -95,9 +96,7 @@ public static class Game
             AssetLoader.spriteWorldIcon,
             "Cambia Mondo",
             () => {
-                var mondo = WorldManager.GetCurrentWorld();
-                mondo = mondo == WorldType.Terra ? WorldType.Luna : WorldType.Terra;
-                WorldManager.SetCurrentWorld(mondo);
+                WorldManager.SetNextWorld();
             }
         );
     }
