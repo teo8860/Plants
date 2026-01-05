@@ -8,7 +8,7 @@ public class Controller : GameElement
 {
     public float offsetY = 0;
     public float offsetMinY = 0;
-    public float offsetMaxY => Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier;
+    public float offsetMaxY => (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier);
 
     public float scrollSpeed = 1000f;  
     public float scrollAcceleration = 5f;  

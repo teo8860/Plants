@@ -5,6 +5,7 @@ using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Textures;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 
 namespace Plants;
@@ -32,7 +33,11 @@ public class Plant : GameElement
     public PlantStats Stats = new PlantStats();
 
     public GameLogicPianta proprieta;
+    
+    public int y3 => (int)(GameProperties.windowHeight - GameProperties.groundPosition - (Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)) + 340;
+    public int y4 => (int)(GameProperties.windowHeight - (Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)) + 300;
 
+    public float nextWorldGroundY => y4 - y3;
     public Plant()
     {
         proprieta = new GameLogicPianta(this);
@@ -42,7 +47,7 @@ public class Plant : GameElement
         GeneraPuntoIniziale();
         
         // /* Test di crescita rapida
-        for(int a = 0; a <1000; a++)
+        for(int a = 0; a <1240; a++)
         {
             Crescita();
         }
@@ -237,7 +242,7 @@ public class Plant : GameElement
             {
                 puntiConOffset[i] = new Vector2(
                     puntiSpline[i].X,
-                    puntiSpline[i].Y + Game.controller.offsetY
+                    puntiSpline[i].Y + offsetY
                 );
             }
 
@@ -247,9 +252,10 @@ public class Plant : GameElement
                     ramo.Draw(offsetY);
             }
 
+
+            Vector2 ultimoPunto = puntiSpline[^1];
             for (int i = 0; i < puntiSpline.Count - 3; i++)
             {
-
                 float segmentMinY = Math.Min(puntiSpline[i].Y, puntiSpline[i + 3].Y);
                 float segmentMaxY = Math.Max(puntiSpline[i].Y, puntiSpline[i + 3].Y);
 
@@ -263,16 +269,55 @@ public class Plant : GameElement
                     Span<Vector2> segmento = puntiConOffset.Slice(i, 4);
                     for (int o = 0; o < segmento.Length; o++)
                     {
-                        segmento[o].X += (float)Math.Sin(Time.GetTime());
+                        segmento[o].X += getSinOffset();
                     }
                     Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
                     if (spessore > 10)
-                    { 
+                    {
                         Graphics.DrawSplineCatmullRom(segmento, spessore - 10, Color.DarkGreen);
                     }
                 }
             }
 
+            if (Stats.Altezza >= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
+            {
+ 
+                Vector2 puntoPartenza = new Vector2(
+                    puntiSpline[^2].X,
+                    puntiSpline[^2].Y + Game.controller.offsetMaxY
+                );
+
+                Vector2 puntoArrivo = new Vector2(
+                    puntiSpline[^2].X,
+                    nextWorldGroundY 
+                );
+                Console.WriteLine(puntoPartenza.Y + " ; " + puntoArrivo.Y);
+                Span<Vector2> segmento = stackalloc Vector2[4];
+                segmento[0] = puntoPartenza;
+                segmento[1] = new Vector2(
+                               puntoPartenza.X + getSinOffset(),
+                               puntoPartenza.Y
+                           );
+                segmento[2] = new Vector2(
+                    puntoArrivo.X - getSinOffset(),
+                    puntoArrivo.Y
+                );
+                segmento[3] = puntoArrivo;
+
+                
+                Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
+                if (spessore > 10)
+                {
+                    Graphics.DrawSplineCatmullRom(segmento, spessore - 10, Color.DarkGreen);
+                }
+                
+
+                //Graphics.DrawLineEx(new Vector2(puntiConOffset[^2].X, puntiConOffset[^2].Y), new Vector2(puntiConOffset[^2].X, nextWorldGroundY), spessore, Color.Yellow);
+
+
+                //Graphics.DrawCircleV(new Vector2(puntoArrivo.X,puntoArrivo.Y - 10), spessore, Color.DarkGreen);
+                //Graphics.DrawEllipse((int)puntoArrivo.X, (int)(puntoArrivo.Y + 10 + offsetY), 15, 25, Color.DarkBrown);
+            }
         }
 
         foreach (var radice in radici)
@@ -280,10 +325,16 @@ public class Plant : GameElement
             if (radice.IsInView(offsetY))
                 radice.Draw(offsetY);
         }
+
         if (ViewCulling.IsYVisible(posizione.Y + 10, offsetY))
         {
-           Graphics.DrawEllipse((int)posizione.X, (int)(posizione.Y + 10 + offsetY), 15, 25, Color.DarkBrown);
+            Graphics.DrawEllipse((int)posizione.X, (int)(posizione.Y + 10 + offsetY), 15, 25, Color.DarkBrown);
         }
-
     }
+
+    public float getSinOffset()
+    {
+        return (float)Math.Sin(Time.GetTime());
+    }
+
 }
