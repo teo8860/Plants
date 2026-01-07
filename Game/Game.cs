@@ -34,14 +34,15 @@ public static class Game
 
     public static void Init()
     {
-        tutorial = GameElement.Create<Tutorial>(-1);
-        tutorial.isTutorialActive = true;
-
-        AssetLoader.LoadAll();
-
         mainRoom = new Room();
         inventoryRoom = new Room(false);
         optionMenu = new Room(false);
+
+
+        tutorial = GameElement.Create<Tutorial>(-1);
+        tutorial.isTutorialActive = false;
+
+        AssetLoader.LoadAll();
 
         GameElement.Create<Test>(0, inventoryRoom);
 
@@ -49,7 +50,7 @@ public static class Game
         ground = GameElement.Create<Ground>(100);
 
         innaffiatoio = GameElement.Create<Water>(-100);
-        innaffiatoio.Initialize(GameProperties.windowWidth, GameProperties.windowHeight);
+        innaffiatoio.Initialize(GameProperties.viewWidth, GameProperties.viewHeight);
 
         weatherSystem = new WeatherRender();
         weatherSystem.Initialize(Window.GetScreenWidth(), Window.GetScreenHeight());

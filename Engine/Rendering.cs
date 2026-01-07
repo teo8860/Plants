@@ -13,13 +13,69 @@ namespace Plants;
 
 internal class Rendering
 {
-    private static WeatherRender weatherSystem;
+    public static PixelCamera camera = new(GameProperties.windowWidth, GameProperties.windowHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth);
     
-    static RenderTexture2D windowView = RenderTexture2D.Load(GameProperties.windowWidth, GameProperties.windowHeight);
-    static RenderTexture2D screenView = RenderTexture2D.Load(GameProperties.viewWidth, GameProperties.viewHeight);
 
-    static Camera2D worldSpaceCamera = new();  // Game world camera
-    static Camera2D screenSpaceCamera = new(); // Smoothing camera
+    public static void Init()
+    {
+        Raylib.SetConfigFlags(ConfigFlags.Msaa4XHint);
+        Time.SetTargetFPS(60);
+
+
+
+        while (true)
+        {
+            if (Window.ShouldClose())
+            {
+                Window.Close();
+            }
+            
+             camera.Update();
+            var elements = GameElement.GetList();
+            elements = elements.FindAll((o)=> o.active == true);
+
+
+            foreach (var item in elements)
+            {
+                item.Update();
+            }
+
+
+            var layerBase = elements.FindAll((o)=> o.guiLayer == false);
+            layerBase.Sort((GameElement a, GameElement b)=> b.depth - a.depth);
+
+            var layerGui = elements.FindAll((o)=> o.guiLayer == true);
+            layerGui.Sort((GameElement a, GameElement b)=> b.depth - a.depth);
+
+            Graphics.BeginDrawing();
+            Graphics.ClearBackground(Color.Black);
+            camera.BeginWorldMode();
+
+            foreach (var item in layerBase)
+            {
+                item.Draw();
+            }
+       
+            camera.EndWorldMode();
+            camera.DrawWorld();
+
+          
+            camera.BeginScreenMode();
+            camera.EndWorldMode();
+            foreach (var item in layerGui)
+            {
+                item.Draw();
+            }
+            
+
+            Graphics.DrawFPS(0,0);
+            Graphics.EndDrawing();
+        }
+    }
+
+    
+
+    /**
 
     
 
@@ -48,14 +104,13 @@ internal class Rendering
 
 
             // Round worldSpace coordinates, keep decimals into screenSpace coordinates
-            worldSpaceCamera.Target.X = screenSpaceCamera.Target.X;
-            screenSpaceCamera.Target.X -= worldSpaceCamera.Target.X;
-            screenSpaceCamera.Target.X *= virtualRatio;
+          //  worldSpaceCamera.Target.X = screenSpaceCamera.Target.X;
+          //  screenSpaceCamera.Target.X -= worldSpaceCamera.Target.X;
+          //  screenSpaceCamera.Target.X *= virtualRatio;
 
-            worldSpaceCamera.Target.Y = screenSpaceCamera.Target.Y;
-            screenSpaceCamera.Target.Y -= worldSpaceCamera.Target.Y;
-            screenSpaceCamera.Target.Y *= virtualRatio;
-
+           // worldSpaceCamera.Target.Y = screenSpaceCamera.Target.Y;
+           // screenSpaceCamera.Target.Y -= worldSpaceCamera.Target.Y;
+          //  screenSpaceCamera.Target.Y *= virtualRatio;
 
             var elements = GameElement.GetList();
             elements = elements.FindAll((o)=> o.active == true);
@@ -124,4 +179,5 @@ internal class Rendering
     }
 
     
+    */
 }

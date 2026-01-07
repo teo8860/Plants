@@ -23,20 +23,23 @@ public class Ground: GameElement
 
     public override void Draw()
     {
-        int x1 = 0;
-        int y1 = (int)(GameProperties.windowHeight - GameProperties.groundPosition + Game.controller.offsetY);
+        int w = GameProperties.cameraWidth;
+        int h = GameProperties.cameraHeight;
 
-        int x2 = GameProperties.windowWidth;
-        int y2 = (int)(GameProperties.windowHeight + Game.controller.offsetY);
+        int x1 = 0;
+        int y1 = (int)(GameProperties.groundPosition);
+
+        int x2 = w;
+        int y2 = h;
 
         Graphics.DrawRectangle(x1, y1, x2, y2, CurrentWorld1);
         Graphics.DrawRectangle(x1, y1 + 10, x2, y2, CurrentWorld2);
 
         int x3 = 0;
-        int y3 = (int)(GameProperties.windowHeight - GameProperties.groundPosition - (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier) + Game.controller.offsetY);
+        int y3 = (int)(h - GameProperties.groundPosition - (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier));
 
-        int x4 = GameProperties.windowWidth;
-        int y4 = (int)(GameProperties.windowHeight - (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier) + Game.controller.offsetY);
+        int x4 = w;
+        int y4 = (int)(h - (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier));
 
         Graphics.DrawRectangle(x3, y3 - 340, x4, y4 - 300, NextWorld1);
         Graphics.DrawRectangle(x3, y3 - 350, x4, y4 - 300, NextWorld2);

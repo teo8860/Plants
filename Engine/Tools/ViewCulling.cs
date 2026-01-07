@@ -9,7 +9,7 @@ public static class ViewCulling
     public static bool IsYVisible(float y, float offsetY)
     {
         float adjustedY = y + offsetY;
-        return adjustedY >= 0 && adjustedY <= GameProperties.windowHeight;
+        return adjustedY >= 0 && adjustedY <= GameProperties.viewHeight;
     }
 
     public static bool IsPointVisible(Vector2 point, float offsetY)
@@ -18,9 +18,9 @@ public static class ViewCulling
         float adjustedX = point.X;
 
         return adjustedX >= 0 &&
-               adjustedX <= GameProperties.windowWidth &&
+               adjustedX <= GameProperties.viewWidth &&
                adjustedY >= 0 &&
-               adjustedY <= GameProperties.windowHeight;
+               adjustedY <= GameProperties.viewHeight;
     }
 
     public static bool IsRangeVisible(float minY, float maxY, float offsetY)
@@ -29,7 +29,7 @@ public static class ViewCulling
         float adjustedMaxY = maxY + offsetY;
 
         float viewTop = 0;
-        float viewBottom = GameProperties.windowHeight;
+        float viewBottom = GameProperties.viewHeight;
 
         return adjustedMaxY >= viewTop && adjustedMinY <= viewBottom;
     }
@@ -39,9 +39,9 @@ public static class ViewCulling
         float adjustedY = y + offsetY;
 
         float viewTop = 0;
-        float viewBottom = GameProperties.windowHeight;
+        float viewBottom = GameProperties.viewHeight;
         float viewLeft = 0;
-        float viewRight = GameProperties.windowWidth;
+        float viewRight = GameProperties.viewWidth;
 
         return (x + width) >= viewLeft &&
                x <= viewRight &&
@@ -54,9 +54,9 @@ public static class ViewCulling
         float adjustedY = center.Y + offsetY;
 
         return (center.X + radius) >= 0 &&
-               (center.X - radius) <= GameProperties.windowWidth &&
+               (center.X - radius) <= GameProperties.viewWidth &&
                (adjustedY + radius) >= 0 &&
-               (adjustedY - radius) <= GameProperties.windowHeight;
+               (adjustedY - radius) <= GameProperties.viewHeight;
     }
 
     public static bool IsLineVisible(Vector2 start, Vector2 end, float offsetY)
@@ -70,9 +70,9 @@ public static class ViewCulling
         float adjustedMaxY = maxY + offsetY;
 
         float viewTop = 0;
-        float viewBottom = GameProperties.windowHeight;
+        float viewBottom = GameProperties.viewHeight;
         float viewLeft = 0;
-        float viewRight = GameProperties.windowWidth;
+        float viewRight = GameProperties.viewWidth;
 
         return maxX >= viewLeft &&
                minX <= viewRight &&

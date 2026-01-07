@@ -21,6 +21,7 @@ public class Controller : GameElement
     public Controller()
     {
         this.persistent = true;
+         Rendering.camera.position.Y = 0;
     }
 
     public override void Update()
@@ -32,6 +33,7 @@ public class Controller : GameElement
         }
 
         Vector2 mouse = Input.GetMousePosition();
+        mouse.Y += Rendering.camera.position.Y;
 
         if (Input.IsMouseButtonDown(MouseButton.Right))
         {
@@ -79,11 +81,11 @@ public class Controller : GameElement
         {
             Game.mainRoom.SetActiveRoom();
         }
-        offsetY = Math.Clamp(offsetY, offsetMinY, offsetMaxY);
+        //offsetY = Math.Clamp(offsetY, offsetMinY, offsetMaxY);
     }
 
     public void Scorri(float delta)
     {
-        offsetY += delta;
+        Rendering.camera.position.Y += delta/10;
     }
 }

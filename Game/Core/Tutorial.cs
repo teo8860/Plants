@@ -13,15 +13,18 @@ namespace Plants
     {
         public bool isTutorialActive = false;
 
+        public Tutorial()
+        {
+        }
+
         public override void Update()
         {
-
         }
 
         public override void Draw()
         {
-            int GlassWidth = GameProperties.windowWidth / 5;
-            int GlassHeight = GameProperties.windowHeight / 5;
+            int GlassWidth = GameProperties.cameraWidth / 5;
+            int GlassHeight = GameProperties.cameraHeight / 5;
 
             Color vetro = Color.SkyBlue;
             vetro.A = 150;
@@ -29,15 +32,16 @@ namespace Plants
             Color finestra = Color.White;
             finestra.A = 100;
 
-            Graphics.DrawRectangle(0,0,GameProperties.windowWidth,GameProperties.windowHeight, vetro);
-            Graphics.DrawLineEx(new Vector2(GlassWidth, 0), new Vector2(GlassWidth, GameProperties.windowHeight), 4 ,finestra);
-            Graphics.DrawLineEx(new Vector2(GlassWidth * 2, 0), new Vector2(GlassWidth * 2, GameProperties.windowHeight), 4, finestra);
-            Graphics.DrawLineEx(new Vector2(GlassWidth * 3, 0), new Vector2(GlassWidth * 3, GameProperties.windowHeight), 4, finestra);
-            Graphics.DrawLineEx(new Vector2(GlassWidth * 4, 0), new Vector2(GlassWidth * 4, GameProperties.windowHeight), 4, finestra);
-            Graphics.DrawLineEx(new Vector2(0, GlassHeight), new Vector2(GameProperties.windowWidth, GlassHeight), 4, finestra);
-            Graphics.DrawLineEx(new Vector2(0, GlassHeight * 2), new Vector2(GameProperties.windowWidth, GlassHeight * 2), 4, finestra);
-            Graphics.DrawLineEx(new Vector2(0, GlassHeight * 3), new Vector2(GameProperties.windowWidth, GlassHeight * 3), 4, finestra);
-            Graphics.DrawLineEx(new Vector2(0, GlassHeight * 4), new Vector2(GameProperties.windowWidth, GlassHeight * 4), 4, finestra);
+            Graphics.DrawRectangle(0,0,GameProperties.cameraWidth,GameProperties.cameraHeight, vetro);
+            Graphics.DrawLineEx(new Vector2(GlassWidth * 1, 0), new Vector2(GlassWidth * 1, GameProperties.cameraHeight), 4 ,finestra);
+            Graphics.DrawLineEx(new Vector2(GlassWidth * 2, 0), new Vector2(GlassWidth * 2, GameProperties.cameraHeight), 4, finestra);
+            Graphics.DrawLineEx(new Vector2(GlassWidth * 3, 0), new Vector2(GlassWidth * 3, GameProperties.cameraHeight), 4, finestra);
+            Graphics.DrawLineEx(new Vector2(GlassWidth * 4, 0), new Vector2(GlassWidth * 4, GameProperties.cameraHeight), 4, finestra);
+
+            Graphics.DrawLineEx(new Vector2(0, GlassHeight * 1), new Vector2(GameProperties.cameraWidth, GlassHeight * 1), 4, finestra);
+            Graphics.DrawLineEx(new Vector2(0, GlassHeight * 2), new Vector2(GameProperties.cameraWidth, GlassHeight * 2), 4, finestra);
+            Graphics.DrawLineEx(new Vector2(0, GlassHeight * 3), new Vector2(GameProperties.cameraWidth, GlassHeight * 3), 4, finestra);
+            Graphics.DrawLineEx(new Vector2(0, GlassHeight * 4), new Vector2(GameProperties.cameraWidth, GlassHeight * 4), 4, finestra);
 
         }
 

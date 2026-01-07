@@ -43,7 +43,6 @@ public class CircularBuffer
 
 public class Particle : GameElement
 {
-    private readonly Random random = new Random();
     private CircularBuffer buffer;
     private int screenWidth;
     private int screenHeight;
@@ -111,7 +110,7 @@ public class Particle : GameElement
             Vector2 center = p.position;
             float radius = p.radius;
             if (center.X < -radius || center.X > screenWidth + radius ||
-                center.Y < -radius || center.Y > screenHeight + radius)
+                center.Y < -radius+ Rendering.camera.position.Y  || center.Y > screenHeight + Rendering.camera.position.Y + radius)
             {
                 p.alive = false;
             }
