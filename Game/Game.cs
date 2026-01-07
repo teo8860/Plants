@@ -26,8 +26,13 @@ public static class Game
     public static GuiStatsPanel statsPanel;
     public static OxygenSystem oxygenSystem;
 
+    public static Tutorial tutorial;
+
     public static void Init()
     {
+        tutorial = GameElement.Create<Tutorial>(-1);
+        tutorial.isTutorialActive = true;
+
         AssetLoader.LoadAll();
 
         background = GameElement.Create<Background>(100);
@@ -40,7 +45,7 @@ public static class Game
         weatherSystem.Initialize(Window.GetScreenWidth(), Window.GetScreenHeight());
 
         controller = new Controller();
-        pianta = new Plant();
+        pianta = GameElement.Create<Plant>(-2);
 
         GameElement.Create<GuiScrollbar>(100);
 
@@ -53,6 +58,7 @@ public static class Game
         SetTimerFase();
         Phase = FaseGiorno.GetCurrentPhase();
         WorldManager.SetCurrentWorld(WorldType.Terra);
+
     }
 
     private static void InitToolbar()

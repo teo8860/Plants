@@ -45,11 +45,14 @@ public class Plant : GameElement
 
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
-        
+
         // /* Test di crescita rapida
-        for(int a = 0; a <1240; a++)
+        if (!Game.tutorial.isTutorialActive)
         {
-            Crescita();
+            for (int a = 0; a < 1240; a++)
+            {
+                Crescita();
+            }
         }
         // */
     }
