@@ -15,7 +15,8 @@ public enum WorldType
     Titano,         
     ReameMistico,  
     GiardinoMistico,
-    Origine    
+    Origine,
+    Serra  //Per il tutorial
 }
 
 
@@ -173,6 +174,21 @@ public class WorldManager
                 LimitMultiplier = 0f,     //infinito    
                 GrowthRateMultiplier = 0.3f,    
                 WaterConsumption = 2.0f,        
+            }
+        },
+
+        {
+            WorldType.Serra,
+            new WorldModifier
+            {
+                SolarMultiplier = 1.0f,
+                GravityMultiplier = 1.0f,
+                OxygenLevel = 1.0f,
+                TemperatureModifier = 0.0f,
+                IsMeteoOn = false,
+                LimitMultiplier = 0.5f,
+                GrowthRateMultiplier = 1.25f,
+                WaterConsumption = 0.75f,
             }
         }
     };
