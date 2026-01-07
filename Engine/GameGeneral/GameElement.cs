@@ -10,26 +10,43 @@ namespace Plants;
 
 public class GameElement
 {
-    public static List<GameElement> elementList = new();
+    
+	public static List<GameElement> elementList = new();
 
+    public bool persistent = false;
+    public bool active = true;
     public int depth = 0;
     public bool guiLayer = false;
+    public  uint roomId;
+   
 
-    public static List<GameElement> GetList()
+    public static T Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T >(int depth = 0, Room room = null) where T : GameElement
+    {
+        T obj =  Activator.CreateInstance<T>();
+        obj.depth = depth;
+
+        if(room != null)
+        {
+            obj.roomId = room.id;
+
+            if(Room.GetActiveId() != room.id)
+            {
+                obj.active = false;
+            }
+        }
+
+        return obj;
+    }
+
+	public static List<GameElement> GetList()
     {
         return elementList;
     }
 
-    public static T Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T >(int depth = 0) where T : GameElement
-    {
-        T obj =  Activator.CreateInstance<T>();
-        obj.depth = depth;
-        return obj;
-    }
-
     public GameElement()
     {
-        elementList.Add(this);
+        GameElement.elementList.Add(this);
+        roomId = Room.GetActiveId();
     }
 
     ~GameElement()

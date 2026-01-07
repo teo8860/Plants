@@ -2,6 +2,7 @@
 using Raylib_CSharp;
 using Raylib_CSharp.Interact;
 using System;
+using System.Linq;
 using System.Numerics;
 
 public class Controller : GameElement
@@ -16,6 +17,11 @@ public class Controller : GameElement
 
     public bool annaffiatoioAttivo = false;
     public bool isButtonRightPressed = false;
+
+    public Controller()
+    {
+        this.persistent = true;
+    }
 
     public override void Update()
     {
@@ -63,6 +69,16 @@ public class Controller : GameElement
             currentScrollSpeed = scrollSpeed;
         }
 
+         if (Input.IsKeyDown(KeyboardKey.Space))
+        {
+            Game.inventoryRoom.SetActiveRoom();
+        }
+
+         
+         if (Input.IsKeyDown(KeyboardKey.V))
+        {
+            Game.mainRoom.SetActiveRoom();
+        }
         offsetY = Math.Clamp(offsetY, offsetMinY, offsetMaxY);
     }
 

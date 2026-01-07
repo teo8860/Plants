@@ -58,6 +58,9 @@ internal class Rendering
 
 
             var elements = GameElement.GetList();
+            elements = elements.FindAll((o)=> o.active == true);
+
+
             foreach (var item in elements)
             {
                 item.Update();

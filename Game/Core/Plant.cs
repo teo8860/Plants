@@ -144,7 +144,7 @@ public class Plant : GameElement
 
             Vector2 pos = posizione;
             pos.X += RandomHelper.Int(-45, 45);
-           pos.Y += RandomHelper.Int(90, 90);
+            pos.Y += RandomHelper.Int(90, 90);
 
             radici.Add(new Radice(puntoAttacco, pos));
 
@@ -172,7 +172,6 @@ public class Plant : GameElement
 
     public void ControlloCrescita()
     {
-
         if (Stats.Altezza >= Stats.AltezzaMassima)
             return;
 

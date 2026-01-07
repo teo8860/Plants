@@ -7,6 +7,10 @@ namespace Plants;
 
 public static class Game
 {
+    public static Room mainRoom;
+    public static Room inventoryRoom;
+    public static Room optionMenu;
+
     public static Controller controller;
     public static Water innaffiatoio;
     public static Plant pianta;
@@ -29,6 +33,12 @@ public static class Game
     public static void Init()
     {
         AssetLoader.LoadAll();
+
+        mainRoom = new Room();
+        inventoryRoom = new Room(false);
+        optionMenu = new Room(false);
+
+        GameElement.Create<Test>(0, inventoryRoom);
 
         background = GameElement.Create<Background>(100);
         ground = GameElement.Create<Ground>(100);
