@@ -36,7 +36,7 @@ public class PixelCamera
 	public PixelCamera(int screenWidth, int screenHeight, float virtualRatio)
 	{
 		offset = new Vector2(0.0f, 0.0f);
-		position = new Vector2(0.0f, 10.0f);
+		position = new Vector2(0.0f, 0.0f);
 		rotation = 0.0f;
 		windowZoom = 1.0f;
 		zoom = 0.5f;
@@ -86,7 +86,7 @@ public class PixelCamera
 
 		Graphics.DrawTexturePro(
 			renderTexture.Texture,
-			new Raylib_CSharp.Transformations.Rectangle(0, 0, renderTexture.Texture.Width, -renderTexture.Texture.Height),
+			new Raylib_CSharp.Transformations.Rectangle(0, 0, renderTexture.Texture.Width, renderTexture.Texture.Height),
 			new Raylib_CSharp.Transformations.Rectangle(-virtualRatio, -virtualRatio,
 				screenWidth + (virtualRatio * 2),
 				screenHeight + (virtualRatio * 2)

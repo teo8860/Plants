@@ -50,10 +50,10 @@ public static class Game
         ground = GameElement.Create<Ground>(100);
 
         innaffiatoio = GameElement.Create<Water>(-100);
-        innaffiatoio.Initialize(GameProperties.viewWidth, GameProperties.viewHeight);
+        innaffiatoio.Initialize(GameProperties.cameraWidth, GameProperties.cameraHeight);
 
         weatherSystem = new WeatherRender();
-        weatherSystem.Initialize(Window.GetScreenWidth(), Window.GetScreenHeight());
+        weatherSystem.Initialize(Rendering.camera.screenWidth, Rendering.camera.screenHeight);
 
         controller = new Controller();
         pianta = GameElement.Create<Plant>(-2);
@@ -62,7 +62,7 @@ public static class Game
 
         InitToolbar();
 
-        statsPanel = new GuiStatsPanel(GameProperties.windowWidth - 143, GameProperties.windowHeight - 487);
+        statsPanel = new GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
         oxygenSystem = new OxygenSystem();
 
         SetTimer();

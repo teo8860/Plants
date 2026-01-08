@@ -5,78 +5,72 @@ namespace Plants;
 
 public static class ViewCulling
 {
+    // World coordinates: Y=0 at ground, Y positive upward
+    // Screen coordinates: Y=0 at top, Y positive downward
+    // cameraY = how high the camera is looking (0 = ground level)
 
-    public static bool IsYVisible(float y, float offsetY)
+    public static bool IsYVisible(float worldY, float cameraY)
     {
-        float adjustedY = y + offsetY;
-        return adjustedY >= 0 && adjustedY <= GameProperties.viewHeight;
+        float screenY = CoordinateHelper.ToScreenY(worldY, cameraY);
+        return screenY >= 0 && screenY <= GameProperties.viewHeight;
     }
 
-    public static bool IsPointVisible(Vector2 point, float offsetY)
+    public static bool IsPointVisible(Vector2 worldPoint, float cameraY)
     {
-        float adjustedY = point.Y + offsetY;
-        float adjustedX = point.X;
+        float screenY = CoordinateHelper.ToScreenY(worldPoint.Y, cameraY);
 
-        return adjustedX >= 0 &&
-               adjustedX <= GameProperties.viewWidth &&
-               adjustedY >= 0 &&
-               adjustedY <= GameProperties.viewHeight;
+        return worldPoint.X >= 0 &&
+               worldPoint.X <= GameProperties.viewWidth &&
+               screenY >= 0 &&
+               screenY <= GameProperties.viewHeight;
     }
 
-    public static bool IsRangeVisible(float minY, float maxY, float offsetY)
+    public static bool IsRangeVisible(float minWorldY, float maxWorldY, float cameraY)
     {
-        float adjustedMinY = minY + offsetY;
-        float adjustedMaxY = maxY + offsetY;
+        // In world coords, minY is lower (closer to ground), maxY is higher (plant top)
+        // Convert both to screen coords
+        float screenMinY = CoordinateHelper.ToScreenY(maxWorldY, cameraY); // max world Y = min screen Y
+        float screenMaxY = CoordinateHelper.ToScreenY(minWorldY, cameraY); // min world Y = max screen Y
 
-        float viewTop = 0;
-        float viewBottom = GameProperties.viewHeight;
-
-        return adjustedMaxY >= viewTop && adjustedMinY <= viewBottom;
+        // Check if range overlaps with visible area [0, viewHeight]
+        return screenMaxY >= 0 && screenMinY <= GameProperties.viewHeight;
     }
 
-    public static bool IsRectVisible(float x, float y, float width, float height, float offsetY)
+    public static bool IsRectVisible(float x, float worldY, float width, float height, float cameraY)
     {
-        float adjustedY = y + offsetY;
+        // worldY is the bottom of the rect, height goes up
+        float screenBottom = CoordinateHelper.ToScreenY(worldY, cameraY);
+        float screenTop = CoordinateHelper.ToScreenY(worldY + height, cameraY);
 
-        float viewTop = 0;
-        float viewBottom = GameProperties.viewHeight;
-        float viewLeft = 0;
-        float viewRight = GameProperties.viewWidth;
-
-        return (x + width) >= viewLeft &&
-               x <= viewRight &&
-               (adjustedY + height) >= viewTop &&
-               adjustedY <= viewBottom;
+        return (x + width) >= 0 &&
+               x <= GameProperties.viewWidth &&
+               screenBottom >= 0 &&
+               screenTop <= GameProperties.viewHeight;
     }
 
-    public static bool IsCircleVisible(Vector2 center, float radius, float offsetY)
+    public static bool IsCircleVisible(Vector2 worldCenter, float radius, float cameraY)
     {
-        float adjustedY = center.Y + offsetY;
+        float screenY = CoordinateHelper.ToScreenY(worldCenter.Y, cameraY);
 
-        return (center.X + radius) >= 0 &&
-               (center.X - radius) <= GameProperties.viewWidth &&
-               (adjustedY + radius) >= 0 &&
-               (adjustedY - radius) <= GameProperties.viewHeight;
+        return (worldCenter.X + radius) >= 0 &&
+               (worldCenter.X - radius) <= GameProperties.viewWidth &&
+               (screenY + radius) >= 0 &&
+               (screenY - radius) <= GameProperties.viewHeight;
     }
 
-    public static bool IsLineVisible(Vector2 start, Vector2 end, float offsetY)
+    public static bool IsLineVisible(Vector2 worldStart, Vector2 worldEnd, float cameraY)
     {
-        float minY = Math.Min(start.Y, end.Y);
-        float maxY = Math.Max(start.Y, end.Y);
-        float minX = Math.Min(start.X, end.X);
-        float maxX = Math.Max(start.X, end.X);
+        float screenStartY = CoordinateHelper.ToScreenY(worldStart.Y, cameraY);
+        float screenEndY = CoordinateHelper.ToScreenY(worldEnd.Y, cameraY);
 
-        float adjustedMinY = minY + offsetY;
-        float adjustedMaxY = maxY + offsetY;
+        float minScreenY = Math.Min(screenStartY, screenEndY);
+        float maxScreenY = Math.Max(screenStartY, screenEndY);
+        float minX = Math.Min(worldStart.X, worldEnd.X);
+        float maxX = Math.Max(worldStart.X, worldEnd.X);
 
-        float viewTop = 0;
-        float viewBottom = GameProperties.viewHeight;
-        float viewLeft = 0;
-        float viewRight = GameProperties.viewWidth;
-
-        return maxX >= viewLeft &&
-               minX <= viewRight &&
-               adjustedMaxY >= viewTop &&
-               adjustedMinY <= viewBottom;
+        return maxX >= 0 &&
+               minX <= GameProperties.viewWidth &&
+               maxScreenY >= 0 &&
+               minScreenY <= GameProperties.viewHeight;
     }
 }

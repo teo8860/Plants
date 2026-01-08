@@ -43,11 +43,11 @@ public class Radice
         Vector2 ultimoPunto = punti[^1];
 
         direzione.X += RandomHelper.Int(-2,2);
-        direzione.Y += RandomHelper.Int(1,1);
+        direzione.Y -= RandomHelper.Int(1,1);
         Vector2 dir = direzione - ultimoPunto;
         dir = Vector2.Normalize(dir);
 
-        Vector2 nuovoPunto = ultimoPunto + dir * RandomHelper.Int(2, 6);
+        Vector2 nuovoPunto = ultimoPunto - dir * RandomHelper.Int(2, 6);
 
         punti.Add(nuovoPunto);
 
@@ -67,27 +67,27 @@ public class Radice
         }
     }
 
-    public bool IsInView(float offsetY)
+    public bool IsInView(float cameraY)
     {
-        return ViewCulling.IsRangeVisible(minY, maxY, offsetY);
+        return ViewCulling.IsRangeVisible(minY, maxY, cameraY);
     }
 
 
-    public void Draw(float offsetY)
+    public void Draw()
     {
         if(punti.Count < 2)
             return;
 
-        Span<Vector2> puntiOffset = stackalloc Vector2[punti.Count];
+        Span<Vector2> puntiSpan = stackalloc Vector2[punti.Count];
         for (int i = 0; i < punti.Count; i++)
         {
-            puntiOffset[i] = new Vector2(punti[i].X, punti[i].Y + offsetY);
+            puntiSpan[i] = new Vector2(punti[i].X, punti[i].Y);
         }
 
         for (int i = 0; i < punti.Count - 1; i++)
         {
-            Vector2 pStart = puntiOffset[i];
-            Vector2 pEnd = puntiOffset[i + 1];
+            Vector2 pStart = puntiSpan[i];
+            Vector2 pEnd = puntiSpan[i + 1];
 
                
             Graphics.DrawLineEx(pStart, pEnd, spessoreAttuale, Color.White);

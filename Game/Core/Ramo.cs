@@ -72,9 +72,9 @@ public class Ramo
         }
     }
 
-    public bool IsInView(float offsetY)
+    public bool IsInView(float cameraY)
     {
-        return ViewCulling.IsRangeVisible(minY, maxY, offsetY);
+        return ViewCulling.IsRangeVisible(minY, maxY, cameraY);
     }
 
     public void Cresci()
@@ -84,7 +84,7 @@ public class Ramo
         Vector2 ultimoPunto = punti[^1];
 
         float deltaX = RandomHelper.Int(20, 20) * (direzione == Direzione.Destra ? 1 : -1);
-        float deltaY = -RandomHelper.Int(10, 15);
+        float deltaY = RandomHelper.Int(10, 15);
 
         Vector2 nuovoPunto = new Vector2(ultimoPunto.X + deltaX, ultimoPunto.Y + deltaY);
         punti.Add(nuovoPunto);
@@ -100,7 +100,7 @@ public class Ramo
         if (punti.Count >= 2)
         {
             float flip;
-            float centroSchermoX = GameProperties.viewWidth / 2.0f;
+            float centroSchermoX = GameProperties.cameraWidth / 2.0f;
             const float margineSicurezza = 80.0f;
 
             if (puntoIniziale.X < centroSchermoX - margineSicurezza)
@@ -133,22 +133,20 @@ public class Ramo
         }
     }
 
-    public void Draw(float offsetY)
+    public void Draw()
     {
         if (punti.Count < 2)
             return;
 
-        Span<Vector2> puntiOffset = stackalloc Vector2[punti.Count];
+        Span<Vector2> puntiSpan = stackalloc Vector2[punti.Count];
         for (int i = 0; i < punti.Count; i++)
         {
-            puntiOffset[i] = new Vector2(punti[i].X, punti[i].Y + offsetY);
+            puntiSpan[i] = new Vector2(punti[i].X, punti[i].Y);
         }
 
         Sprite sprite = AssetLoader.spriteLeaf;
 
-
-        float posizioneBase = GameProperties.windowHeight - GameProperties.groundPosition;
-        float distanzaDaBase = posizioneBase - puntoIniziale.Y;
+        float distanzaDaBase = puntoIniziale.Y - GameProperties.groundPosition;
 
         float fattoreAltezza = Math.Clamp(distanzaDaBase / Game.pianta.Stats.Altezza, 0f, 1f);
 
@@ -157,8 +155,8 @@ public class Ramo
 
         for (int i = 0; i < punti.Count - 1; i++)
         {
-            Vector2 pStart = puntiOffset[i];
-            Vector2 pEnd = puntiOffset[i + 1];
+            Vector2 pStart = puntiSpan[i];
+            Vector2 pEnd = puntiSpan[i + 1];
 
             pStart.X += (float)Math.Sin(Time.GetTime()) * 10f;
             pEnd.X += (float)Math.Sin(Time.GetTime()) * 10f;

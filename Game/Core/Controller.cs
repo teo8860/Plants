@@ -7,7 +7,6 @@ using System.Numerics;
 
 public class Controller : GameElement
 {
-    public float offsetY = 0;
     public float offsetMinY = 0;
     public float offsetMaxY => (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier);
 
@@ -35,6 +34,7 @@ public class Controller : GameElement
         Vector2 mouse = Input.GetMousePosition();
         mouse.Y += Rendering.camera.position.Y;
 
+
         if (Input.IsMouseButtonDown(MouseButton.Right))
         {
             isButtonRightPressed = true;
@@ -56,12 +56,12 @@ public class Controller : GameElement
 
         float deltaTime = Time.GetFrameTime();
 
-        if (Input.IsKeyDown(KeyboardKey.Down))
+        if (Input.IsKeyDown(KeyboardKey.Down))// && Rendering.camera.position.Y > 0)
         {
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(-currentScrollSpeed * deltaTime);
         }
-        else if (Input.IsKeyDown(KeyboardKey.Up))
+        else if (Input.IsKeyDown(KeyboardKey.Up) && Rendering.camera.position.Y <= (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier))
         {
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(currentScrollSpeed * deltaTime);
@@ -81,7 +81,6 @@ public class Controller : GameElement
         {
             Game.mainRoom.SetActiveRoom();
         }
-        //offsetY = Math.Clamp(offsetY, offsetMinY, offsetMaxY);
     }
 
     public void Scorri(float delta)

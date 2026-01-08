@@ -23,6 +23,7 @@ namespace Plants
 
         public override void Draw()
         {
+            if (!isTutorialActive) return;
             int GlassWidth = GameProperties.cameraWidth / 5;
             int GlassHeight = GameProperties.cameraHeight / 5;
 

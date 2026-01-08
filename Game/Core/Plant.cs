@@ -33,11 +33,9 @@ public class Plant : GameElement
     public PlantStats Stats = new PlantStats();
 
     public GameLogicPianta proprieta;
-    
-    public int y3 => (int)(GameProperties.windowHeight - GameProperties.groundPosition - (Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)) + 340;
-    public int y4 => (int)(GameProperties.windowHeight - (Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)) + 300;
 
-    public float nextWorldGroundY => y4 - y3;
+    // Next world ground position (in world coordinates)
+    public float nextWorldGroundY => Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier;
 
     public Plant()
     {
@@ -47,7 +45,7 @@ public class Plant : GameElement
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
-        // /* Test di crescita rapida
+         /* Test di crescita rapida
         if (!Game.tutorial.isTutorialActive)
         {
             for (int a = 0; a < 1240; a++)
@@ -72,9 +70,9 @@ public class Plant : GameElement
 
     public void PosizionaAlCentroInBasso()
     {
-        float centroX = 0.5f;
-        float bassoY = 0.04f;
-        posizione = new(Rendering.camera.view.X / 2, GameProperties.groundPosition);
+        // World coordinates: Y=0 is ground level
+        float centroX = Rendering.camera.view.X / 2;
+        posizione = new(centroX, GameProperties.groundPosition);
     }
 
     public void Crescita()
@@ -165,13 +163,6 @@ public class Plant : GameElement
         {
             radice.Cresci();
         }
-        /*
-        if (puntiSpline.Count >= 3)
-        {
-            float deltaY = puntiSpline[^3].Y - puntiSpline[^2].Y; 
-            if (Game.controller.offsetY < Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
-                Game.controller.Scorri(deltaY);
-        }*/
     }
 
     public void ControlloCrescita()
@@ -189,7 +180,7 @@ public class Plant : GameElement
 
     public void Reset()
     {
-        Game.controller.offsetY = 0;
+        Rendering.camera.position.Y = 0;
         puntiSpline.Clear();
         rami.Clear();
         radici.Clear();
@@ -211,9 +202,9 @@ public class Plant : GameElement
         float terzoX = Math.Clamp(
             puntiSpline[1].X + RandomHelper.Int(-15, 15),
             margineMinimo,
-            GameProperties.windowWidth - margineMinimo
+            GameProperties.cameraWidth - margineMinimo
         );
-        float terzoY = puntiSpline[1].Y - RandomHelper.Int(30, 50);
+        float terzoY = puntiSpline[1].Y + RandomHelper.Int(30, 50);
         puntiSpline.Add(new Vector2(terzoX, terzoY));
     }
 
@@ -221,9 +212,9 @@ public class Plant : GameElement
     {
         Vector2 ultimoPunto = puntiSpline[^1];
 
-        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15, 15), margineMinimo, GameProperties.viewWidth - margineMinimo);
+        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15, 15), margineMinimo, GameProperties.cameraWidth - margineMinimo);
 
-        float nuovoY = ultimoPunto.Y - incrementoAltezza;
+        float nuovoY = ultimoPunto.Y + incrementoAltezza;
 
         puntiSpline.Add(new Vector2(nuovoX, nuovoY));
     }
@@ -235,24 +226,21 @@ public class Plant : GameElement
 
     public override void Draw()
     {
-        float offsetY = Game.controller.offsetY;
+        float cameraY = Rendering.camera.position.Y;
 
         if (puntiSpline.Count >= 4)
         {
-            Span<Vector2> puntiConOffset = stackalloc Vector2[puntiSpline.Count];
+            Span<Vector2> puntiSplineSpan = stackalloc Vector2[puntiSpline.Count];
 
             for (int i = 0; i < puntiSpline.Count; i++)
             {
-                puntiConOffset[i] = new Vector2(
-                    puntiSpline[i].X,
-                    puntiSpline[i].Y + offsetY
-                );
+                puntiSplineSpan[i] = puntiSpline[i];
             }
 
             foreach (var ramo in rami)
             {
-                if (ramo.IsInView(offsetY))
-                    ramo.Draw(offsetY);
+                if (ramo.IsInView(cameraY))
+                    ramo.Draw();
             }
 
 
@@ -262,14 +250,14 @@ public class Plant : GameElement
                 float segmentMinY = Math.Min(puntiSpline[i].Y, puntiSpline[i + 3].Y);
                 float segmentMaxY = Math.Max(puntiSpline[i].Y, puntiSpline[i + 3].Y);
 
-               if (!ViewCulling.IsRangeVisible(segmentMinY, segmentMaxY, -Rendering.camera.position.Y))
-                   continue;
+                if (!ViewCulling.IsRangeVisible(segmentMinY, segmentMaxY, cameraY))
+                    continue;
 
                 spessore = Math.Min(5 + ((puntiSpline.Count - i) / 10), 10);
 
-                if (i + 4 <= puntiConOffset.Length)
+                if (i + 4 <= puntiSplineSpan.Length)
                 {
-                    Span<Vector2> segmento = puntiConOffset.Slice(i, 4);
+                    Span<Vector2> segmento = puntiSplineSpan.Slice(i, 4);
                     for (int o = 0; o < segmento.Length; o++)
                     {
                         segmento[o].X += getSinOffset();
@@ -284,19 +272,16 @@ public class Plant : GameElement
                 }
             }
 
-            if (Stats.Altezza >= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier )//&& offsetY == Game.controller.offsetMaxY)
+            if (Stats.Altezza >= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
             {
- 
-                Vector2 puntoPartenza = new Vector2(
-                    puntiConOffset[^2].X,
-                    puntiConOffset[^2].Y //+ Game.controller.offsetMaxY
-                );
+
+                Vector2 puntoPartenza = puntiSplineSpan[^2];
 
                 Vector2 puntoArrivo = new Vector2(
-                    puntiConOffset[^2].X,
-                    puntiConOffset[^2].Y - nextWorldGroundY //+ offsetY
+                    puntiSplineSpan[^2].X,
+                    CoordinateHelper.ToScreenY(nextWorldGroundY, cameraY)
                 );
-   
+
                 Span<Vector2> segmento = stackalloc Vector2[4];
                 segmento[0] = puntoPartenza;
                 segmento[1] = puntoPartenza;
@@ -306,31 +291,26 @@ public class Plant : GameElement
                 );
                 segmento[3] = puntoArrivo;
 
-                
+
                 Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
                 if (spessore > 10)
                 {
                     Graphics.DrawSplineCatmullRom(segmento, spessore - 10, Color.DarkGreen);
                 }
-                
-
-                //Graphics.DrawLineEx(new Vector2(puntiConOffset[^2].X, puntiConOffset[^2].Y), new Vector2(puntiConOffset[^2].X, nextWorldGroundY), spessore, Color.Yellow);
-
-
-                //Graphics.DrawCircleV(new Vector2(puntoArrivo.X,puntoArrivo.Y - 10), spessore, Color.DarkGreen);
-                //Graphics.DrawEllipse((int)puntoArrivo.X, (int)(puntoArrivo.Y + 10 + offsetY), 15, 25, Color.DarkBrown);
             }
         }
 
         foreach (var radice in radici)
         {
-            if (radice.IsInView(offsetY))
-                radice.Draw(offsetY);
+            if (radice.IsInView(cameraY))
+                radice.Draw();
         }
 
-        if (ViewCulling.IsYVisible(posizione.Y + 10, offsetY))
+        // Draw seed/bulb at base
+        if (ViewCulling.IsYVisible(posizione.Y, cameraY))
         {
-            Graphics.DrawEllipse((int)posizione.X, (int)(posizione.Y + 10 + offsetY), 4, 8, Color.DarkBrown);
+            Vector2 screenPos = posizione;
+            Graphics.DrawEllipse((int)screenPos.X, (int)screenPos.Y, 4, 8, Color.DarkBrown);
         }
     }
 

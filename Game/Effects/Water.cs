@@ -14,8 +14,8 @@ public class Water : Particle
         this.defaultData.gravity_min.X = -0.2f;
         this.defaultData.gravity_max.X = 0.2f;
 
-        this.defaultData.gravity_min.Y = 0.2f;
-        this.defaultData.gravity_max.Y = 0.2f;
+        this.defaultData.gravity_min.Y = -0.2f;
+        this.defaultData.gravity_max.Y = -0.2f;
     }
 
 }
