@@ -1,5 +1,4 @@
 ﻿using NotificationIconSharp;
-using Plants;
 using Raylib_CSharp.Windowing;
 using System;
 using System.Drawing;

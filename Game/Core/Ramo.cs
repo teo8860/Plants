@@ -72,10 +72,6 @@ public class Ramo
         }
     }
 
-    public bool IsInView(float cameraY)
-    {
-        return ViewCulling.IsRangeVisible(minY, maxY, cameraY);
-    }
 
     public void Cresci()
     {
@@ -83,8 +79,8 @@ public class Ramo
 
         Vector2 ultimoPunto = punti[^1];
 
-        float deltaX = RandomHelper.Int(20, 20) * (direzione == Direzione.Destra ? 1 : -1);
-        float deltaY = RandomHelper.Int(10, 15);
+        float deltaX = RandomHelper.Int(12, 12) * (direzione == Direzione.Destra ? 1 : -1);
+        float deltaY = RandomHelper.Int(7, 12);
 
         Vector2 nuovoPunto = new Vector2(ultimoPunto.X + deltaX, ultimoPunto.Y + deltaY);
         punti.Add(nuovoPunto);
@@ -135,6 +131,9 @@ public class Ramo
 
     public void Draw()
     {
+        if(ViewCulling.IsValueVisible(minY, Rendering.camera.position.Y) == false && ViewCulling.IsValueVisible(maxY, Rendering.camera.position.Y) == false)
+            return;
+
         if (punti.Count < 2)
             return;
 
@@ -151,18 +150,18 @@ public class Ramo
         float fattoreAltezza = Math.Clamp(distanzaDaBase / Game.pianta.Stats.Altezza, 0f, 1f);
 
         
-        spessoreBaseRamo = Math.Min(10f - (fattoreAltezza * 4f), 50f);
+        spessoreBaseRamo = Math.Min(8f - (fattoreAltezza * 3f), 50f);
 
         for (int i = 0; i < punti.Count - 1; i++)
         {
             Vector2 pStart = puntiSpan[i];
             Vector2 pEnd = puntiSpan[i + 1];
 
-            pStart.X += (float)Math.Sin(Time.GetTime()) * 10f;
-            pEnd.X += (float)Math.Sin(Time.GetTime()) * 10f;
+            pStart.X += (float)Math.Sin(Time.GetTime()) * 7f;
+            pEnd.X += (float)Math.Sin(Time.GetTime()) *7f;
 
             float fattoreSegmento = (float)(punti.Count - 1 - i) / Math.Max(1, punti.Count - 1);
-            spessoreAttuale = spessoreBaseRamo * (0.4f + fattoreSegmento * 0.6f) + incrementoSpessore;
+            spessoreAttuale = spessoreBaseRamo * (0.3f + fattoreSegmento * 0.5f) + incrementoSpessore;
 
             Graphics.DrawLineEx(pStart, pEnd, spessoreAttuale, Color.DarkBrown);
 
@@ -173,8 +172,6 @@ public class Ramo
             if (w > 0 && h > 0 && i < parametriFoglie.Count)
             {
                 var paramsFoglia = parametriFoglie[i];
-                float scala = 0.8f;
-
                 Vector2 posizioneRamo = Vector2.Lerp(pStart, pEnd, paramsFoglia.posizioneRelativa.X);
 
                 float deltaY = pEnd.Y - pStart.Y;
@@ -192,7 +189,7 @@ public class Ramo
                 float rotazioneFinale = rotazioneBase + paramsFoglia.rotazione;
 
                 if (i > 1)
-                    GameFunctions.DrawSprite(sprite, posizioneFinale, rotazioneFinale, new Vector2(1, 1));
+                    GameFunctions.DrawSprite(sprite, posizioneFinale, rotazioneFinale, new Vector2(0.7f,0.7f));
             }
         }
     }

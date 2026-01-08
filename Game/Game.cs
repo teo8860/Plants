@@ -53,7 +53,6 @@ public static class Game
         innaffiatoio.Initialize(GameProperties.cameraWidth, GameProperties.cameraHeight);
 
         weatherSystem = new WeatherRender();
-        weatherSystem.Initialize(Rendering.camera.screenWidth, Rendering.camera.screenHeight);
 
         controller = new Controller();
         pianta = GameElement.Create<Plant>(-2);

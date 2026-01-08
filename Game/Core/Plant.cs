@@ -45,15 +45,19 @@ public class Plant : GameElement
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
-         /* Test di crescita rapida
-        if (!Game.tutorial.isTutorialActive)
+        for (int a = 0; a < 10; a++)
         {
-            for (int a = 0; a < 1240; a++)
-            {
-                Crescita();
-            }
+            Crescita();
         }
-        // */
+        /* Test di crescita rapida
+       if (!Game.tutorial.isTutorialActive)
+       {
+           for (int a = 0; a < 1240; a++)
+           {
+               Crescita();
+           }
+       }
+       // */
     }
 
     public Plant(SeedType seedType)
@@ -81,7 +85,7 @@ public class Plant : GameElement
         float velocita = proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
         float metabolismo = proprieta.MetabolismoEffettivo;
 
-        float incrementoBase = 30f + RandomHelper.Float(0, 20f);
+        float incrementoBase = 20f + RandomHelper.Float(0, 10f);
         float incrementoFinale = incrementoBase * metabolismo * (0.5f + velocita * 0.5f);
 
         incrementoFinale = Math.Max(15f, incrementoFinale);
@@ -239,8 +243,7 @@ public class Plant : GameElement
 
             foreach (var ramo in rami)
             {
-                if (ramo.IsInView(cameraY))
-                    ramo.Draw();
+               ramo.Draw();
             }
 
 
@@ -250,10 +253,10 @@ public class Plant : GameElement
                 float segmentMinY = Math.Min(puntiSpline[i].Y, puntiSpline[i + 3].Y);
                 float segmentMaxY = Math.Max(puntiSpline[i].Y, puntiSpline[i + 3].Y);
 
-                if (!ViewCulling.IsRangeVisible(segmentMinY, segmentMaxY, cameraY))
+                if (ViewCulling.IsValueVisible(segmentMinY,  cameraY) == false && ViewCulling.IsValueVisible(segmentMaxY, cameraY) == false)
                     continue;
 
-                spessore = Math.Min(5 + ((puntiSpline.Count - i) / 10), 10);
+                spessore = Math.Min(5 + ((puntiSpline.Count - i) / 10), 30);
 
                 if (i + 4 <= puntiSplineSpan.Length)
                 {
@@ -307,10 +310,10 @@ public class Plant : GameElement
         }
 
         // Draw seed/bulb at base
-        if (ViewCulling.IsYVisible(posizione.Y, cameraY))
+        if (ViewCulling.IsValueVisible(posizione.Y, cameraY))
         {
             Vector2 screenPos = posizione;
-            Graphics.DrawEllipse((int)screenPos.X, (int)screenPos.Y, 4, 8, Color.DarkBrown);
+            Graphics.DrawEllipse((int)screenPos.X, (int)screenPos.Y, 8, 12, Color.DarkBrown);
         }
     }
 

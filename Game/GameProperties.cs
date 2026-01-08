@@ -20,7 +20,7 @@ internal static class GameProperties
     public static int cameraWidth => (int)Rendering.camera.view.X;
     public static int cameraHeight => (int)Rendering.camera.view.Y;
 
-    public static int groundPosition = 40;
-    public static int groundHeight = 100;
+    public static int groundPosition = 60;
+    public static int groundHeight = 140;
 
 }

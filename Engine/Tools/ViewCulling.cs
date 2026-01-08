@@ -5,9 +5,6 @@ namespace Plants;
 
 public static class ViewCulling
 {
-    // World coordinates: Y=0 at ground, Y positive upward
-    // Screen coordinates: Y=0 at top, Y positive downward
-    // cameraY = how high the camera is looking (0 = ground level)
 
     public static bool IsYVisible(float worldY, float cameraY)
     {
@@ -25,20 +22,19 @@ public static class ViewCulling
                screenY <= GameProperties.viewHeight;
     }
 
+    public static bool IsValueVisible(float value, float cameraY)
+    {
+        return value > cameraY && value < cameraY + GameProperties.cameraHeight;
+    }
+
     public static bool IsRangeVisible(float minWorldY, float maxWorldY, float cameraY)
     {
-        // In world coords, minY is lower (closer to ground), maxY is higher (plant top)
-        // Convert both to screen coords
-        float screenMinY = CoordinateHelper.ToScreenY(maxWorldY, cameraY); // max world Y = min screen Y
-        float screenMaxY = CoordinateHelper.ToScreenY(minWorldY, cameraY); // min world Y = max screen Y
-
-        // Check if range overlaps with visible area [0, viewHeight]
-        return screenMaxY >= 0 && screenMinY <= GameProperties.viewHeight;
+        return minWorldY > cameraY && minWorldY < cameraY + GameProperties.cameraHeight && 
+                maxWorldY > cameraY && maxWorldY < cameraY + GameProperties.cameraHeight;
     }
 
     public static bool IsRectVisible(float x, float worldY, float width, float height, float cameraY)
     {
-        // worldY is the bottom of the rect, height goes up
         float screenBottom = CoordinateHelper.ToScreenY(worldY, cameraY);
         float screenTop = CoordinateHelper.ToScreenY(worldY + height, cameraY);
 

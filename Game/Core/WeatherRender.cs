@@ -18,6 +18,8 @@ public class WeatherRender : GameElement
 
     public WeatherRender()
     {
+        screenHeight = GameProperties.cameraHeight + (int)Rendering.camera.position.Y;
+        screenWidth = GameProperties.cameraWidth;
         rainBuffer = new CircularBuffer();
         snowBuffer = new CircularBuffer();
 
@@ -25,12 +27,6 @@ public class WeatherRender : GameElement
         {
             cloudOffsets[i] = RandomHelper.Int(0, 300);
         }
-    }
-
-    public void Initialize(int width, int height)
-    {
-        screenWidth = width;
-        screenHeight = height;
     }
 
     private ParticleData AddToBuffer(CircularBuffer buffer)

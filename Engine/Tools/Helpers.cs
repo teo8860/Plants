@@ -16,7 +16,7 @@ public static class CoordinateHelper
     /// <summary>
     /// Posizione Y del terreno sullo schermo (in pixel dalla cima)
     /// </summary>
-    public static float GroundScreenY => GameProperties.viewHeight - GameProperties.groundPosition;
+    public static float GroundScreenY => GameProperties.groundPosition;
 
     /// <summary>
     /// Converte Y da coordinate mondo a coordinate schermo
@@ -40,6 +40,13 @@ public static class CoordinateHelper
     public static float ToWorldY(float screenY, float cameraY)
     {
         return GroundScreenY + cameraY - screenY;
+    }
+
+    public static Vector2 ToWorld(Vector2 viewPos)
+    {
+        viewPos.X = (viewPos.X * Rendering.camera.zoom);
+        viewPos.Y = ((GameProperties.windowHeight - viewPos.Y) * Rendering.camera.zoom) + Rendering.camera.position.Y;
+        return viewPos;
     }
 }
 

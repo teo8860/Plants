@@ -32,7 +32,7 @@ public class Controller : GameElement
         }
 
         Vector2 mouse = Input.GetMousePosition();
-        mouse.Y += Rendering.camera.position.Y;
+        mouse = CoordinateHelper.ToWorld(mouse);
 
 
         if (Input.IsMouseButtonDown(MouseButton.Right))
@@ -56,7 +56,7 @@ public class Controller : GameElement
 
         float deltaTime = Time.GetFrameTime();
 
-        if (Input.IsKeyDown(KeyboardKey.Down))// && Rendering.camera.position.Y > 0)
+        if (Input.IsKeyDown(KeyboardKey.Down) && Rendering.camera.position.Y > 0)
         {
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(-currentScrollSpeed * deltaTime);
