@@ -10,22 +10,21 @@ public class WeatherRender : GameElement
 {
     private CircularBuffer rainBuffer;
     private CircularBuffer snowBuffer;
-    private int screenWidth;
-    private int screenHeight;
     private float lightningTimer = 0f;
     private bool showLightning = false;
     private float[] cloudOffsets = new float[3];
 
+    private int ViewWidth => GameProperties.cameraWidth;
+    private int ViewHeight => GameProperties.cameraHeight + (int)Rendering.camera.position.Y;
+
     public WeatherRender()
     {
-        screenHeight = GameProperties.cameraHeight + (int)Rendering.camera.position.Y;
-        screenWidth = GameProperties.cameraWidth;
         rainBuffer = new CircularBuffer();
         snowBuffer = new CircularBuffer();
 
         for (int i = 0; i < cloudOffsets.Length; i++)
         {
-            cloudOffsets[i] = RandomHelper.Int(0, 300);
+            cloudOffsets[i] = RandomHelper.Int(0, ViewWidth);
         }
     }
 
@@ -67,22 +66,20 @@ public class WeatherRender : GameElement
         }
     }
 
-
-
     private void UpdateRain(bool heavy)
     {
-        int particlesToSpawn = heavy ? 8 : 4;
+        int particlesToSpawn = heavy ? 6 : 3;
 
         for (int I = 0; I < particlesToSpawn; I++)
         {
             ParticleData newParticle = AddToBuffer(rainBuffer);
             if (newParticle != null)
             {
-                newParticle.position = new Vector2(RandomHelper.Int(0, screenWidth), -10);
+                newParticle.position = new Vector2(RandomHelper.Int(0, ViewWidth), ViewHeight);
                 newParticle.alive = true;
-                newParticle.radius = 2.0f;
+                newParticle.radius = 2f;
                 newParticle.color = new Color(173, 216, 230, heavy ? (byte)180 : (byte)120);
-                newParticle.velocity = new Vector2(0, heavy ? 12 : 8);
+                newParticle.velocity = new Vector2(0, heavy ? 9 : 5);
             }
         }
 
@@ -92,9 +89,9 @@ public class WeatherRender : GameElement
             ParticleData p = rainBuffer.buffer[i];
             if (p.alive)
             {
-                p.position += p.velocity;
+                p.position -= p.velocity;
 
-                if (p.position.Y > screenHeight || p.position.X > screenWidth)
+                if (p.position.Y < -1 || p.position.X > ViewWidth)
                 {
                     p.alive = false;
                 }
@@ -119,8 +116,8 @@ public class WeatherRender : GameElement
                 Graphics.DrawLine(
                     (int)p.position.X,
                     (int)p.position.Y,
-                    (int)(p.position.X - 2),
-                    (int)(p.position.Y - 15),
+                    (int)(p.position.X),
+                    (int)(p.position.Y + 8),
                     p.color
                 );
             }
@@ -135,9 +132,9 @@ public class WeatherRender : GameElement
             ParticleData newParticle = AddToBuffer(snowBuffer);
             if (newParticle != null)
             {
-                newParticle.position = new Vector2(RandomHelper.Int(0, screenWidth), -10);
+                newParticle.position = new Vector2(RandomHelper.Int(0, ViewWidth), ViewHeight);
                 newParticle.alive = true;
-                newParticle.radius = 3.0f;
+                newParticle.radius = 1.8f;
                 newParticle.color = new Color(255, 255, 255, 200);
                 newParticle.velocity = new Vector2(0, 1 + RandomHelper.Int(2));
                 newParticle.lifetime = 0;
@@ -151,10 +148,10 @@ public class WeatherRender : GameElement
             if (p.alive)
             {
                 p.lifetime += 0.016f;
-                p.position.X += MathF.Sin(p.lifetime * 2) * 0.5f;
-                p.position.Y += p.velocity.Y;
+                p.position.X += MathF.Sin(p.lifetime * 2) * 0.3f;
+                p.position.Y -= p.velocity.Y;
 
-                if (p.position.Y > screenHeight)
+                if (p.position.Y < -1)
                 {
                     p.alive = false;
                 }
@@ -204,14 +201,14 @@ public class WeatherRender : GameElement
         {
             if (lightningTimer <= 0.1f)
             {
-                Graphics.DrawRectangle(0, 0, screenWidth, screenHeight,
+                Graphics.DrawRectangle(0, 0, ViewWidth, ViewHeight,
                     new Color(255, 255, 255, 150));
             }
             else
             {
                 Graphics.DrawLineEx(
-                    new Vector2(RandomHelper.Int(0, screenWidth), 0),
-                    new Vector2(RandomHelper.Int(0, screenWidth), screenHeight),
+                    new Vector2(RandomHelper.Int(0, ViewWidth), 0),
+                    new Vector2(RandomHelper.Int(0, ViewWidth), ViewHeight),
                     2.0f,
                     Color.Gold
                 );
@@ -221,42 +218,41 @@ public class WeatherRender : GameElement
 
     private void DrawClouds()
     {
-        float time = (float)Time.GetTime();
-        int cloudY = 50;
+        int cloudY = ViewHeight - 60;
 
         for (int I = 0; I < 3; I++)
         {
-            cloudOffsets[I] += 0.3f;
-            if (cloudOffsets[I] > screenWidth + 100)
+            cloudOffsets[I] += 0.2f;
+            if (cloudOffsets[I] > ViewWidth + 50)
             {
-                cloudOffsets[I] = -100;
+                cloudOffsets[I] = - 50;
             }
 
             int x = (int)cloudOffsets[I];
-            int y = cloudY + (I * 40);
+            int y = cloudY + (I * 25);
             DrawCloud(x, y, new Color(200, 200, 210, 150));
         }
     }
 
     private void DrawCloud(int x, int y, Color color)
     {
-        Graphics.DrawCircle(x, y, 30, color);
-        Graphics.DrawCircle(x + 25, y, 35, color);
-        Graphics.DrawCircle(x + 50, y, 30, color);
-        Graphics.DrawCircle(x + 25, y - 20, 25, color);
+        Graphics.DrawCircle(x, y, 13, color);
+        Graphics.DrawCircle(x + 12, y, 16, color);
+        Graphics.DrawCircle(x + 25, y, 13, color);
+        Graphics.DrawCircle(x + 12, y + 10, 10, color);
     }
 
     private void DrawFog()
     {
-        Graphics.DrawRectangle(0, 0, screenWidth, screenHeight,
-            new Color(220, 220, 230, 80));
+        Graphics.DrawRectangle(0, 0, ViewWidth, ViewHeight,
+            new Color(220, 220, 230, 60));
 
-        float offset = MathF.Sin((float)Time.GetTime() * 0.5f) * 50;
-        for (int I = 0; I < 5; I++)
+        float offset = MathF.Sin((float)Time.GetTime() * 0.5f) * 20;
+        for (int I = 0; I < 4; I++)
         {
-            int y = I * 150 + (int)offset;
-            Graphics.DrawRectangle(0, y, screenWidth, 80,
-                new Color(200, 200, 210, 40));
+            int y = I * 80 + (int)offset;
+            Graphics.DrawRectangle(0, y, ViewWidth, 40,
+                new Color(200, 200, 210, 30));
         }
     }
 }
