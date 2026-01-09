@@ -30,7 +30,7 @@ internal class Rendering
                 Window.Close();
             }
             
-             camera.Update();
+            camera.Update();
             var elements = GameElement.GetList();
             elements = elements.FindAll((o)=> o.active == true);
 
@@ -50,12 +50,14 @@ internal class Rendering
             Graphics.BeginDrawing();
             Graphics.ClearBackground(Color.Black);
             camera.BeginWorldMode();
-
             foreach (var item in layerBase)
             {
                 item.Draw();
             }
        
+
+            Graphics.DrawCircle(60,0, 10, Color.White);
+            Graphics.DrawCircle(60,60, 10, Color.White);
             camera.EndWorldMode();
             camera.DrawWorld();
 

@@ -34,7 +34,7 @@ public class Background : GameElement
     private void InitializeStars()
     {
         Random rand = new Random(42);
-        int starCount = 80;
+        int starCount = 5000;
         starPositions = new Vector2[starCount];
         starSizes = new float[starCount];
         starTwinkle = new float[starCount];
@@ -43,7 +43,7 @@ public class Background : GameElement
         {
             starPositions[i] = new Vector2(
                 rand.Next(0, GameProperties.cameraWidth),
-                rand.Next(0, GameProperties.cameraHeight)
+                rand.Next(0, 25000)
             );
             starSizes[i] = (float)(rand.NextDouble() * 1.5 + 0.5);
             starTwinkle[i] = (float)(rand.NextDouble() * 2 + 1);
@@ -92,12 +92,15 @@ public class Background : GameElement
         int segments = 24;
         int segmentHeight = GameProperties.cameraHeight / segments;
 
+        Graphics.DrawRectangle(0, (int)Rendering.camera.position.Y, GameProperties.cameraWidth, (int)(Rendering.camera.position.Y + (int)Rendering.camera.view.Y),  LerpColor(bottomColor, topColor, 0.5f));
+
+
         for (int i = 0; i < segments; i++)
         {
             float t = (float)i / segments;
             Color segmentColor = LerpColor(bottomColor, topColor, t);
-            int y = GameProperties.cameraHeight - (i + 1) * segmentHeight;
-            Graphics.DrawRectangle(0, y, GameProperties.cameraWidth, segmentHeight + 1, segmentColor);
+            int y = (int)(Rendering.camera.position.Y+GameProperties.cameraHeight - (i + 1) * segmentHeight);
+           // Graphics.DrawRectangle(0, y, GameProperties.cameraWidth, segmentHeight + 1, segmentColor);
         }
     }
 
@@ -158,7 +161,11 @@ public class Background : GameElement
             float twinkle = (MathF.Sin(time * starTwinkle[i]) + 1f) * 0.5f;
             byte alpha = (byte)(255 * starSizes[i] * twinkle * visibility * 0.8f);
             Color starColor = new Color(255, 255, 255, alpha);
-            Graphics.DrawCircleV(starPositions[i], starSizes[i], starColor);
+            Vector2 pos = starPositions[i];
+
+         //   pos.Y += Rendering.camera.position.Y;
+         if(ViewCulling.IsValueVisible(pos.Y, Rendering.camera.position.Y))
+            Graphics.DrawCircleV(pos, starSizes[i], starColor);
         }
     }
 

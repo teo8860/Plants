@@ -95,7 +95,7 @@ public class PixelCamera
 			0.0f,
 			Color.White
 		);
-
+	
 		Graphics.EndMode2D();
 	}
 

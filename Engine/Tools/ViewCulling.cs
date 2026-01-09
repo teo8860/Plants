@@ -24,7 +24,7 @@ public static class ViewCulling
 
     public static bool IsValueVisible(float value, float cameraY)
     {
-        return value > cameraY && value < cameraY + GameProperties.cameraHeight;
+        return value > cameraY && value < cameraY + Rendering.camera.view.Y;
     }
 
     public static bool IsRangeVisible(float minWorldY, float maxWorldY, float cameraY)

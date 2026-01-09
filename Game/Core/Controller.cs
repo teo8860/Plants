@@ -71,6 +71,16 @@ public class Controller : GameElement
             currentScrollSpeed = scrollSpeed;
         }
 
+        if (Input.IsKeyDown(KeyboardKey.Right))
+        {
+              Rendering.camera.position.Y = Game.pianta.Stats.AltezzaMassima*WorldManager.GetCurrentModifiers().LimitMultiplier;
+        }
+        
+        if (Input.IsKeyDown(KeyboardKey.Left))
+        {
+              Rendering.camera.position.Y = 0;
+        }
+
          if (Input.IsKeyDown(KeyboardKey.Space))
         {
             Game.inventoryRoom.SetActiveRoom();
@@ -85,6 +95,7 @@ public class Controller : GameElement
 
     public void Scorri(float delta)
     {
-        Rendering.camera.position.Y += delta/10;
+        Rendering.camera.position.Y += delta;
+        Rendering.camera.Update();
     }
 }
