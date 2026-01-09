@@ -1,612 +1,597 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Plants
+namespace Plants;
+
+public class GameLogicPianta
 {
-    public class GameLogicPianta
+    private Plant pianta;
+    public int contatoreSecondi = 0;
+
+    public const float CONSUMO_ACQUA_BASE = 0.0012f;
+    public const float CONSUMO_OSSIGENO_BASE = 0.0006f;
+    public const float CONSUMO_ENERGIA_BASE = 0.0008f;
+    public const float RIGENERAZIONE_SALUTE_BASE = 0.0006f;
+
+    public const float SOGLIA_DISIDRATAZIONE = 0.12f;
+    public const float SOGLIA_SOFFOCAMENTO = 0.15f;
+    public const float SOGLIA_CRITICA_SALUTE = 0.20f;
+    public const float SOGLIA_FAME_ENERGIA = 0.10f;
+
+    public const float TEMPERATURA_GELIDA = -15.0f;
+    public const float TEMPERATURA_FREDDA = 2.0f;
+    public const float TEMPERATURA_FRESCA = 10.0f;
+    public const float TEMPERATURA_IDEALE_MIN = 18.0f;
+    public const float TEMPERATURA_IDEALE_MAX = 26.0f;
+    public const float TEMPERATURA_CALDA = 34.0f;
+    public const float TEMPERATURA_TORRIDA = 45.0f;
+
+    public const float PROBABILITA_PARASSITI_BASE = 0.0006f;
+    public const float DANNO_PARASSITI_BASE = 0.006f;
+    public const float DROP_FOGLIE_BASE = 0.004f;
+
+    public GameLogicPianta(Plant Pianta)
     {
-        private Plant pianta;
-        public int contatoreSecondi = 0;
+        pianta = Pianta;
+    }
 
-        public const float CONSUMO_ACQUA_BASE = 0.002f;
-        public const float CONSUMO_OSSIGENO_BASE = 0.001f;
-        public const float RIGENERAZIONE_SALUTE_BASE = 0.001f;
-        public const float CRESCITA_BASE = 0.5f;
-        public const float SOGLIA_DISIDRATAZIONE = 0.2f;
-        public const float SOGLIA_SOFFOCAMENTO = 0.3f;
+    private static readonly Dictionary<DayPhase, float> TemperatureBaseFase = new()
+    {
+        { DayPhase.Night, 10f },
+        { DayPhase.Dawn, 13f },
+        { DayPhase.Morning, 18f },
+        { DayPhase.Afternoon, 24f },
+        { DayPhase.Dusk, 19f },
+        { DayPhase.Evening, 14f }
+    };
 
-        public const float TEMPERATURA_GELIDA = 0.0f;
-        public const float TEMPERATURA_FREDDA = 10.0f;
-        public const float TEMPERATURA_FRESCA = 15.0f;
-        public const float TEMPERATURA_IDEALE_MIN = 18.0f;
-        public const float TEMPERATURA_IDEALE_MAX = 25.0f;
-        public const float TEMPERATURA_CALDA = 30.0f;
-        public const float TEMPERATURA_TORRIDA = 38.0f;
+    public SeedBonus bonus => pianta.seedBonus;
+    public PlantStats stats => pianta.Stats;
 
-        public GameLogicPianta(Plant Pianta)
+    public float VitalitaMax => 1.0f * bonus.Vitalita;
+    public float ConsumoAcquaMult => bonus.Idratazione;
+
+    public float ResistenzaFreddoTotale => Math.Clamp(stats.ResistenzaFreddo + bonus.ResistenzaFreddo, -1f, 1f);
+    public float ResistenzaCaldoTotale => Math.Clamp(stats.ResistenzaCaldo + bonus.ResistenzaCaldo, -1f, 1f);
+    public float ResistenzaParassitiTotale => Math.Clamp(stats.ResistenzaParassiti + bonus.ResistenzaParassiti, -1f, 1f);
+
+    public int FoglieMassime => (int)(stats.FoglieBase * bonus.Vegetazione);
+    public float MetabolismoEffettivo => Math.Clamp(stats.Metabolismo * bonus.Metabolismo, 0.1f, 3f);
+    public float PercentualeSalute => stats.Salute / VitalitaMax;
+
+    public bool IsViva => stats.Salute > 0;
+    public bool IsCritica => PercentualeSalute < SOGLIA_CRITICA_SALUTE;
+    public bool IsDisidratata => stats.Idratazione < SOGLIA_DISIDRATAZIONE;
+    public bool IsSoffocamento => stats.Ossigeno < SOGLIA_SOFFOCAMENTO;
+    public bool IsFame => stats.Metabolismo < SOGLIA_FAME_ENERGIA;
+
+    public bool IsGelida => stats.Temperatura <= TEMPERATURA_GELIDA;
+    public bool IsFredda => stats.Temperatura < TEMPERATURA_FREDDA;
+    public bool IsCalda => stats.Temperatura > TEMPERATURA_CALDA;
+    public bool IsTorrida => stats.Temperatura >= TEMPERATURA_TORRIDA;
+    public bool IsTemperaturaIdeale => stats.Temperatura >= TEMPERATURA_IDEALE_MIN && stats.Temperatura <= TEMPERATURA_IDEALE_MAX;
+
+    public SeedBonus GetSeedBonus() => bonus;
+
+    public float CalcolaTemperaturaAmbientale(DayPhase fase, Weather meteo, WorldModifier worldMod)
+    {
+        float tempBase = TemperatureBaseFase.GetValueOrDefault(fase, 20f);
+
+        if (worldMod.IsMeteoOn)
         {
-            pianta = Pianta;
+            tempBase += meteo switch
+            {
+                Weather.Sunny => 4f,
+                Weather.Cloudy => -2f,
+                Weather.Rainy => -5f,
+                Weather.Stormy => -8f,
+                Weather.Foggy => -3f,
+                Weather.Snowy => -15f,
+                _ => 0f
+            };
         }
 
-        private static readonly Dictionary<DayPhase, float> TemperatureBaseFase = new()
+        tempBase += worldMod.TemperatureModifier;
+        tempBase += RandomHelper.Float(-1f, 1f);
+
+        return tempBase;
+    }
+
+    public void AggiornaTemperatura(DayPhase fase, Weather meteo, WorldModifier worldMod)
+    {
+        float tempAmbientale = CalcolaTemperaturaAmbientale(fase, meteo, worldMod);
+        float differenza = tempAmbientale - stats.Temperatura;
+
+        float velocitaAdattamento = 0.12f;
+
+        if (differenza < 0 && ResistenzaFreddoTotale > 0)
         {
-            { DayPhase.Night, 8f },
-            { DayPhase.Dawn, 12f },
-            { DayPhase.Morning, 18f },
-            { DayPhase.Afternoon, 26f },
-            { DayPhase.Dusk, 20f },
-            { DayPhase.Evening, 14f }
-        };
-
-        public SeedBonus bonus => pianta.seedBonus;
-        public PlantStats stats => pianta.Stats;
-
-        public float VitalitaMax => 1.0f * bonus.Vitalita;
-        public float ConsumoAcquaMult => bonus.Idratazione;
-        public float ResistenzaFreddoTotale => Math.Clamp(stats.ResistenzaFreddo + bonus.ResistenzaFreddo, -1f, 1f);
-        public float ResistenzaCaldoTotale => Math.Clamp(stats.ResistenzaCaldo + bonus.ResistenzaCaldo, -1f, 1f);
-        public float ResistenzaParassitiTotale => Math.Clamp(stats.ResistenzaParassiti + bonus.ResistenzaParassiti, -1f, 1f);
-        public int FoglieMassime => (int)(stats.FoglieBase * bonus.Vegetazione);
-        public float MetabolismoEffettivo => stats.Metabolismo * bonus.Metabolismo;
-        public float PercentualeSalute => stats.Salute / VitalitaMax;
-
-        public bool IsViva => stats.Salute > 0;
-        public bool IsCritica => PercentualeSalute < 0.25f;
-        public bool IsDisidratata => stats.Idratazione < SOGLIA_DISIDRATAZIONE;
-        public bool IsSoffocamento => stats.Ossigeno < SOGLIA_SOFFOCAMENTO;
-
-        public bool IsGelida => stats.Temperatura <= TEMPERATURA_GELIDA;
-        public bool IsFredda => stats.Temperatura < TEMPERATURA_FREDDA;
-        public bool IsCalda => stats.Temperatura > TEMPERATURA_CALDA;
-        public bool IsTorrida => stats.Temperatura >= TEMPERATURA_TORRIDA;
-        public bool IsTemperaturaIdeale => stats.Temperatura >= TEMPERATURA_IDEALE_MIN && stats.Temperatura <= TEMPERATURA_IDEALE_MAX;
-
-        public SeedBonus GetSeedBonus() => bonus;
-
-
-        public float CalcolaTemperaturaAmbientale(DayPhase fase, Weather meteo, WorldModifier worldMod)
+            velocitaAdattamento *= (1f - ResistenzaFreddoTotale * 0.5f);
+        }
+        else if (differenza > 0 && ResistenzaCaldoTotale > 0)
         {
-            float tempBase = TemperatureBaseFase.GetValueOrDefault(fase, 20f);
-
-            if (worldMod.IsMeteoOn)
-            {
-                tempBase += meteo switch
-                {
-                    Weather.Sunny => 4f,
-                    Weather.Cloudy => -2f,
-                    Weather.Rainy => -6f,
-                    Weather.Stormy => -8f,
-                    Weather.Foggy => -3f,
-                    Weather.Snowy => -15f,
-                    _ => 0f
-                };
-            }
-
-            tempBase += worldMod.TemperatureModifier;
-
-            tempBase += RandomHelper.Float(-1f, 1f);
-
-            return tempBase;
+            velocitaAdattamento *= (1f - ResistenzaCaldoTotale * 0.5f);
         }
 
-        public void AggiornaTemperatura(DayPhase fase, Weather meteo, WorldModifier worldMod)
+        stats.Temperatura += differenza * velocitaAdattamento;
+    }
+
+    public float GetMoltiplicatoreCrescitaTemperatura()
+    {
+        float temp = stats.Temperatura;
+
+        if (temp <= TEMPERATURA_GELIDA) return 0f;
+        if (temp < TEMPERATURA_FREDDA)
         {
-            float tempAmbientale = CalcolaTemperaturaAmbientale(fase, meteo, worldMod);
-            float differenza = tempAmbientale - stats.Temperatura;
+            float t = (temp - TEMPERATURA_GELIDA) / (TEMPERATURA_FREDDA - TEMPERATURA_GELIDA);
+            return 0.1f + t * 0.3f;
+        }
+        if (temp < TEMPERATURA_FRESCA)
+        {
+            float t = (temp - TEMPERATURA_FREDDA) / (TEMPERATURA_FRESCA - TEMPERATURA_FREDDA);
+            return 0.4f + t * 0.3f;
+        }
+        if (temp >= TEMPERATURA_IDEALE_MIN && temp <= TEMPERATURA_IDEALE_MAX)
+        {
+            return 1.0f + RandomHelper.Float(0f, 0.05f);
+        }
+        if (temp < TEMPERATURA_IDEALE_MIN)
+        {
+            float t = (temp - TEMPERATURA_FRESCA) / (TEMPERATURA_IDEALE_MIN - TEMPERATURA_FRESCA);
+            return 0.7f + t * 0.3f;
+        }
+        if (temp <= TEMPERATURA_CALDA)
+        {
+            float t = (temp - TEMPERATURA_IDEALE_MAX) / (TEMPERATURA_CALDA - TEMPERATURA_IDEALE_MAX);
+            return 1.0f - t * 0.3f;
+        }
+        if (temp < TEMPERATURA_TORRIDA)
+        {
+            float t = (temp - TEMPERATURA_CALDA) / (TEMPERATURA_TORRIDA - TEMPERATURA_CALDA);
+            return 0.7f - t * 0.5f;
+        }
+        return Math.Max(0f, 0.2f - (temp - TEMPERATURA_TORRIDA) * 0.02f);
+    }
 
-            float velocitaAdattamento = 0.3f;
+    public void ApplicaDanniTemperatura(WorldModifier worldMod)
+    {
+        float temp = stats.Temperatura;
+        float danno = 0f;
+        string causa = "";
 
-            if (differenza < 0 && ResistenzaFreddoTotale > 0)
-            {
-                velocitaAdattamento *= (1f - ResistenzaFreddoTotale * 0.5f);
-            }
-            else if (differenza > 0 && ResistenzaCaldoTotale > 0)
-            {
-                velocitaAdattamento *= (1f - ResistenzaCaldoTotale * 0.5f);
-            }
+        float moltiplicatoreMondo = worldMod.TemperatureDamage;
 
-            stats.Temperatura += differenza * velocitaAdattamento;
+        if (temp <= TEMPERATURA_GELIDA)
+        {
+            float intensita = Math.Abs(temp - TEMPERATURA_GELIDA) / 20f;
+            danno = intensita * 0.025f * (1f - ResistenzaFreddoTotale) * moltiplicatoreMondo;
+            causa = "gelo";
+        }
+        else if (temp < TEMPERATURA_FREDDA)
+        {
+            float intensita = (TEMPERATURA_FREDDA - temp) / (TEMPERATURA_FREDDA - TEMPERATURA_GELIDA);
+            danno = intensita * 0.01f * (1f - ResistenzaFreddoTotale) * moltiplicatoreMondo;
+            causa = "freddo";
+        }
+        else if (temp >= TEMPERATURA_TORRIDA)
+        {
+            float intensita = (temp - TEMPERATURA_TORRIDA) / 20f;
+            danno = intensita * 0.025f * (1f - ResistenzaCaldoTotale) * moltiplicatoreMondo;
+            causa = "calore estremo";
+        }
+        else if (temp > TEMPERATURA_CALDA)
+        {
+            float intensita = (temp - TEMPERATURA_CALDA) / (TEMPERATURA_TORRIDA - TEMPERATURA_CALDA);
+            danno = intensita * 0.008f * (1f - ResistenzaCaldoTotale) * moltiplicatoreMondo;
+            causa = "caldo";
         }
 
-        public float GetMoltiplicatoreCrescitaTemperatura()
+        if (danno > 0)
         {
-            float temp = stats.Temperatura;
+            ApplicaDanno(Math.Max(0, danno), causa);
+        }
+    }
 
-            if (temp <= TEMPERATURA_GELIDA)
-                return 0f; 
+    public float CalcolaConsumoAcqua(WorldModifier worldMod)
+    {
+        float consumo = CONSUMO_ACQUA_BASE;
 
-            if (temp < TEMPERATURA_FREDDA)
+        consumo *= ConsumoAcquaMult;
+        consumo *= worldMod.WaterConsumption;
+        consumo *= (0.5f + MetabolismoEffettivo * 0.5f);
+
+        float temp = stats.Temperatura;
+        if (temp <= TEMPERATURA_FREDDA) consumo *= 0.5f;
+        else if (temp < TEMPERATURA_IDEALE_MIN) consumo *= 0.7f;
+        else if (temp <= TEMPERATURA_IDEALE_MAX) consumo *= 1.0f;
+        else if (temp <= TEMPERATURA_CALDA) consumo *= 1.3f;
+        else if (temp < TEMPERATURA_TORRIDA) consumo *= 1.8f;
+        else consumo *= 2.5f;
+
+        float rapportoFoglie = (float)stats.FoglieAttuali / Math.Max(1, stats.FoglieBase);
+        consumo *= (0.5f + rapportoFoglie * 0.5f);
+
+        return consumo;
+    }
+
+    public bool AggiornaIdratazione(WorldModifier worldMod, Weather meteo)
+    {
+        float consumo = CalcolaConsumoAcqua(worldMod);
+
+        if (worldMod.IsMeteoOn && (meteo == Weather.Rainy || meteo == Weather.Stormy))
+        {
+            float reidratazione = 0.003f * worldMod.HydrationFromRain;
+
+            if (worldMod.HydrationFromRain < 0)
             {
-                float t = (temp - TEMPERATURA_GELIDA) / (TEMPERATURA_FREDDA - TEMPERATURA_GELIDA);
-                return 0.2f + t * 0.3f;
+                ApplicaDanno(Math.Abs(worldMod.HydrationFromRain) * 0.01f, "pioggia acida");
             }
-
-            if (temp < TEMPERATURA_FRESCA)
+            else
             {
-                float t = (temp - TEMPERATURA_FREDDA) / (TEMPERATURA_FRESCA - TEMPERATURA_FREDDA);
-                return 0.5f + t * 0.3f;
+                stats.Idratazione = Math.Min(1.0f, stats.Idratazione + reidratazione);
             }
-
-            if (temp >= TEMPERATURA_IDEALE_MIN && temp <= TEMPERATURA_IDEALE_MAX)
-            {
-                return 1.0f + RandomHelper.Float(0f, 0.1f);
-            }
-
-            if (temp < TEMPERATURA_IDEALE_MIN)
-            {
-                float t = (temp - TEMPERATURA_FRESCA) / (TEMPERATURA_IDEALE_MIN - TEMPERATURA_FRESCA);
-                return 0.8f + t * 0.2f;
-            }
-
-            if (temp <= TEMPERATURA_CALDA)
-            {
-                float t = (temp - TEMPERATURA_IDEALE_MAX) / (TEMPERATURA_CALDA - TEMPERATURA_IDEALE_MAX);
-                return 1.0f - t * 0.2f;
-            }
-
-            if (temp < TEMPERATURA_TORRIDA)
-            {
-                float t = (temp - TEMPERATURA_CALDA) / (TEMPERATURA_TORRIDA - TEMPERATURA_CALDA);
-                return 0.8f - t * 0.4f;
-            }
-
-            return Math.Max(0f, 0.4f - (temp - TEMPERATURA_TORRIDA) * 0.05f);
         }
 
-        public float GetMoltiplicatoreAcquaTemperatura()
+        stats.Idratazione = Math.Max(0, stats.Idratazione - consumo);
+
+        Game.pianta.ControlloCrescita();
+
+        if (IsDisidratata)
         {
-            float temp = stats.Temperatura;
-
-            if (temp <= TEMPERATURA_FREDDA)
-                return 0.6f;
-
-            if (temp < TEMPERATURA_IDEALE_MIN)
-                return 0.8f;
-
-            if (temp <= TEMPERATURA_IDEALE_MAX)
-                return 1.0f;
-
-            if (temp <= TEMPERATURA_CALDA)
+            contatoreSecondi++;
+            if (contatoreSecondi >= 3)
             {
-                float t = (temp - TEMPERATURA_IDEALE_MAX) / (TEMPERATURA_CALDA - TEMPERATURA_IDEALE_MAX);
-                return 1.0f + t * 0.5f;
+                float danno = (SOGLIA_DISIDRATAZIONE - stats.Idratazione) * 0.012f;
+                ApplicaDanno(danno, "disidratazione");
+                contatoreSecondi = 0;
+                return true;
             }
-
-            if (temp < TEMPERATURA_TORRIDA)
-            {
-                float t = (temp - TEMPERATURA_CALDA) / (TEMPERATURA_TORRIDA - TEMPERATURA_CALDA);
-                return 1.5f + t * 1.0f;
-            }
-
-            return 2.5f + (temp - TEMPERATURA_TORRIDA) * 0.1f;
         }
 
-        public float GetMoltiplicatoreFoglieTemperatura()
+        return false;
+    }
+
+    public void Annaffia(float quantita)
+    {
+        stats.Idratazione = Math.Clamp(stats.Idratazione + quantita, 0f, 1f);
+    }
+
+    public float CalcolaProbabilitaInfestazione(Weather meteo, WorldModifier worldMod)
+    {
+        float probabilita = PROBABILITA_PARASSITI_BASE;
+
+        probabilita *= worldMod.ParasiteChance;
+
+        if (worldMod.IsMeteoOn && (meteo == Weather.Rainy || meteo == Weather.Foggy))
+            probabilita *= 1.5f;
+
+        if (IsDisidratata) probabilita *= 1.3f;
+        if (IsCritica) probabilita *= 1.5f;
+        if (IsFredda || IsTorrida) probabilita *= 0.3f;
+
+        float rapportoFoglie = (float)stats.FoglieAttuali / Math.Max(1, stats.FoglieBase);
+        probabilita *= (0.5f + rapportoFoglie * 0.5f);
+
+        float moltiplicatore = 1f - ResistenzaParassitiTotale;
+        return Math.Clamp(probabilita * moltiplicatore, 0f, 1f);
+    }
+
+    public float CalcolaDannoParassiti(WorldModifier worldMod)
+    {
+        if (!stats.Infestata) return 0f;
+
+        float danno = DANNO_PARASSITI_BASE * stats.IntensitaInfestazione;
+        danno *= worldMod.ParasiteDamage;
+        danno *= (1f - ResistenzaParassitiTotale);
+
+        return Math.Max(0, danno);
+    }
+
+    public void AggiornaParassiti(Weather meteo, WorldModifier worldMod)
+    {
+        if (!stats.Infestata)
         {
-            float temp = stats.Temperatura;
-
-            if (temp <= TEMPERATURA_GELIDA)
-                return 5.0f; 
-
-            if (temp < TEMPERATURA_FREDDA)
+            float probabilita = CalcolaProbabilitaInfestazione(meteo, worldMod);
+            if (RandomHelper.Float(0, 1) < probabilita)
             {
-                float t = (TEMPERATURA_FREDDA - temp) / TEMPERATURA_FREDDA;
-                return 1.0f + t * 3.0f;
+                stats.Infestata = true;
+                stats.IntensitaInfestazione = RandomHelper.Float(0.1f, 0.25f);
             }
-
-            if (temp >= TEMPERATURA_IDEALE_MIN && temp <= TEMPERATURA_IDEALE_MAX)
-                return 0.5f;
-
-            if (temp > TEMPERATURA_CALDA)
-            {
-                float t = (temp - TEMPERATURA_CALDA) / 10f;
-                return 1.0f + t * 2.0f;
-            }
-
-            if (temp >= TEMPERATURA_TORRIDA)
-                return 4.0f;
-
-            return 1.0f;
         }
-
-        public void ApplicaDanniTemperatura()
+        else
         {
-            float temp = stats.Temperatura;
-            float danno = 0f;
-            string causa = "";
+            float peggioramento = 0.001f * (1f + worldMod.ParasiteChance * 0.5f);
+            stats.IntensitaInfestazione = Math.Min(1f, stats.IntensitaInfestazione + peggioramento);
 
-            if (temp <= TEMPERATURA_GELIDA)
-            {
-                float intensita = Math.Abs(temp) / 10f;
-                danno = intensita * 0.03f * (1f - ResistenzaFreddoTotale);
-                causa = "gelo";
-            }
-            else if (temp < TEMPERATURA_FREDDA)
-            {
-                float intensita = (TEMPERATURA_FREDDA - temp) / TEMPERATURA_FREDDA;
-                danno = intensita * 0.01f * (1f - ResistenzaFreddoTotale);
-                causa = "freddo";
-            }
-            else if (temp >= TEMPERATURA_TORRIDA)
-            {
-                float intensita = (temp - TEMPERATURA_TORRIDA) / 10f;
-                danno = intensita * 0.03f * (1f - ResistenzaCaldoTotale);
-                causa = "calore";
-            }
-            else if (temp > TEMPERATURA_CALDA)
-            {
-                float intensita = (temp - TEMPERATURA_CALDA) / (TEMPERATURA_TORRIDA - TEMPERATURA_CALDA);
-                danno = intensita * 0.005f * (1f - ResistenzaCaldoTotale);
-                causa = "caldo";
-            }
-
+            float danno = CalcolaDannoParassiti(worldMod);
             if (danno > 0)
             {
-                ApplicaDanno(Math.Max(0, danno), causa);
-            }
-        }
+                ApplicaDanno(danno, "parassiti");
 
-
-        public float CalcolaConsumoAcqua(WorldModifier worldMod)
-        {
-            float consumo = CONSUMO_ACQUA_BASE;
-
-            consumo *= ConsumoAcquaMult;
-            consumo *= worldMod.WaterConsumption;
-            consumo *= (0.5f + MetabolismoEffettivo * 0.5f);
-
-            consumo *= GetMoltiplicatoreAcquaTemperatura();
-
-            float rapportoFoglie = (float)stats.FoglieAttuali / Math.Max(1, stats.FoglieBase);
-            consumo *= (0.7f + rapportoFoglie * 0.3f);
-
-            return consumo;
-        }
-
-        public bool AggiornaIdratazione(WorldModifier worldMod, Weather meteo)
-        {
-            float consumo = CalcolaConsumoAcqua(worldMod);
-
-            if (worldMod.IsMeteoOn && meteo == Weather.Rainy)
-            {
-                stats.Idratazione = Math.Min(1.0f, stats.Idratazione + 0.005f);
-            }
-            else
-            {
-                stats.Idratazione = Math.Max(0, stats.Idratazione - consumo);
-            }
-
-            Game.pianta.ControlloCrescita();
-
-            if (IsDisidratata)
-            {
-                contatoreSecondi++;
-                if (contatoreSecondi == 5)
+                if (RandomHelper.Float(0, 1) < stats.IntensitaInfestazione * 0.1f * worldMod.ParasiteDamage)
                 {
-                    float danno = (SOGLIA_DISIDRATAZIONE - stats.Idratazione) * 0.01f;
-                    ApplicaDanno(danno, "disidratazione");
-                    contatoreSecondi = 0;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void Annaffia(float quantita)
-        {
-            stats.Idratazione = Math.Clamp(stats.Idratazione + quantita, 0f, 1f);
-        }
-
-
-        public float CalcolaProbabilitaInfestazione(Weather meteo)
-        {
-            float probabilitaBase = 0.001f;
-
-            if (meteo == Weather.Rainy || meteo == Weather.Foggy)
-                probabilitaBase *= 2f;
-
-            if (IsDisidratata)
-                probabilitaBase *= 1.5f;
-
-            if (IsCritica)
-                probabilitaBase *= 2f;
-
-            if (IsFredda || IsTorrida)
-                probabilitaBase *= 0.3f;
-
-            float rapportoFoglie = (float)stats.FoglieAttuali / Math.Max(1, stats.FoglieBase);
-            probabilitaBase *= rapportoFoglie;
-
-            float moltiplicatore = 1f - ResistenzaParassitiTotale;
-
-            return Math.Clamp(probabilitaBase * moltiplicatore, 0f, 1f);
-        }
-
-        public float CalcolaDannoParassiti()
-        {
-            if (!stats.Infestata) return 0f;
-
-            float dannoBase = stats.IntensitaInfestazione * 0.01f;
-            float moltiplicatore = 1f - ResistenzaParassitiTotale;
-
-            return Math.Max(0, dannoBase * moltiplicatore);
-        }
-
-        public void AggiornaParassiti(Weather meteo)
-        {
-            if (!stats.Infestata)
-            {
-                float probabilita = CalcolaProbabilitaInfestazione(meteo);
-                if (RandomHelper.Float(0, 1) < probabilita)
-                {
-                    stats.Infestata = true;
-                    stats.IntensitaInfestazione = RandomHelper.Float(0.1f, 0.3f);
-                }
-            }
-            else
-            {
-                stats.IntensitaInfestazione = Math.Min(1f, stats.IntensitaInfestazione + 0.001f);
-
-                float danno = CalcolaDannoParassiti();
-                if (danno > 0)
-                {
-                    ApplicaDanno(danno, "parassiti");
-
-                    if (RandomHelper.Float(0, 1) < stats.IntensitaInfestazione * 0.1f)
-                    {
-                        PerdiFoglia();
-                    }
+                    PerdiFoglia();
                 }
             }
         }
+    }
 
-        public void CuraParassiti(float efficacia = 1.0f)
+    public void CuraParassiti(float efficacia = 1.0f)
+    {
+        stats.IntensitaInfestazione = Math.Max(0, stats.IntensitaInfestazione - efficacia);
+        if (stats.IntensitaInfestazione <= 0)
         {
-            stats.IntensitaInfestazione = Math.Max(0, stats.IntensitaInfestazione - efficacia);
-            if (stats.IntensitaInfestazione <= 0)
+            stats.Infestata = false;
+            stats.IntensitaInfestazione = 0;
+        }
+    }
+
+    public void AggiornaOssigeno(WorldModifier worldMod)
+    {
+        float consumoBase = CONSUMO_OSSIGENO_BASE * worldMod.OxygenConsumption;
+
+        if (worldMod.OxygenLevel < 0.5f)
+        {
+            float deficit = 1f - worldMod.OxygenLevel;
+            stats.Ossigeno = Math.Max(0, stats.Ossigeno - consumoBase * deficit * 2f);
+
+            if (IsSoffocamento)
             {
-                stats.Infestata = false;
-                stats.IntensitaInfestazione = 0;
+                float danno = (SOGLIA_SOFFOCAMENTO - stats.Ossigeno) * 0.02f;
+                ApplicaDanno(danno, "soffocamento");
             }
         }
-
-
-        public void AggiornaOssigeno(WorldModifier worldMod)
+        else
         {
-            if (worldMod.OxygenLevel < 0.5f)
-            {
-                stats.Ossigeno = Math.Max(0, stats.Ossigeno - CONSUMO_OSSIGENO_BASE);
+            float recupero = 0.004f * worldMod.OxygenLevel;
+            stats.Ossigeno = Math.Min(1f, stats.Ossigeno + recupero);
+        }
+    }
 
-                if (IsSoffocamento)
-                {
-                    float danno = (SOGLIA_SOFFOCAMENTO - stats.Ossigeno) * 0.02f;
-                    ApplicaDanno(danno, "soffocamento");
-                }
-            }
-            else
+    public void FornisciOssigeno(float quantita)
+    {
+        stats.Ossigeno = Math.Clamp(stats.Ossigeno + quantita, 0f, 1f);
+    }
+
+    public float CalcolaFotosintesi(DayPhase fase, Weather meteo, WorldModifier worldMod)
+    {
+        float energiaBase = fase switch
+        {
+            DayPhase.Morning => 0.002f,
+            DayPhase.Afternoon => 0.0025f,
+            DayPhase.Dawn => 0.001f,
+            DayPhase.Dusk => 0.001f,
+            _ => -0.0005f
+        };
+
+        energiaBase *= worldMod.SolarMultiplier;
+
+        if (worldMod.IsMeteoOn)
+        {
+            energiaBase *= meteo switch
             {
-                stats.Ossigeno = Math.Min(1f, stats.Ossigeno + 0.005f);
-            }
+                Weather.Foggy => 0.3f,
+                Weather.Cloudy => 0.5f,
+                Weather.Rainy => 0.35f,
+                Weather.Stormy => 0.15f,
+                Weather.Snowy => 0.4f,
+                _ => 1.0f
+            };
         }
 
-        public void FornisciOssigeno(float quantita)
+        if (IsFredda) energiaBase *= 0.5f;
+        else if (IsTorrida) energiaBase *= 0.3f;
+        else if (IsCalda) energiaBase *= 0.7f;
+
+        float rapportoFoglie = (float)stats.FoglieAttuali / Math.Max(1, FoglieMassime);
+        energiaBase *= (0.3f + rapportoFoglie * 0.7f);
+
+        energiaBase -= CONSUMO_ENERGIA_BASE * (worldMod.EnergyDrain - 1f);
+
+        return energiaBase;
+    }
+
+    public void AggiornaMetabolismo(DayPhase fase, Weather meteo, WorldModifier worldMod)
+    {
+        float energia = CalcolaFotosintesi(fase, meteo, worldMod);
+        stats.Metabolismo = Math.Clamp(stats.Metabolismo + energia, 0f, 1f);
+
+        if (IsFame && worldMod.EnergyDrain > 1.5f)
         {
-            stats.Ossigeno = Math.Clamp(stats.Ossigeno + quantita, 0f, 1f);
+            ApplicaDanno(0.003f * worldMod.EnergyDrain, "fame energetica");
+        }
+    }
+
+    public float CalcolaVelocitaCrescita(WorldModifier worldMod)
+    {
+        float media = (stats.Idratazione + stats.Metabolismo + stats.Ossigeno) / 3f;
+
+        float velocita = media * MetabolismoEffettivo;
+        velocita *= worldMod.GrowthRateMultiplier;
+        velocita *= GetMoltiplicatoreCrescitaTemperatura();
+
+        if (PercentualeSalute < 0.5f)
+        {
+            velocita *= PercentualeSalute * 2f;
         }
 
-
-        public float CalcolaFotosintesi(DayPhase fase, Weather meteo, WorldModifier worldMod)
+        if (IsCritica || IsDisidratata || IsSoffocamento || IsFame)
         {
-            float energiaBase = 0f;
-
-            switch (fase)
-            {
-                case DayPhase.Morning:
-                case DayPhase.Afternoon:
-                    energiaBase = 0.003f;
-                    break;
-                case DayPhase.Dawn:
-                case DayPhase.Dusk:
-                    energiaBase = 0.001f;
-                    break;
-                default:
-                    energiaBase = -0.001f;
-                    break;
-            }
-
-            energiaBase *= worldMod.SolarMultiplier;
-
-            if (worldMod.IsMeteoOn)
-            {
-                switch (meteo)
-                {
-                    case Weather.Foggy:
-                        energiaBase *= 0.3f;
-                        break;
-                    case Weather.Cloudy:
-                        energiaBase *= 0.6f;
-                        break;
-                    case Weather.Rainy:
-                        energiaBase *= 0.4f;
-                        break;
-                    case Weather.Stormy:
-                        energiaBase *= 0.2f;
-                        break;
-                }
-            }
-
-            if (IsFredda)
-                energiaBase *= 0.5f;
-            else if (IsTorrida)
-                energiaBase *= 0.3f;
-            else if (IsCalda)
-                energiaBase *= 0.7f;
-
-            float rapportoFoglie = (float)stats.FoglieAttuali / Math.Max(1, FoglieMassime);
-            energiaBase *= (0.3f + rapportoFoglie * 0.7f);
-
-            return energiaBase;
+            velocita = 0;
         }
 
-        public void AggiornaMetabolismo(DayPhase fase, Weather meteo, WorldModifier worldMod)
+        return Math.Max(0, velocita);
+    }
+
+    public float CalcolaProbabilitaPerdiaFoglia(Weather meteo, WorldModifier worldMod)
+    {
+        float probabilita = DROP_FOGLIE_BASE;
+
+        probabilita *= worldMod.LeafDropRate;
+
+        if (IsDisidratata) probabilita *= 2f;
+        if (IsCritica) probabilita *= 1.8f;
+
+        if (meteo == Weather.Stormy)
         {
-            float energia = CalcolaFotosintesi(fase, meteo, worldMod);
-            stats.Metabolismo = Math.Clamp(stats.Metabolismo + energia, 0f, 1f);
+            probabilita *= 3f * worldMod.StormDamage;
         }
 
-
-
-        public float CalcolaVelocitaCrescita(WorldModifier worldMod)
+        if (stats.Infestata)
         {
-            float media = (stats.Idratazione + stats.Metabolismo + stats.Ossigeno) / 3f;
-
-            float velocita = media * MetabolismoEffettivo;
-
-            velocita *= worldMod.GrowthRateMultiplier;
-
-            velocita *= GetMoltiplicatoreCrescitaTemperatura();
-
-            if (PercentualeSalute < 0.5f)
-            {
-                velocita *= PercentualeSalute * 2f;
-            }
-
-            if (IsCritica || IsDisidratata || IsSoffocamento)
-            {
-                velocita = 0;
-            }
-
-            return Math.Max(0, velocita);
+            probabilita *= (1f + stats.IntensitaInfestazione * worldMod.ParasiteDamage);
         }
 
+        if (IsGelida) probabilita *= 4f;
+        else if (IsFredda) probabilita *= 2f;
+        else if (IsTorrida) probabilita *= 3.5f;
+        else if (IsCalda) probabilita *= 1.5f;
 
-        public float CalcolaProbabilitaPerdiaFoglia(Weather meteo)
+        return probabilita;
+    }
+
+    public void AggiornaFoglie(Weather meteo, WorldModifier worldMod)
+    {
+        float probabilita = CalcolaProbabilitaPerdiaFoglia(meteo, worldMod);
+
+        if (RandomHelper.Float(0, 1) < probabilita && stats.FoglieAttuali > 0)
         {
-            float probabilita = stats.DropRateFoglie;
-
-            if (IsDisidratata)
-                probabilita *= 3f;
-
-            if (IsCritica)
-                probabilita *= 2f;
-
-            if (meteo == Weather.Stormy)
-                probabilita *= 5f;
-
-            if (stats.Infestata)
-                probabilita *= (1f + stats.IntensitaInfestazione);
-
-            probabilita *= GetMoltiplicatoreFoglieTemperatura();
-
-            return probabilita;
+            PerdiFoglia();
         }
+    }
 
-        public void AggiornaFoglie(Weather meteo)
+    public void PerdiFoglia()
+    {
+        if (stats.FoglieAttuali > 0)
         {
-            float probabilita = CalcolaProbabilitaPerdiaFoglia(meteo);
+            stats.FoglieAttuali--;
+        }
+    }
 
-            if (RandomHelper.Float(0, 1) < probabilita && stats.FoglieAttuali > 0)
+    public float PercentualeFoglie => (float)stats.FoglieAttuali / Math.Max(1, FoglieMassime);
+
+    public void ApplicaDanno(float danno, string causa = "")
+    {
+        stats.Salute = Math.Max(0, stats.Salute - danno);
+    }
+
+    public void Rigenera(float quantita)
+    {
+        stats.Salute = Math.Min(VitalitaMax, stats.Salute + quantita);
+    }
+
+    public float CalcolaRigenerazioneNaturale(WorldModifier worldMod)
+    {
+        if (IsDisidratata || IsSoffocamento || stats.Infestata || IsFame)
+            return 0f;
+
+        if (IsFredda || IsTorrida)
+            return 0f;
+
+        float rigenera = RIGENERAZIONE_SALUTE_BASE;
+        rigenera *= (stats.Idratazione + stats.Metabolismo + stats.Ossigeno) / 3f;
+        rigenera *= worldMod.HealthRegen;
+
+        if (IsTemperaturaIdeale)
+            rigenera *= 1.3f;
+
+        return rigenera;
+    }
+
+    public void AggiornaRigenerazione(WorldModifier worldMod)
+    {
+        float rigenera = CalcolaRigenerazioneNaturale(worldMod);
+        if (rigenera > 0 && stats.Salute < VitalitaMax)
+        {
+            Rigenera(rigenera);
+        }
+    }
+
+    public void ApplicaDanniTempesta(Weather meteo, WorldModifier worldMod)
+    {
+        if (!worldMod.IsMeteoOn) return;
+        if (meteo != Weather.Stormy) return;
+
+        float probabilita = 0.1f * worldMod.StormChance;
+
+        if (RandomHelper.Float(0, 1) < probabilita)
+        {
+            float danno = 0.01f * worldMod.StormDamage;
+            ApplicaDanno(danno, "tempesta");
+
+            if (RandomHelper.Float(0, 1) < 0.3f * worldMod.StormDamage)
             {
                 PerdiFoglia();
             }
         }
+    }
 
-        public void PerdiFoglia()
-        {
-            if (stats.FoglieAttuali > 0)
-            {
-                stats.FoglieAttuali--;
-            }
-        }
+    public void AggiornaTutto(DayPhase fase, Weather meteo, WorldModifier worldMod)
+    {
+        if (!IsViva) return;
 
-        public float PercentualeFoglie => (float)stats.FoglieAttuali / Math.Max(1, FoglieMassime);
+        AggiornaTemperatura(fase, meteo, worldMod);
+        ApplicaDanniTemperatura(worldMod);
 
+        AggiornaIdratazione(worldMod, meteo);
+        AggiornaOssigeno(worldMod);
+        AggiornaMetabolismo(fase, meteo, worldMod);
 
-        public void ApplicaDanno(float danno, string causa = "")
-        {
-            stats.Salute = Math.Max(0, stats.Salute - danno);
-            Console.WriteLine($"Pianta danneggiata: -{danno:F3} ({causa}) - Salute: {PercentualeSalute:P0}");
-        }
+        AggiornaParassiti(meteo, worldMod);
+        AggiornaFoglie(meteo, worldMod);
+        ApplicaDanniTempesta(meteo, worldMod);
 
-        public void Rigenera(float quantita)
-        {
-            stats.Salute = Math.Min(VitalitaMax, stats.Salute + quantita);
-        }
+        AggiornaRigenerazione(worldMod);
 
-        public float CalcolaRigenerazioneNaturale()
-        {
-            if (IsDisidratata || IsSoffocamento || stats.Infestata)
-                return 0f;
+        stats.ClampAllValues();
+    }
 
-            if (IsFredda || IsTorrida)
-                return 0f;
+    public void Reset()
+    {
+        stats.Salute = VitalitaMax;
+        stats.Idratazione = 0.5f;
+        stats.Ossigeno = 1.0f;
+        stats.Metabolismo = 0.8f;
+        stats.Temperatura = 20.0f;
+        stats.FoglieAttuali = 0;
+        stats.Altezza = 0f;
+        stats.Infestata = false;
+        stats.IntensitaInfestazione = 0f;
+        contatoreSecondi = 0;
+    }
 
-            float rigenera = RIGENERAZIONE_SALUTE_BASE;
-            rigenera *= (stats.Idratazione + stats.Metabolismo + stats.Ossigeno) / 3f;
+    public string GetRiepilogo()
+    {
+        var worldMod = WorldManager.GetCurrentModifiers();
+        string status = "";
 
-            if (IsTemperaturaIdeale)
-                rigenera *= 1.5f;
+        if (IsCritica) status += "CRITICO ";
+        if (IsDisidratata) status += "ASSETATO ";
+        if (IsSoffocamento) status += "SOFFOCA ";
+        if (IsFame) status += "FAME ";
+        if (stats.Infestata) status += $"INFESTATO ({stats.IntensitaInfestazione:P0}) ";
 
-            return rigenera;
-        }
+        string difficolta = WorldManager.GetDifficultyName(worldMod.Difficulty);
 
-        public void AggiornaRigenerazione()
-        {
-            float rigenera = CalcolaRigenerazioneNaturale();
-            if (rigenera > 0 && stats.Salute < VitalitaMax)
-            {
-                Rigenera(rigenera);
-            }
-        }
+        return $"[{SeedDataType.GetName(Game.pianta.TipoSeme)}] - {difficolta}\n" +
+               $"Salute: {PercentualeSalute:P0}\n" +
+               $"Idratazione: {stats.Idratazione:P0}\n" +
+               $"Ossigeno: {stats.Ossigeno:P0}\n" +
+               $"Energia: {stats.Metabolismo:P0}\n" +
+               $"Temp: {stats.Temperatura:F1}°C ({GetStatoTemperatura()})\n" +
+               $"Foglie: {stats.FoglieAttuali}/{FoglieMassime}\n" +
+               $"Altezza: {stats.Altezza:F0}m\n" +
+               (string.IsNullOrEmpty(status) ? "" : $"\n{status}");
+    }
 
-
-        public void AggiornaTutto(DayPhase fase, Weather meteo, WorldModifier worldMod)
-        {
-            if (!IsViva) return;
-
-            AggiornaTemperatura(fase, meteo, worldMod);
-
-            ApplicaDanniTemperatura();
-
-            AggiornaIdratazione(worldMod, meteo);
-            AggiornaOssigeno(worldMod);
-            AggiornaMetabolismo(fase, meteo, worldMod);
-
-            AggiornaParassiti(meteo);
-            AggiornaFoglie(meteo);
-
-            AggiornaRigenerazione();
-        }
-
-        public void Reset()
-        {
-            stats.Salute = VitalitaMax;
-            stats.Idratazione = 1.0f;
-            stats.Ossigeno = 1.0f;
-            stats.Metabolismo = 1.0f;
-            stats.Temperatura = 20.0f;
-            stats.FoglieAttuali = FoglieMassime;
-            stats.Altezza = 0f;
-            stats.Infestata = false;
-            stats.IntensitaInfestazione = 0f;
-        }
-
-        public string GetRiepilogo()
-        {
-            return $"[{SeedDataType.GetName(Game.pianta.TipoSeme)}]\n" +
-                   $"Salute: {PercentualeSalute:P0}\n" +
-                   $"Idratazione: {stats.Idratazione:P0}\n" +
-                   $"Ossigeno: {stats.Ossigeno:P0}\n" +
-                   $"Metabolismo: {stats.Metabolismo:P0}\n" +
-                   $"Temperatura: {stats.Temperatura:P0}\n" +
-                   $"Foglie: {stats.FoglieAttuali}/{FoglieMassime}\n" +
-                   $"Altezza: {stats.Altezza:F1}\n" +
-                   (stats.Infestata ? $"⚠ INFESTATA ({stats.IntensitaInfestazione:P0})\n" : "");
-        }
-
+    public string GetStatoTemperatura()
+    {
+        if (IsGelida) return "GELO";
+        if (IsFredda) return "Freddo";
+        if (stats.Temperatura < TEMPERATURA_IDEALE_MIN) return "Fresco";
+        if (IsTemperaturaIdeale) return "Ideale";
+        if (stats.Temperatura <= TEMPERATURA_CALDA) return "Caldo";
+        if (IsTorrida) return "TORRIDO";
+        return "Normale";
     }
 }
