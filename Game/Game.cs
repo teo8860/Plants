@@ -1,5 +1,6 @@
 using Raylib_CSharp;
 using Raylib_CSharp.Windowing;
+using Raylib_CSharp.Colors;
 using System;
 using System.Timers;
 
@@ -32,6 +33,9 @@ public static class Game
 
     public static Tutorial tutorial;
 
+    public static Color colore1;
+    public static Color colore2;
+
     public static void Init()
     {
         mainRoom = new Room();
@@ -56,6 +60,10 @@ public static class Game
 
         controller = new Controller();
         pianta = GameElement.Create<Plant>(-2);
+
+        colore1 = Color.FromHSV(130,0.45f,0.68f);
+        colore2 = Color.FromHSV(133,0.47f,0.44f);
+        pianta.setColori(colore1, colore2);
 
         GameElement.Create<GuiScrollbar>(100);
 

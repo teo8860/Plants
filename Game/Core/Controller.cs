@@ -61,7 +61,7 @@ public class Controller : GameElement
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(-currentScrollSpeed * deltaTime);
         }
-        else if (Input.IsKeyDown(KeyboardKey.Up) && Rendering.camera.position.Y <= (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier))
+        else if (Input.IsKeyDown(KeyboardKey.Up) && Rendering.camera.position.Y < (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier))
         {
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(currentScrollSpeed * deltaTime);

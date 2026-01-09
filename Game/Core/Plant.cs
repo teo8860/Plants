@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using System.Security.Cryptography;
 
 namespace Plants;
 
@@ -34,25 +35,30 @@ public class Plant : GameElement
 
     public GameLogicPianta proprieta;
 
+    public Color colore1, colore2;
+
     // Next world ground position (in world coordinates)
-    public float nextWorldGroundY => Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier;
+    public float nextWorldGroundY => Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier + GameProperties.groundHeight - 10;
+
+    public void setColori(Color Colore1, Color Colore2)
+    {
+        colore1 = Colore1;
+        colore2 = Colore2;
+    }
 
     public Plant()
     {
+
         proprieta = new GameLogicPianta(this);
         SetSeed(SeedType.Normale);
 
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
-        for (int a = 0; a < 10; a++)
-        {
-            Crescita();
-        }
-        /* Test di crescita rapida
+       // /* Test di crescita rapida
        if (!Game.tutorial.isTutorialActive)
        {
-           for (int a = 0; a < 1240; a++)
+           for (int a = 0; a < 2600; a++)
            {
                Crescita();
            }
@@ -85,10 +91,10 @@ public class Plant : GameElement
         float velocita = proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
         float metabolismo = proprieta.MetabolismoEffettivo;
 
-        float incrementoBase = 20f + RandomHelper.Float(0, 10f);
+        float incrementoBase = 15f + RandomHelper.Float(0, 8f);
         float incrementoFinale = incrementoBase * metabolismo * (0.5f + velocita * 0.5f);
 
-        incrementoFinale = Math.Max(15f, incrementoFinale);
+        incrementoFinale = Math.Max(7f, incrementoFinale);
 
         if (Stats.Altezza + incrementoFinale > Stats.AltezzaMassima)
         {
@@ -167,6 +173,11 @@ public class Plant : GameElement
         {
             radice.Cresci();
         }
+
+        if (Rendering.camera.position.Y <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
+        { 
+            Rendering.camera.position.Y += incrementoFinale;
+        }
     }
 
     public void ControlloCrescita()
@@ -204,11 +215,11 @@ public class Plant : GameElement
         puntiSpline.Add(new Vector2(posizione.X, posizione.Y));
 
         float terzoX = Math.Clamp(
-            puntiSpline[1].X + RandomHelper.Int(-15, 15),
+            puntiSpline[1].X + RandomHelper.Int(-10, 10),
             margineMinimo,
             GameProperties.cameraWidth - margineMinimo
         );
-        float terzoY = puntiSpline[1].Y + RandomHelper.Int(30, 50);
+        float terzoY = puntiSpline[1].Y + RandomHelper.Int(13, 26);
         puntiSpline.Add(new Vector2(terzoX, terzoY));
     }
 
@@ -216,7 +227,7 @@ public class Plant : GameElement
     {
         Vector2 ultimoPunto = puntiSpline[^1];
 
-        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-15, 15), margineMinimo, GameProperties.cameraWidth - margineMinimo);
+        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-10, 10), margineMinimo, GameProperties.cameraWidth - margineMinimo);
 
         float nuovoY = ultimoPunto.Y + incrementoAltezza;
 
@@ -256,7 +267,7 @@ public class Plant : GameElement
                 if (ViewCulling.IsValueVisible(segmentMinY,  cameraY) == false && ViewCulling.IsValueVisible(segmentMaxY, cameraY) == false)
                     continue;
 
-                spessore = Math.Min(5 + ((puntiSpline.Count - i) / 10), 30);
+                spessore = Math.Min(5f + ((puntiSpline.Count - i) / 10), 22);
 
                 if (i + 4 <= puntiSplineSpan.Length)
                 {
@@ -266,11 +277,11 @@ public class Plant : GameElement
                         segmento[o].X += getSinOffset();
                     }
 
-                    Graphics.DrawSplineCatmullRom(segmento, spessore, Color.Green);
+                    Graphics.DrawSplineCatmullRom(segmento, spessore, colore1);
 
-                    if (spessore > 0.5)
+                    if (spessore > 10)
                     {
-                        Graphics.DrawSplineCatmullRom(segmento, spessore - 10, Color.DarkGreen);
+                        Graphics.DrawSplineCatmullRom(segmento, spessore - 10, colore2);
                     }
                 }
             }
@@ -282,14 +293,17 @@ public class Plant : GameElement
 
                 Vector2 puntoArrivo = new Vector2(
                     puntiSplineSpan[^2].X,
-                    CoordinateHelper.ToScreenY(nextWorldGroundY, cameraY)
+                    nextWorldGroundY
                 );
 
                 Span<Vector2> segmento = stackalloc Vector2[4];
                 segmento[0] = puntoPartenza;
-                segmento[1] = puntoPartenza;
+                segmento[1] = new Vector2(
+                    puntoPartenza.X + getSinOffset(),
+                    puntoPartenza.Y
+                );
                 segmento[2] = new Vector2(
-                    puntoArrivo.X - getSinOffset(),
+                    puntoArrivo.X + getSinOffset(),
                     puntoArrivo.Y
                 );
                 segmento[3] = puntoArrivo;
