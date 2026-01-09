@@ -1,3 +1,4 @@
+
 using Raylib_CSharp;
 using Raylib_CSharp.Windowing;
 using Raylib_CSharp.Colors;
@@ -36,12 +37,13 @@ public static class Game
     public static Color colore1;
     public static Color colore2;
 
+    public static GuiWorldTransition worldTransition;
+
     public static void Init()
     {
         mainRoom = new Room();
         inventoryRoom = new Room(false);
         optionMenu = new Room(false);
-
 
         tutorial = GameElement.Create<Tutorial>(-1);
         tutorial.isTutorialActive = false;
@@ -61,11 +63,13 @@ public static class Game
         controller = new Controller();
         pianta = GameElement.Create<Plant>(-2);
 
-        colore1 = Color.FromHSV(130,0.45f,0.68f);
-        colore2 = Color.FromHSV(133,0.47f,0.44f);
+        colore1 = Color.FromHSV(130, 0.45f, 0.68f);
+        colore2 = Color.FromHSV(133, 0.47f, 0.44f);
         pianta.setColori(colore1, colore2);
 
         GameElement.Create<GuiScrollbar>(100);
+
+        worldTransition = GameElement.Create<GuiWorldTransition>(-200);
 
         InitToolbar();
 
@@ -76,7 +80,6 @@ public static class Game
         SetTimerFase();
         Phase = FaseGiorno.GetCurrentPhase();
         WorldManager.SetCurrentWorld(WorldType.Terra);
-
     }
 
     private static void InitToolbar()
