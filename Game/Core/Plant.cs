@@ -172,6 +172,7 @@ public class Plant : GameElement
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
+        /*
         if (!Game.tutorial.isTutorialActive)
         {
             for (int a = 0; a < 2500; a++)
@@ -179,6 +180,7 @@ public class Plant : GameElement
                 Crescita();
             }
         }
+        // */
     }
 
     public Plant(SeedType seedType)

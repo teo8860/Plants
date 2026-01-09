@@ -10,7 +10,7 @@ public class GuiScrollbar : GameElement
 {
     private static readonly (float percent, string name, Color color)[] Milestones = new[]
     {
-        (0.00f, "Terra", new Color(139, 90, 43, 255)),
+        (0.00f, "Inizio", new Color(139, 90, 43, 255)),
         (0.10f, "Radici", new Color(101, 67, 33, 255)),
         (0.20f, "Germoglio", new Color(50, 150, 50, 255)),
         (0.30f, "Crescita", new Color(60, 180, 60, 255)),
@@ -20,7 +20,7 @@ public class GuiScrollbar : GameElement
         (0.70f, "Nuvole", new Color(200, 200, 220, 255)),
         (0.80f, "Stratosfera", new Color(70, 100, 180, 255)),
         (0.90f, "Spazio", new Color(20, 20, 50, 255)),
-        (1.00f, "Nuovo Mondo", new Color(255, 215, 0, 255))
+        (1.00f, "Fine", new Color(255, 215, 0, 255))
     };
 
     private float displayedProgress = 0f;
@@ -35,7 +35,7 @@ public class GuiScrollbar : GameElement
     public override void Update()
     {
         float maxCamera = Game.controller.offsetMaxY;
-        float currentCamera = Rendering.camera.position.Y;
+        float currentCamera = Game.pianta.Stats.Altezza;
         float targetProgress = maxCamera > 0 ? Math.Clamp(currentCamera / maxCamera, 0f, 1f) : 0f;
 
         float diff = targetProgress - displayedProgress;
@@ -59,7 +59,7 @@ public class GuiScrollbar : GameElement
 
         DrawCurrentMarker(trackX, trackBottom, trackWidth, trackHeight);
 
-        DrawAltitudeInfo(trackX + 22, trackBottom);
+        DrawAltitudeInfo(20,57);
     }
 
     private void DrawTrackBackground(int x, int y, int width, int height)
@@ -94,7 +94,17 @@ public class GuiScrollbar : GameElement
             if (milestone.percent == 0f || milestone.percent == 0.5f || milestone.percent == 1f ||
                 Math.Abs(displayedProgress - milestone.percent) < 0.08f)
             {
-                Color textColor = new Color(200, 200, 200, 180);
+                Color textColor = new Color(255, 255, 255, 255);
+                if (milestone.name == "Inizio")
+                { 
+                    Graphics.DrawText(WorldManager.GetWorldName(WorldManager.GetCurrentWorld()), x + 2, markerY - 4, 8, textColor);
+                    continue;
+                }
+                if (milestone.name == "Fine")
+                {
+                    Graphics.DrawText(WorldManager.GetWorldName(WorldManager.GetNextWorld(WorldManager.GetCurrentWorld())), x + 2, markerY - 8, 8, textColor);
+                    continue;
+                }
                 Graphics.DrawText(milestone.name, x + 2, markerY - 4, 8, textColor);
             }
         }
@@ -129,7 +139,7 @@ public class GuiScrollbar : GameElement
     private void DrawAltitudeInfo(int x, int y)
     {
         float maxHeight = Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier;
-        float currentHeight = Rendering.camera.position.Y;
+        float currentHeight = Game.pianta.Stats.Altezza;
         float percent = displayedProgress * 100f;
 
         string heightStr = currentHeight >= 1000

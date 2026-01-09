@@ -84,7 +84,7 @@ public static class Game
 
     private static void InitToolbar()
     {
-        toolbar = new GuiToolbar(40, 10, buttonSize: 36, spacing: 4);
+        toolbar = new GuiToolbar(10, 5, buttonSize: 36, spacing: 4);
         toolbar.depth = -50;
 
         toolbar.SetIcons(
@@ -130,7 +130,7 @@ public static class Game
 
     public static void SetTimer()
     {
-        Timer = new Timer(1000);
+        Timer = new Timer(500); //1000
         Timer.Elapsed += OnTimedEvent;
         Timer.AutoReset = true;
         Timer.Enabled = true;

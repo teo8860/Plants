@@ -285,6 +285,23 @@ public class WorldManager
         };
     }
 
+    public static string GetWorldName(WorldType current)
+    {
+        switch (current)
+        {
+            case WorldType.Terra: return "Terra";
+            case WorldType.Luna: return "Luna";
+            case WorldType.Marte: return "Marte";
+            case WorldType.Europa: return "Europa";
+            case WorldType.Venere: return "Venere";
+            case WorldType.Titano: return "Titano";
+            case WorldType.ReameMistico: return "Reame Mistico";
+            case WorldType.GiardinoMistico: return "Giardino Mistico";
+            case WorldType.Origine: return "Origine";
+            default: return "Unknown";
+        }
+    }
+
     public static void SetNextWorld()
         {
         SetCurrentWorld(GetNextWorld(currentWorld));
