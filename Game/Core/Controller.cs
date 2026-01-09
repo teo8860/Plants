@@ -17,6 +17,8 @@ public class Controller : GameElement
     public bool annaffiatoioAttivo = false;
     public bool isButtonRightPressed = false;
 
+    public bool autoscroll = true;
+
     public Controller()
     {
         this.persistent = true;
@@ -81,7 +83,7 @@ public class Controller : GameElement
               Rendering.camera.position.Y = 0;
         }
 
-         if (Input.IsKeyDown(KeyboardKey.Space))
+         if (Input.IsKeyDown(KeyboardKey.B))
         {
             Game.inventoryRoom.SetActiveRoom();
         }
@@ -91,6 +93,12 @@ public class Controller : GameElement
         {
             Game.mainRoom.SetActiveRoom();
         }
+
+        if (Input.IsKeyDown(KeyboardKey.Space))
+        {
+            autoscroll = !autoscroll;
+        }
+
     }
 
     public void Scorri(float delta)

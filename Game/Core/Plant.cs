@@ -172,10 +172,10 @@ public class Plant : GameElement
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
-        /*
+         /* 
         if (!Game.tutorial.isTutorialActive)
         {
-            for (int a = 0; a < 2500; a++)
+            for (int a = 0; a < 400; a++)
             {
                 Crescita();
             }
@@ -269,7 +269,7 @@ public class Plant : GameElement
 
             Vector2 pos = posizione;
             pos.X += RandomHelper.Int(-45, 45);
-            pos.Y += RandomHelper.Int(90, 90);
+            pos.Y += posizione.Y;
 
             radici.Add(new Radice(puntoAttacco, pos));
 
@@ -292,7 +292,7 @@ public class Plant : GameElement
             ederaCreata = true;
         }
 
-        if (Rendering.camera.position.Y <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
+        if (Rendering.camera.position.Y <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier && Game.controller.autoscroll == true)
         {
             Rendering.camera.position.Y += incrementoFinale;
         }
@@ -463,7 +463,6 @@ public class Plant : GameElement
 
         foreach (var radice in radici)
         {
-            if (radice.IsInView(cameraY))
                 radice.Draw();
         }
 
