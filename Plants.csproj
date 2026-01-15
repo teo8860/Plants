@@ -10,10 +10,12 @@
 	  <PublishSingleFile>true</PublishSingleFile>
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	  <SelfContained>true</SelfContained>
-	  <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
-
+	<PropertyGroup>
+		<PublishTrimmed>false</PublishTrimmed>
+		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+	</PropertyGroup>
 
 	<PropertyGroup>
 		<ApplicationIcon>Assets\icon.ico</ApplicationIcon>

@@ -129,7 +129,7 @@ public class Plant : GameElement
     DayPhase Fase = Game.Phase;
 
     public SeedType TipoSeme = SeedType.Normale;
-    public SeedBonus seedBonus = SeedBonus.Default;
+    public SeedStats seedBonus = new SeedStats();
 
     public PlantStats Stats = new PlantStats();
 
@@ -172,7 +172,7 @@ public class Plant : GameElement
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
-         /* 
+         ///* 
         if (!Game.tutorial.isTutorialActive)
         {
             for (int a = 0; a < 400; a++)
@@ -262,13 +262,13 @@ public class Plant : GameElement
         }
 
         contatorePuntiPerRadice++;
-        if (contatorePuntiPerRadice == 25)
+        if (contatorePuntiPerRadice == 45)
         {
             Vector2 puntoAttacco = posizione;
-            puntoAttacco.Y += 20;
+            puntoAttacco.Y -= 5;
 
             Vector2 pos = posizione;
-            pos.X += RandomHelper.Int(-45, 45);
+            //pos.X += RandomHelper.Int(-45, 45);
             pos.Y += posizione.Y;
 
             radici.Add(new Radice(puntoAttacco, pos));

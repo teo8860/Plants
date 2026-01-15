@@ -28,85 +28,85 @@ public enum SeedRarity
     Mitico
 }
 
-public struct SeedBonus
+public struct SeedStats
 {
-    public float Vitalita;
-    public float Idratazione;
-    public float ResistenzaFreddo;
-    public float ResistenzaCaldo;
-    public float ResistenzaParassiti;
-    public float Vegetazione;
-    public float Metabolismo;
-    public float ResistenzaVuoto;
+    public float Vitalita  { get; set; }
+    public float Idratazione { get; set; }
+    public float ResistenzaFreddo { get; set; }
+    public float ResistenzaCaldo { get; set; }
+    public float ResistenzaParassiti { get; set; }
+    public float Vegetazione { get; set; }
+    public float Metabolismo { get; set; }
+    public float ResistenzaVuoto { get; set; }
 
-    public static SeedBonus Default => new()
+    public SeedStats()
     {
-        Vitalita = 1.0f,
-        Idratazione = 1.0f,
-        ResistenzaFreddo = 0.0f,
-        ResistenzaCaldo = 0.0f,
-        ResistenzaParassiti = 0.0f,
-        Vegetazione = 1.0f,
-        Metabolismo = 1.0f,
-        ResistenzaVuoto = 0.0f
-    };
+        Vitalita = 1.0f;
+        Idratazione = 1.0f;
+        ResistenzaFreddo = 0.0f;
+        ResistenzaCaldo = 0.0f;
+        ResistenzaParassiti = 0.0f;
+        Vegetazione = 1.0f;
+        Metabolismo = 1.0f;
+        ResistenzaVuoto = 0.0f;
+    }
 }
 
 public static class SeedDataType
 {
-    private static readonly Dictionary<SeedType, SeedBonus> _bonuses = new()
+    private static readonly Dictionary<SeedType, SeedStats> _bonuses = new()
     {
-        { SeedType.Normale, SeedBonus.Default },
+        { SeedType.Normale, new SeedStats()},
 
-        { SeedType.Poderoso, new SeedBonus {
+        { SeedType.Poderoso, new SeedStats {
             Vitalita = 1.5f, Idratazione = 1.1f, ResistenzaFreddo = 0.1f,
             ResistenzaCaldo = 0.1f, ResistenzaParassiti = 0.1f,
             Vegetazione = 0.9f, Metabolismo = 0.8f, ResistenzaVuoto = 0.1f
         }},
 
-        { SeedType.Fluviale, new SeedBonus {
+        { SeedType.Fluviale, new SeedStats {
             Vitalita = 1.0f, Idratazione = 0.5f, ResistenzaFreddo = 0.1f,
             ResistenzaCaldo = -0.2f, ResistenzaParassiti = 0.0f,
             Vegetazione = 1.2f, Metabolismo = 1.0f, ResistenzaVuoto = 0.0f
         }},
 
-        { SeedType.Glaciale, new SeedBonus {
+        { SeedType.Glaciale, new SeedStats {
             Vitalita = 1.1f, Idratazione = 0.85f, ResistenzaFreddo = 0.65f,
             ResistenzaCaldo = -0.3f, ResistenzaParassiti = 0.15f,
             Vegetazione = 0.85f, Metabolismo = 0.85f, ResistenzaVuoto = 0.25f
         }},
 
-        { SeedType.Magmatico, new SeedBonus {
+        { SeedType.Magmatico, new SeedStats {
             Vitalita = 1.1f, Idratazione = 1.4f, ResistenzaFreddo = -0.3f,
             ResistenzaCaldo = 0.65f, ResistenzaParassiti = 0.25f,
             Vegetazione = 0.8f, Metabolismo = 1.1f, ResistenzaVuoto = 0.15f
         }},
 
-        { SeedType.Puro, new SeedBonus {
+        { SeedType.Puro, new SeedStats {
             Vitalita = 0.9f, Idratazione = 1.0f, ResistenzaFreddo = 0.0f,
             ResistenzaCaldo = 0.0f, ResistenzaParassiti = 0.8f,
             Vegetazione = 1.1f, Metabolismo = 1.0f, ResistenzaVuoto = 0.0f
         }},
 
-        { SeedType.Florido, new SeedBonus {
+        { SeedType.Florido, new SeedStats {
             Vitalita = 0.95f, Idratazione = 1.25f, ResistenzaFreddo = -0.1f,
             ResistenzaCaldo = -0.1f, ResistenzaParassiti = -0.15f,
             Vegetazione = 1.7f, Metabolismo = 1.0f, ResistenzaVuoto = 0.0f
         }},
 
-        { SeedType.Rapido, new SeedBonus {
+        { SeedType.Rapido, new SeedStats {
             Vitalita = 0.75f, Idratazione = 1.5f, ResistenzaFreddo = -0.1f,
             ResistenzaCaldo = -0.1f, ResistenzaParassiti = -0.1f,
             Vegetazione = 1.0f, Metabolismo = 1.6f, ResistenzaVuoto = 0.0f
         }},
 
-        { SeedType.Antico, new SeedBonus {
+        { SeedType.Antico, new SeedStats {
             Vitalita = 1.15f, Idratazione = 0.9f, ResistenzaFreddo = 0.2f,
             ResistenzaCaldo = 0.2f, ResistenzaParassiti = 0.2f,
             Vegetazione = 1.1f, Metabolismo = 0.9f, ResistenzaVuoto = 0.15f
         }},
 
-        { SeedType.Cosmico, new SeedBonus {
+        { SeedType.Cosmico, new SeedStats {
             Vitalita = 1.0f, Idratazione = 0.6f, ResistenzaFreddo = 0.45f,
             ResistenzaCaldo = 0.3f, ResistenzaParassiti = 0.35f,
             Vegetazione = 0.7f, Metabolismo = 0.8f, ResistenzaVuoto = 0.7f
@@ -127,8 +127,8 @@ public static class SeedDataType
         { SeedType.Cosmico, SeedRarity.Leggendario }
     };
 
-    public static SeedBonus GetBonus(SeedType type) =>
-        _bonuses.TryGetValue(type, out var bonus) ? bonus : SeedBonus.Default;
+    public static SeedStats GetBonus(SeedType type) =>
+        _bonuses.TryGetValue(type, out var bonus) ? bonus : new SeedStats();
 
     public static SeedRarity GetRarity(SeedType type) =>
         _rarities.TryGetValue(type, out var rarity) ? rarity : SeedRarity.Comune;
@@ -166,7 +166,7 @@ public static class SeedDataType
 
 public class PlantStats
 {
-    public float Salute = 1.0f;
+    public float Salute = 1f;
     public float Idratazione = 0.4f;
     public float Ossigeno = 1.0f;
     public float Metabolismo = 0.8f;

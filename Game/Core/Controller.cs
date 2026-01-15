@@ -86,6 +86,7 @@ public class Controller : GameElement
          if (Input.IsKeyDown(KeyboardKey.B))
         {
             Game.inventoryRoom.SetActiveRoom();
+            Game.InitInventory();
         }
 
          

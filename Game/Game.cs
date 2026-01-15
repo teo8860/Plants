@@ -41,6 +41,8 @@ public static class Game
 
     public static void Init()
     {
+        Inventario.get().Load();
+
         mainRoom = new Room();
         inventoryRoom = new Room(false);
         optionMenu = new Room(false);
@@ -49,8 +51,6 @@ public static class Game
         tutorial.isTutorialActive = false;
 
         AssetLoader.LoadAll();
-
-        GameElement.Create<Test>(0, inventoryRoom);
 
         background = GameElement.Create<Background>(100);
         ground = GameElement.Create<Ground>(100);
@@ -72,6 +72,7 @@ public static class Game
         worldTransition = GameElement.Create<GuiWorldTransition>(-200);
 
         InitToolbar();
+        InitInventory();
 
         statsPanel = new GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
         oxygenSystem = new OxygenSystem();
@@ -126,6 +127,50 @@ public static class Game
                 WorldManager.SetNextWorld();
             }
         );
+    }
+
+    public static void InitInventory()
+    {
+        toolbar = new GuiToolbar(10, 5, buttonSize: 36, spacing: 4);
+        toolbar.depth = -50;
+        toolbar.roomId = Game.inventoryRoom.id;
+        toolbar.active = true;
+
+        var inv = Inventario.get();
+       
+
+		 /*
+
+            ______/``'``'-.
+           (_   6  \    .^
+         __ `'.__,  |    `'-.
+        /_ \  /    /      :`^'
+      /`/_` \/    /       .'
+      "/  `'-     |.-'`^. `.
+      / .`-._     \   `'^^^
+    /`/'    \      \
+    ""       \      `.
+              `\      `.
+                `\/     \-'-.-
+                 /     /`.  `-.
+                (    /'   )  .^
+                 \  \\  .'^. `.
+                  \ > >  `` `. )
+                  // /       .`
+                /`/
+                ""
+		 */
+		foreach(var item in  inv.seeds)
+		{
+			toolbar.AddActionButton(
+            AssetLoader.spritePhaseOff,
+            "",
+            () => {
+              
+            }
+        );
+		}
+		
     }
 
     public static void SetTimer()

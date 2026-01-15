@@ -45,7 +45,7 @@ public class GameLogicPianta
         { DayPhase.Evening, 14f }
     };
 
-    public SeedBonus bonus => pianta.seedBonus;
+    public SeedStats bonus => pianta.seedBonus;
     public PlantStats stats => pianta.Stats;
 
     public float VitalitaMax => 1.0f * bonus.Vitalita;
@@ -71,7 +71,7 @@ public class GameLogicPianta
     public bool IsTorrida => stats.Temperatura >= TEMPERATURA_TORRIDA;
     public bool IsTemperaturaIdeale => stats.Temperatura >= TEMPERATURA_IDEALE_MIN && stats.Temperatura <= TEMPERATURA_IDEALE_MAX;
 
-    public SeedBonus GetSeedBonus() => bonus;
+    public SeedStats GetSeedBonus() => bonus;
 
     public float CalcolaTemperaturaAmbientale(DayPhase fase, Weather meteo, WorldModifier worldMod)
     {
