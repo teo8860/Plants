@@ -39,8 +39,13 @@ public static class Game
 
     public static GuiWorldTransition worldTransition;
 
+    public static GuiInventoryBackground inventoryBackground;
+    public static GuiInventoryGrid inventoryGrid;
+    public static GuiSeedDetailPanel seedDetailPanel;
+
     public static void Init()
     {
+        //Inventario.get().Save();
         Inventario.get().Load();
 
         mainRoom = new Room();
@@ -131,46 +136,19 @@ public static class Game
 
     public static void InitInventory()
     {
-        toolbar = new GuiToolbar(10, 5, buttonSize: 36, spacing: 4);
-        toolbar.depth = -50;
-        toolbar.roomId = Game.inventoryRoom.id;
-        toolbar.active = true;
+        // Background stile legno
+        inventoryBackground = new GuiInventoryBackground();
+        
+        inventoryGrid = new GuiInventoryGrid();
 
-        var inv = Inventario.get();
-       
+        seedDetailPanel = new GuiSeedDetailPanel();
 
-		 /*
+        // Collega il pannello alla griglia per dimensionamento dinamico
+        inventoryGrid.detailPanel = seedDetailPanel;
 
-            ______/``'``'-.
-           (_   6  \    .^
-         __ `'.__,  |    `'-.
-        /_ \  /    /      :`^'
-      /`/_` \/    /       .'
-      "/  `'-     |.-'`^. `.
-      / .`-._     \   `'^^^
-    /`/'    \      \
-    ""       \      `.
-              `\      `.
-                `\/     \-'-.-
-                 /     /`.  `-.
-                (    /'   )  .^
-                 \  \\  .'^. `.
-                  \ > >  `` `. )
-                  // /       .`
-                /`/
-                ""
-		 */
-		foreach(var item in  inv.seeds)
-		{
-			toolbar.AddActionButton(
-            AssetLoader.spritePhaseOff,
-            "",
-            () => {
-              
-            }
-        );
-		}
-		
+        inventoryGrid.OnSeedSelected = (index) => {
+            seedDetailPanel.Toggle(index);
+        };
     }
 
     public static void SetTimer()

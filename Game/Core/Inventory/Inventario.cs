@@ -30,7 +30,10 @@ public class Inventario
 
 	public void Save()
 	{
-		SaveHelper.Save("inventory.json", seeds);
+		seeds.Add(new Seed());
+        seeds.Add(new Seed());
+        seeds.Add(new Seed());
+        SaveHelper.Save("inventory.json", seeds);
 	}
 
 	public void Load()

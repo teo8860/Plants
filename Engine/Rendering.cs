@@ -41,10 +41,10 @@ internal class Rendering
             }
 
 
-            var layerBase = elements.FindAll((o)=> o.guiLayer == false);
+            var layerBase = elements.FindAll((o)=> o.guiLayer == false && o.active == true);
             layerBase.Sort((GameElement a, GameElement b)=> b.depth - a.depth);
 
-            var layerGui = elements.FindAll((o)=> o.guiLayer == true);
+            var layerGui = elements.FindAll((o)=> o.guiLayer == true && o.active == true);
             layerGui.Sort((GameElement a, GameElement b)=> b.depth - a.depth);
 
             Graphics.BeginDrawing();
