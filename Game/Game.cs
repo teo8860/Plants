@@ -51,13 +51,7 @@ public static class Game
         inventoryRoom = new Room(false);
         optionMenu = new Room(false);
 
-     
-        mainRoom.SetActiveRoom();
-
-
-        //Inventario.get().Save();
         Inventario.get().Load();
-
 
         tutorial = GameElement.Create<Tutorial>(-1);
         tutorial.StartTutorial();
@@ -80,11 +74,13 @@ public static class Game
         pianta.setColori(colore1, colore2);
 
         GameElement.Create<GuiScrollbar>(100);
-
+        
+        new SeedImage(new Seed());
+   
         worldTransition = GameElement.Create<GuiWorldTransition>(-200);
 
         InitToolbar();
-        if (inventoryRoom.id == Room.GetActiveId())
+        //if (inventoryRoom.id == Room.GetActiveId())
             InitInventory();
 
         statsPanel = new GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);

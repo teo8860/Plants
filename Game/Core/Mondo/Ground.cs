@@ -2,6 +2,7 @@
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Rendering;
+using Raylib_CSharp.Shaders;
 using System.Numerics;
 
 namespace Plants;
@@ -13,7 +14,6 @@ public class Ground : GameElement
 
     Color CurrentWorld1, CurrentWorld2, NextWorld1, NextWorld2;
 
-
     public override void Update()
     {
 
@@ -22,7 +22,6 @@ public class Ground : GameElement
 
     public override void Draw()
     {
-
         int x1 = 0;
         int y1 = (int)(GameProperties.groundPosition);
 
@@ -40,6 +39,7 @@ public class Ground : GameElement
 
         Graphics.DrawRectangle(x3, y3 - 10, x4, y4, NextWorld1);
         Graphics.DrawRectangle(x3, y3, x4, y4, NextWorld2);
+
     }
 
     public void SetGroundWorld(Color color1CurrentWorld, Color color2CurrentWorld, Color color1NextWorld, Color color2NextWorld)

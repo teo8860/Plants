@@ -17,7 +17,23 @@ public class GameElement
     public bool active = true;
     public int depth = 0;
     public bool guiLayer = false;
-    public  uint roomId;
+
+    
+    private uint _roomId;
+    public uint roomId 
+    {
+        get 
+        {
+            return _roomId;
+        }
+        set{
+           if(Room.GetActiveId() != value)
+            {
+                active = false;
+                _roomId = value;
+            }
+        }
+    }
    
 
     public static T Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T >(int depth = 0, Room room = null) where T : GameElement

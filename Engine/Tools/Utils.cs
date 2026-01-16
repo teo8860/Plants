@@ -46,4 +46,20 @@ internal class Utility
 
         return RayImg.Image.LoadFromMemory(".png", ms.ToArray());
     }
+    
+    
+    public static string LoadTextFromEmbedded(string resourceName, string path = "")
+    {
+       var asm = Assembly.GetExecutingAssembly();
+
+       using var stream = asm.GetManifestResourceStream("Plants."+path+"."+resourceName);
+      if (stream != null)
+		{
+			using var reader = new StreamReader(stream);
+			return reader.ReadToEnd();
+		}
+
+		// Se non esiste come risorsa incorporata, prova a leggere dal filesystem
+		return File.ReadAllText(Path.Combine(path, resourceName));
+    }
 }

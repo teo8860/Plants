@@ -1,5 +1,6 @@
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Images;
+using Raylib_CSharp.Shaders;
 using Raylib_CSharp.Textures;
 using System;
 using System.Numerics;
@@ -24,12 +25,41 @@ public static class AssetLoader
     public static Sprite spriteWeatherOn;
     public static Sprite spriteWorldIcon;
 
+    
+    public static Sprite spriteSeed1;
+    public static Sprite spriteSeed2;
+    
+    public static Sprite spriteNoise1;
+    public static Sprite spriteNoise2;
+    public static Sprite spriteNoise3;
+    public static Sprite spriteNoise4;
+    public static Sprite spriteNoise5;
+    public static Sprite spriteNoise6;
+
+    public static Shader shaderBase;
+    public static Shader shaderRecolor;
+    public static Shader shaderSeed;
+
     public static void LoadAll()
     {
 
         spriteLeaf = new Sprite("leaf.png", 0.5f, new(0.5f, 0.0f));
         spriteCross = new Sprite("x.png", 0.05f, new(0.5f, 0.5f));
         spriteCheck = new Sprite("v.png", 0.05f, new(0.5f, 0.5f));
+        
+        spriteSeed1 = new Sprite("seme1.png", 0.05f, new(0.5f, 0.5f));
+        spriteSeed2 = new Sprite("seme2.png", 0.05f, new(0.5f, 0.5f));
+
+        spriteNoise1 = new Sprite("texture/tex_noise1.png", 0.05f, new(0.5f, 0.5f));
+        spriteNoise2 = new Sprite("texture/tex_noise2.png", 0.05f, new(0.5f, 0.5f));
+        spriteNoise3 = new Sprite("texture/tex_noise3.png", 0.05f, new(0.5f, 0.5f));
+        spriteNoise4 = new Sprite("texture/tex_noise4.png", 0.05f, new(0.5f, 0.5f));
+        spriteNoise5 = new Sprite("texture/tex_noise5.png", 0.05f, new(0.5f, 0.5f));
+        spriteNoise6 = new Sprite("texture/tex_noise6.png", 0.05f, new(0.5f, 0.5f));
+
+        shaderBase = LoadShader("base");
+        shaderRecolor = LoadShader("recolor");
+        shaderSeed = LoadShader("seed");
         
         spriteArrowDown = CreateColoredPlaceholder(new Color(200, 200, 220, 255));
         spriteArrowUp = CreateColoredPlaceholder(new Color(220, 200, 200, 255));
@@ -51,5 +81,10 @@ public static class AssetLoader
         var texture = Texture2D.LoadFromImage(img);
         img.Unload();
         return new Sprite(texture, new Vector2(size / 2f, size / 2f));
+    }
+
+    private static Shader LoadShader(string name)
+    {
+        return Shader.LoadFromMemory(Utility.LoadTextFromEmbedded("base.vert", "Assets/shader"), Utility.LoadTextFromEmbedded(name+".frag", "Assets/shader"));
     }
 }
