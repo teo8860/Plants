@@ -24,6 +24,8 @@ public static class Game
     public static WeatherRender weatherSystem;
 
     public static bool cambiaPhase = false;
+    public static bool isPaused = false;
+    public static float growthSpeed = 0.3f;
 
     public static Timer Timer;
     public static Timer TimerFase;
@@ -45,15 +47,20 @@ public static class Game
 
     public static void Init()
     {
-        //Inventario.get().Save();
-        Inventario.get().Load();
-
         mainRoom = new Room();
         inventoryRoom = new Room(false);
         optionMenu = new Room(false);
 
+     
+        mainRoom.SetActiveRoom();
+
+
+        //Inventario.get().Save();
+        Inventario.get().Load();
+
+
         tutorial = GameElement.Create<Tutorial>(-1);
-        tutorial.isTutorialActive = false;
+        tutorial.StartTutorial();
 
         AssetLoader.LoadAll();
 
@@ -77,7 +84,8 @@ public static class Game
         worldTransition = GameElement.Create<GuiWorldTransition>(-200);
 
         InitToolbar();
-        InitInventory();
+        if (inventoryRoom.id == Room.GetActiveId())
+            InitInventory();
 
         statsPanel = new GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
         oxygenSystem = new OxygenSystem();
@@ -85,7 +93,7 @@ public static class Game
         SetTimer();
         SetTimerFase();
         Phase = FaseGiorno.GetCurrentPhase();
-        WorldManager.SetCurrentWorld(WorldType.Terra);
+        WorldManager.SetCurrentWorld(WorldType.Serra);
     }
 
     private static void InitToolbar()
@@ -161,6 +169,8 @@ public static class Game
 
     private static void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
+        if (isPaused) return;
+        
         pianta.proprieta.AggiornaTutto(
             Phase,
             WeatherManager.GetCurrentWeather(),

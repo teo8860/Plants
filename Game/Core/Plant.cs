@@ -319,6 +319,8 @@ public class Plant : GameElement
 
     public void ControlloCrescita()
     {
+        if (Game.isPaused) return;
+        
         if (Stats.Altezza >= Stats.AltezzaMassima)
             return;
 
