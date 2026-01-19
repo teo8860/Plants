@@ -1,4 +1,4 @@
-﻿using Raylib_CSharp;
+using Raylib_CSharp;
 using Raylib_CSharp.Camera.Cam2D;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Rendering;
@@ -49,26 +49,23 @@ internal class Rendering
 
             Graphics.BeginDrawing();
             Graphics.ClearBackground(Color.Black);
+
+            // World rendering phase
             camera.BeginWorldMode();
             foreach (var item in layerBase)
             {
                 item.Draw();
             }
-       
-
-            Graphics.DrawCircle(60,0, 10, Color.White);
-            Graphics.DrawCircle(60,60, 10, Color.White);
             camera.EndWorldMode();
+
+            // Draw world render texture to screen
             camera.DrawWorld();
 
-          
-            camera.BeginScreenMode();
-            camera.EndWorldMode();
+            // GUI rendering phase
             foreach (var item in layerGui)
             {
                 item.Draw();
             }
-            
 
             Graphics.DrawFPS(0,0);
             Graphics.EndDrawing();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Plants;
 
@@ -102,10 +102,24 @@ public static class WeatherManager
             currentWeather = newWeather;
             lastWeatherChange = DateTime.Now;
         }
+
+        ChangeWeather();
+    }
+
+    public static void SetCurrentWeather(Weather weather)
+    {
+        currentWeather = weather;
+        lastWeatherChange = DateTime.Now;
     }
 
     public static void ForceWeatherChange()
     {
+        ChangeWeatherRandomly();
+    }
+
+    public static void ChangeWeather()
+    {
+        // Weather change logic is already handled in ChangeWeatherRandomly
         ChangeWeatherRandomly();
     }
 }

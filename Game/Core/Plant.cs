@@ -137,7 +137,7 @@ public class Plant : GameElement
 
     public Color colore1, colore2;
 
-    public float nextWorldGroundY => Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier + GameProperties.groundHeight - 10;
+    public float nextWorldGroundY => Stats.EffectiveMaxHeight + GameProperties.groundHeight - 10;
 
     public void setColori(Color Colore1, Color Colore2)
     {
@@ -210,9 +210,9 @@ public class Plant : GameElement
 
         incrementoFinale = Math.Max(7f, incrementoFinale);
 
-        if (Stats.Altezza + incrementoFinale > Stats.AltezzaMassima)
+        if (Stats.Altezza + incrementoFinale > Stats.EffectiveMaxHeight)
         {
-            incrementoFinale = Stats.AltezzaMassima - Stats.Altezza;
+            incrementoFinale = Stats.EffectiveMaxHeight - Stats.Altezza;
         }
 
         Stats.Altezza += incrementoFinale;

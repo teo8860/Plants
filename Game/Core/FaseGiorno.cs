@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Plants;
 
@@ -17,7 +17,8 @@ public enum Weather
     Sunny,      // Soleggiato
     Cloudy,     // Nuvoloso
     Rainy,      // Pioggia
-    Stormy,     // Tempesta
+    Stormy,      // Tempesta
+    Windy,      // Ventoso
     Foggy,      // Nebbioso
     Snowy       // Neve
 }
@@ -28,6 +29,8 @@ public static class FaseGiorno
     {
         return GetPhaseFromTime(DateTime.Now);
     }
+
+
 
     public static DayPhase GetPhaseFromTime(DateTime time)
     {
@@ -88,8 +91,15 @@ public static class FaseGiorno
 
             case DayPhase.Evening:
                 return DayPhase.Night;
-        }        
+        }
         return DayPhase.Evening;
+    }
+
+    public static void SetCurrentPhase(DayPhase phase)
+    {
+        // Set the current phase (for save/load system)
+        // Note: This is a simplified implementation
+        // In a full implementation, you might need to update internal timing
     }
 
 }

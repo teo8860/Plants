@@ -1,4 +1,4 @@
-﻿using Plants;
+using Plants;
 using Raylib_CSharp;
 using Raylib_CSharp.Interact;
 using System;
@@ -8,7 +8,7 @@ using System.Numerics;
 public class Controller : GameElement
 {
     public float offsetMinY = 0;
-    public float offsetMaxY => (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier);
+    public float offsetMaxY => (Game.pianta.Stats.EffectiveMaxHeight);
 
     public float scrollSpeed = 1000f;  
     public float scrollAcceleration = 5f;  
@@ -42,8 +42,8 @@ public class Controller : GameElement
             isButtonRightPressed = true;
             if (annaffiatoioAttivo)
             {
-                Game.innaffiatoio.EmitParticle(mouse);
-                Game.pianta.proprieta.Annaffia(0.01f);
+            Game.innaffiatoio.EmitParticle(mouse);
+            Game.pianta.proprieta.Annaffia(0.01f);
             }
         }
         else
@@ -63,7 +63,7 @@ public class Controller : GameElement
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(-currentScrollSpeed * deltaTime);
         }
-        else if (Input.IsKeyDown(KeyboardKey.Up) && Rendering.camera.position.Y < (Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier))
+        else if (Input.IsKeyDown(KeyboardKey.Up) && Rendering.camera.position.Y < (Game.pianta.Stats.EffectiveMaxHeight))
         {
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(currentScrollSpeed * deltaTime);
@@ -75,7 +75,7 @@ public class Controller : GameElement
 
         if (Input.IsKeyDown(KeyboardKey.Right))
         {
-              Rendering.camera.position.Y = Game.pianta.Stats.AltezzaMassima*WorldManager.GetCurrentModifiers().LimitMultiplier;
+              Rendering.camera.position.Y = Game.pianta.Stats.EffectiveMaxHeight;
         }
         
         if (Input.IsKeyDown(KeyboardKey.Left))
@@ -83,14 +83,14 @@ public class Controller : GameElement
               Rendering.camera.position.Y = 0;
         }
 
-         if (Input.IsKeyDown(KeyboardKey.B))
+          if (Input.IsKeyDown(KeyboardKey.B))
         {
             Game.inventoryRoom.SetActiveRoom();
             Game.InitInventory();
         }
 
          
-         if (Input.IsKeyDown(KeyboardKey.V))
+          if (Input.IsKeyDown(KeyboardKey.V))
         {
             Game.mainRoom.SetActiveRoom();
         }

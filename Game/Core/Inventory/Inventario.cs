@@ -1,15 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Plants;
 
+public class InventorySaveData
+{
+    public Dictionary<SeedType, int> Seeds = new();
+}
 
 public class Inventario
 {
-	public List<Seed> seeds = new();
+	private Dictionary<SeedType, int> seedCounts = new();
 
 	public static Inventario get()
 	{
@@ -22,24 +24,62 @@ public class Inventario
 	private static Inventario instance = null;
 
 	private Inventario()
-	{ 
-		seeds = new();
+	{
+		seedCounts = new Dictionary<SeedType, int>();
 	}
 
+	public Dictionary<SeedType, int> GetAllSeeds()
+	{
+		return new Dictionary<SeedType, int>(seedCounts);
+	}
 
+	public void LoadFromData(InventorySaveData data)
+	{
+		seedCounts = new Dictionary<SeedType, int>(data.Seeds ?? new Dictionary<SeedType, int>());
+	}
+
+	public void AddSeed(SeedType type, int amount = 1)
+	{
+		if (seedCounts.ContainsKey(type))
+		{
+			seedCounts[type] += amount;
+		}
+		else
+		{
+			seedCounts[type] = amount;
+		}
+	}
+
+	public bool RemoveSeed(SeedType type, int amount = 1)
+	{
+		if (seedCounts.ContainsKey(type) && seedCounts[type] >= amount)
+		{
+			seedCounts[type] -= amount;
+			if (seedCounts[type] <= 0)
+			{
+				seedCounts.Remove(type);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	// Legacy methods for compatibility
+	public List<Seed> seeds => seedCounts.SelectMany(kvp => Enumerable.Repeat(new Seed(kvp.Key), kvp.Value)).ToList();
 
 	public void Save()
 	{
-		seeds.Add(new Seed());
-        seeds.Add(new Seed());
-        seeds.Add(new Seed());
-        SaveHelper.Save("inventory.json", seeds);
+		// Add some default seeds for testing
+		AddSeed(SeedType.Normale, 3);
+        SaveHelper.Save("inventory.json", seedCounts);
 	}
 
 	public void Load()
-	{ Console.WriteLine(SaveHelper.Load<List<Seed>>("inventory.json"));
-		seeds = SaveHelper.Load<List<Seed>>("inventory.json");
+	{
+		var loaded = SaveHelper.Load<Dictionary<SeedType, int>>("inventory.json");
+		if (loaded != null)
+		{
+			seedCounts = loaded;
+		}
 	}
-
-
 }

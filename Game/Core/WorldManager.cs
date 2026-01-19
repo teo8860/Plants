@@ -1,4 +1,4 @@
-﻿using Raylib_CSharp.Colors;
+using Raylib_CSharp.Colors;
 using System;
 using System.Collections.Generic;
 
@@ -455,6 +455,300 @@ public static class WorldManager
         WorldDifficulty.Impossible => "Impossibile",
         _ => "???"
     };
+
+    public static WorldDifficulty GetDifficultyFromName(string name) => name switch
+    {
+        "Tutorial" => WorldDifficulty.Tutorial,
+        "Facile" => WorldDifficulty.Easy,
+        "Normale" => WorldDifficulty.Normal,
+        "Medio" => WorldDifficulty.Medium,
+        "Medio-Difficile" => WorldDifficulty.MediumHard,
+        "Difficile" => WorldDifficulty.Hard,
+        "Molto Difficile" => WorldDifficulty.VeryHard,
+        "Estremo" => WorldDifficulty.Extreme,
+        "Incubo" => WorldDifficulty.Nightmare,
+        "Impossibile" => WorldDifficulty.Impossible,
+        _ => WorldDifficulty.Normal
+    };
+
+    private static Dictionary<WorldType, WorldModifier> worldModifiers = new()
+    {
+        {
+            WorldType.Serra,
+            new WorldModifier
+            {
+                SolarMultiplier = 1.0f,
+                GravityMultiplier = 1.0f,
+                OxygenLevel = 1.0f,
+                TemperatureModifier = 0.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 1.0f,
+                GrowthRateMultiplier = 1.0f,
+                WaterConsumption = 1.0f,
+                OxygenConsumption = 1.0f,
+                EnergyDrain = 1.0f,
+                ParasiteChance = 1.0f,
+                ParasiteDamage = 1.0f,
+                StormChance = 1.0f,
+                StormDamage = 1.0f,
+                TemperatureDamage = 1.0f,
+                LeafDropRate = 1.0f,
+                HealthRegen = 1.0f,
+                HydrationFromRain = 1.0f,
+                RequiresOxygenTank = false,
+                Difficulty = WorldDifficulty.Normal
+            }
+        },
+        {
+            WorldType.Terra,
+            new WorldModifier
+            {
+                SolarMultiplier = 1.0f,
+                GravityMultiplier = 1.0f,
+                OxygenLevel = 1.0f,
+                TemperatureModifier = 0.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 1.0f,
+                GrowthRateMultiplier = 1.0f,
+                WaterConsumption = 1.0f,
+                OxygenConsumption = 1.0f,
+                EnergyDrain = 1.0f,
+                ParasiteChance = 1.0f,
+                ParasiteDamage = 1.0f,
+                StormChance = 1.0f,
+                StormDamage = 1.0f,
+                TemperatureDamage = 1.0f,
+                LeafDropRate = 1.0f,
+                HealthRegen = 1.0f,
+                HydrationFromRain = 1.0f,
+                RequiresOxygenTank = false,
+                Difficulty = WorldDifficulty.Normal
+            }
+        },
+        {
+            WorldType.Luna,
+            new WorldModifier
+            {
+                SolarMultiplier = 1.0f,
+                GravityMultiplier = 0.16f,
+                OxygenLevel = 0.0f,
+                TemperatureModifier = -40.0f,
+                IsMeteoOn = false,
+                LimitMultiplier = 2.5f,
+                GrowthRateMultiplier = 0.5f,
+                WaterConsumption = 2.0f,
+                OxygenConsumption = 1.5f,
+                EnergyDrain = 1.5f,
+                ParasiteChance = 0.5f,
+                ParasiteDamage = 0.5f,
+                StormChance = 0.0f,
+                StormDamage = 0.0f,
+                TemperatureDamage = 2.0f,
+                LeafDropRate = 1.5f,
+                HealthRegen = 0.5f,
+                HydrationFromRain = 0.0f,
+                RequiresOxygenTank = true,
+                Difficulty = WorldDifficulty.Medium
+            }
+        },
+        {
+            WorldType.Marte,
+            new WorldModifier
+            {
+                SolarMultiplier = 0.4f,
+                GravityMultiplier = 0.38f,
+                OxygenLevel = 0.0f,
+                TemperatureModifier = -20.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 3.0f,
+                GrowthRateMultiplier = 0.4f,
+                WaterConsumption = 2.5f,
+                OxygenConsumption = 1.8f,
+                EnergyDrain = 1.8f,
+                ParasiteChance = 0.3f,
+                ParasiteDamage = 0.7f,
+                StormChance = 1.5f,
+                StormDamage = 1.5f,
+                TemperatureDamage = 2.0f,
+                LeafDropRate = 2.0f,
+                HealthRegen = 0.4f,
+                HydrationFromRain = 0.0f,
+                RequiresOxygenTank = true,
+                Difficulty = WorldDifficulty.Hard
+            }
+        },
+        {
+            WorldType.Europa,
+            new WorldModifier
+            {
+                SolarMultiplier = 0.05f,
+                GravityMultiplier = 0.13f,
+                OxygenLevel = 0.0f,
+                TemperatureModifier = -80.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 3.5f,
+                GrowthRateMultiplier = 0.35f,
+                WaterConsumption = 2.5f,
+                OxygenConsumption = 2.0f,
+                EnergyDrain = 2.0f,
+                ParasiteChance = 0.2f,
+                ParasiteDamage = 0.6f,
+                StormChance = 0.5f,
+                StormDamage = 1.0f,
+                TemperatureDamage = 2.5f,
+                LeafDropRate = 2.0f,
+                HealthRegen = 0.35f,
+                HydrationFromRain = 0.0f,
+                RequiresOxygenTank = true,
+                Difficulty = WorldDifficulty.Hard
+            }
+        },
+        {
+            WorldType.Venere,
+            new WorldModifier
+            {
+                SolarMultiplier = 0.2f,
+                GravityMultiplier = 0.9f,
+                OxygenLevel = 0.0f,
+                TemperatureModifier = 55.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 4.0f,
+                GrowthRateMultiplier = 0.3f,
+                WaterConsumption = 3.5f,
+                OxygenConsumption = 2.2f,
+                EnergyDrain = 2.0f,
+                ParasiteChance = 0.0f,
+                ParasiteDamage = 0.0f,
+                StormChance = 2.5f,
+                StormDamage = 3.0f,
+                TemperatureDamage = 3.0f,
+                LeafDropRate = 3.0f,
+                HealthRegen = 0.3f,
+                HydrationFromRain = -0.5f,
+                RequiresOxygenTank = true,
+                Difficulty = WorldDifficulty.Hard
+            }
+        },
+        {
+            WorldType.Titano,
+            new WorldModifier
+            {
+                SolarMultiplier = 0.08f,
+                GravityMultiplier = 0.14f,
+                OxygenLevel = 0.0f,
+                TemperatureModifier = -100.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 4.5f,
+                GrowthRateMultiplier = 0.25f,
+                WaterConsumption = 3.0f,
+                OxygenConsumption = 2.5f,
+                EnergyDrain = 2.5f,
+                ParasiteChance = 0.1f,
+                ParasiteDamage = 0.4f,
+                StormChance = 1.0f,
+                StormDamage = 1.5f,
+                TemperatureDamage = 3.5f,
+                LeafDropRate = 2.5f,
+                HealthRegen = 0.25f,
+                HydrationFromRain = 0.0f,
+                RequiresOxygenTank = true,
+                Difficulty = WorldDifficulty.VeryHard
+            }
+        },
+        {
+            WorldType.ReameMistico,
+            new WorldModifier
+            {
+                SolarMultiplier = 0.15f,
+                GravityMultiplier = 0.8f,
+                OxygenLevel = 0.3f,
+                TemperatureModifier = 10.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 5.0f,
+                GrowthRateMultiplier = 0.4f,
+                WaterConsumption = 2.0f,
+                OxygenConsumption = 1.5f,
+                EnergyDrain = 1.5f,
+                ParasiteChance = 2.0f,
+                ParasiteDamage = 2.0f,
+                StormChance = 3.0f,
+                StormDamage = 2.5f,
+                TemperatureDamage = 1.5f,
+                LeafDropRate = 4.0f,
+                HealthRegen = 0.4f,
+                HydrationFromRain = 1.0f,
+                RequiresOxygenTank = false,
+                Difficulty = WorldDifficulty.Extreme
+            }
+        },
+        {
+            WorldType.GiardinoMistico,
+            new WorldModifier
+            {
+                SolarMultiplier = 0.1f,
+                GravityMultiplier = 0.6f,
+                OxygenLevel = 0.5f,
+                TemperatureModifier = -5.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 6.0f,
+                GrowthRateMultiplier = 0.35f,
+                WaterConsumption = 2.5f,
+                OxygenConsumption = 1.8f,
+                EnergyDrain = 2.0f,
+                ParasiteChance = 3.0f,
+                ParasiteDamage = 3.0f,
+                StormChance = 4.0f,
+                StormDamage = 3.5f,
+                TemperatureDamage = 2.0f,
+                LeafDropRate = 5.0f,
+                HealthRegen = 0.35f,
+                HydrationFromRain = 1.5f,
+                RequiresOxygenTank = false,
+                Difficulty = WorldDifficulty.Nightmare
+            }
+        },
+        {
+            WorldType.Origine,
+            new WorldModifier
+            {
+                SolarMultiplier = 0.25f,
+                GravityMultiplier = 1.5f,
+                OxygenLevel = 0.2f,
+                TemperatureModifier = 25.0f,
+                IsMeteoOn = true,
+                LimitMultiplier = 100.0f,
+                GrowthRateMultiplier = 0.2f,
+                WaterConsumption = 5.0f,
+                OxygenConsumption = 3.0f,
+                EnergyDrain = 4.0f,
+                ParasiteChance = 4.0f,
+                ParasiteDamage = 4.0f,
+                StormChance = 3.0f,
+                StormDamage = 4.0f,
+                TemperatureDamage = 3.0f,
+                LeafDropRate = 5.0f,
+                HealthRegen = 0.15f,
+                HydrationFromRain = 0.5f,
+                RequiresOxygenTank = false,
+                Difficulty = WorldDifficulty.Impossible
+            }
+        }
+    };
+
+    // Missing methods needed for save/load system
+    private static WorldDifficulty currentDifficulty = WorldDifficulty.Normal;
+
+    public static WorldDifficulty GetCurrentWorldDifficulty() => currentDifficulty;
+
+    public static void SetWorldDifficulty(WorldType world, WorldDifficulty difficulty)
+    {
+        currentDifficulty = difficulty;
+        // Update current world difficulty
+        if (worldModifiers.ContainsKey(world))
+        {
+            worldModifiers[world] = worldModifiers[world] with { Difficulty = difficulty };
+        }
+    }
 
     public static Color GetDifficultyColor(WorldDifficulty diff) => diff switch
     {

@@ -1,7 +1,8 @@
-﻿using NotificationIconSharp;
+using NotificationIconSharp;
 using Raylib_CSharp.Windowing;
 using System;
 using System.Drawing;
+using Plants;
 
 namespace Plants;
      
@@ -17,6 +18,13 @@ internal static class Program
         //SetupIcon();
 
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
+
+        // Load saved game if exists
+        var saveData = GameSaveManager.LoadGame();
+        if (saveData != null)
+        {
+            GameSaveManager.RestoreGameState(saveData);
+        }
 
         // Avvia il render ed il loop
         Game.Init();
@@ -40,8 +48,15 @@ internal static class Program
 
         trayIcon.OnExit  += () =>
         {
-            trayIcon.Dispose();
-            Window.Close();
+             // Auto-save on exit
+             GameSaveManager.SaveGame(
+                 WorldManager.GetCurrentWorld(),
+                 WorldManager.GetCurrentWorldDifficulty(),
+                 WeatherManager.GetCurrentWeather(),
+                 FaseGiorno.GetCurrentPhase()
+             );
+             trayIcon.Dispose();
+             Window.Close();
         };
         
         trayIcon.LoopEvent();

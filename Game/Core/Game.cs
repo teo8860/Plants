@@ -92,8 +92,15 @@ public static class Game
 
         SetTimer();
         SetTimerFase();
-        Phase = FaseGiorno.GetCurrentPhase();
-        WorldManager.SetCurrentWorld(WorldType.Serra);
+         Phase = FaseGiorno.GetCurrentPhase();
+         WorldManager.SetCurrentWorld(WorldType.Serra);
+
+         // Restore saved game state if available
+         var saveData = GameSaveManager.GetPendingLoadData();
+         if (saveData != null)
+         {
+             GameSaveManager.RestoreGameState(saveData);
+         }
     }
 
     private static void InitToolbar()
