@@ -4,12 +4,12 @@ using Raylib_CSharp.Transformations;
 
 namespace Plants;
 
-public class GuiStatsPanel : GameElement
+public class Obj_GuiStatsPanel : GameElement
 {
     private int x, y;
     private bool expanded = true;
 
-    public GuiStatsPanel(int x, int y)
+    public Obj_GuiStatsPanel(int x, int y)
     {
         this.x = x;
         this.y = y;

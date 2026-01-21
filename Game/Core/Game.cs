@@ -13,15 +13,15 @@ public static class Game
     public static Room room_inventory;
     public static Room room_options;
 
-    public static Controller controller;
-    public static Water innaffiatoio;
-    public static Plant pianta;
+    public static Obj_Controller controller;
+    public static ObjWater innaffiatoio;
+    public static Obj_Plant pianta;
 
-    public static GuiToolbar toolbar;
+    public static Obj_GuiToolbar toolbar;
 
-    public static Background background;
-    public static Ground ground;
-    public static WeatherRender weatherSystem;
+    public static ObjBackground background;
+    public static ObjGround ground;
+    public static ObjWeatherRender weatherSystem;
 
     public static bool cambiaPhase = false;
     public static bool isPaused = false;
@@ -31,16 +31,16 @@ public static class Game
     public static Timer TimerFase;
     public static DayPhase Phase;
 
-    public static GuiStatsPanel statsPanel;
+    public static Obj_GuiStatsPanel statsPanel;
     public static OxygenSystem oxygenSystem;
 
-    public static Tutorial tutorial;
+    public static Obj_Tutorial tutorial;
 
-    public static GuiWorldTransition worldTransition;
+    public static Obj_GuiWorldTransition worldTransition;
 
-    public static GuiInventoryBackground inventoryBackground;
-    public static GuiInventoryGrid inventoryGrid;
-    public static GuiSeedDetailPanel seedDetailPanel;
+    public static Obj_GuiInventoryBackground inventoryBackground;
+    public static Obj_GuiInventoryGrid inventoryGrid;
+    public static Obj_GuiSeedDetailPanel seedDetailPanel;
 
     public static void Init()
     {
@@ -73,37 +73,37 @@ public static class Game
 
     private static void InitMainGame()
     {
-        background = GameElement.Create<Background>(100);
-        ground = GameElement.Create<Ground>(99);
+        background = GameElement.Create<ObjBackground>(100);
+        ground = GameElement.Create<ObjGround>(99);
 
-        innaffiatoio = GameElement.Create<Water>(-100, room_main);
+        innaffiatoio = GameElement.Create<ObjWater>(-100, room_main);
         innaffiatoio.Initialize(GameProperties.cameraWidth, GameProperties.cameraHeight);
 
 
-        weatherSystem = new WeatherRender();
+        weatherSystem = new ObjWeatherRender();
 
-        controller = new Controller();
+        controller = new Obj_Controller();
 
-        tutorial = GameElement.Create<Tutorial>(-1);
-        pianta = GameElement.Create<Plant>(-2);
+        tutorial = GameElement.Create<Obj_Tutorial>(-1);
+        pianta = GameElement.Create<Obj_Plant>(-2);
 
         var colore1 = Color.FromHSV(130, 0.45f, 0.68f);
         var colore2 = Color.FromHSV(133, 0.47f, 0.44f);
         pianta.setColori(colore1, colore2);
 
    
-        worldTransition = GameElement.Create<GuiWorldTransition>(-200);
+        worldTransition = GameElement.Create<Obj_GuiWorldTransition>(-200);
 
         oxygenSystem = new OxygenSystem();
     }
 
     private static void InitGui()
     {
-        GameElement.Create<GuiScrollbar>(100);
+        GameElement.Create<Obj_GuiScrollbar>(100);
 
-        statsPanel = new GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
+        statsPanel = new Obj_GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
 
-        toolbar = new GuiToolbar(10, 5, buttonSize: 36, spacing: 4);
+        toolbar = new Obj_GuiToolbar(10, 5, buttonSize: 36, spacing: 4);
         toolbar.depth = -50;
 
         toolbar.SetIcons(
@@ -150,11 +150,11 @@ public static class Game
     private static void InitInventory()
     {
         // Background stile legno
-        inventoryBackground = new GuiInventoryBackground();
+        inventoryBackground = new Obj_GuiInventoryBackground();
         
-        inventoryGrid = new GuiInventoryGrid();
+        inventoryGrid = new Obj_GuiInventoryGrid();
 
-        seedDetailPanel = new GuiSeedDetailPanel();
+        seedDetailPanel = new Obj_GuiSeedDetailPanel();
 
         // Collega il pannello alla griglia per dimensionamento dinamico
         inventoryGrid.detailPanel = seedDetailPanel;

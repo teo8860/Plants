@@ -9,7 +9,7 @@ namespace Plants;
 
 
 
-public class Ground : GameElement
+public class ObjGround : GameElement
 {
 
     Color CurrentWorld1, CurrentWorld2, NextWorld1, NextWorld2;

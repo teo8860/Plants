@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace Plants;
 
-public class Background : GameElement
+public class ObjBackground : GameElement
 {
     private static readonly (float altitude, Color color)[] AltitudeGradient = new[]
     {
@@ -26,7 +26,7 @@ public class Background : GameElement
     private float[] starTwinkle;
     private bool starsInitialized = false;
 
-    public Background()
+    public ObjBackground()
     {
         this.depth = 100;
     }

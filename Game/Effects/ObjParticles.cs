@@ -1,10 +1,7 @@
-using Raylib_CSharp;
+using Engine.Tools;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Rendering;
-using Raylib_CSharp.Windowing;
-using System;
 using System.Numerics;
-using Engine.Tools;
 
 namespace Plants;
 
@@ -41,7 +38,7 @@ public class CircularBuffer
 }
 
 
-public class Particle : GameElement
+public class ObjParticle : GameElement
 {
     private CircularBuffer buffer;
     private int screenWidth;

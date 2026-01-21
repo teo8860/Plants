@@ -6,7 +6,7 @@ using System;
 
 namespace Plants;
 
-public class GuiScrollbar : GameElement
+public class Obj_GuiScrollbar : GameElement
 {
     private static readonly (float percent, string name, Color color)[] Milestones = new[]
     {
@@ -27,7 +27,7 @@ public class GuiScrollbar : GameElement
     private float animationSpeed = 3f;
     private float pulseTime = 0f;
 
-    public GuiScrollbar()
+    public Obj_GuiScrollbar()
     {
         this.guiLayer = true;
     }

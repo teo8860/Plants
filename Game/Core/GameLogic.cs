@@ -6,7 +6,7 @@ namespace Plants;
 
 public class GameLogicPianta
 {
-    private Plant pianta;
+    private Obj_Plant pianta;
     public int contatoreSecondi = 0;
 
     public const float CONSUMO_ACQUA_BASE = 0.0012f;
@@ -31,7 +31,7 @@ public class GameLogicPianta
     public const float DANNO_PARASSITI_BASE = 0.006f;
     public const float DROP_FOGLIE_BASE = 0.004f;
 
-    public GameLogicPianta(Plant Pianta)
+    public GameLogicPianta(Obj_Plant Pianta)
     {
         pianta = Pianta;
     }

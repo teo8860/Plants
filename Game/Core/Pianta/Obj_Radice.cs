@@ -25,10 +25,10 @@ public class SegmentoRadice
     }
 }
 
-public class Radice
+public class Obj_Radice : GameElement
 {
     private List<SegmentoRadice> segmenti = new();
-    private List<Radice> ramificazioni = new();
+    private List<Obj_Radice> ramificazioni = new();
 
     private Vector2 origine;
     private Vector2 direzioneBase;
@@ -54,7 +54,7 @@ public class Radice
     private static readonly Color ColoreSecondario = new Color(101, 67, 33, 255);
     private static readonly Color ColorePunta = new Color(180, 140, 100, 255);
 
-    public Radice(Vector2 origine, Vector2 direzione, int generazione = 0, int seed = -1)
+    public Obj_Radice(Vector2 origine, Vector2 direzione, int generazione = 0, int seed = -1)
     {
         this.origine = origine;
         this.direzioneBase = Vector2.Normalize(direzione);
@@ -190,7 +190,7 @@ public class Radice
         Vector2 dirRamo = perpendicolare * 0.6f + new Vector2(0, 0.8f);
         dirRamo = Vector2.Normalize(dirRamo);
 
-        var nuovaRadice = new Radice(segmento.End, dirRamo, generazione + 1, rng.Next());
+        var nuovaRadice = new Obj_Radice(segmento.End, dirRamo, generazione + 1, rng.Next());
         ramificazioni.Add(nuovaRadice);
     }
 
@@ -224,7 +224,7 @@ public class Radice
         return ViewCulling.IsRangeVisible(minY - 50, maxY + 50, cameraY);
     }
 
-    public void Draw()
+    public override void Draw()
     {
         foreach (var ramo in ramificazioni)
         {

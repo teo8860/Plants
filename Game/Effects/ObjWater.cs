@@ -3,9 +3,9 @@
 namespace Plants;
 
 
-public class Water : Particle
+public class ObjWater : ObjParticle
 {
-    public Water()
+    public ObjWater()
     {
         this.defaultData = new();
         this.defaultData.radius = 8.5f;

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Plants;
 
 
-public class SeedImage : GameElement
+public class Obj_Seed : GameElement
 {
 	Seed dati;
 	Vector3 color = new Vector3( 0.0f, 1.0f, 1.0f ); 
@@ -22,7 +22,7 @@ public class SeedImage : GameElement
 	int un_noise = AssetLoader.shaderSeed.GetLocation("noise");
 
 
-	public SeedImage(Seed dati)
+	public Obj_Seed(Seed dati)
 	{
 		this.dati = dati;
 		this.guiLayer = true;

@@ -7,7 +7,7 @@ using System;
 
 namespace Plants;
 
-public class GuiInventoryGrid : GameElement
+public class Obj_GuiInventoryGrid : GameElement
 {
     private int cellSize = 70;
     private int spacing = 15;
@@ -18,7 +18,7 @@ public class GuiInventoryGrid : GameElement
     private int hoveredIndex = -1;
 
     public Action<int> OnSeedSelected;
-    public GuiSeedDetailPanel detailPanel; // Riferimento al pannello dettagli
+    public Obj_GuiSeedDetailPanel detailPanel; // Riferimento al pannello dettagli
 
     // Colori stile legno
     private Color cellColor = new Color(101, 67, 43, 250);        // Marrone medio
@@ -28,7 +28,7 @@ public class GuiInventoryGrid : GameElement
     private Color borderSelectedColor = new Color(200, 150, 80, 255); // Oro/giallo selezionato
     private Color innerShadow = new Color(41, 26, 17, 180);       // Ombra scura
 
-    public GuiInventoryGrid() : base()
+    public Obj_GuiInventoryGrid() : base()
     {
         this.roomId = Game.room_inventory.id;
         this.guiLayer = true;

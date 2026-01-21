@@ -72,6 +72,11 @@ public class GameElement
         elementList.Remove(this);
     }
 
+    public void Destroy()
+    {
+        elementList.Remove(this);
+    }
+
     public virtual void Update()
     {
 

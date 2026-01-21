@@ -9,7 +9,7 @@ using System.Numerics;
 
 namespace Plants;
 
-public class GuiToolbar : GameElement
+public class Obj_GuiToolbar : GameElement
 {
     private int baseX;
     private int baseY;
@@ -38,7 +38,7 @@ public class GuiToolbar : GameElement
 
     private float menuButtonAlpha = 255f;
 
-    public GuiToolbar(int x, int y, int buttonSize = 40, int spacing = 5) : base()
+    public Obj_GuiToolbar(int x, int y, int buttonSize = 40, int spacing = 5) : base()
     {
         this.baseX = x;
         this.baseY = y;

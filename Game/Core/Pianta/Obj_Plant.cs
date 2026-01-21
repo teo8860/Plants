@@ -12,117 +12,19 @@ using Engine.Tools;
 
 namespace Plants;
 
-public class RamoEdera
-{
-    public float StartX, StartY;
-    public float Direction;
-    public List<Vector2> Punti = new();
-    public List<(Vector2 pos, float size, float angle)> MiniFoglie = new();
-    public float GrowthProgress = 0;
-    public int MaxSegments = 12;
-    public Color Colore;
-
-    private Random rng;
-    private float oscillationTime = 0;
-
-    public RamoEdera(float x, float y, float direction, Color colore, int seed)
-    {
-        StartX = x;
-        StartY = y;
-        Direction = direction;
-        Colore = colore;
-        rng = new Random(seed);
-
-        float curX = x;
-        float curY = y;
-        Punti.Add(new Vector2(curX, curY));
-
-        for (int i = 0; i < MaxSegments; i++)
-        {
-            float dx = direction * (8 + (float)rng.NextDouble() * 6);
-            float dy = (float)(rng.NextDouble() - 0.5) * 4;
-            dy += MathF.Sin(i * 0.3f) * 1.5f;
-
-            curX += dx;
-            curY += dy;
-            curX = Math.Clamp(curX, 8, GameProperties.cameraWidth - 8);
-
-            Punti.Add(new Vector2(curX, curY));
-
-            if (i % 2 == 0)
-            {
-                float leafAngle = (float)(rng.NextDouble() * MathF.PI - MathF.PI / 2);
-                MiniFoglie.Add((new Vector2(curX, curY), 4 + (float)rng.NextDouble() * 2, leafAngle));
-            }
-        }
-    }
-
-    public void Update(float deltaTime)
-    {
-        oscillationTime += deltaTime;
-        if (GrowthProgress < 1)
-        {
-            GrowthProgress += deltaTime * 0.4f;
-            if (GrowthProgress > 1) GrowthProgress = 1;
-        }
-    }
-
-    public void Draw(float cameraY)
-    {
-        if (!ViewCulling.IsValueVisible(StartY, cameraY)) return;
-
-        int visibleSegments = (int)(Punti.Count * GrowthProgress);
-        if (visibleSegments < 2) return;
-
-        for (int i = 0; i < visibleSegments - 1; i++)
-        {
-            Vector2 p1 = Punti[i];
-            Vector2 p2 = Punti[i + 1];
-
-            float osc = MathF.Sin(oscillationTime * 2 + i * 0.5f) * 1.2f;
-            float thickness = 2.5f * (1 - (float)i / Punti.Count * 0.4f);
-
-            Graphics.DrawLineEx(
-                new Vector2(p1.X + osc, p1.Y),
-                new Vector2(p2.X + osc, p2.Y),
-                thickness, Colore);
-        }
-
-        int visibleLeaves = (int)(MiniFoglie.Count * GrowthProgress);
-        for (int i = 0; i < visibleLeaves; i++)
-        {
-            var (pos, size, angle) = MiniFoglie[i];
-            float leafOsc = MathF.Sin(oscillationTime * 2.5f + i) * 0.08f;
-            DrawMiniLeaf(pos.X, pos.Y, size, angle + leafOsc, Colore);
-        }
-    }
-
-    private void DrawMiniLeaf(float x, float y, float size, float angle, Color color)
-    {
-        float cos = MathF.Cos(angle);
-        float sin = MathF.Sin(angle);
-
-        Vector2 tip = new Vector2(x + cos * size, y - sin * size);
-        Vector2 left = new Vector2(x - sin * size * 0.25f, y - cos * size * 0.25f);
-        Vector2 right = new Vector2(x + sin * size * 0.25f, y + cos * size * 0.25f);
-
-        Graphics.DrawTriangle(tip, left, right, color);
-    }
-}
-
-public class Plant : GameElement
+public class Obj_Plant : GameElement
 {
     public Vector2 posizione = new(0, 0);
 
     public List<Vector2> puntiSpline = new();
     private const int margineMinimo = 40;
 
-    private List<Ramo> rami = new();
-    private List<Radice> radici = new();
+    private List<Obj_Ramo> rami = new();
+    private List<Obj_Radice> radici = new();
     private int contatorePuntiPerRamo = 0;
     private int contatorePuntiPerRadice = 0;
 
-    private List<RamoEdera> ramiEdera = new();
+    private List<Obj_RamoEdera> ramiEdera = new();
     private bool ederaCreata = false;
 
     public float spessore;
@@ -165,7 +67,7 @@ public class Plant : GameElement
         colore2 = Color.FromHSV(hue, sat * 1.1f, val * 0.7f);
     }
 
-    public Plant()
+    public Obj_Plant()
     {
         proprieta = new GameLogicPianta(this);
         SetSeed(SeedType.Normale);
@@ -187,10 +89,13 @@ public class Plant : GameElement
         // */
     }
 
-    public Plant(SeedType seedType)
+
+    public Obj_Plant(SeedType seedType)
     {
         SetSeed(seedType);
     }
+
+
 
     public void SetSeed(SeedType seedType)
     {
@@ -260,7 +165,7 @@ public class Plant : GameElement
                     direction = Direzione.Destra;
             }
 
-            rami.Add(new Ramo(puntoAttacco, direction));
+            rami.Add(new Obj_Ramo(puntoAttacco, direction));
 
             contatorePuntiPerRamo = 0;
         }
@@ -275,7 +180,7 @@ public class Plant : GameElement
             //pos.X += RandomHelper.Int(-45, 45);
             pos.Y += posizione.Y;
 
-            radici.Add(new Radice(puntoAttacco, pos));
+            radici.Add(new Obj_Radice(puntoAttacco, pos));
 
             contatorePuntiPerRadice = 0;
         }
@@ -312,7 +217,7 @@ public class Plant : GameElement
             float direction = (i % 2 == 0) ? -1 : 1;
             float startOffset = (i / 2) * 4 - 8;
 
-            ramiEdera.Add(new RamoEdera(
+            ramiEdera.Add(new Obj_RamoEdera(
                 posizione.X + startOffset,
                 ederaY + rng.Next(-8, 8),
                 direction,
@@ -340,6 +245,16 @@ public class Plant : GameElement
     {
         Rendering.camera.position.Y = 0;
         puntiSpline.Clear();
+
+        foreach (var item in rami)
+            item.Destroy();
+
+        foreach (var item in radici)
+            item.Destroy();
+
+        foreach (var item in ramiEdera)
+            item.Destroy();
+
         rami.Clear();
         radici.Clear();
         ramiEdera.Clear(); 
@@ -380,11 +295,6 @@ public class Plant : GameElement
 
     public override void Update()
     {
-        float deltaTime = Time.GetFrameTime();
-        foreach (var edera in ramiEdera)
-        {
-            edera.Update(deltaTime);
-        }
     }
 
     public override void Draw()
@@ -400,10 +310,7 @@ public class Plant : GameElement
                 puntiSplineSpan[i] = puntiSpline[i];
             }
 
-            foreach (var ramo in rami)
-            {
-                ramo.Draw();
-            }
+       
 
             Vector2 ultimoPunto = puntiSpline[^1];
             for (int i = 0; i < puntiSpline.Count - 3; i++)
@@ -460,16 +367,6 @@ public class Plant : GameElement
                     Graphics.DrawSplineCatmullRom(segmento, spessore - 10, colore2);
                 }
             }
-        }
-
-        foreach (var edera in ramiEdera)
-        {
-            edera.Draw(cameraY);
-        }
-
-        foreach (var radice in radici)
-        {
-                radice.Draw();
         }
 
         if (ViewCulling.IsValueVisible(posizione.Y, cameraY))

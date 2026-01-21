@@ -7,7 +7,7 @@ using Engine.Tools;
 
 namespace Plants;
 
-public class WeatherRender : GameElement
+public class ObjWeatherRender : GameElement
 {
     private CircularBuffer rainBuffer;
     private CircularBuffer snowBuffer;
@@ -18,7 +18,7 @@ public class WeatherRender : GameElement
     private int ViewWidth => GameProperties.cameraWidth;
     private int ViewHeight => GameProperties.cameraHeight + (int)Rendering.camera.position.Y;
 
-    public WeatherRender()
+    public ObjWeatherRender()
     {
         rainBuffer = new CircularBuffer();
         snowBuffer = new CircularBuffer();

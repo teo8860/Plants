@@ -2,11 +2,11 @@
 namespace Plants;
 
 
-public class WorldRender : GameElement
+public class ObjWorldRender : GameElement
 {
    
 
-    public WorldRender()
+    public ObjWorldRender()
     {
         
     }

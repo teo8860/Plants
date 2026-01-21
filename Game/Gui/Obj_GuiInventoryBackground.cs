@@ -5,7 +5,7 @@ using Raylib_CSharp.Transformations;
 
 namespace Plants;
 
-public class GuiInventoryBackground : GameElement
+public class Obj_GuiInventoryBackground : GameElement
 {
     // Colori stile legno
     private Color woodDark = new Color(62, 39, 25, 255);       // Marrone scuro cornice
@@ -16,7 +16,7 @@ public class GuiInventoryBackground : GameElement
 
     private int borderThickness = 12;
 
-    public GuiInventoryBackground() : base()
+    public Obj_GuiInventoryBackground() : base()
     {
         this.roomId = Game.room_inventory.id;
         this.guiLayer = true;

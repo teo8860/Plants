@@ -34,7 +34,7 @@ public enum Direzione
     Destra = 1
 }
 
-public class Ramo
+public class Obj_Ramo: GameElement
 {
     private List<Vector2> punti = new();
     private Direzione direzione;
@@ -57,7 +57,7 @@ public class Ramo
     private Color coloreRamo = Color.DarkBrown;
     private Color coloreRamoChiaro = new Color(100, 70, 50, 255);
 
-    public Ramo(Vector2 puntoIniziale, Direzione direzione)
+    public Obj_Ramo(Vector2 puntoIniziale, Direzione direzione)
     {
         this.direzione = direzione;
         this.puntoIniziale = puntoIniziale;
@@ -142,7 +142,7 @@ public class Ramo
         ));
     }
 
-    public void Draw()
+    public override void Draw()
     {
         float cameraY = Rendering.camera.position.Y;
 

@@ -44,7 +44,7 @@ namespace Plants
         public float Size;
     }
 
-    public class Tutorial : GameElement
+    public class Obj_Tutorial : GameElement
     {
         public bool isTutorialActive = false;
         private TutorialPhase currentPhase = TutorialPhase.Intro;
@@ -80,7 +80,7 @@ namespace Plants
         // Messaggi per ogni fase
         private Dictionary<TutorialPhase, (string titolo, string[] righe)> messaggi;
 
-        public Tutorial()
+        public Obj_Tutorial()
         {
             guiLayer = true;
             depth = -1000;

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Numerics;
 using Engine.Tools;
 
-public class Controller : GameElement
+public class Obj_Controller : GameElement
 {
     public float offsetMinY = 0;
     public float offsetMaxY => (Game.pianta.Stats.EffectiveMaxHeight);
@@ -20,7 +20,7 @@ public class Controller : GameElement
 
     public bool autoscroll = true;
 
-    public Controller()
+    public Obj_Controller()
     {
         this.persistent = true;
          Rendering.camera.position.Y = 0;

@@ -7,7 +7,7 @@ using System;
 
 namespace Plants;
 
-public class GuiSeedDetailPanel : GameElement
+public class Obj_GuiSeedDetailPanel : GameElement
 {
     private bool isOpen = false;
     private float slideProgress = 0f;
@@ -29,7 +29,7 @@ public class GuiSeedDetailPanel : GameElement
 
     public Action<int, string> OnButtonClicked; // (seedIndex, buttonName)
 
-    public GuiSeedDetailPanel() : base()
+    public Obj_GuiSeedDetailPanel() : base()
     {
         this.roomId = Game.room_inventory.id;
         this.guiLayer = true;

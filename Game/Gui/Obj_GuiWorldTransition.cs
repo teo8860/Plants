@@ -7,7 +7,7 @@ using System;
 
 namespace Plants;
 
-public class GuiWorldTransition : GameElement
+public class Obj_GuiWorldTransition : GameElement
 {
     private bool isVisible = false;
     private float animationProgress = 0f;
@@ -16,7 +16,7 @@ public class GuiWorldTransition : GameElement
     private float buttonPulse = 0f;
     private bool hasTriggered = false;
 
-    public GuiWorldTransition()
+    public Obj_GuiWorldTransition()
     {
         this.guiLayer = true;
     }
