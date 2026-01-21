@@ -1,85 +1,73 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Engine.Tools;
 
 namespace Plants;
 
 public class InventorySaveData
 {
-    public Dictionary<SeedType, int> Seeds = new();
+    public List<Seed> seedsData = new();
 }
 
 public class Inventario
 {
-	private Dictionary<SeedType, int> seedCounts = new();
+    public List<Seed> seeds = new();
 
-	public static Inventario get()
-	{
-		if(Inventario.instance == null)
-			Inventario.instance = new Inventario();
+    public static Inventario get()
+    {
+        if (Inventario.instance == null)
+            Inventario.instance = new Inventario();
 
-		return Inventario.instance;
-	}
+        return Inventario.instance;
+    }
 
-	private static Inventario instance = null;
+    private static Inventario instance = null;
 
-	private Inventario()
-	{
-		seedCounts = new Dictionary<SeedType, int>();
-	}
+    private Inventario()
+    {
+        seeds = new();
+    }
 
-	public Dictionary<SeedType, int> GetAllSeeds()
-	{
-		return new Dictionary<SeedType, int>(seedCounts);
-	}
+    public void AddSeed(Seed seed)
+    {
+        seeds.Add(seed);
+    }
+    public void RemoveSeed(Seed seed)
+    {
+        seeds.Remove(seed);
+    }
 
-	public void LoadFromData(InventorySaveData data)
-	{
-		seedCounts = new Dictionary<SeedType, int>(data.Seeds ?? new Dictionary<SeedType, int>());
-	}
+    public bool HasSeed(Seed seed)
+    {
+        return seeds.Contains(seed);
+    }
 
-	public void AddSeed(SeedType type, int amount = 1)
-	{
-		if (seedCounts.ContainsKey(type))
-		{
-			seedCounts[type] += amount;
-		}
-		else
-		{
-			seedCounts[type] = amount;
-		}
-	}
+    public void loadFromData(InventorySaveData data)
+    {
+        seeds = data.seedsData;
+    }
 
-	public bool RemoveSeed(SeedType type, int amount = 1)
-	{
-		if (seedCounts.ContainsKey(type) && seedCounts[type] >= amount)
-		{
-			seedCounts[type] -= amount;
-			if (seedCounts[type] <= 0)
-			{
-				seedCounts.Remove(type);
-			}
-			return true;
-		}
-		return false;
-	}
 
-	// Legacy methods for compatibility
-	public List<Seed> seeds => seedCounts.SelectMany(kvp => Enumerable.Repeat(new Seed(kvp.Key), kvp.Value)).ToList();
+    public List<Seed> GetAllSeeds()
+    {
+        return seeds;
+    }
 
-	public void Save()
-	{
-		// Add some default seeds for testing
-		AddSeed(SeedType.Normale, 3);
-        SaveHelper.Save("inventory.json", seedCounts);
-	}
+    public void Save()
+    {
+        SaveHelper.Save("inventory.json", seeds);
+    }
 
-	public void Load()
-	{
-		var loaded = SaveHelper.Load<Dictionary<SeedType, int>>("inventory.json");
-		if (loaded != null)
-		{
-			seedCounts = loaded;
-		}
-	}
+    public void Load()
+    {
+        seeds = SaveHelper.Load<List<Seed>>("inventory.json");
+
+        if (seeds == null)
+            seeds = new();
+    }
+
+
 }

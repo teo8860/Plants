@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using Raylib_CSharp;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Transformations;
+using Engine.Tools;
 
 namespace Plants
 {
@@ -440,7 +442,7 @@ namespace Plants
                 currentPhase = TutorialPhase.SemeFluttuante;
                 messageAlpha = 0f;
                 animationProgress = 0f;
-                ResumeGrowth(); // Riprendi la crescita (anche se non c'è pianta ancora)
+                //ResumeGrowth(); // Riprendi la crescita (anche se non c'è pianta ancora)
             }
         }
 
@@ -1026,12 +1028,29 @@ namespace Plants
 
         public void StartTutorial()
         {
+            Console.WriteLine($"[TUTORIAL] StartTutorial() chiamato");
             // Controlla se il tutorial è già stato completato
             if (IsTutorialCompleted())
             {
+                Console.WriteLine($"[TUTORIAL] Tutorial completato rilevato - Impostazione mondo a Terra");
                 // Salta direttamente a Terra
                 WorldManager.SetCurrentWorld(WorldType.Terra);
                 Game.pianta.SetNaturalColors(WorldType.Terra);
+
+                // Forza il salvataggio del mondo Terra eliminando prima il vecchio file
+                Console.WriteLine($"[TUTORIAL] Eliminazione file salvataggio esistente...");
+                GameSaveManager.DeleteSaveFile();
+
+                // Salva il gioco con il mondo corretto dopo il completamento del tutorial
+                Console.WriteLine($"[TUTORIAL] Salvataggio completamento tutorial - Mondo: Terra");
+                GameSaveManager.SaveGame(
+                    WorldType.Terra,
+                    WorldManager.GetCurrentWorldDifficulty(),
+                    WeatherManager.GetCurrentWeather(),
+                    FaseGiorno.GetCurrentPhase()
+                );
+                Console.WriteLine($"[TUTORIAL] Salvataggio completato");
+
                 isTutorialActive = false;
                 currentPhase = TutorialPhase.Fine;
                 return;

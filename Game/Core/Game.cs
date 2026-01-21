@@ -53,9 +53,6 @@ public static class Game
 
         Inventario.get().Load();
 
-        tutorial = GameElement.Create<Tutorial>(-1);
-        tutorial.StartTutorial();
-
         AssetLoader.LoadAll();
 
         background = GameElement.Create<Background>(100);
@@ -67,7 +64,11 @@ public static class Game
         weatherSystem = new WeatherRender();
 
         controller = new Controller();
+
+        tutorial = GameElement.Create<Tutorial>(-1);
         pianta = GameElement.Create<Plant>(-2);
+
+        tutorial.StartTutorial();
 
         colore1 = Color.FromHSV(130, 0.45f, 0.68f);
         colore2 = Color.FromHSV(133, 0.47f, 0.44f);

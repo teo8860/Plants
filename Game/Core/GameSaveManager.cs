@@ -1,8 +1,6 @@
 using System;
-using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Collections.Generic;
+using Engine.Tools;
 
 namespace Plants
 {
@@ -28,19 +26,7 @@ public class CompostSaveData
 
 public static class GameSaveManager
 {
-    private static readonly string SaveFilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "Plants",
-        "savegame.json"
-    );
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Converters = { new JsonStringEnumConverter() }
-    };
-
+    private const string SaveFileName = "savegame.json";
     private static GameSaveData _pendingLoadData;
 
     public static void SaveGame(WorldType currentWorld, WorldDifficulty currentDifficulty,
@@ -48,12 +34,8 @@ public static class GameSaveManager
     {
         try
         {
-            // Ensure directory exists
-            string directory = Path.GetDirectoryName(SaveFilePath);
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
+            var compostData = CompostSystem.GetSaveData();
+            var inventorySeeds = Inventario.get().GetAllSeeds();
 
             var saveData = new GameSaveData
             {
@@ -61,18 +43,16 @@ public static class GameSaveManager
                 CurrentDifficulty = currentDifficulty,
                 CurrentWeather = currentWeather,
                 CurrentPhase = currentPhase,
-                CompostData = CompostSystem.GetSaveData(),
+                CompostData = compostData,
                 InventoryData = new InventorySaveData
                 {
-                    Seeds = Inventario.get().GetAllSeeds()
+                    seedsData = inventorySeeds
                 },
                 SaveTime = DateTime.Now
             };
 
-            string jsonString = JsonSerializer.Serialize(saveData, JsonOptions);
-            File.WriteAllText(SaveFilePath, jsonString);
-
-            Console.WriteLine($"Game saved successfully at {saveData.SaveTime}");
+            SaveHelper.Save(SaveFileName, saveData);
+            Console.WriteLine($"Game saved successfully using SaveHelper at {saveData.SaveTime}");
         }
         catch (Exception ex)
         {
@@ -84,18 +64,12 @@ public static class GameSaveManager
     {
         try
         {
-            if (!File.Exists(SaveFilePath))
-            {
-                Console.WriteLine("No save file found, starting new game");
-                return null;
-            }
-
-            string jsonString = File.ReadAllText(SaveFilePath);
-            var saveData = JsonSerializer.Deserialize<GameSaveData>(jsonString, JsonOptions);
+            // Usa SaveHelper dalla cartella tools invece di duplicare la logica
+            var saveData = SaveHelper.Load<GameSaveData>(SaveFileName);
 
             if (saveData == null)
             {
-                Console.WriteLine("Failed to load save data");
+                Console.WriteLine("No save file found or failed to load save data, starting new game");
                 return null;
             }
 
@@ -134,21 +108,18 @@ public static class GameSaveManager
 
         if (saveData.InventoryData != null)
         {
-            Inventario.get().LoadFromData(saveData.InventoryData);
+            Inventario.get().loadFromData(saveData.InventoryData);
         }
     }
 
-    public static bool HasSaveFile() => File.Exists(SaveFilePath);
+    public static bool HasSaveFile() => SaveHelper.Exists(SaveFileName);
 
     public static void DeleteSaveFile()
     {
         try
         {
-            if (File.Exists(SaveFilePath))
-            {
-                File.Delete(SaveFilePath);
-                Console.WriteLine("Save file deleted");
-            }
+            SaveHelper.Delete(SaveFileName);
+            Console.WriteLine("Save file deleted");
         }
         catch (Exception ex)
         {
@@ -160,10 +131,7 @@ public static class GameSaveManager
     {
         try
         {
-            if (!File.Exists(SaveFilePath)) return null;
-
-            string jsonString = File.ReadAllText(SaveFilePath);
-            var saveData = JsonSerializer.Deserialize<GameSaveData>(jsonString, JsonOptions);
+            var saveData = SaveHelper.Load<GameSaveData>(SaveFileName);
             return saveData?.SaveTime;
         }
         catch

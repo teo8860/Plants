@@ -1,152 +1,12 @@
+/// <summary>
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Plants;
-
-/// <summary>
-/// Helper per conversione coordinate mondo-schermo
-/// Coordinate mondo: Y=0 al terreno, Y positivo verso l'alto
-/// Coordinate schermo: Y=0 in alto, Y aumenta verso il basso
-/// </summary>
-public static class CoordinateHelper
-{
-    /// <summary>
-    /// Posizione Y del terreno sullo schermo (in pixel dalla cima)
-    /// </summary>
-    public static float GroundScreenY => GameProperties.groundPosition;
-
-    /// <summary>
-    /// Converte Y da coordinate mondo a coordinate schermo
-    /// </summary>
-    public static float ToScreenY(float worldY, float cameraY)
-    {
-        return GroundScreenY + cameraY - worldY;
-    }
-
-    /// <summary>
-    /// Converte un punto da coordinate mondo a coordinate schermo
-    /// </summary>
-    public static Vector2 ToScreen(Vector2 worldPos, float cameraY)
-    {
-        return new Vector2(worldPos.X, ToScreenY(worldPos.Y, cameraY));
-    }
-
-    /// <summary>
-    /// Converte Y da coordinate schermo a coordinate mondo
-    /// </summary>
-    public static float ToWorldY(float screenY, float cameraY)
-    {
-        return GroundScreenY + cameraY - screenY;
-    }
-
-    public static Vector2 ToWorld(Vector2 viewPos)
-    {
-        viewPos.X = (viewPos.X * Rendering.camera.zoom);
-        viewPos.Y = ((GameProperties.windowHeight - viewPos.Y) * Rendering.camera.zoom) + Rendering.camera.position.Y;
-        return viewPos;
-    }
-}
-
-/// <summary>
-/// Helper per numeri random
-/// </summary>
-public static class RandomHelper
-{
-    private static readonly Random _random = new();
-
-    /// <summary>
-    /// Float casuale nell'intervallo [min, max]
-    /// </summary>
-    public static float Float(float min, float max)
-    {
-        if (max < min)
-            (min, max) = (max, min);
-
-        return min + (float)_random.NextDouble() * (max - min);
-    }
-
-    /// <summary>
-    /// Int casuale nell'intervallo [min, max)
-    /// </summary>
-    public static int Int(int min, int max) => _random.Next(min, max);
-
-    /// <summary>
-    /// Int casuale nell'intervallo [0, max)
-    /// </summary>
-    public static int Int(int max) => _random.Next(max);
-
-    /// <summary>
-    /// Bool casuale con probabilità specificata (0-100)
-    /// </summary>
-    public static bool Chance(int percent) => _random.Next(100) < percent;
-
-    /// <summary>
-    /// Vettore random in un cerchio
-    /// </summary>
-    public static Vector2 InsideCircle(float radius)
-    {
-        float angle = Float(0, MathF.PI * 2);
-        float r = Float(0, radius);
-        return new Vector2(MathF.Cos(angle) * r, MathF.Sin(angle) * r);
-    }
-
-    /// <summary>
-    /// Sceglie un elemento random da un array
-    /// </summary>
-    public static T Choose<T>(params T[] options) => options[Int(options.Length)];
-}
-
-/// <summary>
-/// Helper matematici
-/// </summary>
-public static class MathHelper
-{
-    public const float Deg2Rad = MathF.PI / 180f;
-    public const float Rad2Deg = 180f / MathF.PI;
-
-    /// <summary>
-    /// Limita un valore in un intervallo
-    /// </summary>
-    public static float Clamp(float value, float min, float max) =>
-        MathF.Max(min, MathF.Min(max, value));
-
-    /// <summary>
-    /// Interpolazione lineare
-    /// </summary>
-    public static float Lerp(float a, float b, float t) => a + (b - a) * Clamp(t, 0, 1);
-
-    /// <summary>
-    /// Interpolazione lineare per vettori
-    /// </summary>
-    public static Vector2 Lerp(Vector2 a, Vector2 b, float t) =>
-        new(Lerp(a.X, b.X, t), Lerp(a.Y, b.Y, t));
-
-    /// <summary>
-    /// Smooth step (ease in-out)
-    /// </summary>
-    public static float SmoothStep(float t)
-    {
-        t = Clamp(t, 0, 1);
-        return t * t * (3 - 2 * t);
-    }
-
-    /// <summary>
-    /// Angolo tra due punti in gradi
-    /// </summary>
-    public static float AngleBetween(Vector2 from, Vector2 to)
-    {
-        Vector2 delta = to - from;
-        return MathF.Atan2(delta.Y, delta.X) * Rad2Deg;
-    }
-
-    /// <summary>
-    /// Distanza tra due punti
-    /// </summary>
-    public static float Distance(Vector2 a, Vector2 b) => Vector2.Distance(a, b);
-}
+namespace Engine.Tools;
 
 /// <summary>
 /// Helper per salvataggio/caricamento dati
@@ -166,12 +26,27 @@ public static class SaveHelper
     {
         try
         {
+            Console.WriteLine($"[SAVEHELPER] Salvataggio {fileName}...");
             string json = JsonSerializer.Serialize(data, _jsonOptions);
-            File.WriteAllText(GetSavePath(fileName), json);
+            Console.WriteLine($"[SAVEHELPER] JSON prodotto: {json.Substring(0, Math.Min(100, json.Length))} (lunghezza: {json.Length})");
+
+            string path = GetSavePath(fileName);
+            Console.WriteLine($"[SAVEHELPER] Percorso file: {path}");
+
+            File.WriteAllText(path, json);
+            Console.WriteLine($"[SAVEHELPER] File scritto con successo");
+
+            // Verifica
+            if (File.Exists(path))
+            {
+                var size = new FileInfo(path).Length;
+                Console.WriteLine($"[SAVEHELPER] File esistente, dimensione: {size} bytes");
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Errore nel salvataggio: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -266,34 +141,109 @@ public static class SaveHelper
 }
 
 /// <summary>
-/// Timer semplificato per eventi periodici
+/// Helper per coordinate e conversioni
 /// </summary>
-public class GameTimer
+public static class CoordinateHelper
 {
-    private float _elapsed = 0f;
-    private readonly float _interval;
-    private readonly Action _callback;
-    private bool _isRunning = true;
+    /// <summary>
+    /// Converte coordinate mondo a schermo (Y)
+    /// </summary>
+    public static float ToScreenY(float worldY, float cameraY) => worldY - cameraY;
 
-    public GameTimer(float intervalSeconds, Action callback)
+    /// <summary>
+    /// Converte coordinate mondo a schermo
+    /// </summary>
+    public static Vector2 ToScreen(Vector2 worldPos, Vector2 cameraPos) =>
+        new(worldPos.X - cameraPos.X, worldPos.Y - cameraPos.Y);
+
+    /// <summary>
+    /// Converte coordinate schermo a mondo (Y)
+    /// </summary>
+    public static float ToWorldY(float screenY, float cameraY) => screenY + cameraY;
+
+    /// <summary>
+    /// Converte coordinate schermo a mondo
+    /// </summary>
+    public static Vector2 ToWorld(Vector2 screenPos, Vector2 cameraPos = default) =>
+        new(screenPos.X + cameraPos.X, screenPos.Y + cameraPos.Y);
+}
+
+/// <summary>
+/// Helper per funzioni matematiche
+/// </summary>
+public static class MathHelper
+{
+    /// <summary>
+    /// Limita un valore tra min e max
+    /// </summary>
+    public static float Clamp(float value, float min, float max) =>
+        value < min ? min : value > max ? max : value;
+
+    /// <summary>
+    /// Interpolazione lineare
+    /// </summary>
+    public static float Lerp(float a, float b, float t) => a + (b - a) * t;
+
+    /// <summary>
+    /// Interpolazione smooth step
+    /// </summary>
+    public static float SmoothStep(float a, float b, float t)
     {
-        _interval = intervalSeconds;
-        _callback = callback;
+        t = Clamp((t - a) / (b - a), 0, 1);
+        return t * t * (3 - 2 * t);
     }
 
-    public void Update(float deltaTime)
+    /// <summary>
+    /// Calcola l'angolo tra due vettori
+    /// </summary>
+    public static float AngleBetween(Vector2 a, Vector2 b)
     {
-        if (!_isRunning) return;
-
-        _elapsed += deltaTime;
-        while (_elapsed >= _interval)
-        {
-            _elapsed -= _interval;
-            _callback?.Invoke();
-        }
+        float dot = Vector2.Dot(a, b);
+        float magA = a.Length();
+        float magB = b.Length();
+        return MathF.Acos(dot / (magA * magB));
     }
 
-    public void Start() => _isRunning = true;
-    public void Stop() => _isRunning = false;
-    public void Reset() => _elapsed = 0f;
+    /// <summary>
+    /// Calcola la distanza tra due punti
+    /// </summary>
+    public static float Distance(Vector2 a, Vector2 b) => Vector2.Distance(a, b);
+}
+
+/// <summary>
+/// Helper per generazione numeri casuali
+/// </summary>
+public static class RandomHelper
+{
+    private static readonly Random _random = new();
+
+    /// <summary>
+    /// Genera un float casuale tra min e max
+    /// </summary>
+    public static float Float(float min, float max) => min + _random.NextSingle() * (max - min);
+
+    /// <summary>
+    /// Genera un int casuale tra min e max (escluso)
+    /// </summary>
+    public static int Int(int min = 0, int max = int.MaxValue) => _random.Next(min, max);
+
+    /// <summary>
+    /// Restituisce true con probabilità chance (0-1)
+    /// </summary>
+    public static bool Chance(float chance) => _random.NextSingle() < chance;
+
+    /// <summary>
+    /// Genera un punto casuale dentro un cerchio
+    /// </summary>
+    public static Vector2 InsideCircle(float radius)
+    {
+        float angle = _random.NextSingle() * MathF.PI * 2;
+        float distance = _random.NextSingle() * radius;
+        return new Vector2(MathF.Cos(angle) * distance, MathF.Sin(angle) * distance);
+    }
+
+    /// <summary>
+    /// Sceglie un elemento casuale da una lista di elementi
+    /// </summary>
+    public static T Choose<T>(params T[] items) => items[_random.Next(items.Length)];
 }
