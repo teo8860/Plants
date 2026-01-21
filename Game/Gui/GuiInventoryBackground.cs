@@ -18,7 +18,7 @@ public class GuiInventoryBackground : GameElement
 
     public GuiInventoryBackground() : base()
     {
-        this.roomId = Game.inventoryRoom.id;
+        this.roomId = Game.room_inventory.id;
         this.guiLayer = true;
         this.depth = -40; // Dietro alla griglia ma davanti ad altri elementi
     }

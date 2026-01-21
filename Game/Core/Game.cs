@@ -9,9 +9,9 @@ namespace Plants;
 
 public static class Game
 {
-    public static Room mainRoom;
-    public static Room inventoryRoom;
-    public static Room optionMenu;
+    public static Room room_main;
+    public static Room room_inventory;
+    public static Room room_options;
 
     public static Controller controller;
     public static Water innaffiatoio;
@@ -25,9 +25,9 @@ public static class Game
 
     public static bool cambiaPhase = false;
     public static bool isPaused = false;
-    public static float growthSpeed = 0.3f;
 
     public static Timer Timer;
+    public static Timer TimerSave;
     public static Timer TimerFase;
     public static DayPhase Phase;
 
@@ -35,9 +35,6 @@ public static class Game
     public static OxygenSystem oxygenSystem;
 
     public static Tutorial tutorial;
-
-    public static Color colore1;
-    public static Color colore2;
 
     public static GuiWorldTransition worldTransition;
 
@@ -47,19 +44,41 @@ public static class Game
 
     public static void Init()
     {
-        mainRoom = new Room();
-        inventoryRoom = new Room(false);
-        optionMenu = new Room(false);
-
-        Inventario.get().Load();
+        room_main = new Room();
+        room_inventory = new Room(false);
+        room_options = new Room(false);
+        
 
         AssetLoader.LoadAll();
 
-        background = GameElement.Create<Background>(100);
-        ground = GameElement.Create<Ground>(100);
 
-        innaffiatoio = GameElement.Create<Water>(-100);
+        InitMainGame();
+        InitGui();
+        InitInventory();
+        
+        Inventario.get().Load();
+        GameSave.get().Load();
+
+        SetTimerSave();
+        SetTimer();
+        SetTimerFase();
+
+        Phase = FaseGiorno.GetCurrentPhase();
+
+        
+
+        tutorial.StartTutorial();
+
+    }
+
+    private static void InitMainGame()
+    {
+        background = GameElement.Create<Background>(100);
+        ground = GameElement.Create<Ground>(99);
+
+        innaffiatoio = GameElement.Create<Water>(-100, room_main);
         innaffiatoio.Initialize(GameProperties.cameraWidth, GameProperties.cameraHeight);
+
 
         weatherSystem = new WeatherRender();
 
@@ -68,40 +87,22 @@ public static class Game
         tutorial = GameElement.Create<Tutorial>(-1);
         pianta = GameElement.Create<Plant>(-2);
 
-        tutorial.StartTutorial();
-
-        colore1 = Color.FromHSV(130, 0.45f, 0.68f);
-        colore2 = Color.FromHSV(133, 0.47f, 0.44f);
+        var colore1 = Color.FromHSV(130, 0.45f, 0.68f);
+        var colore2 = Color.FromHSV(133, 0.47f, 0.44f);
         pianta.setColori(colore1, colore2);
 
-        GameElement.Create<GuiScrollbar>(100);
-        
-        new SeedImage(new Seed());
    
         worldTransition = GameElement.Create<GuiWorldTransition>(-200);
 
-        InitToolbar();
-        //if (inventoryRoom.id == Room.GetActiveId())
-            InitInventory();
-
-        statsPanel = new GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
         oxygenSystem = new OxygenSystem();
-
-        SetTimer();
-        SetTimerFase();
-         Phase = FaseGiorno.GetCurrentPhase();
-         WorldManager.SetCurrentWorld(WorldType.Serra);
-
-         // Restore saved game state if available
-         var saveData = GameSaveManager.GetPendingLoadData();
-         if (saveData != null)
-         {
-             GameSaveManager.RestoreGameState(saveData);
-         }
     }
 
-    private static void InitToolbar()
+    private static void InitGui()
     {
+        GameElement.Create<GuiScrollbar>(100);
+
+        statsPanel = new GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
+
         toolbar = new GuiToolbar(10, 5, buttonSize: 36, spacing: 4);
         toolbar.depth = -50;
 
@@ -146,7 +147,7 @@ public static class Game
         );
     }
 
-    public static void InitInventory()
+    private static void InitInventory()
     {
         // Background stile legno
         inventoryBackground = new GuiInventoryBackground();
@@ -163,6 +164,8 @@ public static class Game
         };
     }
 
+
+
     public static void SetTimer()
     {
         Timer = new Timer(500); //1000
@@ -170,6 +173,19 @@ public static class Game
         Timer.AutoReset = true;
         Timer.Enabled = true;
     }
+
+    public static void SetTimerSave()
+    {
+        TimerSave = new Timer(10000); //1000
+        TimerSave.Elapsed += OnTimedEvent1;
+        TimerSave.AutoReset = true;
+        TimerSave.Enabled = true;
+    }
+
+    private static void OnTimedEvent1(Object source, ElapsedEventArgs e)
+    {
+        GameSave.get().Save();
+	}
 
     private static void OnTimedEvent(Object source, ElapsedEventArgs e)
     {

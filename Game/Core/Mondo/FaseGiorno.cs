@@ -100,6 +100,8 @@ public static class FaseGiorno
         // Set the current phase (for save/load system)
         // Note: This is a simplified implementation
         // In a full implementation, you might need to update internal timing
+
+        GameSave.get().Save();
     }
 
 }

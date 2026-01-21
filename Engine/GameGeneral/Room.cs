@@ -28,6 +28,11 @@ public class Room
 		}
 	}
 
+	public void Create()
+	{
+		
+	}
+
 	public static uint GetActiveId()
 	{
 		return Room.activeRoom.id;

@@ -72,7 +72,7 @@ namespace Plants
 
         // Particelle per effetti
         private List<TutorialParticle> particles = new();
-        private const int MAX_PARTICLES = 50;
+        private const int MAX_PARTICLES = 200;
 
         // Salvataggio
         private const string SAVE_FILE = "tutorial.json";
@@ -158,6 +158,8 @@ namespace Plants
             // Fade in messaggi
             if (messageAlpha < 1f)
                 messageAlpha += deltaTime * 2f;
+
+            messageAlpha = Math.Clamp(messageAlpha, 0f, 1f);    
 
             // Animazione popup
             if (currentPhase == TutorialPhase.Intro || 
@@ -296,19 +298,19 @@ namespace Plants
             if (hovered && Input.IsMouseButtonPressed(MouseButton.Left))
             {
                 currentPhase = TutorialPhase.SemeCade;
-                semeTargetY = GameProperties.groundPosition - 20;
+                semeTargetY = 350;//GameProperties.groundPosition - 20;
             }
         }
 
         private void UpdateSemeCade(float deltaTime)
-        {
+        {Console.WriteLine("---------------------------------------semeY: "+semeY+"   target:"+semeTargetY);
             if (!semeCaduto)
             {
                 // Caduta fisica graduale
                 float distanceToTarget = semeTargetY - semeY;
-                float velocity = MathF.Min(distanceToTarget * 2f, 200f); // Velocità massima limitata
+                float velocity = MathF.Min(distanceToTarget * 1.5f, 50f); // Velocità massima limitata
 
-                semeY += velocity * deltaTime;
+                semeY += 1f;// velocity * deltaTime;
 
                 if (semeY >= semeTargetY - 2f) // Tolleranza per evitare oscillazioni
                 {
@@ -345,11 +347,11 @@ namespace Plants
             // Se siamo vicini a un messaggio, rallenta gradualmente
             if (distanceFromThreshold < 0.05f && nextThreshold < 1.0f)
             {
-                targetGrowthSpeed = MathHelper.Lerp(0.01f, Game.growthSpeed, distanceFromThreshold / 0.05f);
+                targetGrowthSpeed = MathHelper.Lerp(0.01f, 0.5f, distanceFromThreshold / 0.05f);
             }
             else
             {
-                targetGrowthSpeed = Game.growthSpeed;
+                targetGrowthSpeed = GetGrowthSpeed();
             }
 
             // Transizione graduale della velocità
@@ -607,14 +609,8 @@ namespace Plants
                         if (messaggi.TryGetValue(currentPhase, out var msg))
                         {
                             DrawMessageBox(msg.titolo, msg.righe);
-                            DrawStatHighlight();
                             DrawContinuePrompt();
                         }
-                    }
-                    else
-                    {
-                        // Durante la crescita, mostra solo l'highlight della statistica
-                        DrawStatHighlight();
                     }
                     break;
 
@@ -852,6 +848,9 @@ namespace Plants
             // Seme (forma ovale marrone)
             Color semeColor1 = new Color(139, 90, 43, 255);
             Color semeColor2 = new Color(101, 67, 33, 255);
+            
+            //TEST
+            Graphics.DrawEllipse(semeX, 0, 55, 55, semeColor1);
 
             Graphics.DrawEllipse(semeX, (int)semeY, 10, 14, semeColor1);
             Graphics.DrawEllipse(semeX - 2, (int)semeY - 2, 6, 8, semeColor2);
@@ -914,59 +913,6 @@ namespace Plants
             }
         }
 
-        private void DrawStatHighlight()
-        {
-            // Evidenzia la statistica rilevante durante la spiegazione
-            int screenW = Rendering.camera.screenWidth;
-            
-            Color highlight = new Color(255, 255, 100, (byte)(60 + MathF.Sin(buttonPulse * 2) * 30));
-            
-            switch (currentPhase)
-            {
-                case TutorialPhase.SpiegaIdratazione:
-                    DrawWaterDropIcon(screenW - 40, 60, highlight);
-                    break;
-                case TutorialPhase.SpiegaTemperatura:
-                    DrawThermometerIcon(screenW - 40, 60, highlight);
-                    break;
-                case TutorialPhase.SpiegaParassiti:
-                    DrawBugIcon(screenW - 40, 60, highlight);
-                    break;
-                case TutorialPhase.SpiegaFoglie:
-                    DrawLeafIcon(screenW - 40, 60, highlight);
-                    break;
-            }
-        }
-
-        private void DrawWaterDropIcon(int x, int y, Color color)
-        {
-            Graphics.DrawCircle(x, y + 8, 12, color);
-            Graphics.DrawTriangle(
-                new Vector2(x, y - 10),
-                new Vector2(x - 10, y + 5),
-                new Vector2(x + 10, y + 5),
-                color
-            );
-        }
-
-        private void DrawThermometerIcon(int x, int y, Color color)
-        {
-            Graphics.DrawRectangle(x - 4, y - 15, 8, 25, color);
-            Graphics.DrawCircle(x, y + 15, 8, color);
-        }
-
-        private void DrawBugIcon(int x, int y, Color color)
-        {
-            Graphics.DrawEllipse(x, y, 10, 6, color);
-            Graphics.DrawCircle(x - 8, y, 4, color);
-        }
-
-        private void DrawLeafIcon(int x, int y, Color color)
-        {
-            Graphics.DrawEllipse(x, y, 8, 14, color);
-            Graphics.DrawLineEx(new Vector2(x, y + 14), new Vector2(x, y - 5), 2, color);
-        }
-
         private void DrawContinuePrompt()
         {
             int screenW = Rendering.camera.screenWidth;
@@ -1021,9 +967,26 @@ namespace Plants
         private void ResumeGrowth()
         {
             Game.isPaused = false;
-            currentGrowthSpeed = Game.growthSpeed;
-            targetGrowthSpeed = Game.growthSpeed;
+            currentGrowthSpeed = GetGrowthSpeed();
+            targetGrowthSpeed = GetGrowthSpeed();
             speedTransitionTime = 0f;
+        }
+
+        public float GetGrowthSpeed()
+        {
+            float velocita = Game.pianta.proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
+            float metabolismo = Game.pianta.proprieta.MetabolismoEffettivo;
+
+            float incrementoBase = 15f + RandomHelper.Float(0, 8f);
+            float incrementoFinale = incrementoBase * metabolismo * (0.5f + velocita * 0.5f);
+
+            incrementoFinale = Math.Max(7f, incrementoFinale);
+
+            if (Game.pianta.Stats.Altezza + incrementoFinale > Game.pianta.Stats.EffectiveMaxHeight)
+            {
+                incrementoFinale = Game.pianta.Stats.EffectiveMaxHeight - Game.pianta.Stats.Altezza;
+            }
+            return incrementoFinale;
         }
 
         public void StartTutorial()
@@ -1032,25 +995,6 @@ namespace Plants
             // Controlla se il tutorial è già stato completato
             if (IsTutorialCompleted())
             {
-                Console.WriteLine($"[TUTORIAL] Tutorial completato rilevato - Impostazione mondo a Terra");
-                // Salta direttamente a Terra
-                WorldManager.SetCurrentWorld(WorldType.Terra);
-                Game.pianta.SetNaturalColors(WorldType.Terra);
-
-                // Forza il salvataggio del mondo Terra eliminando prima il vecchio file
-                Console.WriteLine($"[TUTORIAL] Eliminazione file salvataggio esistente...");
-                GameSaveManager.DeleteSaveFile();
-
-                // Salva il gioco con il mondo corretto dopo il completamento del tutorial
-                Console.WriteLine($"[TUTORIAL] Salvataggio completamento tutorial - Mondo: Terra");
-                GameSaveManager.SaveGame(
-                    WorldType.Terra,
-                    WorldManager.GetCurrentWorldDifficulty(),
-                    WeatherManager.GetCurrentWeather(),
-                    FaseGiorno.GetCurrentPhase()
-                );
-                Console.WriteLine($"[TUTORIAL] Salvataggio completato");
-
                 isTutorialActive = false;
                 currentPhase = TutorialPhase.Fine;
                 return;
@@ -1064,12 +1008,15 @@ namespace Plants
             semeCaduto = false;
             phaseTimer = 0f;
             particles.Clear();
-            currentGrowthSpeed = Game.growthSpeed;
-            targetGrowthSpeed = Game.growthSpeed;
+            currentGrowthSpeed = GetGrowthSpeed();
+            targetGrowthSpeed = GetGrowthSpeed();
             speedTransitionTime = 0f;
 
-            // Metti in pausa il gioco durante il tutorial iniziale
-            Game.isPaused = true;
+            WorldManager.SetCurrentWorld(WorldType.Serra);
+
+			// Metti in pausa il gioco durante il tutorial iniziale
+			Game.isPaused = true;
         }
     }
+
 }

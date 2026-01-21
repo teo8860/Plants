@@ -92,7 +92,7 @@ public class Background : GameElement
         int segments = 24;
         int segmentHeight = GameProperties.cameraHeight / segments;
 
-        Graphics.DrawRectangle(0, (int)Rendering.camera.position.Y, GameProperties.cameraWidth, (int)(Rendering.camera.position.Y + (int)Rendering.camera.view.Y),  LerpColor(bottomColor, topColor, 0.5f));
+        Graphics.DrawRectangle(0, (int)Rendering.camera.position.Y-100, GameProperties.cameraWidth, (int)(Rendering.camera.position.Y + (int)Rendering.camera.view.Y)+100,  LerpColor(bottomColor, topColor, 0.5f));
 
 
         for (int i = 0; i < segments; i++)

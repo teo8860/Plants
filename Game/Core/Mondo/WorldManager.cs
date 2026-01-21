@@ -366,12 +366,14 @@ public static class WorldManager
     {
         currentWorld = world;
         UpdateGroundColors();
+        GameSave.get().Save();
     }
 
     private static void UpdateGroundColors()
     {
         if (worldColors.TryGetValue(currentWorld, out var colors))
         {
+            if(Game.ground != null)
             Game.ground.SetGroundWorld(colors.ground1, colors.ground2, colors.nextGround1, colors.nextGround2);
         }
     }
@@ -748,6 +750,9 @@ public static class WorldManager
         {
             worldModifiers[world] = worldModifiers[world] with { Difficulty = difficulty };
         }
+
+        
+        GameSave.get().Save();
     }
 
     public static Color GetDifficultyColor(WorldDifficulty diff) => diff switch

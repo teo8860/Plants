@@ -23,21 +23,6 @@ internal static class Program
         Game.Init();
         Rendering.Init();
 
-        // Load saved game if exists (dopo l'inizializzazione degli oggetti)
-        Console.WriteLine($"[PROGRAM] Controllo esistenza file salvataggio...");
-        var saveData = GameSaveManager.LoadGame();
-        if (saveData != null)
-        {
-            Console.WriteLine($"[PROGRAM] File salvataggio trovato - Mondo: {saveData.CurrentWorld}, Difficoltà: {saveData.CurrentDifficulty}, Weather: {saveData.CurrentWeather}, Phase: {saveData.CurrentPhase}");
-            Console.WriteLine($"[PROGRAM] Ripristino stato gioco...");
-            GameSaveManager.RestoreGameState(saveData);
-            Console.WriteLine($"[PROGRAM] Stato gioco ripristinato - Mondo corrente: {WorldManager.GetCurrentWorld()}");
-        }
-        else
-        {
-            Console.WriteLine($"[PROGRAM] Nessun file di salvataggio trovato - avvio nuovo gioco");
-        }
-
     }
 
     private static void SetupIcon()
@@ -57,12 +42,7 @@ internal static class Program
         trayIcon.OnExit  += () =>
         {
              // Auto-save on exit
-             GameSaveManager.SaveGame(
-                 WorldManager.GetCurrentWorld(),
-                 WorldManager.GetCurrentWorldDifficulty(),
-                 WeatherManager.GetCurrentWeather(),
-                 FaseGiorno.GetCurrentPhase()
-             );
+            GameSave.get().Save();
              trayIcon.Dispose();
              Window.Close();
         };

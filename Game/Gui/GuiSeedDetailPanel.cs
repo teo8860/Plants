@@ -31,7 +31,7 @@ public class GuiSeedDetailPanel : GameElement
 
     public GuiSeedDetailPanel() : base()
     {
-        this.roomId = Game.inventoryRoom.id;
+        this.roomId = Game.room_inventory.id;
         this.guiLayer = true;
         this.depth = -100;
     }

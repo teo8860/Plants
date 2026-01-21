@@ -84,16 +84,15 @@ public class Controller : GameElement
               Rendering.camera.position.Y = 0;
         }
 
-          if (Input.IsKeyDown(KeyboardKey.B))
+        if (Input.IsKeyDown(KeyboardKey.B))
         {
-            Game.inventoryRoom.SetActiveRoom();
-            Game.InitInventory();
+            Game.room_inventory.SetActiveRoom();
         }
 
          
-          if (Input.IsKeyDown(KeyboardKey.V))
+        if (Input.IsKeyDown(KeyboardKey.V))
         {
-            Game.mainRoom.SetActiveRoom();
+            Game.room_main.SetActiveRoom();
         }
 
         if (Input.IsKeyDown(KeyboardKey.Space))

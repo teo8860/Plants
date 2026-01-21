@@ -7,10 +7,7 @@ using Engine.Tools;
 
 namespace Plants;
 
-public class InventorySaveData
-{
-    public List<Seed> seedsData = new();
-}
+
 
 public class Inventario
 {
@@ -31,6 +28,7 @@ public class Inventario
         seeds = new();
     }
 
+
     public void AddSeed(Seed seed)
     {
         seeds.Add(seed);
@@ -45,10 +43,6 @@ public class Inventario
         return seeds.Contains(seed);
     }
 
-    public void loadFromData(InventorySaveData data)
-    {
-        seeds = data.seedsData;
-    }
 
 
     public List<Seed> GetAllSeeds()
