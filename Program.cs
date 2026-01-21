@@ -19,16 +19,24 @@ internal static class Program
 
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
 
-        // Load saved game if exists
-        var saveData = GameSaveManager.LoadGame();
-        if (saveData != null)
-        {
-            GameSaveManager.RestoreGameState(saveData);
-        }
-
         // Avvia il render ed il loop
         Game.Init();
         Rendering.Init();
+
+        // Load saved game if exists (dopo l'inizializzazione degli oggetti)
+        Console.WriteLine($"[PROGRAM] Controllo esistenza file salvataggio...");
+        var saveData = GameSaveManager.LoadGame();
+        if (saveData != null)
+        {
+            Console.WriteLine($"[PROGRAM] File salvataggio trovato - Mondo: {saveData.CurrentWorld}, Difficoltà: {saveData.CurrentDifficulty}, Weather: {saveData.CurrentWeather}, Phase: {saveData.CurrentPhase}");
+            Console.WriteLine($"[PROGRAM] Ripristino stato gioco...");
+            GameSaveManager.RestoreGameState(saveData);
+            Console.WriteLine($"[PROGRAM] Stato gioco ripristinato - Mondo corrente: {WorldManager.GetCurrentWorld()}");
+        }
+        else
+        {
+            Console.WriteLine($"[PROGRAM] Nessun file di salvataggio trovato - avvio nuovo gioco");
+        }
 
     }
 

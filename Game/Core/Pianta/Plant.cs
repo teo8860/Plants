@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Security.Cryptography;
+using Engine.Tools;
 
 namespace Plants;
 
@@ -173,6 +174,8 @@ public class Plant : GameElement
         GeneraPuntoIniziale();
 
          ///* 
+        // Commentato: non deve crescere automaticamente nel costruttore
+        /*
         if (!Game.tutorial.isTutorialActive)
         {
             for (int a = 0; a < 400; a++)
@@ -180,6 +183,7 @@ public class Plant : GameElement
                 Crescita();
             }
         }
+        */
         // */
     }
 
