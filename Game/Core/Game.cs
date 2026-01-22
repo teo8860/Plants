@@ -48,9 +48,7 @@ public static class Game
         room_inventory = new Room(false);
         room_options = new Room(false);
         
-
         AssetLoader.LoadAll();
-
 
         InitMainGame();
         InitGui();
@@ -59,13 +57,16 @@ public static class Game
         Inventario.get().Load();
         GameSave.get().Load();
 
+        Inventario.get().AddSeed(new Seed(SeedType.Glaciale));
+        Inventario.get().AddSeed(new Seed(SeedType.Magmatico));
+        Inventario.get().AddSeed(new Seed(SeedType.Cosmico));
+
         SetTimerSave();
         SetTimer();
         SetTimerFase();
 
         Phase = FaseGiorno.GetCurrentPhase();
 
-        
 
         tutorial.StartTutorial();
 

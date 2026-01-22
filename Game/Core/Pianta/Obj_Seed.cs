@@ -13,15 +13,20 @@ namespace Plants;
 
 public class Obj_Seed : GameElement
 {
-	Seed dati;
-	Vector3 color = new Vector3( 0.0f, 1.0f, 1.0f ); 
+	public Seed dati;
+	public Vector2 position = new Vector2(0,0);
+	public float scale = 8;
+	public Vector3 color = new Vector3( 0.0f, 1.0f, 1.0f ); 
 	double time = 0;
 
 	int un_time = AssetLoader.shaderSeed.GetLocation("time");
 	int un_color = AssetLoader.shaderSeed.GetLocation("color");
 	int un_noise = AssetLoader.shaderSeed.GetLocation("noise");
 
-
+	public Obj_Seed()
+	{
+		this.guiLayer = true;
+	}
 	public Obj_Seed(Seed dati)
 	{
 		this.dati = dati;
@@ -43,7 +48,7 @@ public class Obj_Seed : GameElement
 			AssetLoader.shaderSeed.SetValue(un_color, color, ShaderUniformDataType.Vec3);
 			AssetLoader.shaderSeed.SetValueTexture(un_noise, AssetLoader.spriteNoise1.texture);
 
-            GameFunctions.DrawSprite(AssetLoader.spriteSeed1, new Vector2(30,100),0,8);
+            GameFunctions.DrawSprite(AssetLoader.spriteSeed1, position,0,scale);
 
        Graphics.EndShaderMode();
 	}

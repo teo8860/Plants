@@ -4,21 +4,24 @@ using Raylib_CSharp.Interact;
 using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Transformations;
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace Plants;
 
 public class Obj_GuiInventoryGrid : GameElement
 {
-    private int cellSize = 70;
-    private int spacing = 15;
+    private int cellSize = 50;
+    private int spacing = 9;
     private int startX = 25;
-    private int startY = 70;
+    private int startY = 25;
 
     private int selectedIndex = -1;
     private int hoveredIndex = -1;
 
     public Action<int> OnSeedSelected;
     public Obj_GuiSeedDetailPanel detailPanel; // Riferimento al pannello dettagli
+    public List<Obj_Seed> visualSeedList = new();
 
     // Colori stile legno
     private Color cellColor = new Color(101, 67, 43, 250);        // Marrone medio
@@ -33,7 +36,25 @@ public class Obj_GuiInventoryGrid : GameElement
         this.roomId = Game.room_inventory.id;
         this.guiLayer = true;
         this.depth = -50;
-    }
+
+        for(int i =0; i<100;i++)
+        {
+            int seedCount = GetSeedCount();
+
+            int col = i % 100;
+            int row = i / 100;
+            int x = startX + col * (cellSize + spacing);
+            int y = startY + row * (cellSize + spacing);
+
+            Obj_Seed seedVisual = new Obj_Seed();
+            seedVisual.roomId = Game.room_inventory.id;
+            seedVisual.scale = 1.8f;
+            seedVisual.depth = -1000;
+            seedVisual.position.X = x+(cellSize/2);
+            seedVisual.position.Y = y+(cellSize/2);
+			visualSeedList.Add(seedVisual);
+		}
+	}
 
     private int GetSeedCount()
     {
@@ -71,7 +92,18 @@ public class Obj_GuiInventoryGrid : GameElement
 
         for (int i = 0; i < seedCount; i++)
         {
-            int col = i % currentColumns;
+            Seed seedInfo = Inventario.get().seeds[i];
+
+            if(seedInfo.type == SeedType.Glaciale)
+			    visualSeedList[i].color = new Vector3(1.0f, 1.0f, 1.0f);
+
+            if(seedInfo.type == SeedType.Magmatico)
+			    visualSeedList[i].color = new Vector3(1.0f, 0.0f, 0.0f);
+
+            if(seedInfo.type == SeedType.Cosmico)
+			    visualSeedList[i].color = new Vector3(0.1f, 0.1f, 0.1f);
+
+			int col = i % currentColumns;
             int row = i / currentColumns;
             int x = startX + col * (cellSize + spacing);
             int y = startY + row * (cellSize + spacing);
@@ -150,6 +182,7 @@ public class Obj_GuiInventoryGrid : GameElement
                 3,
                 border
             );
+
         }
     }
 

@@ -29,6 +29,6 @@ public static class GameFunctions
         Rectangle source = new Rectangle(0, 0, sprite.texture.Width, sprite.texture.Height);
         Rectangle dest = new Rectangle(position.X, position.Y, size.X, size.Y);
 
-        Graphics.DrawTexturePro(sprite.texture, source, dest, sprite.origin, angle, Color.White);
+        Graphics.DrawTexturePro(sprite.texture, source, dest, sprite.origin*scale, angle, Color.White);
      }
 }
