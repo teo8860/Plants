@@ -1,4 +1,4 @@
-#version 330
+#version 330 compatibility
 
 in vec3 vertexPosition;
 in vec2 vertexTexCoord;

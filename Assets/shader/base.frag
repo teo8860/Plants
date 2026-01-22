@@ -1,7 +1,7 @@
-#version 330
+#version 330 compatibility
 
 in vec2 fragTexCoord;
-
+out vec4 outColor;
 uniform vec3 customColor;
 uniform sampler2D texture0;
 
@@ -18,5 +18,5 @@ void main()
 	if(brightness > 0.9)
 		realPixel.b = 1.0;
 
-	gl_FragColor = realPixel;
+	outColor = realPixel;
 }

@@ -1,4 +1,4 @@
-#version 330
+#version 330 compatibility
 
 in vec2 fragTexCoord;
 
@@ -19,9 +19,9 @@ void main()
 	noisePixel.a = 0.9;
 
 	realPixel *= noisePixel;
-	realPixel += color;
+	realPixel.rgb += color;
 	
-	realPixel.a =  (sin(time) * 0.5) + 0.5;
+	
 
 	gl_FragColor = realPixel;
 }

@@ -1,6 +1,7 @@
-#version 330
+#version 330 compatibility
 
 in vec2 fragTexCoord;
+out vec4 outColor;
 
 uniform vec3 customColor;
 
@@ -16,5 +17,5 @@ void main()
 
 	finalColor.a = 0.5;
 
-	gl_FragColor = finalColor;
+	outColor = finalColor;
 }
