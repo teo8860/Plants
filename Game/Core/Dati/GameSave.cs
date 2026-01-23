@@ -11,25 +11,12 @@ public class GameSaveData
     public WorldDifficulty CurrentDifficulty   { get; set; }
     public Weather CurrentWeather   { get; set; }
     public DayPhase CurrentPhase   { get; set; }
-    public CompostSaveData CompostData   { get; set; }
     public DateTime SaveTime   { get; set; }
     public string Version { get; set; }
 
     public GameSaveData()
     {
         Version = "1.0.0";
-    }
-}
-
-public class CompostSaveData
-{
-    public int CollectedLeaves { get; set; }
-    public List<SeedPackageRarity> AvailablePackages { get; set; }
-    public float CompostEfficiency { get; set; }
-
-    public CompostSaveData()
-    {
-        AvailablePackages = new();
     }
 }
 
@@ -75,10 +62,6 @@ public class GameSave
         WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
 
-        if (saveData.CompostData != null)
-        {
-            CompostSystem.LoadFromData(saveData.CompostData);
-        }
     }
 
 

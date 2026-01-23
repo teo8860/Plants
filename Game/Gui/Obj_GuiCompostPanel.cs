@@ -56,7 +56,7 @@ public class Obj_GuiCompostPanel : GameElement
     public override void Draw()
     {
         // Draw leaves count
-        Graphics.DrawText($"Leaves: {CompostSystem.GetCollectedLeaves()}", 10, 10, 20, Color.White);
+        Graphics.DrawText($"Leaves: {Game.pianta.Stats.FoglieAttuali}", 10, 10, 20, Color.White);
 
         // Draw available packages and open buttons
         var packages = CompostSystem.GetAvailablePackages();
