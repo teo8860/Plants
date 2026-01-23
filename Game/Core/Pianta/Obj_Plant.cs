@@ -165,7 +165,9 @@ public class Obj_Plant : GameElement
                     direction = Direzione.Destra;
             }
 
-            rami.Add(new Obj_Ramo(puntoAttacco, direction));
+            var ramo = new Obj_Ramo(puntoAttacco, direction);
+            ramo.roomId = Game.room_main.id;
+            rami.Add(ramo);
 
             contatorePuntiPerRamo = 0;
         }
@@ -180,7 +182,9 @@ public class Obj_Plant : GameElement
             //pos.X += RandomHelper.Int(-45, 45);
             pos.Y += posizione.Y;
 
-            radici.Add(new Obj_Radice(puntoAttacco, pos));
+            var radice = new Obj_Radice(puntoAttacco, pos);
+            radice.roomId = Game.room_main.id;
+            radici.Add(radice);
 
             contatorePuntiPerRadice = 0;
         }
@@ -217,12 +221,14 @@ public class Obj_Plant : GameElement
             float direction = (i % 2 == 0) ? -1 : 1;
             float startOffset = (i / 2) * 4 - 8;
 
-            ramiEdera.Add(new Obj_RamoEdera(
+            var edera = new Obj_RamoEdera(
                 posizione.X + startOffset,
                 ederaY + rng.Next(-8, 8),
                 direction,
                 colore1,
-                rng.Next()));
+                rng.Next());
+            edera.roomId = Game.room_main.id;
+            ramiEdera.Add(edera);
         }
     }
 

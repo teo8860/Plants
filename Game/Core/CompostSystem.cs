@@ -75,9 +75,10 @@ public static class CompostSystem
 
     public static List<SeedPackage> GetAvailablePackages() => new(_availablePackages);
 
-    public static SeedType? OpenPackage(SeedPackage package)
+    public static SeedType OpenPackage(SeedPackage package)
     {
-        if (!_availablePackages.Contains(package)) return null;
+        if (!_availablePackages.Contains(package)) 
+            return SeedType.Normale;
 
         _availablePackages.Remove(package);
         return package.Open();

@@ -89,6 +89,10 @@ public class Obj_Controller : GameElement
             Game.room_inventory.SetActiveRoom();
         }
 
+        if (Input.IsKeyDown(KeyboardKey.C))
+        {
+            Game.room_compost.SetActiveRoom();
+        }
          
         if (Input.IsKeyDown(KeyboardKey.V))
         {

@@ -12,6 +12,7 @@ public static class Game
     public static Room room_main;
     public static Room room_inventory;
     public static Room room_options;
+    public static Room room_compost;
 
     public static Obj_Controller controller;
     public static ObjWater innaffiatoio;
@@ -41,25 +42,25 @@ public static class Game
     public static Obj_GuiInventoryBackground inventoryBackground;
     public static Obj_GuiInventoryGrid inventoryGrid;
     public static Obj_GuiSeedDetailPanel seedDetailPanel;
+    
+    public static Obj_GuiCompostPanel compostPanel;
 
     public static void Init()
     {
         room_main = new Room();
         room_inventory = new Room(false);
         room_options = new Room(false);
+        room_compost = new Room(false);
         
         AssetLoader.LoadAll();
 
         InitMainGame();
         InitGui();
         InitInventory();
+        InitComposter();
         
         Inventario.get().Load();
         GameSave.get().Load();
-
-        Inventario.get().AddSeed(new Seed(SeedType.Glaciale));
-        Inventario.get().AddSeed(new Seed(SeedType.Magmatico));
-        Inventario.get().AddSeed(new Seed(SeedType.Cosmico));
 
         SetTimerSave();
         SetTimer();
@@ -165,7 +166,10 @@ public static class Game
         };
     }
 
-
+    private static void InitComposter()
+    {
+        compostPanel = new Obj_GuiCompostPanel();
+    }
 
     public static void SetTimer()
     {

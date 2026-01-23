@@ -32,6 +32,7 @@ public class Inventario
     public void AddSeed(Seed seed)
     {
         seeds.Add(seed);
+        Save();
     }
     public void RemoveSeed(Seed seed)
     {

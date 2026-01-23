@@ -33,6 +33,11 @@ public class Room
 		
 	}
 
+	public static bool IsActive()
+	{
+		return activeRoom != null;
+	}
+
 	public static uint GetActiveId()
 	{
 		return Room.activeRoom.id;
