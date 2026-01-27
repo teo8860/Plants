@@ -2,6 +2,7 @@ using Raylib_CSharp.Colors;
 using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Transformations;
 using Raylib_CSharp.Interact;
+using Raylib_CSharp;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +18,6 @@ public class Obj_GuiCompostPanel : GameElement
         SeedPackageRarity.Legendary
     };
 
-    // Colori corretti per le rarità
     private Dictionary<SeedPackageRarity, Color> rarityColors = new()
     {
         { SeedPackageRarity.Common, new Color(200, 200, 200, 255) },
@@ -36,11 +36,11 @@ public class Obj_GuiCompostPanel : GameElement
         { SeedPackageRarity.Legendary, "Leggendario" }
     };
 
-    // Menu combobox
     private bool isMenuOpen = false;
     private Rectangle binRect;
     private Rectangle[] menuItems = new Rectangle[5];
-    private Rectangle[] packageButtons = new Rectangle[10];
+    private Rectangle[] packageButtons = new Rectangle[4]; // Massimo 4
+    private Rectangle[] progressButtons = new Rectangle[4]; // Per pacchetti in creazione
 
     public Obj_GuiCompostPanel() : base()
     {
@@ -51,6 +51,9 @@ public class Obj_GuiCompostPanel : GameElement
 
     public override void Update()
     {
+        // Aggiorna il sistema compost
+        CompostSystem.Update(Time.GetFrameTime());
+
         int screenWidth = Rendering.camera.screenWidth;
         int screenHeight = Rendering.camera.screenHeight;
 
@@ -59,13 +62,11 @@ public class Obj_GuiCompostPanel : GameElement
         int binX = tableX + 15;
         int binY = tableY - 45;
 
-        // Area cliccabile del secchio
         binRect = new Rectangle(binX, binY, 35, 40);
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 
-        // Click sul secchio - apri/chiudi menu
         if (Input.IsMouseButtonPressed(MouseButton.Left))
         {
             if (mx >= binRect.X && mx <= binRect.X + binRect.Width &&
@@ -75,7 +76,6 @@ public class Obj_GuiCompostPanel : GameElement
             }
             else if (isMenuOpen)
             {
-                // Click su item del menu
                 bool clickedOnMenu = false;
                 for (int i = 0; i < menuItems.Length; i++)
                 {
@@ -84,18 +84,15 @@ public class Obj_GuiCompostPanel : GameElement
                     {
                         clickedOnMenu = true;
 
-                        // Crea pacchetto se possibile
-                        if (CompostSystem.CanCreatePackage(rarities[i]))
+                        if (CompostSystem.StartPackageCreation(rarities[i]))
                         {
-                            CompostSystem.CreatePackage(rarities[i]);
-                            Console.WriteLine($"Pacchetto {rarities[i]} creato!");
+                            Console.WriteLine($"Creazione pacchetto {rarities[i]} avviata!");
                         }
                         isMenuOpen = false;
                         break;
                     }
                 }
 
-                // Chiudi menu se click fuori
                 if (!clickedOnMenu)
                 {
                     isMenuOpen = false;
@@ -103,7 +100,7 @@ public class Obj_GuiCompostPanel : GameElement
             }
             else
             {
-                // Click sui pacchetti sul tavolo per aprirli
+                // Click sui pacchetti pronti per aprirli
                 var packages = CompostSystem.GetAvailablePackages();
                 for (int i = 0; i < packages.Count && i < packageButtons.Length; i++)
                 {
@@ -123,10 +120,12 @@ public class Obj_GuiCompostPanel : GameElement
 
     public override void Draw()
     {
-        // === INFO FOGLIE ===
+        // Info foglie e slot
+        int totalPackages = CompostSystem.GetTotalPackageCount();
         Graphics.DrawText($"Foglie: {Game.pianta.Stats.FoglieAttuali}", 10, 10, 16, new Color(100, 180, 100, 255));
+        Graphics.DrawText($"Slot: {totalPackages}/4", 10, 30, 14,
+            totalPackages >= 4 ? new Color(255, 100, 100, 255) : new Color(200, 200, 200, 255));
 
-        // === HOVER SUL SECCHIO ===
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 
@@ -135,16 +134,14 @@ public class Obj_GuiCompostPanel : GameElement
 
         if (binHovered && !isMenuOpen)
         {
-            // Indicatore hover
             Graphics.DrawRectangleRoundedLines(binRect, 0.2f, 6, 2, new Color(255, 255, 100, 200));
-            Graphics.DrawText("Clicca per creare", (int)binRect.X - 15, (int)binRect.Y - 15, 9, Color.White);
+
+            string hoverText = totalPackages >= 4 ? "Slot pieni!" : "Clicca per creare";
+            Graphics.DrawText(hoverText, (int)binRect.X - 15, (int)binRect.Y - 15, 9, Color.White);
         }
 
-
-        // === PACCHETTI SUL TAVOLO ===
         DrawPackagesOnTable();
 
-        // === MENU COMBOBOX ===
         if (isMenuOpen)
         {
             DrawComboboxMenu();
@@ -156,11 +153,10 @@ public class Obj_GuiCompostPanel : GameElement
     {
         int menuX = (int)binRect.X + (int)binRect.Width + 5;
         int menuY = (int)binRect.Y;
-        int menuWidth = 140;
-        int itemHeight = 32;
+        int menuWidth = 150;
+        int itemHeight = 36;
         int menuHeight = rarities.Length * itemHeight;
 
-        // Sfondo menu
         Graphics.DrawRectangleRounded(
             new Rectangle(menuX, menuY, menuWidth, menuHeight),
             0.15f, 8,
@@ -176,7 +172,6 @@ public class Obj_GuiCompostPanel : GameElement
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 
-        // Items del menu
         for (int i = 0; i < rarities.Length; i++)
         {
             int itemY = menuY + i * itemHeight;
@@ -186,67 +181,75 @@ public class Obj_GuiCompostPanel : GameElement
             bool hovered = mx >= menuItems[i].X && mx <= menuItems[i].X + menuItems[i].Width &&
                           my >= menuItems[i].Y && my <= menuItems[i].Y + menuItems[i].Height;
 
-            // Background item
             if (hovered && canCreate)
             {
                 Graphics.DrawRectangle(menuX + 2, itemY + 2, menuWidth - 4, itemHeight - 4,
                     new Color(60, 50, 40, 255));
             }
 
-            // Colore rarità (indicatore)
-            Graphics.DrawRectangle(menuX + 5, itemY + 8, 4, itemHeight - 16, rarityColors[rarities[i]]);
+            Graphics.DrawRectangle(menuX + 5, itemY + 10, 4, itemHeight - 20, rarityColors[rarities[i]]);
 
-            // Testo
             var package = new SeedPackage(rarities[i]);
-            string itemText = $"{rarityNames[rarities[i]]}";
+            string itemText = rarityNames[rarities[i]];
             string costText = $"{package.LeavesRequired} foglie";
+
+            // Tempo di creazione
+            var tempPkg = new PackageInProgress(rarities[i]);
+            string timeText = $"{tempPkg.TimeRequired}s";
 
             Color textColor = canCreate ? Color.White : new Color(120, 100, 80, 255);
             Color costColor = canCreate ? rarityColors[rarities[i]] : new Color(100, 80, 60, 255);
 
-            Graphics.DrawText(itemText, menuX + 15, itemY + 6, 10, textColor);
-            Graphics.DrawText(costText, menuX + 15, itemY + 18, 8, costColor);
+            Graphics.DrawText(itemText, menuX + 15, itemY + 4, 10, textColor);
+            Graphics.DrawText(costText, menuX + 15, itemY + 16, 8, costColor);
+            Graphics.DrawText(timeText, menuX + 15, itemY + 26, 7, new Color(200, 180, 160, 255));
 
-            // Icona "lock" se non disponibile
             if (!canCreate)
             {
-                Graphics.DrawText("X", menuX + menuWidth - 18, itemY + 10, 12, new Color(200, 80, 80, 255));
+                string blockReason = CompostSystem.GetTotalPackageCount() >= 4 ? "PIENO" : "X";
+                Graphics.DrawText(blockReason, menuX + menuWidth - 35, itemY + 12, 10, new Color(200, 80, 80, 255));
             }
         }
     }
 
     private void DrawPackagesOnTable()
     {
-        var packages = CompostSystem.GetAvailablePackages();
-
-        if (packages.Count == 0)
-        {
-            Console.WriteLine("Nessun pacchetto da disegnare");
-            return;
-        }
-
-        Console.WriteLine($"Disegno {packages.Count} pacchetti");
-
         int screenWidth = Rendering.camera.screenWidth;
         int screenHeight = Rendering.camera.screenHeight;
 
         int tableX = screenWidth / 2 - 140;
         int tableY = screenHeight - 180;
 
-        // Posizione iniziale per i pacchetti (dopo il secchio)
         int startX = tableX + 70;
         int startY = tableY - 35;
 
-        int packageWidth = 30;
-        int packageHeight = 38;
-        int spacing = 8;
+        int packageWidth = 32;
+        int packageHeight = 40;
+        int spacing = 10;
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 
-        for (int i = 0; i < packages.Count && i < 10; i++)
+        int slotIndex = 0;
+
+        // Disegna pacchetti in creazione (con barra progresso)
+        var inProgress = CompostSystem.GetPackagesInProgress();
+        for (int i = 0; i < inProgress.Count && slotIndex < 4; i++)
         {
-            int pkgX = startX + i * (packageWidth + spacing);
+            int pkgX = startX + slotIndex * (packageWidth + spacing);
+            int pkgY = startY;
+
+            progressButtons[slotIndex] = new Rectangle(pkgX, pkgY, packageWidth, packageHeight);
+
+            DrawPackageInProgress(pkgX, pkgY, packageWidth, packageHeight, inProgress[i]);
+            slotIndex++;
+        }
+
+        // Disegna pacchetti pronti
+        var packages = CompostSystem.GetAvailablePackages();
+        for (int i = 0; i < packages.Count && slotIndex < 4; i++)
+        {
+            int pkgX = startX + slotIndex * (packageWidth + spacing);
             int pkgY = startY;
 
             packageButtons[i] = new Rectangle(pkgX, pkgY, packageWidth, packageHeight);
@@ -255,18 +258,61 @@ public class Obj_GuiCompostPanel : GameElement
                           my >= pkgY && my <= pkgY + packageHeight;
 
             DrawPackage(pkgX, pkgY, packageWidth, packageHeight, packages[i].Rarity, hovered);
+            slotIndex++;
         }
+    }
+
+    private void DrawPackageInProgress(int x, int y, int width, int height, PackageInProgress package)
+    {
+        Color pkgColor = rarityColors[package.Rarity];
+
+        // Ombra
+        Graphics.DrawEllipse(x + width / 2, y + height + 2, width / 2 + 2, 4,
+            new Color(0, 0, 0, 60));
+
+        // Corpo pacchetto (più trasparente)
+        Color bodyColor = new Color((byte)(pkgColor.R * 0.4f), (byte)(pkgColor.G * 0.4f), (byte)(pkgColor.B * 0.4f), 200);
+
+        Graphics.DrawRectangleRounded(
+            new Rectangle(x, y, width, height),
+            0.15f, 6, bodyColor
+        );
+
+        // Bordo pulsante
+        float pulseAlpha = (float)(Math.Sin(Time.GetTime() * 3) * 0.3f + 0.7f);
+        Color borderColor = new Color(pkgColor.R, pkgColor.G, pkgColor.B, (byte)(255 * pulseAlpha));
+
+        Graphics.DrawRectangleRoundedLines(
+            new Rectangle(x, y, width, height),
+            0.15f, 6, 2, borderColor
+        );
+
+        // Barra progresso
+        int barHeight = 6;
+        int barY = y + height - barHeight - 4;
+        int barWidth = width - 8;
+        int barX = x + 4;
+
+        // Background barra
+        Graphics.DrawRectangle(barX, barY, barWidth, barHeight, new Color(40, 40, 40, 200));
+
+        // Progresso
+        int progressWidth = (int)(barWidth * package.Progress);
+        Graphics.DrawRectangle(barX, barY, progressWidth, barHeight, pkgColor);
+
+        // Tempo rimanente
+        float timeLeft = package.TimeRequired - package.TimeElapsed;
+        string timeText = $"{(int)timeLeft}s";
+        Graphics.DrawText(timeText, x + width / 2 - 6, y + height / 2 - 4, 8, Color.White);
     }
 
     private void DrawPackage(int x, int y, int width, int height, SeedPackageRarity rarity, bool hovered)
     {
         Color pkgColor = rarityColors[rarity];
 
-        // Ombra
         Graphics.DrawEllipse(x + width / 2, y + height + 2, width / 2 + 2, 4,
             new Color(0, 0, 0, 80));
 
-        // Corpo pacchetto (busta)
         Color bodyColor = hovered ?
             new Color((byte)(pkgColor.R * 0.9f), (byte)(pkgColor.G * 0.9f), (byte)(pkgColor.B * 0.9f), 255) :
             new Color((byte)(pkgColor.R * 0.7f), (byte)(pkgColor.G * 0.7f), (byte)(pkgColor.B * 0.7f), 255);
@@ -276,17 +322,14 @@ public class Obj_GuiCompostPanel : GameElement
             0.15f, 6, bodyColor
         );
 
-        // Bordo luminoso
         Graphics.DrawRectangleRoundedLines(
             new Rectangle(x, y, width, height),
             0.15f, 6, hovered ? 3 : 2, pkgColor
         );
 
-        // Lembo superiore della busta
         Graphics.DrawRectangle(x + 3, y + 3, width - 6, 8,
             new Color(pkgColor.R, pkgColor.G, pkgColor.B, 120));
 
-        // Simbolo seme (tre cerchi)
         int centerX = x + width / 2;
         int centerY = y + height / 2 + 4;
 
@@ -297,24 +340,19 @@ public class Obj_GuiCompostPanel : GameElement
         Graphics.DrawCircle(centerX + 3, centerY - 3, 3,
             new Color(pkgColor.R, pkgColor.G, pkgColor.B, 180));
 
-        // Effetto brillantezza per rarità alte
         if (rarity == SeedPackageRarity.Legendary || rarity == SeedPackageRarity.Epic)
         {
-            float time = (float)Raylib_CSharp.Time.GetTime();
+            float time = (float)Time.GetTime();
             byte sparkleAlpha = (byte)(100 + Math.Sin(time * 3) * 80);
 
             Graphics.DrawCircle(x + width - 6, y + 6, 2, new Color(255, 255, 255, sparkleAlpha));
             Graphics.DrawCircle(x + 6, y + height - 8, 1, new Color(255, 255, 255, (byte)(sparkleAlpha * 0.7f)));
         }
 
-        // Tooltip hover
         if (hovered)
         {
-            string tooltip = $"Clicca per aprire\n{rarityNames[rarity]}";
-            int tooltipX = x - 20;
-            int tooltipY = y - 25;
-
-            Graphics.DrawText(tooltip, tooltipX, tooltipY, 8, Color.White);
+            string tooltip = $"Clicca per aprire";
+            Graphics.DrawText(tooltip, x - 15, y - 15, 8, Color.White);
         }
     }
 }
