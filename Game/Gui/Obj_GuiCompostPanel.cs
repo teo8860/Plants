@@ -15,6 +15,7 @@ public class Obj_GuiCompostPanel : GameElement
     {
         this.guiLayer = true;
         this.roomId = Game.room_compost.id;
+        this.depth = -50;
         createButtons = new Rectangle[rarities.Length];
         for (int i = 0; i < rarities.Length; i++)
         {

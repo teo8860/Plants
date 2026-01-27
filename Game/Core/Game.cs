@@ -44,6 +44,7 @@ public static class Game
     public static Obj_GuiSeedDetailPanel seedDetailPanel;
     
     public static Obj_GuiCompostPanel compostPanel;
+    public static Obj_GuiCompostBackground compostBackground;
 
     public static void Init()
     {
@@ -168,6 +169,8 @@ public static class Game
 
     private static void InitComposter()
     {
+        compostBackground = new Obj_GuiCompostBackground();
+
         compostPanel = new Obj_GuiCompostPanel();
     }
 
