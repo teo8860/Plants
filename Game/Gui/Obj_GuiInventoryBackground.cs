@@ -2,77 +2,90 @@ using Raylib_CSharp;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Transformations;
+using Raylib_CSharp.Interact;
+using System;
 
 namespace Plants;
 
 public class Obj_GuiInventoryBackground : GameElement
 {
-    // Colori stile legno
-    private Color woodDark = new Color(62, 39, 25, 255);       // Marrone scuro cornice
-    private Color woodMedium = new Color(101, 67, 43, 255);    // Marrone medio
-    private Color woodLight = new Color(139, 90, 55, 255);     // Marrone chiaro
-    private Color woodHighlight = new Color(166, 118, 76, 255); // Highlight legno
-    private Color woodShadow = new Color(41, 26, 17, 255);     // Ombra scura
+    // Colori palette
+    private Color wallColor = new Color(230, 220, 200, 255);
+    private Color wallShadow = new Color(200, 190, 170, 255);
+    private Color woodDark = new Color(62, 39, 25, 255);
+    private Color woodMedium = new Color(101, 67, 43, 255);
+    private Color woodLight = new Color(139, 90, 55, 255);
+    private Color floorLight = new Color(180, 140, 100, 255);
+    private Color floorDark = new Color(150, 110, 70, 255);
 
-    private int borderThickness = 12;
 
     public Obj_GuiInventoryBackground() : base()
     {
         this.roomId = Game.room_inventory.id;
         this.guiLayer = true;
-        this.depth = -40; // Dietro alla griglia ma davanti ad altri elementi
+        this.depth = -40;
+
     }
+
 
     public override void Update()
     {
-        // Nessuna logica di update necessaria
+
     }
+
 
     public override void Draw()
     {
+
         int screenWidth = Rendering.camera.screenWidth;
         int screenHeight = Rendering.camera.screenHeight;
 
-        // Background principale legno chiaro
-        Graphics.DrawRectangle(0, 0, screenWidth, screenHeight, woodMedium);
+        // === MURO ===
+        Graphics.DrawRectangle(0, 0, screenWidth, screenHeight, wallColor);
 
-        // Pattern venature legno (linee orizzontali sottili)
-        for (int y = 0; y < screenHeight; y += 8)
+        for (int y = 0; y < screenHeight; y += 12)
         {
-            Color lineColor = (y % 24 == 0) ? woodLight : woodHighlight;
-            lineColor.A = 40;
+            Color lineColor = new Color(wallShadow.R, wallShadow.G, wallShadow.B, 20);
             Graphics.DrawLine(0, y, screenWidth, y, lineColor);
         }
 
-        // Cornice esterna marrone scuro
-        // Top
-        Graphics.DrawRectangle(0, 0, screenWidth, borderThickness, woodDark);
-        // Bottom
-        Graphics.DrawRectangle(0, screenHeight - borderThickness, screenWidth, borderThickness, woodDark);
-        // Left
-        Graphics.DrawRectangle(0, 0, borderThickness, screenHeight, woodDark);
-        // Right
-        Graphics.DrawRectangle(screenWidth - borderThickness, 0, borderThickness, screenHeight, woodDark);
+        // === PAVIMENTO ===
+        int floorHeight = 120;
+        int floorY = screenHeight - floorHeight;
 
-        // Bordo interno evidenziato (effetto rilievo)
-        int innerX = borderThickness;
-        int innerY = borderThickness;
-        int innerW = screenWidth - borderThickness * 2;
-        int innerH = screenHeight - borderThickness * 2;
+        int plankHeight = 15;
+        for (int i = 0; i < floorHeight / plankHeight; i++)
+        {
+            Color plankColor = (i % 2 == 0) ? floorLight : floorDark;
+            Graphics.DrawRectangle(0, floorY + i * plankHeight, screenWidth, plankHeight, plankColor);
+            Graphics.DrawLine(0, floorY + i * plankHeight, screenWidth, floorY + i * plankHeight, woodDark);
+        }
 
-        // Linea chiara in alto e sinistra (luce)
-        Graphics.DrawLine(innerX, innerY, innerX + innerW, innerY, woodHighlight);
-        Graphics.DrawLine(innerX, innerY, innerX, innerY + innerH, woodHighlight);
+        Graphics.DrawRectangleGradientV(floorY, floorY, screenWidth, 30,
+            new Color(0, 0, 0, 40), new Color(0, 0, 0, 0));
 
-        // Linea scura in basso e destra (ombra)
-        Graphics.DrawLine(innerX, innerY + innerH, innerX + innerW, innerY + innerH, woodShadow);
-        Graphics.DrawLine(innerX + innerW, innerY, innerX + innerW, innerY + innerH, woodShadow);
+        // === BATTISCOPA ===
+        Graphics.DrawRectangle(0, floorY - 8, screenWidth, 8, woodDark);
+        Graphics.DrawLine(0, floorY - 8, screenWidth, floorY - 8, woodMedium);
 
-        // Angoli decorativi (piccoli quadrati scuri)
-        int cornerSize = borderThickness + 4;
-        Graphics.DrawRectangle(0, 0, cornerSize, cornerSize, woodShadow);
-        Graphics.DrawRectangle(screenWidth - cornerSize, 0, cornerSize, cornerSize, woodShadow);
-        Graphics.DrawRectangle(0, screenHeight - cornerSize, cornerSize, cornerSize, woodShadow);
-        Graphics.DrawRectangle(screenWidth - cornerSize, screenHeight - cornerSize, cornerSize, cornerSize, woodShadow);
+        // === TITOLO ===
+        Graphics.DrawText("MAGAZZINO SEMI", screenWidth / 2 - 70, 20, 18, woodDark);
+        Graphics.DrawText("Scegli una cassa", screenWidth / 2 - 45, 42, 11, new Color(100, 80, 60, 255));
+
+        // === BORDI STANZA ===
+        DrawRoomBorders();
+    }
+
+    private void DrawRoomBorders()
+    {
+        int screenWidth = Rendering.camera.screenWidth;
+        int screenHeight = Rendering.camera.screenHeight;
+        int borderThickness = 4;
+
+        Color borderColor = new Color(woodDark.R, woodDark.G, woodDark.B, 150);
+
+        Graphics.DrawRectangle(0, 0, screenWidth, borderThickness, borderColor);
+        Graphics.DrawRectangle(0, 0, borderThickness, screenHeight, borderColor);
+        Graphics.DrawRectangle(screenWidth - borderThickness, 0, borderThickness, screenHeight, borderColor);
     }
 }

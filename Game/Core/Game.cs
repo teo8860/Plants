@@ -42,7 +42,9 @@ public static class Game
     public static Obj_GuiInventoryBackground inventoryBackground;
     public static Obj_GuiInventoryGrid inventoryGrid;
     public static Obj_GuiSeedDetailPanel seedDetailPanel;
-    
+    public static Obj_GuiInventoryCrates inventoryCrates;
+    public static Obj_GuiInventoryCratesBackground inventoryCratesBackground;
+
     public static Obj_GuiCompostPanel compostPanel;
     public static Obj_GuiCompostBackground compostBackground;
 
@@ -154,7 +156,11 @@ public static class Game
     {
         // Background stile legno
         inventoryBackground = new Obj_GuiInventoryBackground();
-        
+
+        inventoryCrates = new Obj_GuiInventoryCrates();
+
+        inventoryCratesBackground = new Obj_GuiInventoryCratesBackground();
+
         inventoryGrid = new Obj_GuiInventoryGrid();
 
         seedDetailPanel = new Obj_GuiSeedDetailPanel();

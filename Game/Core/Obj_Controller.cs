@@ -89,6 +89,11 @@ public class Obj_Controller : GameElement
             Game.room_inventory.SetActiveRoom();
         }
 
+        if (Input.IsKeyDown(KeyboardKey.N) && Game.inventoryCrates != null && Game.inventoryCrates.IsInventoryOpen && Room.GetActiveId() == Game.room_inventory.id)
+        {
+            Game.inventoryCrates.CloseInventory();
+        }
+
         if (Input.IsKeyDown(KeyboardKey.C))
         {
             Game.room_compost.SetActiveRoom();

@@ -62,6 +62,13 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
     public override void Update()
     {
+        if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
+        {
+            Close();
+            // Nascondi tutto se non siamo in modalità inventario
+            return;
+        }
+
         float target = isOpen ? 1f : 0f;
         slideProgress += (target - slideProgress) * Time.GetFrameTime() * animationSpeed;
         slideProgress = Math.Clamp(slideProgress, 0f, 1f);
@@ -109,6 +116,13 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
     public override void Draw()
     {
+        if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
+        {
+            Close();
+            // Nascondi tutto se non siamo in modalità inventario
+            return;
+        }
+
         if (slideProgress < 0.01f) return;
 
         int screenWidth = Rendering.camera.screenWidth;
