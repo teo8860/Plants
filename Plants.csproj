@@ -65,6 +65,9 @@
 	  <None Update="Assets\shader\base.frag">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Assets\shine.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Assets\texture\tex_noise1.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

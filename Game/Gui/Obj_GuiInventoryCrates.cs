@@ -95,6 +95,7 @@ public class Obj_GuiInventoryCrates : GameElement
 
         if (Game.inventoryGrid != null)
         {
+            Game.inventoryGrid.Populate();
             Game.inventoryGrid.SetRarityFilter(rarity);
         }
     }
@@ -131,7 +132,7 @@ public class Obj_GuiInventoryCrates : GameElement
         int screenHeight = Rendering.camera.screenHeight;
 
         // Pavimento base (y dove inizia il pavimento)
-        int floorY = screenHeight - 50;
+        int floorY = screenHeight - 30;
 
         // === 2 CASSE A SINISTRA (impilate) ===
         int leftX = 60;
@@ -155,6 +156,9 @@ public class Obj_GuiInventoryCrates : GameElement
 
         // Cassa Leggendario (top piramide)
         DrawCrate3D(rightX, rightZ - 65, 70, 60, rarityColors[4], rarityNames[4], 4, hoveredCrate == 4);
+
+        DrawCrate3D(rightX, rightZ - 65, 70, 60, rarityColors[4], rarityNames[4], 4, hoveredCrate == 4);
+
     }
 
     private void DrawCrate3D(int x, int y, int width, int height, Color rarityColor, string name, int index, bool hovered)
@@ -273,8 +277,15 @@ public class Obj_GuiInventoryCrates : GameElement
             float time = (float)Time.GetTime();
             byte alpha = (byte)(100 + Math.Sin(time * 2.5f) * 80);
 
-            Graphics.DrawCircle(x + width - 12, y + 12, 3, new Color(255, 255, 255, alpha));
-            Graphics.DrawCircle(x + 15, y + height - 18, 2, new Color(255, 255, 255, (byte)(alpha * 0.6f)));
+            Color color = new Color(255, 255, 255, alpha);
+
+		
+
+			GameFunctions.DrawSprite(AssetLoader.spriteShine, new Vector2(x + width - 12, y + 12), time*20, (float)(Math.Sin(time*2)), rarityColor, 0.7f);
+			GameFunctions.DrawSprite(AssetLoader.spriteShine, new Vector2(x + 15, y + height - 18), time*15, (float)(Math.Sin(time*1.7)*0.6), rarityColor, 0.8f );
+
+           // Graphics.DrawCircle(x + width - 12, y + 12, 3, new Color(255, 255, 255, alpha));
+          //  Graphics.DrawCircle(x + 15, y + height - 18, 2, new Color(255, 255, 255, (byte)(alpha * 0.6f)));
         }
     }
 }

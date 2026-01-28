@@ -71,8 +71,10 @@ public static class Game
 
         Phase = FaseGiorno.GetCurrentPhase();
 
-
-        tutorial.StartTutorial();
+        for(int i=0; i < 12; i++)
+            Inventario.get().AddSeed(new Seed(SeedType.Normale));
+		
+		tutorial.StartTutorial();
 
     }
 

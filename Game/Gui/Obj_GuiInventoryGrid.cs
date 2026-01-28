@@ -12,223 +12,214 @@ namespace Plants;
 
 public class Obj_GuiInventoryGrid : GameElement
 {
-    private int cellSize = 50;
-    private int spacing = 9;
-    private int startX = 25;
-    private int startY = 60; // Più in basso per header
+	private int cellSize = 50;
+	private int spacing = 9;
+	private int startX = 25;
+	private int startY = 60;
 
-    private int selectedIndex = -1;
-    private int hoveredIndex = -1;
+	private int selectedIndex = -1;
+	private int hoveredIndex = -1;
 
-    public Action<int> OnSeedSelected;
-    public Obj_GuiSeedDetailPanel detailPanel;
-    public List<Obj_Seed> visualSeedList = new();
+	public Action<int> OnSeedSelected;
+	public Obj_GuiSeedDetailPanel detailPanel;
 
-    private SeedRarity? rarityFilter = null;
-    private List<Seed> filteredSeeds = new();
+	private SeedRarity? rarityFilter = null;
+	private List<Seed> filteredSeeds = new();
+	private List<Obj_Seed> visualSeedList = new();
 
-    // Colori
-    private Color cellColor = new Color(101, 67, 43, 250);
-    private Color cellHoverColor = new Color(139, 90, 55, 250);
-    private Color cellSelectedColor = new Color(166, 118, 76, 250);
-    private Color borderColor = new Color(62, 39, 25, 255);
-    private Color borderSelectedColor = new Color(200, 150, 80, 255);
-    private Color innerShadow = new Color(41, 26, 17, 180);
+	// Colori
+	private Color cellColor = new Color(101, 67, 43, 250);
+	private Color cellHoverColor = new Color(139, 90, 55, 250);
+	private Color cellSelectedColor = new Color(166, 118, 76, 250);
+	private Color borderColor = new Color(62, 39, 25, 255);
+	private Color borderSelectedColor = new Color(200, 150, 80, 255);
+	private Color innerShadow = new Color(41, 26, 17, 180);
 
-    public Obj_GuiInventoryGrid() : base()
-    {
-        this.roomId = Game.room_inventory.id;
-        this.guiLayer = true;
-        this.depth = -50;
+	public Obj_GuiInventoryGrid() : base()
+	{
+		this.roomId = Game.room_inventory.id;
+		this.guiLayer = true;
+		this.depth = -50;
+	}
 
-        for (int i = 0; i < 100; i++)
-        {
-            int col = i % 100;
-            int row = i / 100;
-            int x = startX + col * (cellSize + spacing);
-            int y = startY + row * (cellSize + spacing);
+	public void SetRarityFilter(SeedRarity rarity)
+	{
+		rarityFilter = rarity;
+		UpdateFilteredSeeds();
+	}
 
-            Obj_Seed seedVisual = new Obj_Seed();
-            seedVisual.roomId = Game.room_inventory.id;
-            seedVisual.scale = 1.8f;
-            seedVisual.depth = -1000;
-            seedVisual.position.X = x + (cellSize / 2);
-            seedVisual.position.Y = y + (cellSize / 2);
-            visualSeedList.Add(seedVisual);
-        }
-    }
+	public void ClearRarityFilter()
+	{
+		rarityFilter = null;
+		filteredSeeds.Clear();
+	}
 
-    public void SetRarityFilter(SeedRarity rarity)
-    {
-        rarityFilter = rarity;
-        UpdateFilteredSeeds();
-    }
+	private void UpdateFilteredSeeds()
+	{
+		if (!rarityFilter.HasValue)
+			filteredSeeds = Inventario.get().GetAllSeeds();
+		else
+			filteredSeeds = Inventario.get().GetAllSeeds()
+				.Where(seed => seed.rarity == rarityFilter.Value)
+				.ToList();
+	}
 
-    public void ClearRarityFilter()
-    {
-        rarityFilter = null;
-        filteredSeeds.Clear();
-    }
+	private int GetCurrentColumns()
+	{
+		if (detailPanel == null)
+			return 10;
 
-    private void UpdateFilteredSeeds()
-    {
-        if (!rarityFilter.HasValue)
-        {
-            filteredSeeds = Inventario.get().GetAllSeeds();
-        }
-        else
-        {
-            filteredSeeds = Inventario.get().GetAllSeeds()
-                .Where(seed => seed.rarity == rarityFilter.Value)
-                .ToList();
-        }
-    }
+		int screenWidth = Rendering.camera.screenWidth;
+		int usableWidth = GameProperties.windowWidth-detailPanel.panelWidth - startX; // spazio tra l'inizio e il pannello
+		return Math.Max(1, usableWidth / (cellSize + spacing));
+	}
 
-    private int GetSeedCount()
-    {
-        if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
-            return 0;
+	public void Populate()
+	{
+		if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
+			return;
 
-        UpdateFilteredSeeds();
-        return filteredSeeds.Count;
-    }
+		UpdateFilteredSeeds();
 
-    private int GetPanelOffset()
-    {
-        if (detailPanel == null) return 0;
-        return (int)((detailPanel.PanelWidth + 10) * detailPanel.SlideProgress);
-    }
+		visualSeedList.Clear();
 
-    private int GetCurrentColumns()
-    {
-        int screenWidth = Rendering.camera.screenWidth;
-        int availableWidth = screenWidth - GetPanelOffset();
+		int columns = GetCurrentColumns();
 
-        int margin = 25;
-        int usableWidth = availableWidth - margin * 2;
-        return Math.Max(1, usableWidth / (cellSize + spacing));
-    }
+		for (int i = 0; i < filteredSeeds.Count; i++)
+		{
+			int col = i % columns;
+			int row = i / columns;
+			int x = startX + col * (cellSize + spacing);
+			int y = startY + row * (cellSize + spacing);
 
-    public override void Update()
-    {
-        if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
-        {
-            // Nascondi tutto se non siamo in modalità inventario
-            return;
-        }
+			Obj_Seed seedVisual = new Obj_Seed
+			{
+				roomId = Game.room_inventory.id,
+				scale = 1.8f,
+				depth = -1000,
+				position = new Vector2(x + (cellSize / 2), y + (cellSize / 2))
+			};
 
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
+			Seed seedInfo = filteredSeeds[i];
 
-        hoveredIndex = -1;
-        int seedCount = GetSeedCount();
-        int currentColumns = GetCurrentColumns();
+			if (seedInfo.type == SeedType.Glaciale)
+				seedVisual.color = new Vector3(1f, 1f, 1f);
+			else if (seedInfo.type == SeedType.Magmatico)
+				seedVisual.color = new Vector3(1f, 0f, 0f);
+			else if (seedInfo.type == SeedType.Cosmico)
+				seedVisual.color = new Vector3(0.1f, 0.1f, 0.1f);
 
-        bool clickedOnCell = false;
+			visualSeedList.Add(seedVisual);
+		}
+	}
 
-        for (int i = 0; i < seedCount; i++)
-        {
-            Seed seedInfo = filteredSeeds[i];
+	public override void Update()
+	{
+		if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
+			return;
 
-            // Aggiorna colori visuali
-            if (seedInfo.type == SeedType.Glaciale)
-                visualSeedList[i].color = new Vector3(1.0f, 1.0f, 1.0f);
+		int mx = Input.GetMouseX();
+		int my = Input.GetMouseY();
+		bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
 
-            if (seedInfo.type == SeedType.Magmatico)
-                visualSeedList[i].color = new Vector3(1.0f, 0.0f, 0.0f);
+		hoveredIndex = -1;
+		int seedCount = filteredSeeds.Count;
 
-            if (seedInfo.type == SeedType.Cosmico)
-                visualSeedList[i].color = new Vector3(0.1f, 0.1f, 0.1f);
+		bool clickedOnCell = false;
 
-            int col = i % currentColumns;
-            int row = i / currentColumns;
-            int x = startX + col * (cellSize + spacing);
-            int y = startY + row * (cellSize + spacing);
+		for (int i = 0; i < seedCount; i++)
+		{
+			int columns = GetCurrentColumns();
+			int col = i % columns;
+			int row = i / columns;
+			int x = startX + col * (cellSize + spacing);
+			int y = startY + row * (cellSize + spacing);
 
-            if (mx >= x && mx <= x + cellSize && my >= y && my <= y + cellSize)
-            {
-                hoveredIndex = i;
+			if (mx >= x && mx <= x + cellSize && my >= y && my <= y + cellSize)
+			{
+				hoveredIndex = i;
 
-                if (clicked)
-                {
-                    clickedOnCell = true;
-                    selectedIndex = i;
-                    OnSeedSelected?.Invoke(i);
-                }
-                break;
-            }
-        }
+				if (clicked)
+				{
+					clickedOnCell = true;
+					selectedIndex = i;
 
-        if (clicked && !clickedOnCell && detailPanel != null && detailPanel.IsOpen)
-        {
-            int screenWidth = Rendering.camera.screenWidth;
-            int panelX = screenWidth - (int)(detailPanel.PanelWidth * detailPanel.SlideProgress);
+					// Mostra info nel pannello
+					//detailPanel?.SetSeed(filteredSeeds[i]);
+					//detailPanel?.Open();
+					OnSeedSelected?.Invoke(i);
+				}
+				break;
+			}
+		}
 
-            if (mx < panelX)
-            {
-                detailPanel.Close();
-                selectedIndex = -1;
-            }
-        }
-    }
+		// Click fuori dalle celle non chiude il pannello
+	}
 
-    public override void Draw()
-    {
-        if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
-            return;
+	public override void Draw()
+{
+	if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
+		return;
 
-        int seedCount = GetSeedCount();
-        int currentColumns = GetCurrentColumns();
+	int columns = GetCurrentColumns(); // calcola quante colonne possono stare nello spazio
 
-        // Messaggio se vuoto
-        if (seedCount == 0)
-        {
-            Graphics.DrawText("Nessun seme di questa rarità",
-                Rendering.camera.screenWidth / 2 - 100,
-                Rendering.camera.screenHeight / 2,
-                14, new Color(150, 150, 150, 255));
-            return;
-        }
+	int maxX = detailPanel != null ? GameProperties.windowWidth - detailPanel.panelWidth : GameProperties.windowWidth;
 
-        for (int i = 0; i < seedCount; i++)
-        {
-            int col = i % currentColumns;
-            int row = i / currentColumns;
-            int x = startX + col * (cellSize + spacing);
-            int y = startY + row * (cellSize + spacing);
+	// Disegna solo le slot che stanno nello spazio disponibile fino al pannello
+	int maxRows = (int)Math.Ceiling(100.0 / columns);
 
-            Color bg = cellColor;
-            if (i == selectedIndex)
-                bg = cellSelectedColor;
-            else if (i == hoveredIndex)
-                bg = cellHoverColor;
+	for (int row = 0; row < maxRows; row++)
+	{
+		for (int col = 0; col < columns; col++)
+		{
+			int i = row * columns + col;
+			if (i >= 100) break;
 
-            Graphics.DrawRectangleRounded(
-                new Rectangle(x + 3, y + 3, cellSize - 2, cellSize - 2),
-                0.18f, 8, innerShadow
-            );
+			int x = startX + col * (cellSize + spacing);
+			int y = startY + row * (cellSize + spacing);
 
-            Graphics.DrawRectangleRounded(
-                new Rectangle(x, y, cellSize, cellSize),
-                0.18f, 8, bg
-            );
+			// Se la cella supera il bordo del pannello, non disegnarla
+			if (x + cellSize > maxX) continue;
 
-            Color border = (i == selectedIndex) ? borderSelectedColor : borderColor;
-            Graphics.DrawRectangleRoundedLines(
-                new Rectangle(x, y, cellSize, cellSize),
-                0.18f, 8, 3, border
-            );
-        }
-    }
+			Color bg = cellColor;
+			if (i == selectedIndex)
+				bg = cellSelectedColor;
+			else if (i == hoveredIndex)
+				bg = cellHoverColor;
 
-    public void ClearSelection()
-    {
-        selectedIndex = -1;
-    }
+			Graphics.DrawRectangleRounded(new Rectangle(x + 3, y + 3, cellSize - 2, cellSize - 2),
+				0.18f, 8, innerShadow);
 
-    public int GetSelectedIndex()
-    {
-        return selectedIndex;
-    }
+			Graphics.DrawRectangleRounded(new Rectangle(x, y, cellSize, cellSize),
+				0.18f, 8, bg);
+
+			Color border = (i == selectedIndex) ? borderSelectedColor : borderColor;
+			Graphics.DrawRectangleRoundedLines(new Rectangle(x, y, cellSize, cellSize),
+				0.18f, 8, 3, border);
+		}
+	}
+
+	// Disegna solo i semi presenti, limitandosi allo spazio disponibile
+	for (int i = 0; i < visualSeedList.Count; i++)
+	{
+		int col = i % columns;
+		int row = i / columns;
+		int x = startX + col * (cellSize + spacing);
+
+		// Limita i semi allo stesso spazio delle celle
+		if (x + cellSize > maxX) continue;
+
+		visualSeedList[i].Draw();
+	}
+}
+
+	public void ClearSelection()
+	{
+		selectedIndex = -1;
+	}
+
+	public int GetSelectedIndex()
+	{
+		return selectedIndex;
+	}
 }

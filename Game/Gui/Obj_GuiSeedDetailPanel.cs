@@ -13,7 +13,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
     private float slideProgress = 0f;
     private float animationSpeed = 8f;
 
-    private int panelWidth = 170;
+    public int panelWidth = 170;
     private int selectedSeedIndex = -1;
 
     // Colori stile legno

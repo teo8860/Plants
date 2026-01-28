@@ -12,8 +12,9 @@ namespace Plants;
 public class Inventario
 {
     public List<Seed> seeds = new();
+    public int maxSeeds = 100;
 
-    public static Inventario get()
+	public static Inventario get()
     {
         if (Inventario.instance == null)
             Inventario.instance = new Inventario();

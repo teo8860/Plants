@@ -35,6 +35,8 @@ public static class AssetLoader
     public static Sprite spriteNoise4;
     public static Sprite spriteNoise5;
     public static Sprite spriteNoise6;
+    
+    public static Sprite spriteShine;
 
     public static Shader shaderBase;
     public static Shader shaderRecolor;
@@ -56,6 +58,8 @@ public static class AssetLoader
         spriteNoise4 = new Sprite("texture/tex_noise4.png", 0.05f, new(0.5f, 0.5f));
         spriteNoise5 = new Sprite("texture/tex_noise5.png", 0.05f, new(0.5f, 0.5f));
         spriteNoise6 = new Sprite("texture/tex_noise6.png", 0.05f, new(0.5f, 0.5f));
+
+        spriteShine = new Sprite("shine.png", 0.05f, new(0.5f, 0.5f));  
 
         shaderBase = LoadShader("base");
         shaderRecolor = LoadShader("recolor");
