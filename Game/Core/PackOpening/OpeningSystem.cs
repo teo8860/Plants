@@ -10,11 +10,11 @@ public class OpeningSystem
     private static int luckLegendary = 0;
 
     private const int MAX_LUCK_EPIC = 60;
-    private const int MAX_LUCK_LEGENDARY = 25;
+    private const int MAX_LUCK_LEGENDARY = 40;
 
     private readonly Dictionary<SeedRarity, int> baseWeights = new()
     {
-        { SeedRarity.Comune, 1000 },
+        { SeedRarity.Comune, 750 },
         { SeedRarity.NonComune, 400 },
         { SeedRarity.Raro, 100 },
         { SeedRarity.Epico, 20 },
@@ -35,9 +35,12 @@ public class OpeningSystem
                 rollWeights[SeedRarity.Raro] += 30;
                 break;
             case SeedPackageRarity.Epic:
+                rollWeights[SeedRarity.NonComune] -= 5;
                 rollWeights[SeedRarity.Epico] += 10;
                 break;
             case SeedPackageRarity.Legendary:
+                rollWeights[SeedRarity.Comune] -= 15;
+                rollWeights[SeedRarity.NonComune] -= 10;
                 rollWeights[SeedRarity.Raro] += 20;
                 rollWeights[SeedRarity.Epico] += 15;
                 rollWeights[SeedRarity.Leggendario] += 5;
@@ -51,7 +54,8 @@ public class OpeningSystem
         int cursor = 0;
         SeedRarity selectedRarity = SeedRarity.Comune;
 
-        foreach (var item in rollWeights)
+
+		foreach (var item in rollWeights)
         {
             cursor += item.Value;
             if (roll <= cursor)
@@ -61,7 +65,7 @@ public class OpeningSystem
             }
         }
 
-        ApplyMomentum(selectedRarity);
+		ApplyMomentum(selectedRarity);
 
         return CreateRandomSeedOfRarity(selectedRarity);
     }
