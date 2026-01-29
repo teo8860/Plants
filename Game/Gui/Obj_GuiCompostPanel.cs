@@ -107,10 +107,9 @@ public class Obj_GuiCompostPanel : GameElement
                     if (mx >= packageButtons[i].X && mx <= packageButtons[i].X + packageButtons[i].Width &&
                         my >= packageButtons[i].Y && my <= packageButtons[i].Y + packageButtons[i].Height)
                     {
-                        SeedType seedType = CompostSystem.OpenPackage(packages[i]);
-                        Seed newSeed = new Seed(seedType);
-                        Inventario.get().AddSeed(newSeed);
-                        Console.WriteLine($"Pacchetto aperto! Ricevuto: {seedType}");
+                        Seed seed = CompostSystem.OpenPackage(packages[i]);
+                        Inventario.get().AddSeed(seed);
+                        Console.WriteLine($"Pacchetto aperto! Ricevuto: {seed}");
                         break;
                     }
                 }

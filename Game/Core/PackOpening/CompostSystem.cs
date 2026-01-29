@@ -88,47 +88,45 @@ public static class CompostSystem
 {
     private static List<SeedPackage> _availablePackages = new();
     private static List<PackageInProgress> _packagesInProgress = new();
+    private static OpeningSystem _openingSystem = new(); 
 
-    private const int MAX_PACKAGES = 4; // Limite totale
+    private const int MAX_PACKAGES = 4;
 
     public static List<SeedPackage> GetAvailablePackages() => new(_availablePackages);
     public static List<PackageInProgress> GetPackagesInProgress() => new(_packagesInProgress);
-
     public static int GetTotalPackageCount() => _availablePackages.Count + _packagesInProgress.Count;
 
     public static void Update(float deltaTime)
     {
-        // Aggiorna tutti i pacchetti in creazione
         for (int i = _packagesInProgress.Count - 1; i >= 0; i--)
         {
             _packagesInProgress[i].Update(deltaTime);
 
-            // Se completato, spostalo nei pacchetti disponibili
             if (_packagesInProgress[i].IsComplete)
             {
                 var completed = _packagesInProgress[i];
                 _packagesInProgress.RemoveAt(i);
-
-                var package = new SeedPackage(completed.Rarity);
-                _availablePackages.Add(package);
-
-                Console.WriteLine($"Pacchetto {completed.Rarity} completato!");
+                _availablePackages.Add(new SeedPackage(completed.Rarity));
+                Console.WriteLine($"Pacchetto {completed.Rarity} pronto per l'apertura!");
             }
         }
     }
 
-    public static SeedType OpenPackage(SeedPackage package)
+    public static Seed OpenPackage(SeedPackage package)
     {
         if (!_availablePackages.Contains(package))
-            return SeedType.Normale;
+            return new Seed(SeedType.Normale);
 
         _availablePackages.Remove(package);
-        return package.Open();
+
+        Seed resultSeed = _openingSystem.RollSeedFromPackage(package.Rarity);
+
+        Console.WriteLine($"Aperto pacchetto {package.Rarity}: Trovato {resultSeed.name} ({resultSeed.rarity})");
+        return resultSeed;
     }
 
     public static bool CanCreatePackage(SeedPackageRarity rarity)
     {
-        // Controlla limite totale
         if (GetTotalPackageCount() >= MAX_PACKAGES)
             return false;
 
@@ -138,7 +136,7 @@ public static class CompostSystem
 
     public static bool StartPackageCreation(SeedPackageRarity rarity)
     {
-        if (!CanCreatePackage(rarity))
+        if (GetTotalPackageCount() >= MAX_PACKAGES)
             return false;
 
         int leavesNeeded = new SeedPackage(rarity).LeavesRequired;
@@ -146,8 +144,6 @@ public static class CompostSystem
 
         var packageInProgress = new PackageInProgress(rarity);
         _packagesInProgress.Add(packageInProgress);
-
-        Console.WriteLine($"Iniziata creazione pacchetto {rarity} - Tempo richiesto: {packageInProgress.TimeRequired}s");
         return true;
     }
 }
