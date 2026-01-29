@@ -110,6 +110,9 @@ public class Obj_GuiCompostPanel : GameElement
                         Seed seed = CompostSystem.OpenPackage(packages[i]);
                         Inventario.get().AddSeed(seed);
                         Console.WriteLine($"Pacchetto aperto! Ricevuto: {seed}");
+
+                        Game.packOpening.StartAnimation(seed);
+
                         break;
                     }
                 }

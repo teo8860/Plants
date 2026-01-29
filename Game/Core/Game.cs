@@ -47,6 +47,7 @@ public static class Game
 
     public static Obj_GuiCompostPanel compostPanel;
     public static Obj_GuiCompostBackground compostBackground;
+    public static Obj_GuiPackOpeningAnimation packOpening;
 
     public static void Init()
     {
@@ -178,6 +179,9 @@ public static class Game
         compostBackground = new Obj_GuiCompostBackground();
 
         compostPanel = new Obj_GuiCompostPanel();
+
+        packOpening = new Obj_GuiPackOpeningAnimation();
+      
     }
 
     public static void SetTimer()
