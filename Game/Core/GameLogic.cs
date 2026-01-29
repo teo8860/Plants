@@ -563,6 +563,12 @@ public class GameLogicPianta
 
     public string GetRiepilogo()
     {
+        if (!IsViva)
+            return "La pianta è morta.";
+
+        if (Room.GetActiveId() != Game.room_main.id)
+            return "";
+
         var worldMod = WorldManager.GetCurrentModifiers();
         string status = "";
 

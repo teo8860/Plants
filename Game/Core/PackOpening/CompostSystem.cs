@@ -66,11 +66,11 @@ public class PackageInProgress
         // Tempi in secondi basati sulla rarità
         TimeRequired = rarity switch
         {
-            SeedPackageRarity.Common => 300f,      // 5 secondi
-            SeedPackageRarity.Uncommon => 600f,   // 10 secondi
-            SeedPackageRarity.Rare => 1200f,       // 20 secondi
-            SeedPackageRarity.Epic => 2400f,       // 40 secondi
-            SeedPackageRarity.Legendary => 3600f,  // 60 secondi
+            SeedPackageRarity.Common => 1f,      // 5 secondi
+            SeedPackageRarity.Uncommon => 1f,   // 10 secondi
+            SeedPackageRarity.Rare => 1f,       // 20 secondi
+            SeedPackageRarity.Epic => 1f,       // 40 secondi
+            SeedPackageRarity.Legendary => 1f,  // 60 secondi
             _ => 5f
         };
     }
@@ -136,7 +136,7 @@ public static class CompostSystem
 
     public static bool StartPackageCreation(SeedPackageRarity rarity)
     {
-        if (GetTotalPackageCount() >= MAX_PACKAGES)
+        if (!CanCreatePackage(rarity))
             return false;
 
         int leavesNeeded = new SeedPackage(rarity).LeavesRequired;
