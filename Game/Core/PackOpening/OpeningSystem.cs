@@ -90,7 +90,6 @@ public class OpeningSystem
                 luckLegendary = 0;
                 break;
         }
-        Console.WriteLine($"[LOG] Estratto: {rarity} | Luck E: {luckEpic}/{MAX_LUCK_EPIC} | Luck L: {luckLegendary}/{MAX_LUCK_LEGENDARY}");
     }
 
     private Seed CreateRandomSeedOfRarity(SeedRarity rarity)

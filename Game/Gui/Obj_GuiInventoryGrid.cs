@@ -16,6 +16,7 @@ public class Obj_GuiInventoryGrid : GameElement
 	private int spacing = 9;
 	private int startX = 25;
 	private int startY = 60;
+	private int scrollY = 0;
 
 	private int selectedIndex = -1;
 	private int hoveredIndex = -1;
@@ -115,6 +116,25 @@ public class Obj_GuiInventoryGrid : GameElement
 
 	public override void Update()
 	{
+		float wheelDelta = Input.GetMouseWheelMove();
+
+		if(wheelDelta != 0)
+		{
+			scrollY += (int)(wheelDelta * 20);
+			scrollY = Math.Clamp(scrollY, -(cellSize*visualSeedList.Count/3), -cellSize+(cellSize/2));
+
+			int columns = GetCurrentColumns();
+			for (int i = 0; i < visualSeedList.Count; i++)
+			{
+				var seed = visualSeedList[i];
+				
+				int col = i % columns;
+				int row = i / columns;
+
+				seed.position.Y = startY + row * (cellSize + spacing) + scrollY + (cellSize / 2);
+			}
+		}
+
 		if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
 			return;
 
@@ -123,8 +143,7 @@ public class Obj_GuiInventoryGrid : GameElement
 		bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
 
 		hoveredIndex = -1;
-		int seedCount = filteredSeeds.Count;
-
+		int seedCount = visualSeedList.Count;
 		bool clickedOnCell = false;
 
 		for (int i = 0; i < seedCount; i++)
@@ -133,7 +152,7 @@ public class Obj_GuiInventoryGrid : GameElement
 			int col = i % columns;
 			int row = i / columns;
 			int x = startX + col * (cellSize + spacing);
-			int y = startY + row * (cellSize + spacing);
+			int y = startY + row * (cellSize + spacing)  + scrollY;
 
 			if (mx >= x && mx <= x + cellSize && my >= y && my <= y + cellSize)
 			{
@@ -145,7 +164,7 @@ public class Obj_GuiInventoryGrid : GameElement
 					selectedIndex = i;
 
 					// Mostra info nel pannello
-					//detailPanel?.SetSeed(filteredSeeds[i]);
+					detailPanel?.Open(i);
 					//detailPanel?.Open();
 					OnSeedSelected?.Invoke(i);
 				}
@@ -176,7 +195,7 @@ public class Obj_GuiInventoryGrid : GameElement
 			if (i >= 100) break;
 
 			int x = startX + col * (cellSize + spacing);
-			int y = startY + row * (cellSize + spacing);
+			int y = startY + row * (cellSize + spacing) + scrollY;
 
 			// Se la cella supera il bordo del pannello, non disegnarla
 			if (x + cellSize > maxX) continue;

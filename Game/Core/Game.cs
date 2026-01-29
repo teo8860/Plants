@@ -71,8 +71,6 @@ public static class Game
 
         Phase = FaseGiorno.GetCurrentPhase();
 
-        for(int i=0; i < 12; i++)
-            Inventario.get().AddSeed(new Seed(SeedType.Normale));
 		
 		tutorial.StartTutorial();
 
@@ -212,7 +210,7 @@ public static class Game
             WeatherManager.GetCurrentWeather(),
             WorldManager.GetCurrentModifiers()
         );
-        Console.WriteLine(pianta.proprieta.GetRiepilogo());
+       // Console.WriteLine(pianta.proprieta.GetRiepilogo());
     }
 
     public static void SetTimerFase()

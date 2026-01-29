@@ -303,7 +303,7 @@ namespace Plants
         }
 
         private void UpdateSemeCade(float deltaTime)
-        {Console.WriteLine("---------------------------------------semeY: "+semeY+"   target:"+semeTargetY);
+        {
             if (!semeCaduto)
             {
                 // Caduta fisica graduale
@@ -991,7 +991,6 @@ namespace Plants
 
         public void StartTutorial()
         {
-            Console.WriteLine($"[TUTORIAL] StartTutorial() chiamato");
             // Controlla se il tutorial è già stato completato
             if (IsTutorialCompleted())
             {

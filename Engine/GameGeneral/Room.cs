@@ -77,7 +77,7 @@ public class Room
 		for(int i=GameElement.elementList.Count-1; i>-1; i--)
 		{
 			var item = GameElement.elementList[i];
-			Console.WriteLine(item.roomId+"  =  "+this.id);
+		
 			if(item.roomId == this.id)
 			{
 				if(item.persistent == false)

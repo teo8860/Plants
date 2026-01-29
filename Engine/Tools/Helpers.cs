@@ -26,21 +26,16 @@ public static class SaveHelper
     {
         try
         {
-            Console.WriteLine($"[SAVEHELPER] Salvataggio {fileName}...");
             string json = JsonSerializer.Serialize(data, _jsonOptions);
-            Console.WriteLine($"[SAVEHELPER] JSON prodotto: {json.Substring(0, Math.Min(100, json.Length))} (lunghezza: {json.Length})");
 
             string path = GetSavePath(fileName);
-            Console.WriteLine($"[SAVEHELPER] Percorso file: {path}");
 
             File.WriteAllText(path, json);
-            Console.WriteLine($"[SAVEHELPER] File scritto con successo");
 
             // Verifica
             if (File.Exists(path))
             {
                 var size = new FileInfo(path).Length;
-                Console.WriteLine($"[SAVEHELPER] File esistente, dimensione: {size} bytes");
             }
         }
         catch (Exception ex)

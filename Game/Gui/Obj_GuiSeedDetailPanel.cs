@@ -9,7 +9,7 @@ namespace Plants;
 
 public class Obj_GuiSeedDetailPanel : GameElement
 {
-    private bool isOpen = false;
+    private bool isOpen = true;
     private float slideProgress = 0f;
     private float animationSpeed = 8f;
 
@@ -44,8 +44,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
     public void Close()
     {
-        isOpen = false;
-        selectedSeedIndex = -1;
+        isOpen = true;
     }
 
     public void Toggle(int seedIndex)
