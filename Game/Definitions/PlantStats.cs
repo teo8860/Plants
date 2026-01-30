@@ -120,7 +120,7 @@ public static class SeedDataType
         { SeedType.Fluviale, SeedRarity.NonComune },
         { SeedType.Glaciale, SeedRarity.Raro },
         { SeedType.Magmatico, SeedRarity.Raro },
-        { SeedType.Puro, SeedRarity.Esotico },
+        { SeedType.Puro, SeedRarity.Epico },
         { SeedType.Florido, SeedRarity.NonComune },
         { SeedType.Rapido, SeedRarity.Raro },
         { SeedType.Antico, SeedRarity.Epico },
