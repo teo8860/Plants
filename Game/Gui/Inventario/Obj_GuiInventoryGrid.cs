@@ -100,10 +100,11 @@ public class Obj_GuiInventoryGrid : GameElement
 				depth = -1000,
 				position = new Vector2(x + (cellSize / 2), y + (cellSize / 2))
 			};
-
 			Seed seedInfo = filteredSeeds[i];
-			seedVisual.color = seedInfo.color; // Imposta il colore di tutti i semi uguale all'ultimo seme (da correggere)
-            visualSeedList.Add(seedVisual);
+			
+			seedVisual.dati = seedInfo;
+			seedVisual.color = seedInfo.color; // TODO - togliere color da Seed e metterlo solo su Obj_Seed
+			visualSeedList.Add(seedVisual);
 		}
 	}
 
