@@ -61,13 +61,16 @@ public class Inventario
     {
         seeds = SaveHelper.Load<List<Seed>>("inventory.json");
 
-		foreach(var item in seeds)
-		{
-			item.type = item.type;
-		}
 
-		if (seeds == null)
+        if (seeds == null)
             seeds = new();
+        else
+        {
+            foreach (var item in seeds)
+            {
+                item.type = item.type;
+            }
+        }
     }
 
 
