@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,14 +13,16 @@ public struct Seed
 	public String name  { get; set; }
 	public SeedRarity rarity  { get; set; }
 	public SeedType type  { get; set; }
+	public Vector3 color { get; set; }
 
-	public Seed()
+    public Seed()
 	{
 		this.stats = new();
 		this.name = "Seme";
 		this.rarity = SeedRarity.Comune;
 		this.type = SeedType.Normale;
-	}
+		this.color = GetColorFromType(this.type);
+    }
 
 	public Seed(SeedType type)
 	{
@@ -27,7 +30,8 @@ public struct Seed
 		this.name = GetNameFromType(type);
 		this.rarity = GetRarityFromType(type);
 		this.type = type;
-	}
+        this.color = GetColorFromType(type);
+    }
 
 	private static string GetNameFromType(SeedType type) => type switch
 	{
@@ -58,5 +62,20 @@ public struct Seed
 		SeedType.Cosmico => SeedRarity.Leggendario,
 		_ => SeedRarity.Comune
 	};
+
+    private static Vector3 GetColorFromType(SeedType type) => type switch
+    {
+        SeedType.Normale => new Vector3(0.6f, 0.6f, 0.6f), // grigio neutro
+        SeedType.Poderoso => new Vector3(0.9f, 0.2f, 0.2f), // rosso intenso (forza)
+        SeedType.Fluviale => new Vector3(0.2f, 0.5f, 0.9f), // blu acqua
+        SeedType.Florido => new Vector3(0.2f, 0.8f, 0.3f), // verde vivo
+        SeedType.Glaciale => new Vector3(0.7f, 0.9f, 1.0f), // azzurro ghiaccio
+        SeedType.Magmatico => new Vector3(1.0f, 0.4f, 0.0f), // arancione lava
+        SeedType.Rapido => new Vector3(1.0f, 1.0f, 0.2f), // giallo elettrico
+        SeedType.Puro => new Vector3(1.0f, 1.0f, 1.0f), // bianco puro
+        SeedType.Antico => new Vector3(0.5f, 0.4f, 0.2f), // marrone/oro spento
+        SeedType.Cosmico => new Vector3(0.6f, 0.2f, 0.8f), // viola cosmico
+        _ => new Vector3(0.6f, 0.6f, 0.6f)
+    };
 
 }

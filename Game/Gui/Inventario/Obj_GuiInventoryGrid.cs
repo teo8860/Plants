@@ -102,15 +102,8 @@ public class Obj_GuiInventoryGrid : GameElement
 			};
 
 			Seed seedInfo = filteredSeeds[i];
-
-			if (seedInfo.type == SeedType.Glaciale)
-				seedVisual.color = new Vector3(1f, 1f, 1f);
-			else if (seedInfo.type == SeedType.Magmatico)
-				seedVisual.color = new Vector3(1f, 0f, 0f);
-			else if (seedInfo.type == SeedType.Cosmico)
-				seedVisual.color = new Vector3(0.1f, 0.1f, 0.1f);
-
-			visualSeedList.Add(seedVisual);
+			seedVisual.color = seedInfo.color; // Imposta il colore di tutti i semi uguale all'ultimo seme (da correggere)
+            visualSeedList.Add(seedVisual);
 		}
 	}
 
