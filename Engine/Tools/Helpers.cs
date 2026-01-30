@@ -168,41 +168,50 @@ public static class CoordinateHelper
 /// </summary>
 public static class MathHelper
 {
-    public static float CalcoloMediaValori(List<float> valori)
-	{
-		if(valori.Count == 0)
-			return float.NaN;
+    /// <summary>
+    /// Trasformazione logaritmica con segno.
+    /// Mantiene la progressione esponenziale e supporta valori negativi.
+    /// </summary>
+    private static double SignedLog(double value, double malusWeight)
+    {
+        if (value == 0)
+            return 0;
 
-		var bins = new Dictionary<string, (double a, double b, int count)>();
+        double weight = value < 0 ? malusWeight : 1.0;
+        return Math.Sign(value) * Math.Log10(1 + Math.Abs(value)) * weight;
+    }
 
-		foreach(var v in valori)
-		{
-			if(v <= 0)
-				throw new Exception("Valori <= 0 non supportati");
+    /// <summary>
+    /// Trasformazione inversa della SignedLog.
+    /// </summary>
+    private static double InverseSignedLog(double value)
+    {
+        if (value == 0)
+            return 0;
 
-			int exp = (int)Math.Floor(Math.Log10(v));
-			double a = Math.Pow(10, exp);
-			double b = Math.Pow(10, exp + 1);
-			string key = a + "-" + b;
+        return Math.Sign(value) * (Math.Pow(10, Math.Abs(value)) - 1);
+    }
 
-			if(!bins.ContainsKey(key))
-				bins[key] = (a, b, 0);
+    /// <summary>
+    /// Calcola una statistica bilanciata per pack opening / loot generation.
+    /// </summary>
+    public static float CalcoloMediaValori(
+        List<float> valori,
+        double malusWeight = 1.0)
+    {
+        if (valori == null || valori.Count == 0)
+            return 0f;
 
-			bins[key] = (bins[key].a, bins[key].b, bins[key].count + 1);
-		}
+        double sommaLog = 0;
 
-		double totale = valori.Count;
-		double risultato = 0;
+        foreach (var v in valori)
+            sommaLog += SignedLog(v, malusWeight);
 
-		foreach(var bin in bins.Values)
-		{
-			double peso = bin.count / totale;
-			double centro = Math.Sqrt(bin.a * bin.b); // centro geometrico
-			risultato += centro * peso;
-		}
+        double mediaLog = sommaLog / valori.Count;
 
-		return (float)risultato;
-	}
+        return (float)InverseSignedLog(mediaLog);
+    }
+
     /// <summary>
     /// Limita un valore tra min e max
     /// </summary>
