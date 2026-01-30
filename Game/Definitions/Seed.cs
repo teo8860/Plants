@@ -10,78 +10,78 @@ namespace Plants;
 
 public class Seed
 {
-	public SeedStats stats  { get; set; }
-	public String name  { get; set; }
-	public SeedRarity rarity  { get; set; }
-	private SeedType _type;
-	public SeedType type  
-	{ 
-		get
-		{
-			return _type;
-		} 
-		set 
-		{ 
-			this._type = value;
-			this.color = GetColorFromType(value);
-			this.name = GetNameFromType(value);
-			this.rarity = GetRarityFromType(value);
-		} 
-	}
-	public Vector3 color { get; set; }
+    public SeedStats stats { get; set; }
+    public String name { get; set; }
+    public SeedRarity rarity { get; set; }
+    private SeedType _type;
+    public SeedType type
+    {
+        get
+        {
+            return _type;
+        }
+        set
+        {
+            this._type = value;
+            this.color = GetColorFromType(value);
+            this.name = GetNameFromType(value);
+            this.rarity = GetRarityFromType(value);
+        }
+    }
+    public Vector3 color { get; set; }
 
 
     public Seed()
-	{
+    {
     }
 
-	public Seed(SeedType type)
-	{
-		this.name = GetNameFromType(type);
-		this.rarity = GetRarityFromType(type);
-		this.type = type;
+    public Seed(SeedType type)
+    {
+        this.name = GetNameFromType(type);
+        this.rarity = GetRarityFromType(type);
+        this.type = type;
         this.color = GetColorFromType(type);
-		this.stats = GenStats();
+        this.stats = GenStats();
     }
 
-	
+
     public Seed(Seed seed1, Seed seed2)
-	{
+    {
 		this.stats = GenStats(seed1, seed2);
 		this.name = "Seme";
 		this.type = SeedType.Normale;
 		this.color = GetColorFromType(this.type);
     }
 
-	private static string GetNameFromType(SeedType type) => type switch
-	{
-		SeedType.Normale => "Seme Normale",
-		SeedType.Poderoso => "Seme Poderoso",
-		SeedType.Fluviale => "Seme Fluviale",
-		SeedType.Florido => "Seme Florido",
-		SeedType.Glaciale => "Seme Glaciale",
-		SeedType.Magmatico => "Seme Magmatico",
-		SeedType.Rapido => "Seme Rapido",
-		SeedType.Puro => "Seme Puro",
-		SeedType.Antico => "Seme Antico",
-		SeedType.Cosmico => "Seme Cosmico",
-		_ => "Seme"
-	};
+    private static string GetNameFromType(SeedType type) => type switch
+    {
+        SeedType.Normale => "Seme Normale",
+        SeedType.Poderoso => "Seme Poderoso",
+        SeedType.Fluviale => "Seme Fluviale",
+        SeedType.Florido => "Seme Florido",
+        SeedType.Glaciale => "Seme Glaciale",
+        SeedType.Magmatico => "Seme Magmatico",
+        SeedType.Rapido => "Seme Rapido",
+        SeedType.Puro => "Seme Puro",
+        SeedType.Antico => "Seme Antico",
+        SeedType.Cosmico => "Seme Cosmico",
+        _ => "Seme"
+    };
 
-	private static SeedRarity GetRarityFromType(SeedType type) => type switch
-	{
-		SeedType.Normale => SeedRarity.Comune,
-		SeedType.Poderoso => SeedRarity.NonComune,
-		SeedType.Fluviale => SeedRarity.NonComune,
-		SeedType.Florido => SeedRarity.NonComune,
-		SeedType.Glaciale => SeedRarity.Raro,
-		SeedType.Magmatico => SeedRarity.Raro,
-		SeedType.Rapido => SeedRarity.Raro,
-		SeedType.Puro => SeedRarity.Epico,
-		SeedType.Antico => SeedRarity.Epico,
-		SeedType.Cosmico => SeedRarity.Leggendario,
-		_ => SeedRarity.Comune
-	};
+    private static SeedRarity GetRarityFromType(SeedType type) => type switch
+    {
+        SeedType.Normale => SeedRarity.Comune,
+        SeedType.Poderoso => SeedRarity.NonComune,
+        SeedType.Fluviale => SeedRarity.NonComune,
+        SeedType.Florido => SeedRarity.NonComune,
+        SeedType.Glaciale => SeedRarity.Raro,
+        SeedType.Magmatico => SeedRarity.Raro,
+        SeedType.Rapido => SeedRarity.Raro,
+        SeedType.Puro => SeedRarity.Epico,
+        SeedType.Antico => SeedRarity.Epico,
+        SeedType.Cosmico => SeedRarity.Leggendario,
+        _ => SeedRarity.Comune
+    };
 
     private static Vector3 GetColorFromType(SeedType type) => type switch
     {
@@ -98,92 +98,182 @@ public class Seed
         _ => new Vector3(0.6f, 0.6f, 0.6f)
     };
 
-	private SeedStats GenStats()
-	{
-		// Calcoliamo i valori di base da cui partire
+    private SeedStats GenStats()
+    {
+        var baseValues = new SeedStats();
 
-		{
-			idratazione			= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.idratazione).ToList()),
-			metabolismo			= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.metabolismo).ToList()),
-			resistenzaCaldo		= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.resistenzaCaldo).ToList()),
-			resistenzaFreddo	= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.resistenzaFreddo).ToList()),
-			resistenzaParassiti = MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.resistenzaParassiti).ToList()),
-			resistenzaVuoto		= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.resistenzaVuoto).ToList()),
-			vegetazione			= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.vegetazione).ToList()),
-			vitalita			= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.vitalita).ToList()),
-		};
-
-		// Calcoliamo i punti da sommare, di base tutti neutrali
-		var additionalValues = new SeedStats()
-		{
-			idratazione			= RandomHelper.Int(-10, 10),
-			metabolismo			= RandomHelper.Int(-10, 10),
-			resistenzaCaldo		= RandomHelper.Int(-10, 10),
-			resistenzaFreddo	= RandomHelper.Int(-10, 10),
-			resistenzaParassiti = RandomHelper.Int(-10, 10),
-			resistenzaVuoto		= RandomHelper.Int(-10, 10),
-			vegetazione			= RandomHelper.Int(-10, 10),
-			vitalita			= RandomHelper.Int(-10, 10),
-		};
-
-		// In base al tipo di seme, ricalcoliamo i punti da sommare come bonus/malus
-		if(this.type == SeedType.Glaciale)
-		{
-			additionalValues.resistenzaFreddo = RandomHelper.Int(10, 25);
-			additionalValues.resistenzaCaldo = RandomHelper.Int(-15, 5);
-		}
-		if(this.type == SeedType.Magmatico)
-		{
-			additionalValues.resistenzaCaldo = RandomHelper.Int(10, 25);
-			additionalValues.resistenzaFreddo = RandomHelper.Int(-15, 5);
-		}
-		if(this.type == SeedType.Rapido)
-		{
-			additionalValues.metabolismo = RandomHelper.Int(10, 25);
-		}
-
-		// TODO - Aggiungere gli altri tipi di seme
+        var allSeeds = Inventario.get().GetAllSeeds();
+        if (allSeeds != null && allSeeds.Count > 0)
+        {
+            baseValues.idratazione          = MathHelper.CalcoloMediaValori(allSeeds.Select(o => o.stats.idratazione).ToList());
+            baseValues.metabolismo          = MathHelper.CalcoloMediaValori(allSeeds.Select(o => o.stats.metabolismo).ToList());
+            baseValues.resistenzaCaldo      = MathHelper.CalcoloMediaValori(allSeeds.Select(o => o.stats.resistenzaCaldo).ToList());
+            baseValues.resistenzaFreddo     = MathHelper.CalcoloMediaValori(allSeeds.Select(o => o.stats.resistenzaFreddo).ToList());
+            baseValues.resistenzaParassiti  = MathHelper.CalcoloMediaValori(allSeeds.Select(o => o.stats.resistenzaParassiti).ToList());
+            baseValues.resistenzaVuoto      = MathHelper.CalcoloMediaValori(allSeeds.Select(o => o.stats.resistenzaVuoto).ToList());
+            baseValues.vegetazione          = MathHelper.CalcoloMediaValori(allSeeds.Select(o => o.stats.vegetazione).ToList());
+            baseValues.vitalita             = MathHelper.CalcoloMediaValori(allSeeds.Select(o => o.stats.vitalita).ToList());
+        }
+        else
+        {
+            // Valori base per il primo seme mai generato
+            baseValues.vitalita = 1.0f;
+            baseValues.idratazione = 1.0f;
+            baseValues.metabolismo = 1.0f;
+            baseValues.vegetazione = 1.0f;
+            baseValues.resistenzaFreddo = 0.0f;
+            baseValues.resistenzaCaldo = 0.0f;
+            baseValues.resistenzaParassiti = 0.0f;
+            baseValues.resistenzaVuoto = 0.0f;
+        }
 
 
-		// Calcola il moltiplicatore in base alla rarità
-		float multiplier = 1.0f;
+        var randomVariation = new SeedStats()
+        {
+            vitalita = RandomHelper.Float(-0.1f, 0.1f),
+            idratazione = RandomHelper.Float(-0.1f, 0.1f),
+            metabolismo = RandomHelper.Float(-0.1f, 0.1f),
+            resistenzaCaldo = RandomHelper.Float(-0.05f, 0.05f),
+            resistenzaFreddo = RandomHelper.Float(-0.05f, 0.05f),
+            resistenzaParassiti = RandomHelper.Float(-0.05f, 0.05f),
+            resistenzaVuoto = RandomHelper.Float(-0.05f, 0.05f),
+            vegetazione = RandomHelper.Float(-0.1f, 0.1f),
+        };
 
-		if(this.rarity == SeedRarity.NonComune)
-			multiplier = 1.1f;
-		else if(this.rarity == SeedRarity.Raro)
-			multiplier = 1.25f;
-		else if(this.rarity == SeedRarity.Epico)
-			multiplier = 1.5f;
-		else if(this.rarity == SeedRarity.Leggendario)
-			multiplier = 2.0f;
+        var typeBonus = GetTypeBonuses(this.type);
 
-		// Applica il multiplier solo se i valori base sono maggiori di 0 (per non penalizzare ulteriormente i valori negativi)
-		float ApplyMultiplier(float value, float multiplier)
-		{
-			return value > 0 ? value * multiplier : value;
-		};
+        float rarityMultiplier = GetRarityMultiplier(this.rarity);
 
-		// Calcola le stast finali facendo la somma dei valori massimi + (valori aggiuntivi moltiplicati per il moltiplicatore)
-		var finalStats = new SeedStats()
-		{
-			vitalita			= (int)(maxValues.vitalita				+ ApplyMultiplier(additionalValues.vitalita, multiplier)),
-			idratazione			= (int)(maxValues.idratazione			+ ApplyMultiplier(additionalValues.idratazione, multiplier)),
-			resistenzaFreddo	= (int)(maxValues.resistenzaFreddo		+ ApplyMultiplier(additionalValues.resistenzaFreddo, multiplier)),
-			resistenzaCaldo		= (int)(maxValues.resistenzaCaldo		+ ApplyMultiplier(additionalValues.resistenzaCaldo, multiplier)),	
-			resistenzaParassiti = (int)(maxValues.resistenzaParassiti	+ ApplyMultiplier(additionalValues.resistenzaParassiti, multiplier)),	
-			vegetazione			= (int)(maxValues.vegetazione			+ ApplyMultiplier(additionalValues.vegetazione, multiplier)),	
-			metabolismo			= (int)(maxValues.metabolismo			+ ApplyMultiplier(additionalValues.metabolismo, multiplier)),	
-			resistenzaVuoto		= (int)(maxValues.resistenzaVuoto		+ ApplyMultiplier(additionalValues.resistenzaVuoto, multiplier)),	
-		};
+        var finalStats = new SeedStats()
+        {
+            vitalita = Math.Max(0.5f, (baseValues.vitalita + randomVariation.vitalita + typeBonus.vitalita) * rarityMultiplier),
+            idratazione = Math.Max(0.3f, (baseValues.idratazione + randomVariation.idratazione + typeBonus.idratazione) * rarityMultiplier),
+            metabolismo = Math.Max(0.5f, (baseValues.metabolismo + randomVariation.metabolismo + typeBonus.metabolismo) * rarityMultiplier),
+            vegetazione = Math.Max(0.5f, (baseValues.vegetazione + randomVariation.vegetazione + typeBonus.vegetazione) * rarityMultiplier),
+            resistenzaFreddo = Math.Clamp((baseValues.resistenzaFreddo + randomVariation.resistenzaFreddo + typeBonus.resistenzaFreddo) * rarityMultiplier, -0.5f, 1.0f),
+            resistenzaCaldo = Math.Clamp((baseValues.resistenzaCaldo + randomVariation.resistenzaCaldo + typeBonus.resistenzaCaldo) * rarityMultiplier, -0.5f, 1.0f),
+            resistenzaParassiti = Math.Clamp((baseValues.resistenzaParassiti + randomVariation.resistenzaParassiti + typeBonus.resistenzaParassiti) * rarityMultiplier, -0.5f, 1.0f),
+            resistenzaVuoto = Math.Clamp((baseValues.resistenzaVuoto + randomVariation.resistenzaVuoto + typeBonus.resistenzaVuoto) * rarityMultiplier, -0.3f, 1.0f),
+        };
 
-		return finalStats;
-	}
+        return finalStats;
+    }
 
-	private SeedStats GenStats(Seed seed1, Seed seed2)
-	{
-		return new SeedStats()
-		{
+    private SeedStats GetTypeBonuses(SeedType type)
+    {
+        return type switch
+        {
+            SeedType.Normale => new SeedStats()
+            {
+                vitalita = RandomHelper.Float(-0.05f, 0.05f),
+                idratazione = RandomHelper.Float(-0.05f, 0.05f),
+                metabolismo = RandomHelper.Float(-0.05f, 0.05f),
+                vegetazione = RandomHelper.Float(-0.05f, 0.05f),
+            },
 
-		};
-	}
+            SeedType.Poderoso => new SeedStats()
+            {
+                vitalita = RandomHelper.Float(0.4f, 0.6f),
+                idratazione = RandomHelper.Float(0.05f, 0.15f),
+                metabolismo = RandomHelper.Float(-0.25f, -0.15f),
+                resistenzaParassiti = RandomHelper.Float(0.05f, 0.15f),
+                vegetazione = RandomHelper.Float(-0.15f, -0.05f),
+            },
+
+            SeedType.Fluviale => new SeedStats()
+            {
+                idratazione = RandomHelper.Float(-0.6f, -0.4f),
+                vegetazione = RandomHelper.Float(0.15f, 0.25f),
+                resistenzaCaldo = RandomHelper.Float(-0.25f, -0.15f),
+                resistenzaFreddo = RandomHelper.Float(0.05f, 0.15f),
+            },
+
+            SeedType.Florido => new SeedStats()
+            {
+                vegetazione = RandomHelper.Float(0.6f, 0.8f),
+                idratazione = RandomHelper.Float(0.2f, 0.3f), 
+                vitalita = RandomHelper.Float(-0.1f, 0.0f),
+                resistenzaParassiti = RandomHelper.Float(-0.2f, -0.1f),
+            },
+
+            SeedType.Glaciale => new SeedStats()
+            {
+                resistenzaFreddo = RandomHelper.Float(0.6f, 0.7f),
+                resistenzaCaldo = RandomHelper.Float(-0.35f, -0.25f),
+                vitalita = RandomHelper.Float(0.05f, 0.15f),
+                idratazione = RandomHelper.Float(-0.2f, -0.1f),
+                metabolismo = RandomHelper.Float(-0.2f, -0.1f),
+                resistenzaVuoto = RandomHelper.Float(0.2f, 0.3f),
+            },
+
+            SeedType.Magmatico => new SeedStats()
+            {
+                resistenzaCaldo = RandomHelper.Float(0.6f, 0.7f),
+                resistenzaFreddo = RandomHelper.Float(-0.35f, -0.25f),
+                vitalita = RandomHelper.Float(0.05f, 0.15f),
+                idratazione = RandomHelper.Float(0.3f, 0.5f),
+                metabolismo = RandomHelper.Float(0.05f, 0.15f),
+                resistenzaParassiti = RandomHelper.Float(0.2f, 0.3f),
+            },
+
+            SeedType.Rapido => new SeedStats()
+            {
+                metabolismo = RandomHelper.Float(0.5f, 0.7f),
+                vitalita = RandomHelper.Float(-0.3f, -0.2f),
+                idratazione = RandomHelper.Float(0.4f, 0.6f), 
+                resistenzaParassiti = RandomHelper.Float(-0.15f, -0.05f),
+            },
+
+            SeedType.Puro => new SeedStats()
+            {
+                resistenzaParassiti = RandomHelper.Float(0.75f, 0.85f),
+                vitalita = RandomHelper.Float(-0.15f, -0.05f),
+                vegetazione = RandomHelper.Float(0.05f, 0.15f),
+            },
+
+            SeedType.Antico => new SeedStats()
+            {
+                vitalita = RandomHelper.Float(0.1f, 0.2f),
+                idratazione = RandomHelper.Float(-0.15f, -0.05f),
+                metabolismo = RandomHelper.Float(-0.15f, -0.05f),
+                resistenzaFreddo = RandomHelper.Float(0.15f, 0.25f),
+                resistenzaCaldo = RandomHelper.Float(0.15f, 0.25f),
+                resistenzaParassiti = RandomHelper.Float(0.15f, 0.25f),
+                vegetazione = RandomHelper.Float(0.05f, 0.15f),
+                resistenzaVuoto = RandomHelper.Float(0.1f, 0.2f),
+            },
+
+            SeedType.Cosmico => new SeedStats()
+            {
+                resistenzaVuoto = RandomHelper.Float(0.65f, 0.75f),
+                resistenzaFreddo = RandomHelper.Float(0.4f, 0.5f),
+                resistenzaCaldo = RandomHelper.Float(0.25f, 0.35f),
+                resistenzaParassiti = RandomHelper.Float(0.3f, 0.4f),
+                idratazione = RandomHelper.Float(-0.45f, -0.35f),
+                metabolismo = RandomHelper.Float(-0.25f, -0.15f),
+                vegetazione = RandomHelper.Float(-0.35f, -0.25f),
+            },
+
+            _ => new SeedStats()
+        };
+    }
+
+    private float GetRarityMultiplier(SeedRarity rarity) => rarity switch
+    {
+        SeedRarity.Comune => 1.0f,
+        SeedRarity.NonComune => 1.1f,   // +10%
+        SeedRarity.Raro => 1.25f,       // +25%
+        SeedRarity.Epico => 1.5f,       // +50%
+        SeedRarity.Leggendario => 2.0f, // +100%
+        _ => 1.0f
+    };
+
+    private SeedStats GenStats(Seed seed1, Seed seed2)
+    {
+        return new SeedStats()
+        {
+
+        };
+    }
+
 }
