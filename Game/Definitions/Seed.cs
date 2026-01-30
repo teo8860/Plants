@@ -49,7 +49,6 @@ public class Seed
 	{
 		this.stats = GenStats(seed1, seed2);
 		this.name = "Seme";
-		this.rarity = SeedRarity.Comune;
 		this.type = SeedType.Normale;
 		this.color = GetColorFromType(this.type);
     }
@@ -102,7 +101,7 @@ public class Seed
 	private SeedStats GenStats()
 	{
 		// Calcoliamo i valori di base da cui partire
-		var maxValues = new SeedStats()
+
 		{
 			idratazione			= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.idratazione).ToList()),
 			metabolismo			= MathHelper.CalcoloMediaValori(Inventario.get().GetAllSeeds().Select(o=> o.stats.metabolismo).ToList()),
