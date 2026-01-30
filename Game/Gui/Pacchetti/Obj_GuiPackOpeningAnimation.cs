@@ -35,7 +35,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
     private const float OPEN_DURATION = 0.5f;
     private const float ROULETTE_SPIN_DURATION = 1.5f;
     private const float ROULETTE_SLOW_DURATION = 2.0f;
-    private const float ROULETTE_STOP_DURATION = 0.8f;
+    private const float ROULETTE_STOP_DURATION = 1.0f;
     private float revealDuration = 2.0f;
 
     // Pack animation
@@ -988,6 +988,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         {
             visualSeed.scale = 8f * revealScale;
             visualSeed.position = center;
+            visualSeed.color = resultSeed.color;
             visualSeed.Draw();
         }
 
