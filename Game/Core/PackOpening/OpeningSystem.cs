@@ -103,7 +103,8 @@ public class OpeningSystem
             .Where(t => new Seed(t).rarity == rarity)
             .ToList();
 
-        if (possibleTypes.Count == 0) return new Seed(SeedType.Normale);
+        if (possibleTypes.Count == 0) 
+            return new Seed(SeedType.Normale);
 
         SeedType chosenType = possibleTypes[Random.Shared.Next(possibleTypes.Count)];
         return new Seed(chosenType);

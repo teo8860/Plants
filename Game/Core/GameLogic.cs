@@ -49,15 +49,15 @@ public class GameLogicPianta
     public SeedStats bonus => pianta.seedBonus;
     public PlantStats stats => pianta.Stats;
 
-    public float VitalitaMax => 1.0f * bonus.Vitalita;
-    public float ConsumoAcquaMult => bonus.Idratazione;
+    public float VitalitaMax => 1.0f * bonus.vitalita;
+    public float ConsumoAcquaMult => bonus.idratazione;
 
-    public float ResistenzaFreddoTotale => Math.Clamp(stats.ResistenzaFreddo + bonus.ResistenzaFreddo, -1f, 1f);
-    public float ResistenzaCaldoTotale => Math.Clamp(stats.ResistenzaCaldo + bonus.ResistenzaCaldo, -1f, 1f);
-    public float ResistenzaParassitiTotale => Math.Clamp(stats.ResistenzaParassiti + bonus.ResistenzaParassiti, -1f, 1f);
+    public float ResistenzaFreddoTotale => Math.Clamp(stats.ResistenzaFreddo + bonus.resistenzaFreddo, -1f, 1f);
+    public float ResistenzaCaldoTotale => Math.Clamp(stats.ResistenzaCaldo + bonus.resistenzaCaldo, -1f, 1f);
+    public float ResistenzaParassitiTotale => Math.Clamp(stats.ResistenzaParassiti + bonus.resistenzaParassiti, -1f, 1f);
 
-    public int FoglieMassime => (int)(stats.FoglieBase * bonus.Vegetazione);
-    public float MetabolismoEffettivo => Math.Clamp(stats.Metabolismo * bonus.Metabolismo, 0.1f, 3f);
+    public int FoglieMassime => (int)(stats.FoglieBase * bonus.vegetazione);
+    public float MetabolismoEffettivo => Math.Clamp(stats.Metabolismo * bonus.metabolismo, 0.1f, 3f);
     public float PercentualeSalute => stats.Salute / VitalitaMax;
 
     public bool IsViva => stats.Salute > 0;

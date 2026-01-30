@@ -310,6 +310,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         }
     }
 
+    int chosenRarity = 0;
     private void UpdatePackOpen(float deltaTime)
     {
         float progress = phaseTimer / OPEN_DURATION;
@@ -322,6 +323,8 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         if (phaseTimer >= OPEN_DURATION)
         {
             currentPhase = PackOpeningPhase.RarityRoulette;
+            chosenRarity = Random.Shared.Next(10000);
+            Console.WriteLine(chosenRarity);
             phaseTimer = 0f;
             rouletteSpeed = 30f; 
             currentRarityIndex = 0f;
@@ -885,15 +888,20 @@ public class Obj_GuiPackOpeningAnimation : GameElement
                 .Where(t => new Seed(t).rarity == rarity)
                 .ToList();
 
-                SeedType chosenType = possibleTypes[Random.Shared.Next(possibleTypes.Count)];                
+                SeedType chosenType = possibleTypes[chosenRarity % possibleTypes.Count];                
 
                 Vector2 boxCenter = new Vector2(scaledX + scaledSize / 2, scaledY + scaledSize / 2);
 
                 visualSeed.position = boxCenter;
                 visualSeed.scale = 3.0f * scale;
-                visualSeed.color = new Seed(chosenType).color; // non riesco ad aggiungere che quando si ferma imposta il colore del seed che esce
 
-                visualSeed.Draw();
+                float totalDuration = ROULETTE_SPIN_DURATION + ROULETTE_SLOW_DURATION + ROULETTE_STOP_DURATION;
+
+                if (phaseTimer >= totalDuration)
+                    visualSeed.color = resultSeed.color;
+                else
+                    visualSeed.color = new Seed(chosenType).color;
+				visualSeed.Draw();
             }
         }
 

@@ -168,6 +168,41 @@ public static class CoordinateHelper
 /// </summary>
 public static class MathHelper
 {
+    public static float CalcoloMediaValori(List<float> valori)
+	{
+		if(valori.Count == 0)
+			return float.NaN;
+
+		var bins = new Dictionary<string, (double a, double b, int count)>();
+
+		foreach(var v in valori)
+		{
+			if(v <= 0)
+				throw new Exception("Valori <= 0 non supportati");
+
+			int exp = (int)Math.Floor(Math.Log10(v));
+			double a = Math.Pow(10, exp);
+			double b = Math.Pow(10, exp + 1);
+			string key = a + "-" + b;
+
+			if(!bins.ContainsKey(key))
+				bins[key] = (a, b, 0);
+
+			bins[key] = (bins[key].a, bins[key].b, bins[key].count + 1);
+		}
+
+		double totale = valori.Count;
+		double risultato = 0;
+
+		foreach(var bin in bins.Values)
+		{
+			double peso = bin.count / totale;
+			double centro = Math.Sqrt(bin.a * bin.b); // centro geometrico
+			risultato += centro * peso;
+		}
+
+		return (float)risultato;
+	}
     /// <summary>
     /// Limita un valore tra min e max
     /// </summary>

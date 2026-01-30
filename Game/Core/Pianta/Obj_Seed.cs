@@ -35,7 +35,6 @@ public class Obj_Seed : GameElement
 
 	public override void Update()
 	{
-		color.Y = 0.6f;
 		time += 0.1;
 	}
 
@@ -47,7 +46,7 @@ public class Obj_Seed : GameElement
 			AssetLoader.shaderSeed.SetValue(un_time, (float)Time.GetTime()*2, ShaderUniformDataType.Float);
 			AssetLoader.shaderSeed.SetValue(un_color, color, ShaderUniformDataType.Vec3);
 			AssetLoader.shaderSeed.SetValueTexture(un_noise, AssetLoader.spriteNoise1.texture);
-
+		
             GameFunctions.DrawSprite(AssetLoader.spriteSeed1, position,0,scale);
 
        Graphics.EndShaderMode();

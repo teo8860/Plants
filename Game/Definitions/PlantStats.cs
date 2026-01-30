@@ -30,25 +30,25 @@ public enum SeedRarity
 
 public struct SeedStats
 {
-    public float Vitalita  { get; set; }
-    public float Idratazione { get; set; }
-    public float ResistenzaFreddo { get; set; }
-    public float ResistenzaCaldo { get; set; }
-    public float ResistenzaParassiti { get; set; }
-    public float Vegetazione { get; set; }
-    public float Metabolismo { get; set; }
-    public float ResistenzaVuoto { get; set; }
+    public float vitalita  { get; set; }
+    public float idratazione { get; set; }
+    public float resistenzaFreddo { get; set; }
+    public float resistenzaCaldo { get; set; }
+    public float resistenzaParassiti { get; set; }
+    public float vegetazione { get; set; }
+    public float metabolismo { get; set; }
+    public float resistenzaVuoto { get; set; }
 
     public SeedStats()
     {
-        Vitalita = 1.0f;
-        Idratazione = 1.0f;
-        ResistenzaFreddo = 0.0f;
-        ResistenzaCaldo = 0.0f;
-        ResistenzaParassiti = 0.0f;
-        Vegetazione = 1.0f;
-        Metabolismo = 1.0f;
-        ResistenzaVuoto = 0.0f;
+        vitalita = 1.0f;
+        idratazione = 1.0f;
+        resistenzaFreddo = 0.0f;
+        resistenzaCaldo = 0.0f;
+        resistenzaParassiti = 0.0f;
+        vegetazione = 1.0f;
+        metabolismo = 1.0f;
+        resistenzaVuoto = 0.0f;
     }
 }
 
@@ -59,57 +59,57 @@ public static class SeedDataType
         { SeedType.Normale, new SeedStats()},
 
         { SeedType.Poderoso, new SeedStats {
-            Vitalita = 1.5f, Idratazione = 1.1f, ResistenzaFreddo = 0.1f,
-            ResistenzaCaldo = 0.1f, ResistenzaParassiti = 0.1f,
-            Vegetazione = 0.9f, Metabolismo = 0.8f, ResistenzaVuoto = 0.1f
+            vitalita = 1.5f, idratazione = 1.1f, resistenzaFreddo = 0.1f,
+            resistenzaCaldo = 0.1f, resistenzaParassiti = 0.1f,
+            vegetazione = 0.9f, metabolismo = 0.8f, resistenzaVuoto = 0.1f
         }},
 
         { SeedType.Fluviale, new SeedStats {
-            Vitalita = 1.0f, Idratazione = 0.5f, ResistenzaFreddo = 0.1f,
-            ResistenzaCaldo = -0.2f, ResistenzaParassiti = 0.0f,
-            Vegetazione = 1.2f, Metabolismo = 1.0f, ResistenzaVuoto = 0.0f
+            vitalita = 1.0f, idratazione = 0.5f, resistenzaFreddo = 0.1f,
+            resistenzaCaldo = -0.2f, resistenzaParassiti = 0.0f,
+            vegetazione = 1.2f, metabolismo = 1.0f, resistenzaVuoto = 0.0f
         }},
 
         { SeedType.Glaciale, new SeedStats {
-            Vitalita = 1.1f, Idratazione = 0.85f, ResistenzaFreddo = 0.65f,
-            ResistenzaCaldo = -0.3f, ResistenzaParassiti = 0.15f,
-            Vegetazione = 0.85f, Metabolismo = 0.85f, ResistenzaVuoto = 0.25f
+            vitalita = 1.1f, idratazione = 0.85f, resistenzaFreddo = 0.65f,
+            resistenzaCaldo = -0.3f, resistenzaParassiti = 0.15f,
+            vegetazione = 0.85f, metabolismo = 0.85f, resistenzaVuoto = 0.25f
         }},
 
         { SeedType.Magmatico, new SeedStats {
-            Vitalita = 1.1f, Idratazione = 1.4f, ResistenzaFreddo = -0.3f,
-            ResistenzaCaldo = 0.65f, ResistenzaParassiti = 0.25f,
-            Vegetazione = 0.8f, Metabolismo = 1.1f, ResistenzaVuoto = 0.15f
+            vitalita = 1.1f, idratazione = 1.4f, resistenzaFreddo = -0.3f,
+            resistenzaCaldo = 0.65f, resistenzaParassiti = 0.25f,
+            vegetazione = 0.8f, metabolismo = 1.1f, resistenzaVuoto = 0.15f
         }},
 
         { SeedType.Puro, new SeedStats {
-            Vitalita = 0.9f, Idratazione = 1.0f, ResistenzaFreddo = 0.0f,
-            ResistenzaCaldo = 0.0f, ResistenzaParassiti = 0.8f,
-            Vegetazione = 1.1f, Metabolismo = 1.0f, ResistenzaVuoto = 0.0f
+            vitalita = 0.9f, idratazione = 1.0f, resistenzaFreddo = 0.0f,
+            resistenzaCaldo = 0.0f, resistenzaParassiti = 0.8f,
+            vegetazione = 1.1f, metabolismo = 1.0f, resistenzaVuoto = 0.0f
         }},
 
         { SeedType.Florido, new SeedStats {
-            Vitalita = 0.95f, Idratazione = 1.25f, ResistenzaFreddo = -0.1f,
-            ResistenzaCaldo = -0.1f, ResistenzaParassiti = -0.15f,
-            Vegetazione = 1.7f, Metabolismo = 1.0f, ResistenzaVuoto = 0.0f
+            vitalita = 0.95f, idratazione = 1.25f, resistenzaFreddo = -0.1f,
+            resistenzaCaldo = -0.1f, resistenzaParassiti = -0.15f,
+            vegetazione = 1.7f, metabolismo = 1.0f, resistenzaVuoto = 0.0f
         }},
 
         { SeedType.Rapido, new SeedStats {
-            Vitalita = 0.75f, Idratazione = 1.5f, ResistenzaFreddo = -0.1f,
-            ResistenzaCaldo = -0.1f, ResistenzaParassiti = -0.1f,
-            Vegetazione = 1.0f, Metabolismo = 1.6f, ResistenzaVuoto = 0.0f
+            vitalita = 0.75f, idratazione = 1.5f, resistenzaFreddo = -0.1f,
+            resistenzaCaldo = -0.1f, resistenzaParassiti = -0.1f,
+            vegetazione = 1.0f, metabolismo = 1.6f, resistenzaVuoto = 0.0f
         }},
 
         { SeedType.Antico, new SeedStats {
-            Vitalita = 1.15f, Idratazione = 0.9f, ResistenzaFreddo = 0.2f,
-            ResistenzaCaldo = 0.2f, ResistenzaParassiti = 0.2f,
-            Vegetazione = 1.1f, Metabolismo = 0.9f, ResistenzaVuoto = 0.15f
+            vitalita = 1.15f, idratazione = 0.9f, resistenzaFreddo = 0.2f,
+            resistenzaCaldo = 0.2f, resistenzaParassiti = 0.2f,
+            vegetazione = 1.1f, metabolismo = 0.9f, resistenzaVuoto = 0.15f
         }},
 
         { SeedType.Cosmico, new SeedStats {
-            Vitalita = 1.0f, Idratazione = 0.6f, ResistenzaFreddo = 0.45f,
-            ResistenzaCaldo = 0.3f, ResistenzaParassiti = 0.35f,
-            Vegetazione = 0.7f, Metabolismo = 0.8f, ResistenzaVuoto = 0.7f
+            vitalita = 1.0f, idratazione = 0.6f, resistenzaFreddo = 0.45f,
+            resistenzaCaldo = 0.3f, resistenzaParassiti = 0.35f,
+            vegetazione = 0.7f, metabolismo = 0.8f, resistenzaVuoto = 0.7f
         }}
     };
 
