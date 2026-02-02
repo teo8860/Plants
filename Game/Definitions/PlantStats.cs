@@ -38,6 +38,7 @@ public struct SeedStats
     public float vegetazione { get; set; }
     public float metabolismo { get; set; }
     public float resistenzaVuoto { get; set; }
+    public int fusionCount { get; set; }
 
     public SeedStats()
     {
@@ -49,6 +50,7 @@ public struct SeedStats
         vegetazione = 1.0f;
         metabolismo = 1.0f;
         resistenzaVuoto = 0.0f;
+        fusionCount = 0;
     }
 }
 

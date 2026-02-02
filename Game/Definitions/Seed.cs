@@ -30,6 +30,12 @@ public class Seed
     }
     public Vector3 color { get; set; }
 
+    public const int MAX_FUSIONS = 4;
+
+    public bool CanBeFused => stats.fusionCount < MAX_FUSIONS;
+
+    public int RemainingFusions => Math.Max(0, MAX_FUSIONS - stats.fusionCount);
+
 
     public Seed()
     {
@@ -48,9 +54,10 @@ public class Seed
     public Seed(Seed seed1, Seed seed2)
     {
 		this.stats = GenStats(seed1, seed2);
-		this.name = "Seme";
-		this.type = SeedType.Normale;
-		this.color = GetColorFromType(this.type);
+		this.name = "Seme ibrido";
+        this.rarity = CalculateBreedingRarity(seed1.rarity, seed2.rarity);
+        this.type = SeedType.Normale; //da capire
+		this.color = BlendColors(seed1.color, seed2.color);
     }
 
     private static string GetNameFromType(SeedType type) => type switch
@@ -154,6 +161,7 @@ public class Seed
             resistenzaCaldo = Math.Clamp((baseValues.resistenzaCaldo + randomVariation.resistenzaCaldo + typeBonus.resistenzaCaldo) * rarityMultiplier, -0.5f, 1.0f),
             resistenzaParassiti = Math.Clamp((baseValues.resistenzaParassiti + randomVariation.resistenzaParassiti + typeBonus.resistenzaParassiti) * rarityMultiplier, -0.5f, 1.0f),
             resistenzaVuoto = Math.Clamp((baseValues.resistenzaVuoto + randomVariation.resistenzaVuoto + typeBonus.resistenzaVuoto) * rarityMultiplier, -0.3f, 1.0f),
+            fusionCount = 0
         };
 
         return finalStats;
@@ -297,6 +305,7 @@ public class Seed
         hybrid.resistenzaCaldo = Math.Clamp(hybrid.resistenzaCaldo, -0.5f, 1.0f);
         hybrid.resistenzaParassiti = Math.Clamp(hybrid.resistenzaParassiti, -0.5f, 1.0f);
         hybrid.resistenzaVuoto = Math.Clamp(hybrid.resistenzaVuoto, -0.3f, 1.0f);
+        hybrid.fusionCount = Math.Max(seed1.stats.fusionCount, seed2.stats.fusionCount) + 1;
 
         return hybrid;
     }

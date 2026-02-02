@@ -17,17 +17,18 @@ public class Obj_GuiSeedDetailPanel : GameElement
     private int selectedSeedIndex = -1;
 
     // Colori stile legno
-    private Color panelColor = new Color(82, 54, 35, 245);        // Marrone medio pannello
-    private Color panelBorder = new Color(62, 39, 25, 255);       // Marrone scuro bordo
-    private Color buttonColor = new Color(101, 67, 43, 255);      // Marrone medio bottone
-    private Color buttonHoverColor = new Color(139, 90, 55, 255); // Marrone chiaro hover
-    private Color buttonBorder = new Color(62, 39, 25, 255);      // Marrone scuro bordo bottone
-    private Color textColor = new Color(245, 235, 220, 255);      // Beige/crema per testo
+    private Color panelColor = new Color(82, 54, 35, 245);
+    private Color panelBorder = new Color(62, 39, 25, 255);
+    private Color buttonColor = new Color(101, 67, 43, 255);
+    private Color buttonHoverColor = new Color(139, 90, 55, 255);
+    private Color buttonActiveColor = new Color(100, 180, 255, 255);
+    private Color buttonBorder = new Color(62, 39, 25, 255);
+    private Color textColor = new Color(245, 235, 220, 255);
 
     private string[] buttonLabels = { "Unisci", "Scarta", "Migliora" };
     private int hoveredButton = -1;
 
-    public Action<int, string> OnButtonClicked; // (seedIndex, buttonName)
+    public Action<int, string> OnButtonClicked;
 
     public Obj_GuiSeedDetailPanel() : base()
     {
@@ -64,7 +65,6 @@ public class Obj_GuiSeedDetailPanel : GameElement
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
         {
             Close();
-            // Nascondi tutto se non siamo in modalità inventario
             return;
         }
 
@@ -106,11 +106,84 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
                 if (clicked)
                 {
-                    OnButtonClicked?.Invoke(selectedSeedIndex, buttonLabels[i]);
+                    HandleButtonClick(i);
                 }
                 break;
             }
         }
+    }
+
+    private void HandleButtonClick(int buttonIndex)
+    {
+        string action = buttonLabels[buttonIndex];
+
+        switch (action)
+        {
+            case "Unisci":
+                HandleFusion();
+                break;
+            case "Scarta":
+                HandleDiscard();
+                break;
+            case "Migliora":
+                HandleUpgrade();
+                break;
+        }
+
+        OnButtonClicked?.Invoke(selectedSeedIndex, action);
+    }
+
+    private void HandleFusion()
+    {
+        var fusionManager = SeedFusionManager.Get();
+
+        if (fusionManager.IsFusionMode)
+        {
+            // Se siamo già in modalità fusione e abbiamo 2 semi selezionati, esegui la fusione
+            if (fusionManager.CanFuse)
+            {
+                Seed fusedSeed = fusionManager.PerformFusion();
+
+                if (fusedSeed != null && Game.inventoryGrid != null)
+                {
+                    // Ripopola la griglia
+                    Game.inventoryGrid.Populate();
+
+                    // Mostra animazione o notifica (opzionale)
+                    Console.WriteLine($"Fusione completata! Nuovo seme: {fusedSeed.name} [{fusedSeed.rarity}]");
+                }
+            }
+            else
+            {
+                // Cancella la modalità fusione
+                fusionManager.StopFusionMode();
+            }
+        }
+        else
+        {
+            // Entra in modalità fusione
+            fusionManager.StartFusionMode();
+        }
+    }
+
+    private void HandleDiscard()
+    {
+        if (selectedSeedIndex < 0) return;
+
+        var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
+        if (seed != null)
+        {
+            Inventario.get().RemoveSeed(seed);
+            Game.inventoryGrid?.Populate();
+            selectedSeedIndex = -1;
+            Console.WriteLine("Seme scartato");
+        }
+    }
+
+    private void HandleUpgrade()
+    {
+        // TODO: Implementare logica di miglioramento
+        Console.WriteLine("Funzione miglioramento non ancora implementata");
     }
 
     public override void Draw()
@@ -118,7 +191,6 @@ public class Obj_GuiSeedDetailPanel : GameElement
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
         {
             Close();
-            // Nascondi tutto se non siamo in modalità inventario
             return;
         }
 
@@ -132,11 +204,11 @@ public class Obj_GuiSeedDetailPanel : GameElement
         Graphics.DrawRectangle(panelX, 0, panelWidth, screenHeight, panelColor);
         Graphics.DrawLine(panelX, 0, panelX, screenHeight, panelBorder);
 
-        // Area stats (placeholder in alto)
+        // Area stats
         int statsAreaHeight = 150;
-        Color statsBoxColor = new Color(62, 39, 25, 220); // Marrone scuro
-        Color statsBoxBorder = new Color(41, 26, 17, 255); // Ombra ancora più scura
-        
+        Color statsBoxColor = new Color(62, 39, 25, 220);
+        Color statsBoxBorder = new Color(41, 26, 17, 255);
+
         Graphics.DrawRectangleRounded(
             new Rectangle(panelX + 10, 15, panelWidth - 20, statsAreaHeight),
             0.1f,
@@ -150,16 +222,68 @@ public class Obj_GuiSeedDetailPanel : GameElement
             2,
             statsBoxBorder
         );
-        
-        // Testo placeholder stats
+
+        // Contenuto stats
         Graphics.DrawText("STATS", panelX + 18, 25, 14, textColor);
+
         if (selectedSeedIndex >= 0)
         {
-            Color subtextColor = new Color(200, 180, 150, 255); // Beige più scuro
-            Graphics.DrawText($"Seme #{selectedSeedIndex + 1}", panelX + 18, 50, 12, subtextColor);
+            var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
+            if (seed != null)
+            {
+                Color subtextColor = new Color(200, 180, 150, 255);
+                Graphics.DrawText($"Seme #{selectedSeedIndex + 1}", panelX + 18, 50, 12, subtextColor);
+
+                // Mostra rarità
+                Color rarityColor = GetRarityColor(seed.rarity);
+                Graphics.DrawText(GetRarityName(seed.rarity), panelX + 18, 70, 11, rarityColor);
+            }
         }
 
-        // Bottoni in basso
+        // Info modalità fusione
+        var fusionManager = SeedFusionManager.Get();
+        if (fusionManager.IsFusionMode)
+        {
+            DrawFusionInfo(panelX, statsAreaHeight + 30);
+        }
+
+        // Bottoni
+        DrawButtons(panelX, screenHeight);
+    }
+
+    private void DrawFusionInfo(int panelX, int startY)
+    {
+        var fusionManager = SeedFusionManager.Get();
+
+        Color infoBoxColor = new Color(100, 180, 255, 100);
+        int boxHeight = 80;
+
+        Graphics.DrawRectangleRounded(
+            new Rectangle(panelX + 10, startY, panelWidth - 20, boxHeight),
+            0.1f, 8, infoBoxColor
+        );
+
+        Graphics.DrawText("FUSIONE", panelX + 18, startY + 8, 12, new Color(255, 255, 255, 255));
+
+        if (fusionManager.CanFuse)
+        {
+            Graphics.DrawText("Semi selezionati: 2", panelX + 18, startY + 28, 9, textColor);
+            Graphics.DrawText("Premi Unisci per", panelX + 18, startY + 43, 9, textColor);
+            Graphics.DrawText("completare", panelX + 18, startY + 58, 9, textColor);
+        }
+        else
+        {
+            int count = fusionManager.SelectedSeed1 != null ? 1 : 0;
+            Graphics.DrawText($"Semi selezionati: {count}/2", panelX + 18, startY + 28, 9, textColor);
+            Graphics.DrawText("Seleziona 2 semi", panelX + 18, startY + 43, 9, textColor);
+            Graphics.DrawText("dalla griglia", panelX + 18, startY + 58, 9, textColor);
+        }
+    }
+
+    private void DrawButtons(int panelX, int screenHeight)
+    {
+        var fusionManager = SeedFusionManager.Get();
+
         int buttonHeight = 36;
         int buttonSpacing = 16;
         int buttonMargin = 12;
@@ -172,7 +296,16 @@ public class Obj_GuiSeedDetailPanel : GameElement
             int btnY = buttonsStartY + i * (buttonHeight + buttonSpacing);
             int btnWidth = panelWidth - buttonMargin * 2;
 
-            Color bg = (i == hoveredButton) ? buttonHoverColor : buttonColor;
+            // Colore bottone speciale per "Unisci" in modalità fusione
+            Color bg = buttonColor;
+            if (i == 0 && fusionManager.IsFusionMode) // Bottone "Unisci"
+            {
+                bg = buttonActiveColor;
+            }
+            else if (i == hoveredButton)
+            {
+                bg = buttonHoverColor;
+            }
 
             Graphics.DrawRectangleRounded(
                 new Rectangle(btnX, btnY, btnWidth, buttonHeight),
@@ -189,10 +322,37 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 buttonBorder
             );
 
-            int textWidth = buttonLabels[i].Length * 7;
+            // Testo del bottone
+            string label = buttonLabels[i];
+            if (i == 0 && fusionManager.IsFusionMode && fusionManager.CanFuse)
+            {
+                label = "FONDI!";
+            }
+
+            int textWidth = label.Length * 7;
             int textX = btnX + (btnWidth - textWidth) / 2;
             int textY = btnY + (buttonHeight - 14) / 2;
-            Graphics.DrawText(buttonLabels[i], textX, textY, 14, textColor);
+            Graphics.DrawText(label, textX, textY, 14, textColor);
         }
     }
+
+    private Color GetRarityColor(SeedRarity rarity) => rarity switch
+    {
+        SeedRarity.Comune => new Color(200, 200, 200, 255),
+        SeedRarity.NonComune => new Color(80, 200, 80, 255),
+        SeedRarity.Raro => new Color(80, 150, 255, 255),
+        SeedRarity.Epico => new Color(180, 80, 255, 255),
+        SeedRarity.Leggendario => new Color(255, 180, 50, 255),
+        _ => Color.White
+    };
+
+    private string GetRarityName(SeedRarity rarity) => rarity switch
+    {
+        SeedRarity.Comune => "Comune",
+        SeedRarity.NonComune => "Non Comune",
+        SeedRarity.Raro => "Raro",
+        SeedRarity.Epico => "Epico",
+        SeedRarity.Leggendario => "Leggendario",
+        _ => "???"
+    };
 }
