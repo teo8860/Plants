@@ -111,7 +111,7 @@ public class Obj_GuiCompostPanel : GameElement
                         Inventario.get().AddSeed(seed);
                         Console.WriteLine($"Pacchetto aperto! Ricevuto: {seed}");
 
-                        Game.packOpening.StartAnimation(seed);
+                        Game.packOpening.StartAnimation(seed, packages[i].Rarity);
 
                         break;
                     }

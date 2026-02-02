@@ -84,6 +84,17 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         { SeedRarity.Leggendario, new Color(255, 180, 50, 255) }
     };
 
+    // Rarity Package colors
+    private Dictionary<SeedPackageRarity, Color> rarityPackageColors = new()
+    {
+        { SeedPackageRarity.Common, new Color(200, 200, 200, 255) },
+        { SeedPackageRarity.Uncommon, new Color(80, 200, 80, 255) },
+        { SeedPackageRarity.Rare, new Color(80, 150, 255, 255) },
+        { SeedPackageRarity.Epic, new Color(180, 80, 255, 255) },
+        { SeedPackageRarity.Legendary, new Color(255, 180, 50, 255) }
+    };
+
+
     // UI
     private bool canSkip = false;
     private float skipButtonAlpha = 0f;
@@ -765,7 +776,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
     private void DrawPack(Vector2 shakeOffset)
     {
         Vector2 pos = packPosition + packOffset + shakeOffset;
-        Color rarityColor = rarityColors[resultSeed.rarity];
+        Color rarityColor = rarityPackageColors[packageRarity];
 
         if (currentPhase == PackOpeningPhase.PackShake)
         {

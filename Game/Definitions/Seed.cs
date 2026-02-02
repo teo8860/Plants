@@ -270,10 +270,120 @@ public class Seed
 
     private SeedStats GenStats(Seed seed1, Seed seed2)
     {
-        return new SeedStats()
-        {
 
+        var hybrid = new SeedStats();
+
+        hybrid.vitalita = BreedStat(seed1.stats.vitalita, seed2.stats.vitalita, 0.05f);
+        hybrid.idratazione = BreedStat(seed1.stats.idratazione, seed2.stats.idratazione, 0.05f);
+        hybrid.metabolismo = BreedStat(seed1.stats.metabolismo, seed2.stats.metabolismo, 0.05f);
+        hybrid.vegetazione = BreedStat(seed1.stats.vegetazione, seed2.stats.vegetazione, 0.05f);
+        hybrid.resistenzaFreddo = BreedStat(seed1.stats.resistenzaFreddo, seed2.stats.resistenzaFreddo, 0.05f);
+        hybrid.resistenzaCaldo = BreedStat(seed1.stats.resistenzaCaldo, seed2.stats.resistenzaCaldo, 0.05f);
+        hybrid.resistenzaParassiti = BreedStat(seed1.stats.resistenzaParassiti, seed2.stats.resistenzaParassiti, 0.05f);
+        hybrid.resistenzaVuoto = BreedStat(seed1.stats.resistenzaVuoto, seed2.stats.resistenzaVuoto, 0.05f);
+
+        float compatibilityBonus = CalculateCompatibilityBonus(seed1, seed2);
+        if (compatibilityBonus > 0)
+        {
+            hybrid.vitalita *= (1f + compatibilityBonus * 0.1f);
+            hybrid.metabolismo *= (1f + compatibilityBonus * 0.1f);
+        }
+
+        hybrid.vitalita = Math.Max(0.5f, hybrid.vitalita);
+        hybrid.idratazione = Math.Max(0.3f, hybrid.idratazione);
+        hybrid.metabolismo = Math.Max(0.5f, hybrid.metabolismo);
+        hybrid.vegetazione = Math.Max(0.5f, hybrid.vegetazione);
+        hybrid.resistenzaFreddo = Math.Clamp(hybrid.resistenzaFreddo, -0.5f, 1.0f);
+        hybrid.resistenzaCaldo = Math.Clamp(hybrid.resistenzaCaldo, -0.5f, 1.0f);
+        hybrid.resistenzaParassiti = Math.Clamp(hybrid.resistenzaParassiti, -0.5f, 1.0f);
+        hybrid.resistenzaVuoto = Math.Clamp(hybrid.resistenzaVuoto, -0.3f, 1.0f);
+
+        return hybrid;
+    }
+
+    private float BreedStat(float stat1, float stat2, float mutationChance)
+    {
+        float better = Math.Max(stat1, stat2);
+        float worse = Math.Min(stat1, stat2);
+
+        float bred = better * 0.7f + worse * 0.3f;
+
+        if (RandomHelper.Float(0, 1) < mutationChance)
+        {
+            float mutation = RandomHelper.Float(-0.15f, 0.15f);
+            bred += bred * mutation;
+        }
+
+        return bred;
+    }
+
+    private float CalculateCompatibilityBonus(Seed seed1, Seed seed2)
+    {
+        float bonus = 0f;
+
+        int rarityDiff = Math.Abs((int)seed1.rarity - (int)seed2.rarity);
+        if (rarityDiff == 0)
+            bonus += 0.3f;
+        else if (rarityDiff == 1)
+            bonus += 0.15f; 
+
+        if (AreTypesComplementary(seed1.type, seed2.type))
+            bonus += 0.2f;
+
+        return bonus;
+    }
+
+    private bool AreTypesComplementary(SeedType type1, SeedType type2)
+    {
+        var complementaryPairs = new List<(SeedType, SeedType)>
+        {
+            (SeedType.Glaciale, SeedType.Magmatico),
+            (SeedType.Fluviale, SeedType.Florido),
+            (SeedType.Rapido, SeedType.Poderoso),
+            (SeedType.Puro, SeedType.Antico),
         };
+
+        foreach (var pair in complementaryPairs)
+        {
+            if ((type1 == pair.Item1 && type2 == pair.Item2) ||
+                (type1 == pair.Item2 && type2 == pair.Item1))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private SeedRarity CalculateBreedingRarity(SeedRarity rarity1, SeedRarity rarity2)
+    {
+        int avgRarity = ((int)rarity1 + (int)rarity2) / 2;
+
+        int higherRarity = Math.Max((int)rarity1, (int)rarity2);
+        if (RandomHelper.Float(0, 1) < 0.2f)
+        {
+            avgRarity = higherRarity;
+        }
+
+        if (RandomHelper.Float(0, 1) < 0.05f && avgRarity < (int)SeedRarity.Leggendario)
+        {
+            avgRarity++;
+        }
+
+        return (SeedRarity)Math.Clamp(avgRarity, 0, (int)SeedRarity.Leggendario);
+    }
+
+    private Vector3 BlendColors(Vector3 color1, Vector3 color2)
+    {
+        float r = (color1.X + color2.X) / 2f + RandomHelper.Float(-0.1f, 0.1f);
+        float g = (color1.Y + color2.Y) / 2f + RandomHelper.Float(-0.1f, 0.1f);
+        float b = (color1.Z + color2.Z) / 2f + RandomHelper.Float(-0.1f, 0.1f);
+
+        return new Vector3(
+            Math.Clamp(r, 0f, 1f),
+            Math.Clamp(g, 0f, 1f),
+            Math.Clamp(b, 0f, 1f)
+        );
     }
 
 }
