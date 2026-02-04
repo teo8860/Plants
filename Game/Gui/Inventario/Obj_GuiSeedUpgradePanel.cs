@@ -41,24 +41,18 @@ public class Obj_GuiSeedUpgradePanel : GameElement
     {
         SeedStatType.Vitalita,
         SeedStatType.Idratazione,
-        SeedStatType.ResistenzaFreddo,
-        SeedStatType.ResistenzaCaldo,
         SeedStatType.ResistenzaParassiti,
         SeedStatType.Vegetazione,
-        SeedStatType.Metabolismo,
-        SeedStatType.ResistenzaVuoto
+        SeedStatType.Metabolismo
     };
 
     private static readonly string[] StatNames = new[]
     {
         "Vitalità",
         "Idratazione",
-        "Res. Freddo",
-        "Res. Caldo",
         "Res. Parassiti",
         "Vegetazione",
-        "Metabolismo",
-        "Res. Vuoto"
+        "Metabolismo"
     };
 
     public Obj_GuiSeedUpgradePanel()
