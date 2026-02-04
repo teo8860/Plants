@@ -29,6 +29,8 @@ public class Seed
         }
     }
     public Vector3 color { get; set; }
+    public int upgradeLevel { get; set; } = 0;
+    public List<SeedStatType> upgradedStats { get; set; }
 
     public const int MAX_FUSIONS = 4;
 
@@ -48,6 +50,8 @@ public class Seed
         this.type = type;
         this.color = GetColorFromType(type);
         this.stats = GenStats();
+        this.upgradeLevel = 0;
+        this.upgradedStats = new List<SeedStatType>();
     }
 
 
@@ -58,6 +62,8 @@ public class Seed
         this.rarity = CalculateBreedingRarity(seed1.rarity, seed2.rarity);
         this.type = SeedType.Normale; //da capire
 		this.color = BlendColors(seed1.color, seed2.color);
+        this.upgradeLevel = 0;
+        this.upgradedStats = new List<SeedStatType>();
     }
 
     private static string GetNameFromType(SeedType type) => type switch
@@ -281,14 +287,14 @@ public class Seed
 
         var hybrid = new SeedStats();
 
-        hybrid.vitalita = BreedStat(seed1.stats.vitalita, seed2.stats.vitalita, 0.05f);
-        hybrid.idratazione = BreedStat(seed1.stats.idratazione, seed2.stats.idratazione, 0.05f);
-        hybrid.metabolismo = BreedStat(seed1.stats.metabolismo, seed2.stats.metabolismo, 0.05f);
-        hybrid.vegetazione = BreedStat(seed1.stats.vegetazione, seed2.stats.vegetazione, 0.05f);
-        hybrid.resistenzaFreddo = BreedStat(seed1.stats.resistenzaFreddo, seed2.stats.resistenzaFreddo, 0.05f);
-        hybrid.resistenzaCaldo = BreedStat(seed1.stats.resistenzaCaldo, seed2.stats.resistenzaCaldo, 0.05f);
-        hybrid.resistenzaParassiti = BreedStat(seed1.stats.resistenzaParassiti, seed2.stats.resistenzaParassiti, 0.05f);
-        hybrid.resistenzaVuoto = BreedStat(seed1.stats.resistenzaVuoto, seed2.stats.resistenzaVuoto, 0.05f);
+        hybrid.vitalita = BreedStat(seed1.stats.vitalita, seed2.stats.vitalita, 0.5f);
+        hybrid.idratazione = BreedStat(seed1.stats.idratazione, seed2.stats.idratazione, 0.5f);
+        hybrid.metabolismo = BreedStat(seed1.stats.metabolismo, seed2.stats.metabolismo, 0.5f);
+        hybrid.vegetazione = BreedStat(seed1.stats.vegetazione, seed2.stats.vegetazione, 0.5f);
+        hybrid.resistenzaFreddo = BreedStat(seed1.stats.resistenzaFreddo, seed2.stats.resistenzaFreddo, 0.3f);
+        hybrid.resistenzaCaldo = BreedStat(seed1.stats.resistenzaCaldo, seed2.stats.resistenzaCaldo, 0.3f);
+        hybrid.resistenzaParassiti = BreedStat(seed1.stats.resistenzaParassiti, seed2.stats.resistenzaParassiti, 0.3f);
+        hybrid.resistenzaVuoto = BreedStat(seed1.stats.resistenzaVuoto, seed2.stats.resistenzaVuoto, 0.1f);
 
         float compatibilityBonus = CalculateCompatibilityBonus(seed1, seed2);
         if (compatibilityBonus > 0)

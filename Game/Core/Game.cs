@@ -44,6 +44,7 @@ public static class Game
     public static Obj_GuiSeedDetailPanel seedDetailPanel;
     public static Obj_GuiInventoryCrates inventoryCrates;
     public static Obj_GuiInventoryCratesBackground inventoryCratesBackground;
+    public static Obj_GuiSeedUpgradePanel seedUpgradePanel;
 
     public static Obj_GuiCompostPanel compostPanel;
     public static Obj_GuiCompostBackground compostBackground;
@@ -165,6 +166,8 @@ public static class Game
         inventoryGrid = new Obj_GuiInventoryGrid();
 
         seedDetailPanel = new Obj_GuiSeedDetailPanel();
+
+        seedUpgradePanel = new Obj_GuiSeedUpgradePanel();
 
         // Collega il pannello alla griglia per dimensionamento dinamico
         inventoryGrid.detailPanel = seedDetailPanel;

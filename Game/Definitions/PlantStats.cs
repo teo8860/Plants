@@ -28,6 +28,18 @@ public enum SeedRarity
     Mitico
 }
 
+public enum SeedStatType
+{
+    Vitalita,
+    Idratazione,
+    ResistenzaFreddo,
+    ResistenzaCaldo,
+    ResistenzaParassiti,
+    Vegetazione,
+    Metabolismo,
+    ResistenzaVuoto
+}
+
 public struct SeedStats
 {
     public float vitalita  { get; set; }

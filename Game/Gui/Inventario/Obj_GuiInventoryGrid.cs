@@ -101,7 +101,7 @@ public class Obj_GuiInventoryGrid : GameElement
             {
                 roomId = Game.room_inventory.id,
                 scale = 1.8f,
-                depth = -1000,
+                depth = -50,
                 position = new Vector2(x + (cellSize / 2), y + (cellSize / 2))
             };
             Seed seedInfo = filteredSeeds[i];

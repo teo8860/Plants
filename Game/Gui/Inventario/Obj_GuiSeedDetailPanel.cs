@@ -182,8 +182,16 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
     private void HandleUpgrade()
     {
-        // TODO: Implementare logica di miglioramento
-        Console.WriteLine("Funzione miglioramento non ancora implementata");
+        if (selectedSeedIndex < 0) return;
+
+        var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
+        if (seed == null) return;
+
+        // Apri la schermata di upgrade
+        if (Game.seedUpgradePanel != null)
+        {
+            Game.seedUpgradePanel.OpenForSeed(seed, selectedSeedIndex);
+        }
     }
 
     public override void Draw()
