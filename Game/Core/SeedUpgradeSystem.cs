@@ -20,10 +20,10 @@ public static class SeedUpgradeSystem
     private static readonly Dictionary<SeedRarity, int> MaxUpgradeLevels = new()
     {
         { SeedRarity.Comune, 5 },
-        { SeedRarity.NonComune, 8 },
-        { SeedRarity.Raro, 12 },
-        { SeedRarity.Epico, 16 },
-        { SeedRarity.Leggendario, 20 }
+        { SeedRarity.NonComune, 7 },
+        { SeedRarity.Raro, 9 },
+        { SeedRarity.Epico, 11 },
+        { SeedRarity.Leggendario, 13 }
     };
 
     // Range di essenza base per rarità (min-max)
@@ -37,7 +37,7 @@ public static class SeedUpgradeSystem
     };
 
     // Bonus per stat per livello
-    private const float STAT_BONUS_PER_LEVEL = 0.05f; // +5% per livello
+    private const float STAT_BONUS_PER_LEVEL = 5f; // +5% per livello
 
     public static int SacrificeSeed(Seed seed)
     {
@@ -49,15 +49,16 @@ public static class SeedUpgradeSystem
         if (seed.upgradeLevel > 0)
         {
             int totalLevels = seed.upgradeLevel;
-            essenceGained += totalLevels * 5; // +5 essenza per livello
+            essenceGained += totalLevels * 25; // +25 essenza per livello
         }
-
-        Essence += essenceGained;
+        
+        SetEssence(Essence+essenceGained);
 
         // Rimuovi dall'inventario
         Inventario.get().RemoveSeed(seed);
+        Inventario.get().Save();
 
-        return essenceGained;
+		return essenceGained;
     }
 
     private static int CalculateSeedEssenceValue(Seed seed)
@@ -156,21 +157,24 @@ public static class SeedUpgradeSystem
             return false;
 
         int cost = GetUpgradeCost(seed);
-        Essence -= cost;
+        SetEssence(Essence-cost);
 
-        //ApplyStatBonus(seed, stats);
-
+        
         seed.upgradeLevel += 1;
         seed.upgradedStats.Add(stats);
+
+        ApplyStatBonus(seed, stats);
 
         return true;
     }
 
-  /*  public static void ApplyStatBonus(Seed seed, SeedStatType stat)
+    public static void ApplyStatBonus(Seed seed, SeedStatType stat)
     {
-        float multiplier = GetStatLevel(seed, stat) + STAT_BONUS_PER_LEVEL;
-
-        switch (stat)
+        float level = GetStatLevel(seed, stat);
+        float percentage = (STAT_BONUS_PER_LEVEL / 100 ) * level;
+        float multiplier = level + percentage;
+   
+		switch (stat)
         {
             case SeedStatType.Vitalita:
                 seed.stats.vitalita *= multiplier;
@@ -205,7 +209,7 @@ public static class SeedUpgradeSystem
                 break;
         }
     }
-  */
+  
 
     public static int GetMaxUpgradeLevel(Seed seed)
     {
@@ -214,12 +218,18 @@ public static class SeedUpgradeSystem
 
     public static int GetStatLevel(Seed seed, SeedStatType stats)
     {
-        if (seed.upgradedStats.Count == 0)
+        if (seed.upgradedStats.Count(x => x == stats) == 0)
         {
             return 0;
         }
 
         return seed.upgradedStats.Count(x => x == stats);
     }
+
+	internal static void SetEssence(int essence)
+	{
+		SeedUpgradeSystem.Essence = essence;
+        GameSave.get().data.essence = essence;
+	}
 }
 

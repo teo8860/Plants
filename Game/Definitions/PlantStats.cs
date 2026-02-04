@@ -40,7 +40,7 @@ public enum SeedStatType
     ResistenzaVuoto
 }
 
-public struct SeedStats
+public class SeedStats
 {
     public float vitalita  { get; set; }
     public float idratazione { get; set; }

@@ -4,6 +4,7 @@ using Raylib_CSharp.Windowing;
 using Raylib_CSharp.Colors;
 using System;
 using System.Timers;
+using System.Numerics;
 
 namespace Plants;
 
@@ -75,7 +76,62 @@ public static class Game
 
 		
 		tutorial.StartTutorial();
+        seedTest();
+        
+	}
 
+    private static void seedTest()
+    {
+        Obj_Seed s;
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Normale });
+        s.position = new Vector2(100, 100);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Poderoso });
+        s.position = new Vector2(150, 100);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Fluviale });
+        s.position = new Vector2(200, 100);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Glaciale });
+        s.position = new Vector2(250, 100);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Magmatico });
+        s.position = new Vector2(100, 150);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Puro });
+        s.position = new Vector2(150, 150);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Florido });
+        s.position = new Vector2(200, 150);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Rapido });
+        s.position = new Vector2(250, 150);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Antico });
+        s.position = new Vector2(100, 200);
+        s.scale = 2.0f;
+
+        
+        s = new Obj_Seed(new Seed(){ type = SeedType.Cosmico });
+        s.position = new Vector2(150, 200);
+        s.scale = 2.0f;
     }
 
     private static void InitMainGame()

@@ -51,6 +51,7 @@ public class Obj_GuiInventoryGrid : GameElement
     {
         rarityFilter = rarity;
         UpdateFilteredSeeds();
+        Populate();
     }
 
     public void ClearRarityFilter()
@@ -86,10 +87,10 @@ public class Obj_GuiInventoryGrid : GameElement
 
         UpdateFilteredSeeds();
 
-        visualSeedList.Clear();
+        visualSeedList.ForEach(seed => seed.Destroy());
+		visualSeedList.Clear();
 
         int columns = GetCurrentColumns();
-
         for (int i = 0; i < filteredSeeds.Count; i++)
         {
             int col = i % columns;

@@ -21,7 +21,13 @@ public class Obj_Seed : GameElement
 
 	int un_time = AssetLoader.shaderSeed.GetLocation("time");
 	int un_color = AssetLoader.shaderSeed.GetLocation("color");
-	int un_noise = AssetLoader.shaderSeed.GetLocation("noise");
+	int un_type = AssetLoader.shaderSeed.GetLocation("type");
+	int un_noise1 = AssetLoader.shaderSeed.GetLocation("tex_noise1");
+	int un_noise2 = AssetLoader.shaderSeed.GetLocation("tex_noise2");
+	int un_noise3 = AssetLoader.shaderSeed.GetLocation("tex_noise3");
+	int un_noise4 = AssetLoader.shaderSeed.GetLocation("tex_noise4");
+	int un_noise5 = AssetLoader.shaderSeed.GetLocation("tex_noise5");
+	int un_noise6 = AssetLoader.shaderSeed.GetLocation("tex_noise6");
 
 	public Obj_Seed()
 	{
@@ -45,7 +51,13 @@ public class Obj_Seed : GameElement
 		
 			AssetLoader.shaderSeed.SetValue(un_time, (float)Time.GetTime()*2, ShaderUniformDataType.Float);
 			AssetLoader.shaderSeed.SetValue(un_color, color, ShaderUniformDataType.Vec3);
-			AssetLoader.shaderSeed.SetValueTexture(un_noise, AssetLoader.spriteNoise1.texture);
+			AssetLoader.shaderSeed.SetValue(un_type, dati.type, ShaderUniformDataType.Int);
+			AssetLoader.shaderSeed.SetValueTexture(un_noise1, AssetLoader.spriteNoise1.texture);
+			AssetLoader.shaderSeed.SetValueTexture(un_noise2, AssetLoader.spriteNoise2.texture);
+			AssetLoader.shaderSeed.SetValueTexture(un_noise3, AssetLoader.spriteNoise3.texture);
+			AssetLoader.shaderSeed.SetValueTexture(un_noise4, AssetLoader.spriteNoise4.texture);
+			AssetLoader.shaderSeed.SetValueTexture(un_noise5, AssetLoader.spriteNoise5.texture);
+			AssetLoader.shaderSeed.SetValueTexture(un_noise6, AssetLoader.spriteNoise6.texture);
 		
             GameFunctions.DrawSprite(AssetLoader.spriteSeed1, position,0,scale);
 

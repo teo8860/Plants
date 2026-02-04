@@ -13,8 +13,9 @@ public class GameSaveData
     public DayPhase CurrentPhase   { get; set; }
     public DateTime SaveTime   { get; set; }
     public string Version { get; set; }
+    public int essence { get; set; }
 
-    public GameSaveData()
+	public GameSaveData()
     {
         Version = "1.0.0";
     }
@@ -61,8 +62,9 @@ public class GameSave
         WorldManager.SetWorldDifficulty(saveData.CurrentWorld, saveData.CurrentDifficulty);
         WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
+        SeedUpgradeSystem.SetEssence(saveData.essence);
 
-    }
+	}
 
 
     public static void DeleteSaveFile()
