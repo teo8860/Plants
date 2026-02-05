@@ -36,6 +36,15 @@ public static class SeedUpgradeSystem
         { SeedRarity.Leggendario, (350, 450) }
     };
 
+    private static readonly Dictionary<int, float> BonusPerTier = new()
+{
+    { 0, 10f },  
+    { 1, 8f },  
+    { 2, 7f },  
+    { 3, 6f },  
+    { 4, 5f }   
+};
+
     // Bonus per stat per livello
     private const float STAT_BONUS_PER_LEVEL = 5f; // +5% per livello
 
@@ -170,46 +179,49 @@ public static class SeedUpgradeSystem
 
     public static void ApplyStatBonus(Seed seed, SeedStatType stat)
     {
-        float level = GetStatLevel(seed, stat);
-        float percentage = (STAT_BONUS_PER_LEVEL / 100 ) * level;
-        float multiplier = level + percentage;
+        int level = GetStatLevel(seed, stat);
+        float percentage = (STAT_BONUS_PER_LEVEL + GetBonusForLevel(level)) / 100;
+        float multiplier = level * percentage;
    
 		switch (stat)
         {
             case SeedStatType.Vitalita:
-                seed.stats.vitalita *= multiplier;
+                seed.stats.vitalita += seed.stats.vitalita * multiplier;
                 break;
 
             case SeedStatType.Idratazione:
-                seed.stats.idratazione *= multiplier;
-                break;
-
-            case SeedStatType.ResistenzaFreddo:
-                seed.stats.resistenzaFreddo *= multiplier;
-                break;
-
-            case SeedStatType.ResistenzaCaldo:
-                seed.stats.resistenzaCaldo *= multiplier;
+                seed.stats.idratazione += seed.stats.idratazione * multiplier;
                 break;
 
             case SeedStatType.ResistenzaParassiti:
-                seed.stats.resistenzaParassiti *= multiplier;
+                seed.stats.resistenzaParassiti += seed.stats.resistenzaParassiti * multiplier;
                 break;
 
             case SeedStatType.Vegetazione:
-                seed.stats.vegetazione *= multiplier;
+                seed.stats.vegetazione += seed.stats.vegetazione * multiplier;
                 break;
 
             case SeedStatType.Metabolismo:
-                seed.stats.metabolismo *= multiplier;
-                break;
-
-            case SeedStatType.ResistenzaVuoto:
-                seed.stats.resistenzaVuoto *= multiplier;
+                seed.stats.metabolismo += seed.stats.metabolismo * multiplier;
                 break;
         }
     }
-  
+
+    private static int GetCurrentTier(int level)
+    {
+        if (level < 5) return 0;
+        if (level < 7) return 1;
+        if (level < 9) return 2;
+        if (level < 11) return 3;
+        return 4;
+    }
+
+    private static float GetBonusForLevel(int level)
+    {
+        int tier = GetCurrentTier(level);
+        return BonusPerTier.GetValueOrDefault(tier, 0.03f);
+    }
+
 
     public static int GetMaxUpgradeLevel(Seed seed)
     {
