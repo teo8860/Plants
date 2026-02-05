@@ -162,6 +162,8 @@ public static class Game
 
     private static void InitGui()
     {
+
+
         GameElement.Create<Obj_GuiScrollbar>(100);
 
         statsPanel = new Obj_GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
@@ -208,6 +210,8 @@ public static class Game
                 WorldManager.SetNextWorld();
             }
         );
+
+        GameElement.Create<Obj_GuiBottomNavigation>(-600);
     }
 
     private static void InitInventory()
