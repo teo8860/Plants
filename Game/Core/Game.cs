@@ -249,7 +249,7 @@ public static class Game
 
     public static void SetTimer()
     {
-        Timer = new Timer(500); //1000
+        Timer = new Timer(1000); //1000
         Timer.Elapsed += OnTimedEvent;
         Timer.AutoReset = true;
         Timer.Enabled = true;

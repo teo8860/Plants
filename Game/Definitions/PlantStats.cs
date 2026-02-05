@@ -180,22 +180,22 @@ public static class SeedDataType
 
 public class PlantStats
 {
-    public float Salute = 1f;
-    public float Idratazione = 0.4f;
-    public float Ossigeno = 1.0f;
-    public float Metabolismo = 0.8f;
-    public float Temperatura = 20.0f;
-    public float ResistenzaFreddo = 0.0f;
-    public float ResistenzaCaldo = 0.0f;
-    public float ResistenzaParassiti = 0.0f;
-    public float ResistenzaVuoto = 0.0f;
-    public int FoglieBase = 120;
-    public int FoglieAttuali = 1000;
-    public float DropRateFoglie = 0.003f;
-    public float Altezza = 0.0f;
-    public float AltezzaMassima = 5000.0f;
-    public bool Infestata = false;
-    public float IntensitaInfestazione = 0.0f;
+    public float Salute { get; set; } = 1f;
+    public float Idratazione { get; set; } = 0.4f;
+    public float Ossigeno { get; set; } = 1.0f;
+    public float Metabolismo { get; set; } = 1.0f;
+    public float Temperatura { get; set; } = 20.0f;
+    public float ResistenzaFreddo { get; set; } = 0.0f;
+    public float ResistenzaCaldo { get; set; } = 0.0f;
+    public float ResistenzaParassiti { get; set; } = 0.0f;
+    public float ResistenzaVuoto { get; set; } = 0.0f;
+    public int FoglieBase { get; set; } = 100;
+    public int FoglieAttuali { get; set; } = 0;
+    public float DropRateFoglie { get; set; } = 0.003f;
+    public float Altezza { get; set; } = 0.0f;
+    public float AltezzaMassima { get; set; } = 5000.0f;
+    public bool Infestata { get; set; } = false;
+    public float IntensitaInfestazione { get; set; } = 0.0f;
 
     public float EffectiveMaxHeight => AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier;
    
@@ -208,7 +208,7 @@ public class PlantStats
         Idratazione = Math.Clamp(Idratazione, 0f, 1f);
         Ossigeno = Math.Clamp(Ossigeno, 0f, 1f);
         Metabolismo = Math.Clamp(Metabolismo, 0f, 2f);
-        FoglieAttuali = Math.Clamp(FoglieAttuali, 0, FoglieBase * 3);
+        FoglieAttuali = Math.Clamp(FoglieAttuali, 0, FoglieBase);
         IntensitaInfestazione = Math.Clamp(IntensitaInfestazione, 0f, 1f);
     }
 }
