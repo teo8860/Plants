@@ -35,16 +35,16 @@ public class Obj_Controller : GameElement
         }
 
         Vector2 mouse = Input.GetMousePosition();
-        mouse = CoordinateHelper.ToWorld(mouse);
-
-
-        if (Input.IsMouseButtonDown(MouseButton.Right))
+        Console.WriteLine(mouse);
+		mouse = CoordinateHelper.ToWorld(mouse, Rendering.camera.position);
+        
+		if (Input.IsMouseButtonDown(MouseButton.Right))
         {
             isButtonRightPressed = true;
             if (annaffiatoioAttivo)
             {
-            Game.innaffiatoio.EmitParticle(mouse);
-            Game.pianta.proprieta.Annaffia(0.01f);
+                Game.innaffiatoio.EmitParticle(mouse);
+                Game.pianta.proprieta.Annaffia(0.01f);
             }
         }
         else

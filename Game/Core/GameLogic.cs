@@ -542,7 +542,7 @@ public class GameLogicPianta
         AggiornaFoglie(meteo, worldMod);
         ApplicaDanniTempesta(meteo, worldMod);
 
-        AggiornaRigenerazione(worldMod);
+        //AggiornaRigenerazione(worldMod);
 
         stats.ClampAllValues();
     }
