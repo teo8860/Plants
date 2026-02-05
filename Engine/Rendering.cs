@@ -1,6 +1,7 @@
 using Raylib_CSharp;
 using Raylib_CSharp.Camera.Cam2D;
 using Raylib_CSharp.Colors;
+using Raylib_CSharp.Interact;
 using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Textures;
 using Raylib_CSharp.Transformations;
@@ -67,8 +68,9 @@ internal class Rendering
                 item.Draw();
             }
 
-            Graphics.DrawFPS(0,0);
-            Graphics.EndDrawing();
+            GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);    
+			//Graphics.DrawFPS(0,0);
+			Graphics.EndDrawing();
         }
     }
 

@@ -4,6 +4,7 @@ using System;
 using System.Drawing;
 using Plants;
 using System.Collections.Generic;
+using Raylib_CSharp.Interact;
 
 namespace Plants;
      
@@ -43,9 +44,10 @@ internal static class Program
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
 
         // Avvia il render ed il loop
+        Input.HideCursor();
+
         Game.Init();
         Rendering.Init();
-
 
 	}
 

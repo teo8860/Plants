@@ -74,10 +74,8 @@ public static class Game
 
         Phase = FaseGiorno.GetCurrentPhase();
 
-		
 		tutorial.StartTutorial();
-        seedTest();
-        
+        //seedTest();
 	}
 
     private static void seedTest()
