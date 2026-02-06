@@ -169,7 +169,9 @@ public class Obj_Ramo: GameElement
 
         for (int i = 0; i < punti.Count - 1; i++)
         {
-            Vector2 pStart = puntiSpan[i];
+            if(puntiSpan.Length < i +1) continue;
+
+			Vector2 pStart = puntiSpan[i];
             Vector2 pEnd = puntiSpan[i + 1];
 
             float oscillazione = MathF.Sin(tempoVita * 1.2f + i * 0.4f) * 5f;

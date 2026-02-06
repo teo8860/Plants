@@ -9,49 +9,50 @@ using Plants;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Windowing;
 using System;
-using System.Drawing;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 namespace Plants;
      
 
-public class ExampleWindow() : CopperDevs.DearImGui.Window("Example Window", true)
-{
-    private string inputString = "quick brown fox";
-    private float inputFloat = 0.5f;
-
-    public override void Render()
-    {
-        CopperImGui.Text("Hello World");
-        CopperImGui.Button("Save", () => Console.WriteLine("Button Click"));
-        CopperImGui.Text("string", ref inputString);
-        CopperImGui.SliderValue("float", ref inputFloat, 0f, 1f);
-    }
-}
 
 internal static class Program
 {
-	static NativeTrayIcon trayIcon;
+	public static NativeTrayIcon trayIcon;
     
-    static String inputString;
-    static float inputFloat;
+        // Const per stili finestra
+    const int GWL_STYLE = -16;
+    const uint WS_MINIMIZEBOX = 0x00020000;
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetActiveWindow();
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
     
     public static void Main()
     {
-        //SetupIcon();
-
 
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
+        Window.ClearState(ConfigFlags.ResizableWindow);
+        Window.SetState(ConfigFlags.HiddenWindow);
+
+        IntPtr hwnd = Window.GetHandle();
+		uint style = GetWindowLong(hwnd, GWL_STYLE);
+        style &= ~WS_MINIMIZEBOX; // rimuove la possibilità di minimizzare
+        SetWindowLong(hwnd, GWL_STYLE, style);
+
+
+        SetupIcon();
 
         Input.HideCursor();
-
-        CopperImGui.Setup<RlImGuiRenderer<RlImGuiBinding>>();
-        CopperImGui.ShowDearImGuiAboutWindow = true;
-        CopperImGui.ShowDearImGuiDemoWindow = false;
-        CopperImGui.ShowDearImGuiMetricsWindow = false;
-        CopperImGui.ShowDearImGuiDebugLogWindow = false;
-        CopperImGui.ShowDearImGuiIdStackToolWindow = false;
-
+        
+     
 		Game.Init();
         Rendering.Init();
 	}
@@ -59,27 +60,24 @@ internal static class Program
     private static void SetupIcon()
     {
         // Carica icona nella barra delle applicazioni
-        Icon icon = Utility.LoadIconFromEmbedded("icon.ico", "assets");
+        Icon icon = Utility.LoadIconFromEmbedded("icon.ico", "Assets");
         trayIcon = new NativeTrayIcon(icon, "Tooltip icona");
         
-        trayIcon.OnClickLeft += () =>
+        trayIcon.OnClickLeft += ()=>
         {
            Window.ClearState(ConfigFlags.HiddenWindow);
            var m = MouseHelper.GetMousePosition();
 
-           Window.SetPosition((int)m.X-100, (int)m.Y-400);
+           Window.SetPosition((int)m.X-(GameProperties.windowWidth/2), (int)m.Y-GameProperties.windowHeight);
         };
 
         trayIcon.OnExit  += () =>
         {
-             // Auto-save on exit
             GameSave.get().Save();
             NotificationManager.Cleanup();
             trayIcon.Dispose();
-             Window.Close();
+            Window.Close();
         };
-        
-        trayIcon.LoopEvent();
        
         AppDomain.CurrentDomain.ProcessExit += (s, e) =>
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Raylib_CSharp.Windowing;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Plants;
@@ -24,10 +25,14 @@ public static class WindowStateHelper
     {
         try
         {
-            IntPtr foregroundWindow = GetForegroundWindow();
-            IntPtr activeWindow = GetActiveWindow();
 
-            if (foregroundWindow == IntPtr.Zero || activeWindow == IntPtr.Zero)
+            return  Window.IsFocused() &&  !Window.IsHidden();
+
+			/**
+             * 
+            bool foregroundWindow = GetForegroundWindow();
+            bool activeWindow = GetActiveWindow();
+			if (foregroundWindow == IntPtr.Zero || activeWindow == IntPtr.Zero)
                 return false;
 
             // Ottieni il process ID della finestra in primo piano
@@ -38,8 +43,10 @@ public static class WindowStateHelper
 
             // Se il processo in primo piano è il nostro, siamo focati
             return foregroundProcessId == currentProcessId;
-        }
-        catch (Exception ex)
+            * 
+             */
+		}
+		catch (Exception ex)
         {
             Console.WriteLine($"Errore nel controllo focus finestra: {ex.Message}");
             return false; // In caso di errore, assumiamo non focati

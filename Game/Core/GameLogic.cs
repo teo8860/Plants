@@ -14,7 +14,7 @@ public class GameLogicPianta
     public const float CONSUMO_ENERGIA_BASE = 0.0008f;
     public const float RIGENERAZIONE_SALUTE_BASE = 0.0006f;
 
-    public const float SOGLIA_DISIDRATAZIONE = 0.12f;
+    public const float SOGLIA_DISIDRATAZIONE = 0.85f;
     public const float SOGLIA_SOFFOCAMENTO = 0.15f;
     public const float SOGLIA_CRITICA_SALUTE = 0.20f;
     public const float SOGLIA_FAME_ENERGIA = 0.10f;

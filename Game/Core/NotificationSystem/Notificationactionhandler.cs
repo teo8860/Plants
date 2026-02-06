@@ -153,7 +153,7 @@ public static class NotificationActionHandler
                 Window.ClearState(ConfigFlags.HiddenWindow);
 
                 // Porta la finestra in primo piano usando SetForegroundWindow
-                IntPtr hwnd = GetActiveWindow();
+                IntPtr hwnd = Window.GetHandle();
                 if (hwnd != IntPtr.Zero)
                 {
                     SetForegroundWindow(hwnd);

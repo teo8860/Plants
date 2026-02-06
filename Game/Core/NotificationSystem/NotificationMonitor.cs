@@ -54,7 +54,6 @@ public class NotificationMonitor : GameElement
             else
             {
                 Console.WriteLine("[Event] Acqua bassa rilevata (app attiva, notifica non inviata)");
-                Game.pianta.proprieta.EventSystem.ResetState(0);
             }
         };
 
@@ -72,7 +71,6 @@ public class NotificationMonitor : GameElement
             else
             {
                 Console.WriteLine("[Event] Salute critica rilevata (app attiva, notifica non inviata)");
-                Game.pianta.proprieta.EventSystem.ResetState(1);
             }
         };
 
@@ -90,7 +88,6 @@ public class NotificationMonitor : GameElement
             else
             {
                 Console.WriteLine("[Event] Parassiti rilevati (app attiva, notifica non inviata)");
-                Game.pianta.proprieta.EventSystem.ResetState(2);
             }
         };
 
@@ -102,7 +99,6 @@ public class NotificationMonitor : GameElement
                 NotificationManager.ShowWorldTransitionReady();
                 hasNotifiedWorldTransition = true;
                 Console.WriteLine("[Event] Notifica: Transizione mondo pronta");
-                Game.pianta.proprieta.EventSystem.ResetState(3);
             }
         };
 
@@ -120,7 +116,6 @@ public class NotificationMonitor : GameElement
             else
             {
                 Console.WriteLine("[Event] Temperatura pericolosa rilevata (app attiva, notifica non inviata)");
-                Game.pianta.proprieta.EventSystem.ResetState(4);
             }
         };
     }

@@ -134,7 +134,17 @@ public class NativeTrayIcon : IDisposable
         }
 
     }
+    
+    public void LoopEventRender()
+    {
+        MSG msg;
+        while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1))
+        {
+            TranslateMessage(ref msg);
+            DispatchMessage(ref msg);
+        }
 
+    }
 
     // P/Invoke
 
@@ -218,8 +228,10 @@ public class NativeTrayIcon : IDisposable
         public int Y;
     }
 
-
-
+    
+    [DllImport("user32.dll")]
+    private static extern bool PeekMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax, uint asdasd );
+    
     [DllImport("user32.dll")]
     private static extern bool GetMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
 

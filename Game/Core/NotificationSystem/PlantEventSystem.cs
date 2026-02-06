@@ -33,13 +33,14 @@ public class PlantEventSystem
     /// </summary>
     public void CheckAndFireEvents()
     {
-        if (gameLogic.stats == null) return;
-
+        if (gameLogic.stats == null) 
+            return;
+   
         // Evento acqua bassa
-        bool isLowWater = gameLogic.IsDisidratata;
-        if (isLowWater && !wasLowWater)
+        bool isLowWater = gameLogic.IsDisidratata;   
+        if (isLowWater)
         {
-            OnLowWater?.Invoke();
+			OnLowWater?.Invoke();
         }
         wasLowWater = isLowWater;
 
