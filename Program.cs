@@ -18,29 +18,7 @@ internal static class Program
     public static void Main()
     {
         //SetupIcon();
-        
-        var opening = new OpeningSystem();
-        Dictionary<SeedRarity, int> packageCounts = new()
-        {
-            { SeedRarity.Comune, 0 },
-            { SeedRarity.NonComune, 0 },
-            { SeedRarity.Raro, 0 },
-            { SeedRarity.Epico, 0 },
-            { SeedRarity.Leggendario, 0 }
-        };
 
-		for(int i=0; i<1000; i++)
-        {
-            var seed = opening.RollSeedFromPackage(SeedPackageRarity.Common);
-            packageCounts[seed.rarity]++;
-		}
-
-        Console.WriteLine("Common packages opened: " + packageCounts[SeedRarity.Comune]);
-        Console.WriteLine("Uncommon packages opened: " + packageCounts[SeedRarity.NonComune]);
-        Console.WriteLine("Rare packages opened: " + packageCounts[SeedRarity.Raro]);
-        Console.WriteLine("Epic packages opened: " + packageCounts[SeedRarity.Epico]);
-        Console.WriteLine("Legendary packages opened: " + packageCounts[SeedRarity.Leggendario]);
-        Console.WriteLine("\n\n\n");
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
 
         // Avvia il render ed il loop
@@ -69,7 +47,8 @@ internal static class Program
         {
              // Auto-save on exit
             GameSave.get().Save();
-             trayIcon.Dispose();
+            NotificationManager.Cleanup();
+            trayIcon.Dispose();
              Window.Close();
         };
         

@@ -4,7 +4,6 @@ using Raylib_CSharp.Interact;
 using System;
 using System.Linq;
 using System.Numerics;
-using Engine.Tools;
 
 public class Obj_Controller : GameElement
 {
@@ -35,7 +34,6 @@ public class Obj_Controller : GameElement
         }
 
         Vector2 mouse = Input.GetMousePosition();
-        Console.WriteLine(mouse);
 		mouse = CoordinateHelper.ToWorld(mouse, Rendering.camera.position);
         
 		if (Input.IsMouseButtonDown(MouseButton.Right))

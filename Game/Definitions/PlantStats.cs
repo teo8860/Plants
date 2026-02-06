@@ -181,7 +181,7 @@ public static class SeedDataType
 public class PlantStats
 {
     public float Salute { get; set; } = 1f;
-    public float Idratazione { get; set; } = 0.4f;
+    public float Idratazione { get; set; } = 0.1f;
     public float Ossigeno { get; set; } = 1.0f;
     public float Metabolismo { get; set; } = 1.0f;
     public float Temperatura { get; set; } = 20.0f;
