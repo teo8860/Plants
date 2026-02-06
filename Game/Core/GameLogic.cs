@@ -7,6 +7,7 @@ public class GameLogicPianta
 {
     private Obj_Plant pianta;
     public int contatoreSecondi = 0;
+    public PlantEventSystem EventSystem { get; set; }
 
     public const float CONSUMO_ACQUA_BASE = 0.0012f;
     public const float CONSUMO_OSSIGENO_BASE = 0.0006f;
@@ -33,6 +34,7 @@ public class GameLogicPianta
     public GameLogicPianta(Obj_Plant Pianta)
     {
         pianta = Pianta;
+        EventSystem = new PlantEventSystem(this);
     }
 
     private static readonly Dictionary<DayPhase, float> TemperatureBaseFase = new()
@@ -544,6 +546,8 @@ public class GameLogicPianta
         //AggiornaRigenerazione(worldMod);
 
         stats.ClampAllValues();
+        EventSystem?.CheckAndFireEvents();
+
     }
 
     public void Reset()

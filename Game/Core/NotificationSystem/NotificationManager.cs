@@ -12,17 +12,32 @@ public static class NotificationManager
     {
         // Registra l'app per le notifiche
         ToastNotificationManagerCompat.OnActivated += OnNotificationActivated;
+
+        // Inizializza il gestore delle azioni
+        NotificationActionHandler.Initialize();
     }
 
     private static void OnNotificationActivated(ToastNotificationActivatedEventArgsCompat e)
     {
-        // Gestisci il click sulla notifica
-        Console.WriteLine($"Notifica cliccata: {e.Argument}");
+        Console.WriteLine($"Notifica cliccata con argomento: {e.Argument}");
 
-        // Riporta la finestra in primo piano
-        if (Window.IsReady())
+        // Estrae l'azione dagli argomenti
+        var args = ToastArguments.Parse(e.Argument);
+
+        if (args.Contains("action"))
         {
-            Window.ClearState(ConfigFlags.HiddenWindow);
+            string action = args["action"];
+
+            // Esegui l'azione tramite l'handler
+            NotificationActionHandler.HandleAction(action);
+        }
+        else
+        {
+            // Se non c'è azione specifica, apri solo il gioco
+            if (Window.IsReady())
+            {
+                Window.ClearState(ConfigFlags.HiddenWindow);
+            }
         }
     }
 
@@ -38,7 +53,6 @@ public static class NotificationManager
                 .SetContent("Apri gioco")
                 .AddArgument("action", "open"))
             .Show();
-        ;
     }
 
     public static void ShowPlantDying()
@@ -50,8 +64,10 @@ public static class NotificationManager
             .AddButton(new ToastButton()
                 .SetContent("Salva la pianta")
                 .AddArgument("action", "rescue"))
+            .AddButton(new ToastButton()
+                .SetContent("Apri gioco")
+                .AddArgument("action", "open"))
             .Show();
-        ;
     }
 
     public static void ShowWorldTransitionReady()
@@ -64,8 +80,10 @@ public static class NotificationManager
             .AddButton(new ToastButton()
                 .SetContent("Viaggia")
                 .AddArgument("action", "travel"))
+            .AddButton(new ToastButton()
+                .SetContent("Apri gioco")
+                .AddArgument("action", "open"))
             .Show();
-        ;
     }
 
     public static void ShowParasiteInfestation()
@@ -77,8 +95,23 @@ public static class NotificationManager
             .AddButton(new ToastButton()
                 .SetContent("Cura")
                 .AddArgument("action", "cure"))
+            .AddButton(new ToastButton()
+                .SetContent("Apri gioco")
+                .AddArgument("action", "open"))
             .Show();
-        ;
+    }
+
+    public static void ShowTemperatureDanger()
+    {
+        string tempStatus = Game.pianta.proprieta.IsGelida ? "GELIDA" : "TORRIDA";
+
+        new ToastContentBuilder()
+            .AddText($"🌡️ Temperatura {tempStatus}!")
+            .AddText($"La temperatura è pericolosa: {Game.pianta.Stats.Temperatura:F1}°C")
+            .AddButton(new ToastButton()
+                .SetContent("Controlla")
+                .AddArgument("action", "open"))
+            .Show();
     }
 
     public static void Cleanup()

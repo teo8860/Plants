@@ -2,7 +2,6 @@ using NotificationIconSharp;
 using Raylib_CSharp.Windowing;
 using System;
 using System.Drawing;
-using Plants;
 using System.Collections.Generic;
 using Raylib_CSharp.Interact;
 
