@@ -1,6 +1,7 @@
+using Engine.Tools;
 using System;
 using System.Collections.Generic;
-using Engine.Tools;
+using System.Numerics;
 
 namespace Plants;
 
@@ -14,10 +15,15 @@ public class GameSaveData
     public DateTime SaveTime   { get; set; }
     public string Version { get; set; }
     public int essence { get; set; }
+    public PlantStats PlantStats { get; set; }
+    public SeedType PlantSeedType { get; set; }
+    public SeedStats PlantSeedBonus { get; set; }
 
-	public GameSaveData()
+    public GameSaveData()
     {
         Version = "1.0.0";
+        PlantStats = new PlantStats();
+        PlantSeedBonus = new SeedStats();
     }
 }
 
@@ -45,6 +51,15 @@ public class GameSave
 
      public void Save()
     {
+        if (Game.pianta != null)
+        {
+            data.PlantStats = Game.pianta.Stats;
+            data.PlantSeedType = Game.pianta.TipoSeme;
+            data.PlantSeedBonus = Game.pianta.seedBonus;
+        }
+
+        data.SaveTime = DateTime.Now;
+
         SaveHelper.Save(SaveFileName, data);
     }
 
@@ -57,16 +72,53 @@ public class GameSave
 
          var saveData = GameSave.get().data;
 
-		// Restore game state
 		WorldManager.SetCurrentWorld(saveData.CurrentWorld);
         WorldManager.SetWorldDifficulty(saveData.CurrentWorld, saveData.CurrentDifficulty);
         WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
         SeedUpgradeSystem.SetEssence(saveData.essence);
 
-	}
+        Game.pianta.Stats = saveData.PlantStats;
+        Game.pianta.TipoSeme = saveData.PlantSeedType;
+        Game.pianta.seedBonus = saveData.PlantSeedBonus;
 
+        CalculateOfflineGrowth();
+    }
 
+    private void CalculateOfflineGrowth()
+    {
+        if (data.SaveTime == default(DateTime))
+        {
+            data.SaveTime = DateTime.Now;
+            return;
+        }
+
+        TimeSpan timeOffline = DateTime.Now - data.SaveTime;
+
+        if (timeOffline.TotalMinutes < 1)
+            return;
+        SimulateOfflineGrowth(timeOffline);
+    }
+
+    private void SimulateOfflineGrowth(TimeSpan timeOffline)
+    {
+        if (Game.pianta == null || data.PlantStats == null)
+            return;
+
+        int growthTicks = (int)timeOffline.TotalSeconds;
+
+        for (int i = 0; i < growthTicks; i++)
+        {
+            if (Game.pianta.Stats.Altezza >= Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
+                break;
+
+            Game.pianta.proprieta.AggiornaTutto(
+                FaseGiorno.GetCurrentPhase(),
+                WeatherManager.GetCurrentWeather(),
+                WorldManager.GetCurrentModifiers()
+            );
+        }
+    }
     public static void DeleteSaveFile()
     {
         try

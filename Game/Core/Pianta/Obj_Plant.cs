@@ -75,18 +75,6 @@ public class Obj_Plant : GameElement
         PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
 
-         ///* 
-        // Commentato: non deve crescere automaticamente nel costruttore
-        /*
-        if (!Game.tutorial.isTutorialActive)
-        {
-            for (int a = 0; a < 400; a++)
-            {
-                Crescita();
-            }
-        }
-        */
-        // */
     }
 
 
@@ -235,8 +223,8 @@ public class Obj_Plant : GameElement
     public void ControlloCrescita()
     {
         if (Game.isPaused) return;
-        
-        if (Stats.Altezza >= Stats.AltezzaMassima)
+
+        if (Stats.Altezza >= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
             return;
 
         float velocita = proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
