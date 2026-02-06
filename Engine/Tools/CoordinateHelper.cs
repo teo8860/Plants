@@ -1,8 +1,7 @@
 /// <summary>
-using Plants;
 using System.Numerics;
 
-namespace Engine.Tools;
+namespace Plants;
 
 /// <summary>
 /// Helper per coordinate e conversioni

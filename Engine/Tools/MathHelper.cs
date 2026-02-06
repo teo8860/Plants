@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Engine.Tools;
+namespace Plants;
+
 
 /// <summary>
 /// Helper per funzioni matematiche

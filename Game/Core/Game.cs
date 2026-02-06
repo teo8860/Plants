@@ -51,6 +51,8 @@ public static class Game
     public static Obj_GuiCompostBackground compostBackground;
     public static Obj_GuiPackOpeningAnimation packOpening;
 
+    public static NotificationMonitor notificationMonitor;
+
     public static void Init()
     {
         room_main = new Room();
@@ -60,6 +62,8 @@ public static class Game
         
         AssetLoader.LoadAll();
 
+        NotificationManager.Initialize();
+
         InitMainGame();
         InitGui();
         InitInventory();
@@ -67,6 +71,8 @@ public static class Game
         
         Inventario.get().Load();
         GameSave.get().Load();
+
+        notificationMonitor = GameElement.Create<NotificationMonitor>();
 
         SetTimerSave();
         SetTimer();

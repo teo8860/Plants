@@ -2,7 +2,8 @@
 using System;
 using System.Numerics;
 
-namespace Engine.Tools;
+namespace Plants;
+
 
 /// <summary>
 /// Helper per generazione numeri casuali
