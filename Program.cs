@@ -1,19 +1,39 @@
+﻿﻿using CopperDevs.Core.Utility;
+using CopperDevs.DearImGui;
+using CopperDevs.DearImGui.Renderer.Raylib;
+using CopperDevs.DearImGui.Renderer.Raylib.Raylib_CSharp;
+using CopperDevs.DearImGui.Rendering;
+using Hexa.NET.ImGui;
 using NotificationIconSharp;
+using Plants;
+using Raylib_CSharp.Interact;
 using Raylib_CSharp.Windowing;
 using System;
-using System.Drawing;
-using Plants;
 using System.Collections.Generic;
-using Raylib_CSharp.Interact;
-
+using System.Drawing;
 namespace Plants;
      
 
+public class ExampleWindow() : CopperDevs.DearImGui.Window("Example Window", true)
+{
+    private string inputString = "quick brown fox";
+    private float inputFloat = 0.5f;
+
+    public override void Render()
+    {
+        CopperImGui.Text("Hello World");
+        CopperImGui.Button("Save", () => Console.WriteLine("Button Click"));
+        CopperImGui.Text("string", ref inputString);
+        CopperImGui.SliderValue("float", ref inputFloat, 0f, 1f);
+    }
+}
 
 internal static class Program
 {
 	static NativeTrayIcon trayIcon;
-
+    
+    static String inputString;
+    static float inputFloat;
     
     public static void Main()
     {
@@ -41,14 +61,20 @@ internal static class Program
         Console.WriteLine("Epic packages opened: " + packageCounts[SeedRarity.Epico]);
         Console.WriteLine("Legendary packages opened: " + packageCounts[SeedRarity.Leggendario]);
         Console.WriteLine("\n\n\n");
+
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
 
-        // Avvia il render ed il loop
         Input.HideCursor();
 
-        Game.Init();
-        Rendering.Init();
+        CopperImGui.Setup<RlImGuiRenderer<RlImGuiBinding>>();
+        CopperImGui.ShowDearImGuiAboutWindow = true;
+        CopperImGui.ShowDearImGuiDemoWindow = false;
+        CopperImGui.ShowDearImGuiMetricsWindow = false;
+        CopperImGui.ShowDearImGuiDebugLogWindow = false;
+        CopperImGui.ShowDearImGuiIdStackToolWindow = false;
 
+		Game.Init();
+        Rendering.Init();
 	}
 
     private static void SetupIcon()

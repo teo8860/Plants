@@ -1,3 +1,4 @@
+using CopperDevs.DearImGui;
 using Raylib_CSharp;
 using Raylib_CSharp.Camera.Cam2D;
 using Raylib_CSharp.Colors;
@@ -16,12 +17,10 @@ internal class Rendering
 {
     public static PixelCamera camera = new(GameProperties.windowWidth, GameProperties.windowHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth);
     
-
     public static void Init()
     {
         Raylib.SetConfigFlags(ConfigFlags.Msaa4XHint);
         Time.SetTargetFPS(60);
-
 
 
         while (true)
@@ -29,6 +28,8 @@ internal class Rendering
             if (Window.ShouldClose())
             {
                 Window.Close();
+                CopperImGui.Shutdown();
+                break;
             }
             
             camera.Update();
@@ -68,8 +69,12 @@ internal class Rendering
                 item.Draw();
             }
 
+			CopperImGui.Render();
+            
+
             GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);    
-			//Graphics.DrawFPS(0,0);
+			
+            //Graphics.DrawFPS(0,0);
 			Graphics.EndDrawing();
         }
     }

@@ -35,7 +35,7 @@ public class Obj_Controller : GameElement
         }
 
         Vector2 mouse = Input.GetMousePosition();
-        Console.WriteLine(mouse);
+   
 		mouse = CoordinateHelper.ToWorld(mouse, Rendering.camera.position);
         
 		if (Input.IsMouseButtonDown(MouseButton.Right))
