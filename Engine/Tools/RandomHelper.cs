@@ -41,4 +41,55 @@ public static class RandomHelper
     /// Sceglie un elemento casuale da una lista di elementi
     /// </summary>
     public static T Choose<T>(params T[] items) => items[_random.Next(items.Length)];
+
+    public static int DeterministicIntAt(int seed, int index)
+    {
+        ulong x = (ulong)seed;
+        x += (ulong)index * 0x9E3779B97F4A7C15UL;
+
+        x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9UL;
+        x = (x ^ (x >> 27)) * 0x94D049BB133111EBUL;
+        x ^= x >> 31;
+
+        return (int)(x & 0x7FFFFFFF);
+    }
+
+    public static int DeterministicIntRange(int seed, int index, int min, int max)
+    {
+        if (max <= min)
+            return min;
+
+        int r = DeterministicIntAt(seed, index);
+        return min + (r % (max - min));
+    }
+
+
+    public static float DeterministicFloatAt(int seed, int index)
+    {
+        ulong x = Mix(seed, index);
+
+        const float inv = 1.0f / (1u << 24);
+        return (float)((x >> 40) & 0xFFFFFF) * inv;
+    }
+
+    public static float DeterministicFloatRangeAt(int seed, int index, float min, float max)
+    {
+        if (max <= min)
+            return min;
+
+        float t = DeterministicFloatAt(seed, index);
+        return min + (max - min) * t;
+    }
+
+    private static ulong Mix(int seed, int index)
+    {
+        ulong x = (ulong)seed;
+        x += (ulong)index * 0x9E3779B97F4A7C15UL;
+
+        x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9UL;
+        x = (x ^ (x >> 27)) * 0x94D049BB133111EBUL;
+        x ^= x >> 31;
+
+        return x;
+    }
 }

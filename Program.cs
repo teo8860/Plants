@@ -40,7 +40,6 @@ internal static class Program
 
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
         Window.ClearState(ConfigFlags.ResizableWindow);
-        Window.SetState(ConfigFlags.HiddenWindow);
 
         IntPtr hwnd = Window.GetHandle();
 		uint style = GetWindowLong(hwnd, GWL_STYLE);
@@ -48,7 +47,8 @@ internal static class Program
         SetWindowLong(hwnd, GWL_STYLE, style);
 
 
-        SetupIcon();
+        //SetupIcon();
+        //Window.SetState(ConfigFlags.HiddenWindow);
 
         Input.HideCursor();
         

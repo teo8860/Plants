@@ -44,7 +44,7 @@ internal class Rendering
                // break;
             }
 
-            Program.trayIcon.LoopEventRender();
+            Program.trayIcon?.LoopEventRender();
             
             camera.Update();
             var elements = GameElement.GetList();

@@ -1,6 +1,7 @@
 using Raylib_CSharp;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Images;
+using Raylib_CSharp.Interact;
 using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Textures;
 using System;
@@ -13,6 +14,7 @@ namespace Plants;
 
 public class Obj_Plant : GameElement
 {
+    public int rseed = 440131434;
     public Vector2 posizione = new(0, 0);
 
     public List<Vector2> puntiSpline = new();
@@ -101,7 +103,7 @@ public class Obj_Plant : GameElement
         float velocita = proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
         float metabolismo = proprieta.MetabolismoEffettivo;
 
-        float incrementoBase = 15f + RandomHelper.Float(0, 8f);
+        float incrementoBase = 15f + RandomHelper.DeterministicFloatRangeAt(rseed, puntiSpline.Count, 0, 8f);
         float incrementoFinale = incrementoBase * metabolismo * (0.5f + velocita * 0.5f);
 
         incrementoFinale = Math.Max(7f, incrementoFinale);
@@ -116,7 +118,7 @@ public class Obj_Plant : GameElement
         if (Stats.FoglieAttuali < proprieta.FoglieMassime)
         {
             float probabilitaFoglia = velocita * 0.15f * (1f - (float)Stats.FoglieAttuali / proprieta.FoglieMassime);
-            if (RandomHelper.Float(0, 1) < probabilitaFoglia)
+            if (RandomHelper.DeterministicFloatRangeAt(rseed, Stats.FoglieAttuali, 0, 1) < probabilitaFoglia)
             {
                 Stats.FoglieAttuali++;
             }
@@ -146,7 +148,7 @@ public class Obj_Plant : GameElement
             }
             else
             {
-                if (RandomHelper.Int(0, 2) == 0)
+                if (RandomHelper.DeterministicIntRange(rseed, puntiSpline.Count, 0, 2) == 0)
                     direction = Direzione.Sinistra;
                 else
                     direction = Direzione.Destra;
@@ -166,7 +168,6 @@ public class Obj_Plant : GameElement
             puntoAttacco.Y -= 5;
 
             Vector2 pos = posizione;
-            //pos.X += RandomHelper.Int(-45, 45);
             pos.Y += posizione.Y;
 
             var radice = new Obj_Radice(puntoAttacco, pos);
@@ -228,7 +229,7 @@ public class Obj_Plant : GameElement
 
         float velocita = proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
 
-        if (velocita > 0.01f && RandomHelper.Float(0, 1) < velocita)
+        if (velocita > 0.01f && RandomHelper.DeterministicFloatRangeAt(rseed, puntiSpline.Count, 0, 1) < velocita)
         {
             Crescita();
         }
@@ -267,11 +268,11 @@ public class Obj_Plant : GameElement
         puntiSpline.Add(new Vector2(posizione.X, posizione.Y));
 
         float terzoX = Math.Clamp(
-            puntiSpline[1].X + RandomHelper.Int(-10, 10),
+            puntiSpline[1].X + RandomHelper.DeterministicIntRange(rseed, 0, -10, 10),
             margineMinimo,
             GameProperties.cameraWidth - margineMinimo
         );
-        float terzoY = puntiSpline[1].Y + RandomHelper.Int(13, 26);
+        float terzoY = puntiSpline[1].Y + RandomHelper.DeterministicIntRange(rseed, 0, 13, 26);
         puntiSpline.Add(new Vector2(terzoX, terzoY));
     }
 
@@ -279,7 +280,7 @@ public class Obj_Plant : GameElement
     {
         Vector2 ultimoPunto = puntiSpline[^1];
 
-        float nuovoX = Math.Clamp(ultimoPunto.X + Raylib.GetRandomValue(-10, 10), margineMinimo, GameProperties.cameraWidth - margineMinimo);
+        float nuovoX = Math.Clamp(ultimoPunto.X + RandomHelper.DeterministicIntRange(rseed, puntiSpline.Count, -10, 10), margineMinimo, GameProperties.cameraWidth - margineMinimo);
 
         float nuovoY = ultimoPunto.Y + incrementoAltezza;
 
@@ -288,6 +289,15 @@ public class Obj_Plant : GameElement
 
     public override void Update()
     {
+        if(Input.IsKeyPressed(KeyboardKey.R))
+        {
+            Reset();
+
+            for (int i = 0; i < 100; i++)
+                Crescita();
+
+            Rendering.camera.position.Y = 0;
+        }
     }
 
     public override void Draw()
