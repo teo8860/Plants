@@ -25,7 +25,26 @@ internal class Rendering
 
         while (true)
         {
-            Program.trayIcon.LoopEventRender();
+            
+            if (Window.IsMinimized() || Window.IsHidden())
+            {
+                
+                Window.SetState(ConfigFlags.HiddenWindow);
+                //Window.Close();
+                //CopperImGui.Shutdown();
+               // break;
+            }
+
+            if (Window.ShouldClose())
+            {
+                
+                Window.SetState(ConfigFlags.HiddenWindow);
+                //Window.Close();
+                //CopperImGui.Shutdown();
+               // break;
+            }
+
+            Program.trayIcon?.LoopEventRender();
             
             camera.Update();
             var elements = GameElement.GetList();

@@ -62,7 +62,7 @@ public class Obj_Ramo: GameElement
         this.puntoIniziale = puntoIniziale;
         this.punti.Add(puntoIniziale);
 
-        maxCrescita = 5 + RandomHelper.Int(0, 3);
+        maxCrescita = 5 + RandomHelper.DeterministicIntRange(Game.pianta.rseed, 4, 0, 3);
 
         UpdateBounds();
     }
@@ -86,11 +86,11 @@ public class Obj_Ramo: GameElement
 
         Vector2 ultimoPunto = punti[^1];
 
-        float deltaXBase = 10 + RandomHelper.Float(0, 5);
+        float deltaXBase = 10 + RandomHelper.DeterministicFloatRangeAt(Game.pianta.rseed, punti.Count, 0, 5);
         float deltaX = deltaXBase * (direzione == Direzione.Destra ? 1 : -1);
 
         float progressione = (float)crescitaAttuale / maxCrescita;
-        float deltaY = 8 + RandomHelper.Float(0, 5) - progressione * 3;
+        float deltaY = 8 + RandomHelper.DeterministicFloatRangeAt(Game.pianta.rseed, punti.Count, 0, 5) - progressione * 3;
 
         Vector2 nuovoPunto = new Vector2(ultimoPunto.X + deltaX, ultimoPunto.Y + deltaY);
 
@@ -124,13 +124,13 @@ public class Obj_Ramo: GameElement
             flip = puntoIniziale.X < centroSchermoX ? -1.0f : 1.0f;
         }
 
-        if (RandomHelper.Float(0, 1) < 0.25f)
+        if (RandomHelper.DeterministicFloatRangeAt(Game.pianta.rseed, parametriFoglie.Count, 0, 1) < 0.25f)
             flip *= -1.0f;
 
-        float rotazioneCasuale = RandomHelper.Float(-25f, 25f);
-        float scostamentoCasuale = RandomHelper.Float(4f, 8f);
-        float posizioneRelativa = 0.4f + RandomHelper.Float(0f, 0.3f);
-        float dimensione = 0.6f + RandomHelper.Float(0f, 0.3f);
+        float rotazioneCasuale = RandomHelper.DeterministicFloatRangeAt(Game.pianta.rseed, parametriFoglie.Count, -25f, 25f);
+        float scostamentoCasuale = RandomHelper.DeterministicFloatRangeAt(Game.pianta.rseed, parametriFoglie.Count, 4f, 8f);
+        float posizioneRelativa = 0.4f + RandomHelper.DeterministicFloatRangeAt(Game.pianta.rseed, parametriFoglie.Count, 0f, 0.3f);
+        float dimensione = 0.6f + RandomHelper.DeterministicFloatRangeAt(Game.pianta.rseed, parametriFoglie.Count, 0f, 0.3f);
 
         parametriFoglie.Add(new ParametriFoglie(
             scostamentoCasuale,

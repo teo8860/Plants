@@ -80,7 +80,12 @@ public static class Game
 
         Phase = FaseGiorno.GetCurrentPhase();
 
-		tutorial.StartTutorial();
+
+        for (int i = 0; i < 100; i++)
+            Game.pianta.Crescita();
+
+        Rendering.camera.position.Y = 0;
+        tutorial.StartTutorial();
         //seedTest();
 	}
 
