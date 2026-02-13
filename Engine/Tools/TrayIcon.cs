@@ -27,6 +27,7 @@ public class NativeTrayIcon : IDisposable
 
     public event Action OnClickLeft;
     public event Action OnExit;
+    private WndProc _wndProcDelegate;
 
     public NativeTrayIcon(Icon hIcon, string tip)
     {
@@ -55,9 +56,10 @@ public class NativeTrayIcon : IDisposable
 
     private IntPtr CreateMessageWindow()
     {
+        this._wndProcDelegate = WindowProc;
         var wc = new WNDCLASS();
         wc.lpszClassName = "NativeTrayIconWndClass";
-        wc.lpfnWndProc = WindowProc;
+        wc.lpfnWndProc = _wndProcDelegate;
         RegisterClass(ref wc);
 
         IntPtr hwnd = CreateWindowEx(

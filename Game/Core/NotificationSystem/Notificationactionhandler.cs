@@ -66,7 +66,7 @@ public static class NotificationActionHandler
         Console.WriteLine("Pianta annaffiata da notifica!");
 
         // Mostra la finestra del gioco
-        OpenGame();
+       //OpenGame();
     }
 
     /// <summary>

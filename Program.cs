@@ -40,7 +40,6 @@ internal static class Program
 
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
         Window.ClearState(ConfigFlags.ResizableWindow);
-        Window.SetState(ConfigFlags.HiddenWindow);
 
         IntPtr hwnd = Window.GetHandle();
 		uint style = GetWindowLong(hwnd, GWL_STYLE);
@@ -54,6 +53,7 @@ internal static class Program
         
      
 		Game.Init();
+        Window.SetState(ConfigFlags.HiddenWindow);
         Rendering.Init();
 	}
 
@@ -68,7 +68,7 @@ internal static class Program
            Window.ClearState(ConfigFlags.HiddenWindow);
            var m = MouseHelper.GetMousePosition();
 
-           Window.SetPosition((int)m.X-(GameProperties.windowWidth/2), (int)m.Y-GameProperties.windowHeight);
+           Window.SetPosition((int)m.X-(GameProperties.windowWidth/2), (int)m.Y-GameProperties.windowHeight-50);
         };
 
         trayIcon.OnExit  += () =>

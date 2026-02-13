@@ -25,25 +25,6 @@ internal class Rendering
 
         while (true)
         {
-            
-            if (Window.IsMinimized() || Window.IsHidden())
-            {
-                
-                Window.SetState(ConfigFlags.HiddenWindow);
-                //Window.Close();
-                //CopperImGui.Shutdown();
-               // break;
-            }
-
-            if (Window.ShouldClose())
-            {
-                
-                Window.SetState(ConfigFlags.HiddenWindow);
-                //Window.Close();
-                //CopperImGui.Shutdown();
-               // break;
-            }
-
             Program.trayIcon.LoopEventRender();
             
             camera.Update();
@@ -90,6 +71,25 @@ internal class Rendering
 			
             //Graphics.DrawFPS(0,0);
 			Graphics.EndDrawing();
+
+
+            if (Window.IsMinimized() || Window.IsHidden())
+            {
+                
+                Window.SetState(ConfigFlags.HiddenWindow);
+                //Window.Close();
+                //CopperImGui.Shutdown();
+               // break;
+            }
+
+            if (Window.ShouldClose())
+            {
+                
+                Window.SetState(ConfigFlags.HiddenWindow);
+                //Window.Close();
+                //CopperImGui.Shutdown();
+               // break;
+            }
         }
     }
 

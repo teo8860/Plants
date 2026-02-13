@@ -34,6 +34,8 @@
 	  <None Remove=".gitignore" />
 	  <None Remove="build.bat" />
 	  <None Remove="desktop.ini" />
+	  <None Remove="pull.bat" />
+	  <None Remove="push.bat" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -25,7 +25,7 @@ public static class WindowStateHelper
     {
         try
         {
-
+            return !Window.IsHidden();
             return  Window.IsFocused() &&  !Window.IsHidden();
 
 			/**
