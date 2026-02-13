@@ -14,7 +14,7 @@ namespace Plants;
 
 public class Obj_Plant : GameElement
 {
-    public int rseed = 440131434;
+    public int rseed = 470131434;
     public Vector2 posizione = new(0, 0);
 
     public List<Vector2> puntiSpline = new();

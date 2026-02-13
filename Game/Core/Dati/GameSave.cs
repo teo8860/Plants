@@ -17,8 +17,10 @@ public class GameSaveData
     public PlantStats PlantStats { get; set; }
     public SeedType PlantSeedType { get; set; }
     public SeedStats PlantSeedBonus { get; set; }
+    public int randomSeed {get; set; }
+    public int plantGrowhtStage { get; set; }
 
-    public GameSaveData()
+	public GameSaveData()
     {
         Version = "1.0.0";
         PlantStats = new PlantStats();
@@ -55,7 +57,9 @@ public class GameSave
             data.PlantStats = Game.pianta.Stats;
             data.PlantSeedType = Game.pianta.TipoSeme;
             data.PlantSeedBonus = Game.pianta.seedBonus;
-        }
+            data.randomSeed = Game.pianta.rseed;
+            data.plantGrowhtStage = Game.pianta.puntiSpline.Count+3;
+		}
 
         data.SaveTime = DateTime.Now;
 
@@ -67,9 +71,21 @@ public class GameSave
         data = SaveHelper.Load<GameSaveData>(SaveFileName);
 
         if (data == null)
-            data = new();
+        {
+            Console.WriteLine("No save data found, starting new game.");
+			data = new();
+        }
 
-         var saveData = GameSave.get().data;
+        var saveData = GameSave.get().data;
+        Console.WriteLine($"Loaded plant growth stage: {saveData.plantGrowhtStage}");
+
+        Game.pianta.Stats = saveData.PlantStats;
+        Game.pianta.TipoSeme = saveData.PlantSeedType;
+        Game.pianta.seedBonus = saveData.PlantSeedBonus;
+        Game.pianta.rseed = saveData.randomSeed;
+
+		for (int i = 0; i < saveData.plantGrowhtStage; i++)
+            Game.pianta.Crescita();
 
 		WorldManager.SetCurrentWorld(saveData.CurrentWorld);
         WorldManager.SetWorldDifficulty(saveData.CurrentWorld, saveData.CurrentDifficulty);
@@ -77,11 +93,8 @@ public class GameSave
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
         SeedUpgradeSystem.SetEssence(saveData.essence);
 
-        Game.pianta.Stats = saveData.PlantStats;
-        Game.pianta.TipoSeme = saveData.PlantSeedType;
-        Game.pianta.seedBonus = saveData.PlantSeedBonus;
 
-        CalculateOfflineGrowth();
+		CalculateOfflineGrowth();
     }
 
     private void CalculateOfflineGrowth()

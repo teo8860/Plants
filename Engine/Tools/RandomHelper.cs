@@ -42,6 +42,7 @@ public static class RandomHelper
     /// </summary>
     public static T Choose<T>(params T[] items) => items[_random.Next(items.Length)];
 
+
     public static int DeterministicIntAt(int seed, int index)
     {
         ulong x = (ulong)seed;

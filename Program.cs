@@ -47,8 +47,8 @@ internal static class Program
         SetWindowLong(hwnd, GWL_STYLE, style);
 
 
-        //SetupIcon();
-        //Window.SetState(ConfigFlags.HiddenWindow);
+        SetupIcon();
+        Window.SetState(ConfigFlags.HiddenWindow);
 
         Input.HideCursor();
         
