@@ -91,7 +91,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         bool isGold = RandomHelper.Chance(0.3f);
         Color col = isGold
             ? new Color(255, 210, 80, 255)
-            : new Color(80 + RandomHelper.Int(120), 180 + RandomHelper.Int(60), 80, 255);
+            : new Color((byte)(80 + RandomHelper.Int(120)), (byte)(180 + RandomHelper.Int(60)), 80, 255);
 
         particles.Add(new HarvestParticle
         {
