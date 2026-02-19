@@ -56,13 +56,16 @@ public class Obj_Ramo: GameElement
     private Color coloreRamo = Color.DarkBrown;
     private Color coloreRamoChiaro = new Color(100, 70, 50, 255);
 
-    public Obj_Ramo(Vector2 puntoIniziale, Direzione direzione)
+    public Obj_Ramo(Vector2 puntoIniziale, Direzione direzione, bool restore = false)
     {
         this.direzione = direzione;
         this.puntoIniziale = puntoIniziale;
-        this.punti.Add(puntoIniziale);
 
-        maxCrescita = 5 + RandomHelper.DeterministicIntRange(Game.pianta.rseed, 4, 0, 3);
+        if (!restore)
+        {
+            this.punti.Add(puntoIniziale);
+            maxCrescita = 5 + RandomHelper.DeterministicIntRange(Game.pianta.rseed, 4, 0, 3);
+        }
 
         UpdateBounds();
     }
@@ -235,4 +238,26 @@ public class Obj_Ramo: GameElement
 
     public bool IsComplete => crescitaAttuale >= maxCrescita;
     public int NumeroFoglie => parametriFoglie.Count;
+
+    public RamoSaveData ToSaveData()
+    {
+        return new RamoSaveData { Punti = new List<Vector2>(punti) };
+    }
+
+    public static Obj_Ramo FromSaveData(RamoSaveData data)
+    {
+        Direzione dir = data.Punti.Count >= 2 && data.Punti[1].X >= data.Punti[0].X
+            ? Direzione.Destra : Direzione.Sinistra;
+
+        var ramo = new Obj_Ramo(data.Punti[0], dir, restore: true);
+        ramo.punti = new List<Vector2>(data.Punti);
+        ramo.crescitaAttuale = data.Punti.Count - 1;
+        ramo.maxCrescita = 5 + RandomHelper.DeterministicIntRange(Game.pianta.rseed, 4, 0, 3);
+
+        for (int i = 1; i < ramo.punti.Count; i++)
+            ramo.GeneraParametriFoglia();
+
+        ramo.UpdateBounds();
+        return ramo;
+    }
 }

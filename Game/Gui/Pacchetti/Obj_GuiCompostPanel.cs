@@ -124,7 +124,7 @@ public class Obj_GuiCompostPanel : GameElement
     {
         // Info foglie e slot
         int totalPackages = CompostSystem.GetTotalPackageCount();
-        Graphics.DrawText($"Foglie: {Game.pianta.Stats.FoglieAttuali}", 10, 10, 16, new Color(100, 180, 100, 255));
+        Graphics.DrawText($"Foglie: {Game.pianta.Stats.FoglieAccumulate}", 10, 10, 16, new Color(100, 180, 100, 255));
         Graphics.DrawText($"Slot: {totalPackages}/4", 10, 30, 14,
             totalPackages >= 4 ? new Color(255, 100, 100, 255) : new Color(200, 200, 200, 255));
 

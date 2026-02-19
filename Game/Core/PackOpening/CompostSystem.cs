@@ -131,7 +131,7 @@ public static class CompostSystem
             return false;
 
         int leavesNeeded = new SeedPackage(rarity).LeavesRequired;
-        return Game.pianta.Stats.FoglieAttuali >= leavesNeeded;
+        return Game.pianta.Stats.FoglieAccumulate >= leavesNeeded;
     }
 
     public static bool StartPackageCreation(SeedPackageRarity rarity)
@@ -140,7 +140,7 @@ public static class CompostSystem
             return false;
 
         int leavesNeeded = new SeedPackage(rarity).LeavesRequired;
-        Game.pianta.Stats.FoglieAttuali -= leavesNeeded;
+        Game.pianta.Stats.FoglieAccumulate -= leavesNeeded;
 
         var packageInProgress = new PackageInProgress(rarity);
         _packagesInProgress.Add(packageInProgress);

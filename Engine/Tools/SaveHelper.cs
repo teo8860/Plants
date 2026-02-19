@@ -15,7 +15,8 @@ public static class SaveHelper
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        IncludeFields = true
     };
 
     /// <summary>

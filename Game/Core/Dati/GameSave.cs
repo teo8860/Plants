@@ -4,6 +4,34 @@ using System.Numerics;
 
 namespace Plants;
 
+public class RamoSaveData
+{
+    public List<Vector2> Punti { get; set; } = new();
+}
+
+public class RadiceSaveData
+{
+    public List<Vector2> Start { get; set; } = new();
+    public List<Vector2> End { get; set; } = new();
+    public List<RadiceSaveData> Rami { get; set; } = new();
+    public int Generazione { get; set; }
+}
+
+public class EderaSaveData
+{
+    public List<Vector2> Punti { get; set; } = new();
+}
+
+public class PlantSaveData
+{
+    public List<Vector2> PuntiSpline { get; set; } = new();
+    public List<RamoSaveData> Rami { get; set; } = new();
+    public List<RadiceSaveData> Radici { get; set; } = new();
+    public List<EderaSaveData> Edera { get; set; } = new();
+    public bool EderaCreata { get; set; }
+    public int ContatorePuntiPerRamo { get; set; }
+    public int ContatorePuntiPerRadice { get; set; }
+}
 
 public class GameSaveData
 {
@@ -18,7 +46,8 @@ public class GameSaveData
     public SeedType PlantSeedType { get; set; }
     public SeedStats PlantSeedBonus { get; set; }
     public int randomSeed {get; set; }
-    public int plantGrowhtStage { get; set; }
+
+    public PlantSaveData Plant { get; set; }
 
 	public GameSaveData()
     {
@@ -33,7 +62,7 @@ public class GameSave
     private const string SaveFileName = "savegame.json";
     public  GameSaveData data = new();
 
-    
+
     private static GameSave instance = null;
 
     public static GameSave get()
@@ -58,7 +87,7 @@ public class GameSave
             data.PlantSeedType = Game.pianta.TipoSeme;
             data.PlantSeedBonus = Game.pianta.seedBonus;
             data.randomSeed = Game.pianta.rseed;
-            data.plantGrowhtStage = Game.pianta.puntiSpline.Count+3;
+            data.Plant = Game.pianta.ToSaveData();
 		}
 
         data.SaveTime = DateTime.Now;
@@ -74,18 +103,21 @@ public class GameSave
         {
             Console.WriteLine("No save data found, starting new game.");
 			data = new();
+            return;
         }
 
         var saveData = GameSave.get().data;
-        Console.WriteLine($"Loaded plant growth stage: {saveData.plantGrowhtStage}");
 
         Game.pianta.Stats = saveData.PlantStats;
         Game.pianta.TipoSeme = saveData.PlantSeedType;
         Game.pianta.seedBonus = saveData.PlantSeedBonus;
         Game.pianta.rseed = saveData.randomSeed;
 
-		for (int i = 0; i < saveData.plantGrowhtStage; i++)
-            Game.pianta.Crescita();
+        if (saveData.Plant != null && saveData.Plant.PuntiSpline.Count > 0)
+        {
+            Game.pianta.RestoreFromSaveData(saveData.Plant);
+            Console.WriteLine($"Loaded plant: {saveData.Plant.PuntiSpline.Count} spline points, {saveData.Plant.Rami.Count} branches, {saveData.Plant.Radici.Count} roots");
+        }
 
 		WorldManager.SetCurrentWorld(saveData.CurrentWorld);
         WorldManager.SetWorldDifficulty(saveData.CurrentWorld, saveData.CurrentDifficulty);

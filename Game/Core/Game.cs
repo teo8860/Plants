@@ -82,7 +82,6 @@ public static class Game
 
         Phase = FaseGiorno.GetCurrentPhase();
 
-
         Rendering.camera.position.Y = 0;
         tutorial.StartTutorial();
         //seedTest();

@@ -383,4 +383,68 @@ public class Obj_Plant : GameElement
     {
         return (float)Math.Sin(Time.GetTime());
     }
+
+    public PlantSaveData ToSaveData()
+    {
+        var data = new PlantSaveData();
+        data.PuntiSpline = new List<Vector2>(puntiSpline);
+        data.EderaCreata = ederaCreata;
+        data.ContatorePuntiPerRamo = contatorePuntiPerRamo;
+        data.ContatorePuntiPerRadice = contatorePuntiPerRadice;
+
+        foreach (var ramo in rami)
+            data.Rami.Add(ramo.ToSaveData());
+
+        foreach (var radice in radici)
+            data.Radici.Add(radice.ToSaveData());
+
+        foreach (var edera in ramiEdera)
+            data.Edera.Add(edera.ToSaveData());
+
+        return data;
+    }
+
+    public void RestoreFromSaveData(PlantSaveData data)
+    {
+        foreach (var item in rami)
+            item.Destroy();
+        foreach (var item in radici)
+            item.Destroy();
+        foreach (var item in ramiEdera)
+            item.Destroy();
+
+        rami.Clear();
+        radici.Clear();
+        ramiEdera.Clear();
+        puntiSpline.Clear();
+
+        puntiSpline.AddRange(data.PuntiSpline);
+        ederaCreata = data.EderaCreata;
+        contatorePuntiPerRamo = data.ContatorePuntiPerRamo;
+        contatorePuntiPerRadice = data.ContatorePuntiPerRadice;
+
+        if (puntiSpline.Count > 0)
+            posizione = puntiSpline[0];
+
+        foreach (var ramoData in data.Rami)
+        {
+            var ramo = Obj_Ramo.FromSaveData(ramoData);
+            ramo.roomId = Game.room_main.id;
+            rami.Add(ramo);
+        }
+
+        foreach (var radiceData in data.Radici)
+        {
+            var radice = Obj_Radice.FromSaveData(radiceData);
+            radice.roomId = Game.room_main.id;
+            radici.Add(radice);
+        }
+
+        foreach (var ederaData in data.Edera)
+        {
+            var edera = Obj_RamoEdera.FromSaveData(ederaData, colore1);
+            edera.roomId = Game.room_main.id;
+            ramiEdera.Add(edera);
+        }
+    }
 }
