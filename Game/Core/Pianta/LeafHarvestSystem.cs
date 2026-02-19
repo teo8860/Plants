@@ -222,8 +222,10 @@ public static class LeafHarvestSystem
         // Le foglie integre vanno a FoglieAttuali (usate per aprire pacchetti)
         if (result.IntactLeaves > 0)
         {
-            stats.FoglieAttuali += result.IntactLeaves;
+            stats.FoglieAccumulate += result.IntactLeaves;
         }
+
+        stats.FoglieAttuali = 0;
 
         return result;
     }

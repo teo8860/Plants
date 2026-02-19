@@ -191,6 +191,7 @@ public class PlantStats
     public float ResistenzaVuoto { get; set; } = 0.0f;
     public int FoglieBase { get; set; } = 100;
     public int FoglieAttuali { get; set; } = 0;
+    public int FoglieAccumulate { get; set; } = 0;
     public float DropRateFoglie { get; set; } = 0.003f;
     public float Altezza { get; set; } = 0.0f;
     public float AltezzaMassima { get; set; } = 5000.0f;

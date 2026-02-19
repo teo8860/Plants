@@ -530,7 +530,14 @@ public class GameLogicPianta
 
     public void AggiornaTutto(DayPhase fase, Weather meteo, WorldModifier worldMod)
     {
-        if (!IsViva) return;
+        if (!IsViva)
+        {
+            if (stats.FoglieAttuali > 0)
+            {
+                LeafHarvestSystem.HarvestAndShow("Pianta morta");
+            }
+            return;
+        }
 
         AggiornaTemperatura(fase, meteo, worldMod);
         ApplicaDanniTemperatura(worldMod);
