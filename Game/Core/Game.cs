@@ -53,6 +53,8 @@ public static class Game
 
     public static NotificationMonitor notificationMonitor;
 
+    public static Obj_GuiLeafHarvestPopup leafHarvestPopup;
+
     public static void Init()
     {
         room_main = new Room();
@@ -164,6 +166,7 @@ public static class Game
         worldTransition = GameElement.Create<Obj_GuiWorldTransition>(-200);
 
         oxygenSystem = new OxygenSystem();
+        Game.leafHarvestPopup = new Obj_GuiLeafHarvestPopup();
     }
 
     private static void InitGui()

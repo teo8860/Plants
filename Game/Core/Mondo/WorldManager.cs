@@ -786,6 +786,12 @@ public static class WorldManager
     };
 
     public static int GetTotalWorlds() => 10;
-    public static void SetNextWorld() => SetCurrentWorld(GetNextWorld(currentWorld));
-    public static void SetPreviousWorld() => SetCurrentWorld(GetPreviousWorld(currentWorld));
+    public static void SetNextWorld() { 
+        SetCurrentWorld(GetNextWorld(currentWorld)); 
+        LeafHarvestSystem.HarvestAndShow("Cambio Mondo"); 
+    }
+    public static void SetPreviousWorld() {
+        SetCurrentWorld(GetPreviousWorld(currentWorld)); 
+        LeafHarvestSystem.HarvestAndShow("Cambio Mondo"); 
+    }
 }
