@@ -9,8 +9,7 @@ namespace Plants;
 public class LeafResult
 {
     public bool IsIntact { get; set; }       // foglia integra (raccoglibile)
-    public float Quality { get; set; }        // qualità 0-1
-    public int EssenceValue { get; set; }     // essence che vale
+    public float Quality { get; set; }        // qualità 0-1 (cosmetic, per UI)
     public string DamageReason { get; set; } // motivo del danno se rotta
 }
 
@@ -22,19 +21,17 @@ public class HarvestResult
     public int TotalLeaves { get; set; }
     public int IntactLeaves { get; set; }
     public int BrokenLeaves { get; set; }
-    public int EssenceGained { get; set; }
     public List<LeafResult> Leaves { get; set; } = new();
     public string TriggerReason { get; set; } // "Cambio Mondo" o "Pianta morta"
 }
 
 /// <summary>
-/// Sistema per raccogliere le foglie quando la pianta muore o si cambia mondo
+/// Sistema per raccogliere le foglie quando la pianta muore o si cambia mondo.
+/// Le foglie integre vengono aggiunte a FoglieAttuali (usate per aprire pacchetti).
+/// Le foglie rotte vengono semplicemente scartate.
 /// </summary>
 public static class LeafHarvestSystem
 {
-    // Essence base per foglia integra (scala con rarità del seme)
-    private const int BASE_ESSENCE_PER_LEAF = 3;
-    private const int MAX_ESSENCE_PER_LEAF = 15;
 
     /// <summary>
     /// Calcola la probabilità che una foglia sia integra in base alle condizioni attuali
@@ -168,30 +165,8 @@ public static class LeafHarvestSystem
     }
 
     /// <summary>
-    /// Calcola il valore in essence di una foglia integra
-    /// </summary>
-    private static int CalculateLeafEssenceValue(float quality, SeedType seedType)
-    {
-        // Rarità del seme influenza il valore base
-        SeedRarity rarity = SeedDataType.GetRarity(seedType);
-        float rarityMultiplier = rarity switch
-        {
-            SeedRarity.Comune => 1.0f,
-            SeedRarity.NonComune => 1.3f,
-            SeedRarity.Raro => 1.7f,
-            SeedRarity.Epico => 2.5f,
-            SeedRarity.Leggendario => 4.0f,
-            _ => 1.0f
-        };
-
-        float essenceF = BASE_ESSENCE_PER_LEAF + (MAX_ESSENCE_PER_LEAF - BASE_ESSENCE_PER_LEAF) * quality;
-        essenceF *= rarityMultiplier;
-
-        return Math.Max(1, (int)essenceF);
-    }
-
-    /// <summary>
     /// Esegue la raccolta di tutte le foglie della pianta.
+    /// Le foglie integre vengono aggiunte a FoglieAttuali (usate per aprire pacchetti).
     /// Chiamato quando si cambia mondo o la pianta muore.
     /// </summary>
     public static HarvestResult Harvest(string triggerReason = "Cambio Mondo")
@@ -222,40 +197,32 @@ public static class LeafHarvestSystem
         {
             bool isIntact = RandomHelper.Chance(intactChance);
 
-            // qualità influenzata dall'integrità e da un po' di random
+            // qualità influenzata dall'integrità e da un po' di random (cosmetic, per UI)
             float quality = isIntact
                 ? RandomHelper.Float(0.5f, 1.0f) * intactChance
                 : 0f;
 
             quality = Math.Clamp(quality, 0f, 1f);
 
-            int essence = isIntact ? CalculateLeafEssenceValue(quality, pianta.TipoSeme) : 0;
-
             var leafResult = new LeafResult
             {
                 IsIntact = isIntact,
                 Quality = quality,
-                EssenceValue = essence,
                 DamageReason = isIntact ? "" : damageReason
             };
 
             result.Leaves.Add(leafResult);
 
             if (isIntact)
-            {
                 result.IntactLeaves++;
-                result.EssenceGained += essence;
-            }
             else
-            {
                 result.BrokenLeaves++;
-            }
         }
 
-        // Applica l'essence guadagnata
-        if (result.EssenceGained > 0)
+        // Le foglie integre vanno a FoglieAttuali (usate per aprire pacchetti)
+        if (result.IntactLeaves > 0)
         {
-            SeedUpgradeSystem.SetEssence(SeedUpgradeSystem.Essence + result.EssenceGained);
+            stats.FoglieAttuali += result.IntactLeaves;
         }
 
         return result;

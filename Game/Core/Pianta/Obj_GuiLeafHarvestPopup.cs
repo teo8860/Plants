@@ -25,9 +25,9 @@ public class Obj_GuiLeafHarvestPopup : GameElement
     private int scrollOffset = 0;
     private const int LEAVES_PER_PAGE = 8;
 
-    // Contatore animato
-    private float animatedEssence = 0f;
-    private float essenceAnimSpeed = 0f;
+    // Contatore animato foglie integre
+    private float animatedLeaves = 0f;
+    private float leavesAnimSpeed = 0f;
 
     // Particelle
     private List<HarvestParticle> particles = new();
@@ -43,7 +43,6 @@ public class Obj_GuiLeafHarvestPopup : GameElement
     private readonly Color headerBg = new Color(40, 60, 35, 255);
     private readonly Color intactColor = new Color(100, 220, 100, 255);
     private readonly Color brokenColor = new Color(200, 80, 80, 255);
-    private readonly Color essenceColor = new Color(180, 100, 255, 255);
     private readonly Color scrollBg = new Color(20, 25, 15, 200);
 
     private struct HarvestParticle
@@ -71,8 +70,8 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         isVisible = true;
         animProgress = 0f;
         scrollOffset = 0;
-        animatedEssence = 0f;
-        essenceAnimSpeed = result.EssenceGained / 1.5f; // arriva in ~1.5 secondi
+        animatedLeaves = 0f;
+        leavesAnimSpeed = result.IntactLeaves / 1.5f; // arriva in ~1.5 secondi
         particles.Clear();
         particleTimer = 0f;
         pulseTime = 0f;
@@ -117,14 +116,14 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         animProgress += (target - animProgress) * dt * ANIM_SPEED;
         animProgress = Math.Clamp(animProgress, 0f, 1f);
 
-        // Contatore essence animato
-        if (currentResult != null && animatedEssence < currentResult.EssenceGained)
+        // Contatore foglie integre animato
+        if (currentResult != null && animatedLeaves < currentResult.IntactLeaves)
         {
-            animatedEssence = Math.Min(currentResult.EssenceGained, animatedEssence + essenceAnimSpeed * dt);
+            animatedLeaves = Math.Min(currentResult.IntactLeaves, animatedLeaves + leavesAnimSpeed * dt);
         }
 
-        // Particelle occasionali se c'è essence da mostrare
-        if (currentResult != null && currentResult.EssenceGained > 0 && animProgress > 0.8f)
+        // Particelle occasionali se ci sono foglie integre da mostrare
+        if (currentResult != null && currentResult.IntactLeaves > 0 && animProgress > 0.8f)
         {
             particleTimer += dt;
             if (particleTimer > 0.15f)
@@ -297,21 +296,21 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         DrawStatBox(px + 8 + colW * 2, py + 4, colW, "ROTTE", currentResult.BrokenLeaves.ToString(),
             brokenColor);
 
-        // Essence guadagnata (sotto)
-        int essenceY = py + 38;
-        string essStr = $"+{(int)animatedEssence} Essence";
-        int essW = essStr.Length * 7 + 10;
-        int essX = px + (pw - essW) / 2;
+        // Foglie guadagnate (sotto)
+        int leavesY = py + 38;
+        string leavesStr = $"+{(int)animatedLeaves} Foglie";
+        int leavesW = leavesStr.Length * 7 + 10;
+        int leavesX = px + (pw - leavesW) / 2;
 
         // Pulsa
         float pulse = (MathF.Sin(pulseTime * 4f) + 1f) * 0.5f;
-        byte essAlpha = (byte)(200 + pulse * 55);
+        byte leafAlpha = (byte)(200 + pulse * 55);
 
-        Graphics.DrawText(essStr, essX + 5, essY, 12,
-            new Color(essenceColor.R, essenceColor.G, essenceColor.B, essAlpha));
+        Color leafGlow = new Color(100, 220, 100, leafAlpha);
+        Graphics.DrawText(leavesStr, leavesX + 5, leavesY, 12, leafGlow);
 
-        // Cristallino essence piccolo
-        DrawEssenceIcon(essX + essW - 8, essY + 8, 6);
+        // Piccola icona foglia
+        DrawLeafIcon(leavesX + leavesW - 8, leavesY + 6, 5);
     }
 
     private void DrawStatBox(int x, int y, int w, string label, string value, Color valueColor)
@@ -376,9 +375,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
                 Graphics.DrawRectangle(barX, barY, (int)(barW * leaf.Quality), barH, barColor);
 
-                // Essence
-                string essText = $"+{leaf.EssenceValue}";
-                Graphics.DrawText(essText, px + pw - 50, rowY + 5, 9, essenceColor);
+                Graphics.DrawText("integra", px + pw - 55, rowY + 5, 8, intactColor);
             }
             else
             {
@@ -426,24 +423,15 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         Graphics.DrawText(label, btnX + (btnW - lw) / 2, py + 8, 13, Color.White);
     }
 
-    private void DrawEssenceIcon(int x, int y, int size)
+    private void DrawLeafIcon(int x, int y, int size)
     {
         float pulse = (MathF.Sin(pulseTime * 3f) + 1f) * 0.5f;
         byte a = (byte)(180 + pulse * 75);
-        Color col = new Color(essenceColor.R, essenceColor.G, essenceColor.B, a);
+        Color col = new Color(80, (byte)(200 + pulse * 55), 80, a);
 
-        Graphics.DrawTriangle(
-            new Vector2(x, y - size),
-            new Vector2(x - size / 2, y),
-            new Vector2(x + size / 2, y),
-            col
-        );
-        Graphics.DrawTriangle(
-            new Vector2(x, y + size),
-            new Vector2(x - size / 2, y),
-            new Vector2(x + size / 2, y),
-            col
-        );
+        // Foglia stilizzata come ellisse ruotata
+        Graphics.DrawEllipse(x, y, size, size / 2, col);
+        Graphics.DrawLine(x - size, y, x + size, y, new Color(col.R, col.G, col.B, (byte)(a / 2)));
     }
 
     private float EaseOutBack(float x)
