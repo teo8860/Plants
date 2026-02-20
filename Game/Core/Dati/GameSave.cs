@@ -103,6 +103,7 @@ public class GameSave
         {
             Console.WriteLine("No save data found, starting new game.");
 			data = new();
+            WorldManager.SetCurrentWorld(WorldType.Terra);
             return;
         }
 
@@ -116,7 +117,8 @@ public class GameSave
         if (saveData.Plant != null && saveData.Plant.PuntiSpline.Count > 0)
         {
             Game.pianta.RestoreFromSaveData(saveData.Plant);
-            Console.WriteLine($"Loaded plant: {saveData.Plant.PuntiSpline.Count} spline points, {saveData.Plant.Rami.Count} branches, {saveData.Plant.Radici.Count} roots");
+            int ramiMassimi = Math.Max(1, Game.pianta.proprieta.FoglieMassime / 5);
+            Console.WriteLine($"Loaded plant: {saveData.Plant.PuntiSpline.Count} spline points, {saveData.Plant.Rami.Count}/{ramiMassimi} branches, {saveData.Plant.Radici.Count} roots, foglie {Game.pianta.Stats.FoglieAttuali}/{Game.pianta.proprieta.FoglieMassime}");
         }
 
 		WorldManager.SetCurrentWorld(saveData.CurrentWorld);

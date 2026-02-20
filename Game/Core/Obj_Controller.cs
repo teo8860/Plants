@@ -108,11 +108,17 @@ public class Obj_Controller : GameElement
             autoscroll = !autoscroll;
         }
 
+        if (Input.IsKeyDown(KeyboardKey.G))
+        {
+            Game.pianta.Crescita();
+        }
+
     }
 
     public void Scorri(float delta)
     {
         Rendering.camera.position.Y += delta;
+        Rendering.camera.position.Y = Math.Clamp(Rendering.camera.position.Y, offsetMinY, offsetMaxY);
         Rendering.camera.Update();
     }
 }

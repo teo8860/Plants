@@ -43,6 +43,24 @@ public class Obj_Plant : GameElement
 
     public float nextWorldGroundY => Stats.EffectiveMaxHeight + GameProperties.groundHeight - 10;
 
+
+    public Obj_Plant()
+    {
+        proprieta = new GameLogicPianta(this);
+        SetSeed(SeedType.Normale);
+
+        PosizionaAlCentroInBasso();
+        GeneraPuntoIniziale();
+
+    }
+
+
+    public Obj_Plant(SeedType seedType)
+    {
+        SetSeed(seedType);
+    }
+
+    
     public void setColori(Color Colore1, Color Colore2)
     {
         colore1 = Colore1;
@@ -67,24 +85,6 @@ public class Obj_Plant : GameElement
         colore1 = Color.FromHSV(hue, sat, val);
         colore2 = Color.FromHSV(hue, sat * 1.1f, val * 0.7f);
     }
-
-    public Obj_Plant()
-    {
-        proprieta = new GameLogicPianta(this);
-        SetSeed(SeedType.Normale);
-
-        PosizionaAlCentroInBasso();
-        GeneraPuntoIniziale();
-
-    }
-
-
-    public Obj_Plant(SeedType seedType)
-    {
-        SetSeed(seedType);
-    }
-
-
 
     public void SetSeed(SeedType seedType)
     {
@@ -118,7 +118,7 @@ public class Obj_Plant : GameElement
         if (Stats.FoglieAttuali < proprieta.FoglieMassime)
         {
             float probabilitaFoglia = velocita * 0.15f * (1f - (float)Stats.FoglieAttuali / proprieta.FoglieMassime);
-            if (RandomHelper.DeterministicFloatRangeAt(rseed, Stats.FoglieAttuali, 0, 1) < probabilitaFoglia)
+            if (RandomHelper.DeterministicFloatRangeAt(rseed, Stats.FoglieAttuali + puntiSpline.Count, 0, 1) < probabilitaFoglia)
             {
                 Stats.FoglieAttuali++;
             }

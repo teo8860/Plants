@@ -170,19 +170,17 @@ public class Obj_Ramo: GameElement
 
         spessoreBase = Math.Max(2f, 7f - fattoreAltezza * 4f);
 
-        for (int i = 0; i < punti.Count - 1; i++)
+        for (int i = 0; i < puntiSpan.Length - 1; i++)
         {
-            if(puntiSpan.Length < i +1) continue;
-
 			Vector2 pStart = puntiSpan[i];
             Vector2 pEnd = puntiSpan[i + 1];
 
             float oscillazione = MathF.Sin(tempoVita * 1.2f + i * 0.4f) * 5f;
-            float fattoreOscillazione = (float)(i + 1) / punti.Count;
+            float fattoreOscillazione = (float)(i + 1) / puntiSpan.Length;
             pStart.X += oscillazione * fattoreOscillazione * 0.5f;
             pEnd.X += oscillazione * fattoreOscillazione;
 
-            float fattoreSegmento = (float)(punti.Count - 1 - i) / Math.Max(1, punti.Count - 1);
+            float fattoreSegmento = (float)(puntiSpan.Length - 1 - i) / Math.Max(1, puntiSpan.Length - 1);
             spessoreAttuale = spessoreBase * (0.25f + fattoreSegmento * 0.6f);
             spessoreAttuale = Math.Max(1f, spessoreAttuale);
 
