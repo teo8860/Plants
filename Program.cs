@@ -68,8 +68,8 @@ internal static class Program
         {
            Window.ClearState(ConfigFlags.HiddenWindow);
            var m = MouseHelper.GetMousePosition();
-
-           Window.SetPosition((int)m.X-(GameProperties.windowWidth/2), (int)m.Y-GameProperties.windowHeight-50);
+         
+            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 10, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
         };
 
         trayIcon.OnExit  += () =>
