@@ -41,20 +41,20 @@ internal static class Program
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
         Window.ClearState(ConfigFlags.ResizableWindow);
 
+        // rimuove la possibilità di minimizzare
         IntPtr hwnd = Window.GetHandle();
 		uint style = GetWindowLong(hwnd, GWL_STYLE);
-        style &= ~WS_MINIMIZEBOX; // rimuove la possibilità di minimizzare
+        style &= ~WS_MINIMIZEBOX; 
         SetWindowLong(hwnd, GWL_STYLE, style);
 
 
         SetupIcon();
-        Window.SetState(ConfigFlags.HiddenWindow);
+        Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 10, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
 
         Input.HideCursor();
         
      
 		Game.Init();
-        Window.SetState(ConfigFlags.HiddenWindow);
         Rendering.Init();
 	}
 
@@ -62,13 +62,11 @@ internal static class Program
     {
         // Carica icona nella barra delle applicazioni
         Icon icon = Utility.LoadIconFromEmbedded("icon.ico", "Assets");
-        trayIcon = new NativeTrayIcon(icon, "Tooltip icona");
+        trayIcon = new NativeTrayIcon(icon, "Plants");
         
         trayIcon.OnClickLeft += ()=>
         {
-           Window.ClearState(ConfigFlags.HiddenWindow);
-           var m = MouseHelper.GetMousePosition();
-         
+            Window.ClearState(ConfigFlags.HiddenWindow);
             Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 10, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
         };
 

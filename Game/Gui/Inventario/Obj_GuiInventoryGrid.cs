@@ -28,12 +28,11 @@ public class Obj_GuiInventoryGrid : GameElement
     private List<Seed> filteredSeeds = new();
     private List<Obj_Seed> visualSeedList = new();
 
-    // Colori
     private Color cellColor = new Color(101, 67, 43, 250);
     private Color cellHoverColor = new Color(139, 90, 55, 250);
     private Color cellSelectedColor = new Color(166, 118, 76, 250);
     private Color cellFusionSelectedColor = new Color(100, 180, 255, 250);
-    private Color cellMaxFusionColor = new Color(150, 50, 50, 250); // Rosso per semi al max fusioni
+    private Color cellMaxFusionColor = new Color(150, 50, 50, 250);
     private Color borderColor = new Color(62, 39, 25, 255);
     private Color borderSelectedColor = new Color(200, 150, 80, 255);
     private Color borderFusionColor = new Color(100, 200, 255, 255);
@@ -57,7 +56,8 @@ public class Obj_GuiInventoryGrid : GameElement
     public void ClearRarityFilter()
     {
         rarityFilter = null;
-        filteredSeeds.Clear();
+        UpdateFilteredSeeds();
+        Populate();
     }
 
     private void UpdateFilteredSeeds()
@@ -75,7 +75,6 @@ public class Obj_GuiInventoryGrid : GameElement
         if (detailPanel == null)
             return 10;
 
-        int screenWidth = Rendering.camera.screenWidth;
         int usableWidth = GameProperties.windowWidth - detailPanel.panelWidth - startX;
         return Math.Max(1, usableWidth / (cellSize + spacing));
     }
@@ -87,14 +86,19 @@ public class Obj_GuiInventoryGrid : GameElement
 
         UpdateFilteredSeeds();
 
-        visualSeedList.ForEach(seed => seed.Destroy());
-		visualSeedList.Clear();
+        foreach (var seed in visualSeedList)
+            seed.Destroy();
+
+        visualSeedList.Clear();
+        scrollY = 0;
 
         int columns = GetCurrentColumns();
+
         for (int i = 0; i < filteredSeeds.Count; i++)
         {
             int col = i % columns;
             int row = i / columns;
+
             int x = startX + col * (cellSize + spacing);
             int y = startY + row * (cellSize + spacing);
 
@@ -105,51 +109,61 @@ public class Obj_GuiInventoryGrid : GameElement
                 depth = -50,
                 position = new Vector2(x + (cellSize / 2), y + (cellSize / 2))
             };
-            Seed seedInfo = filteredSeeds[i];
 
+            Seed seedInfo = filteredSeeds[i];
             seedVisual.dati = seedInfo;
             seedVisual.color = seedInfo.color;
+
             visualSeedList.Add(seedVisual);
         }
     }
 
     public override void Update()
     {
+        if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
+            return;
+
         float wheelDelta = Input.GetMouseWheelMove();
 
         if (wheelDelta != 0)
         {
             scrollY += (int)(wheelDelta * 20);
-            scrollY = Math.Clamp(scrollY, -(cellSize * visualSeedList.Count / 3), -cellSize + (cellSize / 2));
 
             int columns = GetCurrentColumns();
+            int rows = (int)Math.Ceiling((float)visualSeedList.Count / columns);
+
+            int contentHeight = rows * (cellSize + spacing);
+            int visibleHeight = Rendering.camera.screenHeight - startY;
+
+            int minScroll = Math.Min(0, visibleHeight - contentHeight);
+            int maxScroll = 0;
+
+            scrollY = Math.Clamp(scrollY, minScroll, maxScroll);
+
             for (int i = 0; i < visualSeedList.Count; i++)
             {
-                var seed = visualSeedList[i];
-
                 int col = i % columns;
                 int row = i / columns;
 
-                seed.position.Y = startY + row * (cellSize + spacing) + scrollY + (cellSize / 2);
+                visualSeedList[i].position.Y =
+                    startY + row * (cellSize + spacing) + scrollY + (cellSize / 2);
             }
         }
-
-        if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
-            return;
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
         bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
 
         hoveredIndex = -1;
-        int seedCount = visualSeedList.Count;
-        bool clickedOnCell = false;
 
-        for (int i = 0; i < seedCount; i++)
+        int columnsCurrent = GetCurrentColumns();
+        var fusionManager = SeedFusionManager.Get();
+
+        for (int i = 0; i < visualSeedList.Count; i++)
         {
-            int columns = GetCurrentColumns();
-            int col = i % columns;
-            int row = i / columns;
+            int col = i % columnsCurrent;
+            int row = i / columnsCurrent;
+
             int x = startX + col * (cellSize + spacing);
             int y = startY + row * (cellSize + spacing) + scrollY;
 
@@ -159,23 +173,16 @@ public class Obj_GuiInventoryGrid : GameElement
 
                 if (clicked)
                 {
-                    clickedOnCell = true;
-
-                    var fusionManager = SeedFusionManager.Get();
-
                     if (fusionManager.IsFusionMode)
-                    {
-                        // Modalità fusione: seleziona/deseleziona semi
                         fusionManager.ToggleSeedSelection(filteredSeeds[i], i);
-                    }
                     else
                     {
-                        // Modalità normale: mostra dettagli
                         selectedIndex = i;
                         detailPanel?.Open(i);
                         OnSeedSelected?.Invoke(i);
                     }
                 }
+
                 break;
             }
         }
@@ -187,31 +194,33 @@ public class Obj_GuiInventoryGrid : GameElement
             return;
 
         int columns = GetCurrentColumns();
-        int maxX = detailPanel != null ? GameProperties.windowWidth - detailPanel.panelWidth : GameProperties.windowWidth;
-        int maxRows = (int)Math.Ceiling(100.0 / columns);
+        int maxX = detailPanel != null
+            ? GameProperties.windowWidth - detailPanel.panelWidth
+            : GameProperties.windowWidth;
 
+        int rows = (int)Math.Ceiling((float)filteredSeeds.Count / columns);
         var fusionManager = SeedFusionManager.Get();
 
-        for (int row = 0; row < maxRows; row++)
+        for (int row = 0; row < rows; row++)
         {
             for (int col = 0; col < columns; col++)
             {
                 int i = row * columns + col;
-                if (i >= 100) break;
+                if (i >= filteredSeeds.Count)
+                    break;
 
                 int x = startX + col * (cellSize + spacing);
                 int y = startY + row * (cellSize + spacing) + scrollY;
 
-                if (x + cellSize > maxX) continue;
+                if (x + cellSize > maxX)
+                    continue;
 
-                // Ottieni il seme per controllare fusionCount
-                Seed seed = i < filteredSeeds.Count ? filteredSeeds[i] : null;
+                Seed seed = filteredSeeds[i];
                 bool isMaxFusion = seed != null && !seed.CanBeFused;
 
                 Color bg = cellColor;
                 Color border = borderColor;
 
-                // Determina il colore in base allo stato
                 if (isMaxFusion)
                 {
                     bg = cellMaxFusionColor;
@@ -228,23 +237,20 @@ public class Obj_GuiInventoryGrid : GameElement
                     border = borderSelectedColor;
                 }
                 else if (i == hoveredIndex)
-                {
                     bg = cellHoverColor;
-                }
 
-                // Ombra
-                Graphics.DrawRectangleRounded(new Rectangle(x + 3, y + 3, cellSize - 2, cellSize - 2),
+                Graphics.DrawRectangleRounded(
+                    new Rectangle(x + 3, y + 3, cellSize - 2, cellSize - 2),
                     0.18f, 8, innerShadow);
 
-                // Background
-                Graphics.DrawRectangleRounded(new Rectangle(x, y, cellSize, cellSize),
+                Graphics.DrawRectangleRounded(
+                    new Rectangle(x, y, cellSize, cellSize),
                     0.18f, 8, bg);
 
-                // Bordo
-                Graphics.DrawRectangleRoundedLines(new Rectangle(x, y, cellSize, cellSize),
+                Graphics.DrawRectangleRoundedLines(
+                    new Rectangle(x, y, cellSize, cellSize),
                     0.18f, 8, 3, border);
 
-                // Indicatore fusione (numerino nell'angolo in alto a destra)
                 if (fusionManager.IsFusionMode && fusionManager.IsSeedSelected(i))
                 {
                     int selectionNum = i == fusionManager.SelectedIndex1 ? 1 : 2;
@@ -252,21 +258,18 @@ public class Obj_GuiInventoryGrid : GameElement
                     Graphics.DrawText(selectionNum.ToString(), x + cellSize - 13, y + 4, 12, new Color(0, 0, 0, 255));
                 }
 
-                // Indicatore contatore fusioni (barra in basso)
-                if (seed != null && seed.stats.fusionCount > 0)
-                {
+                if (seed.stats.fusionCount > 0)
                     DrawFusionBar(x, y, seed.stats.fusionCount);
-                }
             }
         }
 
-        // Disegna i semi
         for (int i = 0; i < visualSeedList.Count; i++)
         {
             int col = i % columns;
             int x = startX + col * (cellSize + spacing);
 
-            if (x + cellSize > maxX) continue;
+            if (x + cellSize > maxX)
+                continue;
 
             visualSeedList[i].Draw();
         }
@@ -279,27 +282,24 @@ public class Obj_GuiInventoryGrid : GameElement
         int barWidth = cellSize - 4;
         int barX = x + 2;
 
-        // Background barra
         Graphics.DrawRectangle(barX, barY, barWidth, barHeight, new Color(0, 0, 0, 150));
 
-        // Calcola larghezza riempimento
         float fillRatio = (float)fusionCount / Seed.MAX_FUSIONS;
         int fillWidth = (int)(barWidth * fillRatio);
 
-        // Colore in base al livello di fusione
         Color fillColor;
+
         if (fusionCount >= Seed.MAX_FUSIONS)
-            fillColor = new Color(200, 50, 50, 255); // Rosso - max
+            fillColor = new Color(200, 50, 50, 255);
         else if (fusionCount >= 3)
-            fillColor = new Color(255, 150, 50, 255); // Arancione - quasi max
+            fillColor = new Color(255, 150, 50, 255);
         else if (fusionCount >= 2)
-            fillColor = new Color(255, 200, 50, 255); // Giallo
+            fillColor = new Color(255, 200, 50, 255);
         else
-            fillColor = new Color(100, 200, 100, 255); // Verde
+            fillColor = new Color(100, 200, 100, 255);
 
         Graphics.DrawRectangle(barX, barY, fillWidth, barHeight, fillColor);
 
-        // Numero fusioni (piccolo testo)
         string fusionText = $"{fusionCount}/{Seed.MAX_FUSIONS}";
         Graphics.DrawText(fusionText, x + cellSize - 18, y + cellSize - 12, 7, Color.White);
     }
@@ -318,6 +318,7 @@ public class Obj_GuiInventoryGrid : GameElement
     {
         if (index >= 0 && index < filteredSeeds.Count)
             return filteredSeeds[index];
+
         return null;
     }
 }
