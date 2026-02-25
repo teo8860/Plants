@@ -4,6 +4,7 @@ using Raylib_CSharp.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Windows.Devices.Radios;
 
 namespace Plants;
 
@@ -63,6 +64,11 @@ public class Obj_Radice : GameElement
 
         ConfiguraParametri();
         segmenti.Add(new SegmentoRadice(origine, origine, spessoreBase, generazione == 0));
+    }
+    ~Obj_Radice()
+    {
+        foreach (var item in ramificazioni)
+            item.Destroy();
     }
 
     private void ConfiguraParametri()
