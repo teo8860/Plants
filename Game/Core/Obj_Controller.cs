@@ -138,6 +138,10 @@ public class Obj_Controller : GameElement
         {
             ManagerMinigames.Avvia(TipoMinigioco.Tieni);
         }
+        if (Input.IsKeyPressed(KeyboardKey.Three) && !ManagerMinigames.InCorso)
+        {
+            ManagerMinigames.Avvia(TipoMinigioco.Resta);
+        }
 
     }
 

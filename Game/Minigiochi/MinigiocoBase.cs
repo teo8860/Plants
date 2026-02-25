@@ -19,7 +19,8 @@ public enum MinigiocoStato
 public enum TipoMinigioco
 {
     Cerchio,
-    Tieni
+    Tieni,
+    Resta
 }
 
 public abstract class MinigiocoBase : GameElement
@@ -269,7 +270,7 @@ public abstract class MinigiocoBase : GameElement
         AssegnaFoglie(foglie);
         this.active = false;
         Game.room_main.SetActiveRoom();
-        MinigiocoManager.OnMinigiocoFinito();
+        ManagerMinigames.OnMinigiocoFinito();
     }
 
     protected int CalcolaFoglie()

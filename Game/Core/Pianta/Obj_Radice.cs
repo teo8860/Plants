@@ -71,6 +71,14 @@ public class Obj_Radice : GameElement
             item.Destroy();
     }
 
+    public new void Destroy()
+    {
+        foreach (var item in ramificazioni)
+            item.Destroy();
+        ramificazioni.Clear();
+        base.Destroy();
+    }
+
     private void ConfiguraParametri()
     {
         float fattoreGenerazione = MathF.Pow(0.65f, generazione);
@@ -168,7 +176,7 @@ public class Obj_Radice : GameElement
             mediaPosizioni /= count;
 
             float offsetDalCentro = posizione.X - origine.X;
-            dir.X += Math.Sign(offsetDalCentro) * 0.1f;
+            dir.X -= Math.Sign(offsetDalCentro) * 0.1f;
         }
 
         return Vector2.Normalize(dir);

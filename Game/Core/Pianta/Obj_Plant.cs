@@ -167,12 +167,23 @@ public class Obj_Plant : GameElement
             Vector2 puntoAttacco = posizione;
             puntoAttacco.Y -= 5;
 
-            Vector2 pos = posizione;
-            pos.Y += posizione.Y;
+            // Alterna sinistra/destra: pari va a sinistra, dispari a destra
+            float lato = (radici.Count % 2 == 0) ? -1f : 1f;
+            float dirX = lato * RandomHelper.DeterministicFloatRangeAt(rseed, radici.Count, 0.15f, 0.5f);
+            Vector2 direzione = new Vector2(dirX, -1f);
 
-            var radice = new Obj_Radice(puntoAttacco, pos);
+            var radice = new Obj_Radice(puntoAttacco, direzione);
             radice.roomId = Game.room_main.id;
             radici.Add(radice);
+
+            // La prima radice crea subito una gemella nella direzione opposta
+            if (radici.Count == 1)
+            {
+                Vector2 direzioneOpposta = new Vector2(-dirX, -1f);
+                var radiceGemella = new Obj_Radice(puntoAttacco, direzioneOpposta);
+                radiceGemella.roomId = Game.room_main.id;
+                radici.Add(radiceGemella);
+            }
 
             contatorePuntiPerRadice = 0;
         }
@@ -251,8 +262,11 @@ public class Obj_Plant : GameElement
 
         rami.Clear();
         radici.Clear();
-        ramiEdera.Clear(); 
-        ederaCreata = false; 
+        ramiEdera.Clear();
+        ederaCreata = false;
+
+        contatorePuntiPerRamo = 0;
+        contatorePuntiPerRadice = 0;
 
         Stats.Altezza = 0;
         Stats.FoglieAttuali = 0;

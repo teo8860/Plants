@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Plants;
 
-public static class MinigiocoManager
+public static class ManagerMinigames
 {
     private static Dictionary<TipoMinigioco, MinigiocoBase> minigiochi = new();
     private static Room room_minigioco;
@@ -21,6 +21,9 @@ public static class MinigiocoManager
 
         var tieni = GameElement.Create<MinigiocoTieni>(0, room_minigioco);
         minigiochi[TipoMinigioco.Tieni] = tieni;
+
+        var resta = GameElement.Create<MinigiocoResta>(0, room_minigioco);
+        minigiochi[TipoMinigioco.Resta] = resta;
     }
 
     public static Room GetRoom() => room_minigioco;
