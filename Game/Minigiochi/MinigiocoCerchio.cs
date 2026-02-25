@@ -104,9 +104,7 @@ public class MinigiocoCerchio : MinigiocoBase
     protected override void DrawGioco()
     {
         // Area di gioco
-        Graphics.DrawRectangleLines(marginX - 2, marginTop - 2,
-            sw - marginX * 2 + 4, sh - marginTop - marginBottom + 4,
-            new Color(60, 100, 60, 100));
+        Graphics.DrawRectangleLines(marginX - 2, marginTop - 2, sw - marginX * 2 + 4, sh - marginTop - marginBottom + 4, new Color(60, 100, 60, 100));
 
         // Cerchio target
         float scale = EaseOutElastic(animCerchio);
