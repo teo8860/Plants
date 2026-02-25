@@ -36,6 +36,7 @@
 	  <None Remove="desktop.ini" />
 	  <None Remove="pull.bat" />
 	  <None Remove="push.bat" />
+	  <None Remove="Save Data Location.lnk" />
 	</ItemGroup>
 
 	<ItemGroup>

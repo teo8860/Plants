@@ -8,6 +8,13 @@ using System.Numerics;
 
 namespace Plants;
 
+public enum TipoMinigioco
+{
+    Cerchio,
+    Tieni,
+    Resta
+}
+
 public enum MinigiocoStato
 {
     Intro,
@@ -16,12 +23,6 @@ public enum MinigiocoStato
     Sconfitta
 }
 
-public enum TipoMinigioco
-{
-    Cerchio,
-    Tieni,
-    Resta
-}
 
 public abstract class MinigiocoBase : GameElement
 {
@@ -86,6 +87,7 @@ public abstract class MinigiocoBase : GameElement
         this.active = true;
     }
 
+    // Da far ereditare a ciascun minigioco
     protected abstract void OnAvvia();
     protected abstract void UpdateGioco(float dt);
     protected abstract void DrawGioco();

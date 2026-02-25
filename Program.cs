@@ -49,7 +49,7 @@ internal static class Program
 
 
         SetupIcon();
-        Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 10, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
+        Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
 
         Input.HideCursor();
         
@@ -67,7 +67,7 @@ internal static class Program
         trayIcon.OnClickLeft += ()=>
         {
             Window.ClearState(ConfigFlags.HiddenWindow);
-            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 10, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
+            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
         };
 
         trayIcon.OnExit  += () =>

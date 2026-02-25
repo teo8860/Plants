@@ -26,7 +26,10 @@ public static class ManagerMinigames
         minigiochi[TipoMinigioco.Resta] = resta;
     }
 
-    public static Room GetRoom() => room_minigioco;
+    public static Room GetRoom()
+    {
+        return room_minigioco;
+    }
 
     public static void Avvia(TipoMinigioco tipo)
     {
