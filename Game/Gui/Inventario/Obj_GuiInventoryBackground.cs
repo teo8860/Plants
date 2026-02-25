@@ -50,8 +50,9 @@ public class Obj_GuiInventoryBackground : GameElement
         }
 
         // === PAVIMENTO ===
+        int navBarHeight = 45; // Spazio per la barra di navigazione (35px + padding)
         int floorHeight = 120;
-        int floorY = screenHeight - floorHeight;
+        int floorY = screenHeight - floorHeight - navBarHeight;
 
         int plankHeight = 15;
         for (int i = 0; i < floorHeight / plankHeight; i++)

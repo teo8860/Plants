@@ -80,5 +80,9 @@ public class Obj_GuiInventoryCratesBackground : GameElement
         Graphics.DrawRectangle(screenWidth - cornerSize, 0, cornerSize, cornerSize, woodShadow);
         Graphics.DrawRectangle(0, screenHeight - cornerSize, cornerSize, cornerSize, woodShadow);
         Graphics.DrawRectangle(screenWidth - cornerSize, screenHeight - cornerSize, cornerSize, cornerSize, woodShadow);
+
+        // === RIGA DI PAVIMENTO IN BASSO PER COPRIRE LA BARRA BIANCA DELLA SCROLLBAR ===
+        int bottomFloorHeight = 45;
+        Graphics.DrawRectangle(borderThickness, screenHeight - bottomFloorHeight, screenWidth - borderThickness * 2, bottomFloorHeight, woodDark);
     }
 }

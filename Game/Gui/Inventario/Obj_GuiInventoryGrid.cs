@@ -17,6 +17,7 @@ public class Obj_GuiInventoryGrid : GameElement
     private int startX = 25;
     private int startY = 60;
     private int scrollY = 0;
+    private int bottomMargin = 45; // Spazio per la barra di navigazione (35px + padding)
 
     private int selectedIndex = -1;
     private int hoveredIndex = -1;
@@ -77,6 +78,13 @@ public class Obj_GuiInventoryGrid : GameElement
 
         int usableWidth = GameProperties.windowWidth - detailPanel.panelWidth - startX;
         return Math.Max(1, usableWidth / (cellSize + spacing));
+    }
+
+    private int GetMaxVisibleRows()
+    {
+        int screenHeight = Rendering.camera.screenHeight;
+        int usableHeight = screenHeight - startY - bottomMargin;
+        return Math.Max(1, usableHeight / (cellSize + spacing));
     }
 
     public void Populate()

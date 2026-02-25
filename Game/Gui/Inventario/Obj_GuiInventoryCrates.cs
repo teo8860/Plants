@@ -131,8 +131,11 @@ public class Obj_GuiInventoryCrates : GameElement
         int screenWidth = Rendering.camera.screenWidth;
         int screenHeight = Rendering.camera.screenHeight;
 
+        // Spazio per la barra di navigazione (35px + padding)
+        int navBarHeight = 45;
+
         // Pavimento base (y dove inizia il pavimento)
-        int floorY = screenHeight - 30;
+        int floorY = screenHeight - 30 - navBarHeight;
 
         // === 2 CASSE A SINISTRA (impilate) ===
         int leftX = 60;

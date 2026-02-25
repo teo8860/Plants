@@ -75,10 +75,10 @@ public class Obj_GuiCompostBackground : GameElement
 
         DrawWindow(windowX, windowY, windowWidth, windowHeight);
 
-        // === TAVOLINO PIÙ LUNGO ===
-        int tableX = screenWidth / 2 - 140;  // Più largo
+        // === TAVOLINO PIï¿½ LUNGO ===
+        int tableX = screenWidth / 2 - 140;  // Piï¿½ largo
         int tableY = screenHeight - 180;
-        int tableWidth = 280;  // Molto più largo
+        int tableWidth = 280;  // Molto piï¿½ largo
         int tableHeight = 60;
 
         DrawTable(tableX, tableY, tableWidth, tableHeight);
@@ -93,6 +93,12 @@ public class Obj_GuiCompostBackground : GameElement
 
         // === BORDI STANZA ===
         DrawRoomBorders();
+
+        // === RIGA DI PAVIMENTO IN BASSO PER COPRIRE LA BARRA BIANCA DELLA SCROLLBAR ===
+        int bottomFloorHeight = 45;
+        Graphics.DrawRectangle(0, screenHeight - bottomFloorHeight, screenWidth, bottomFloorHeight, woodDark);
+        // Riga superiore della striscia di pavimento
+        Graphics.DrawRectangle(0, screenHeight - bottomFloorHeight, screenWidth, 4, woodMedium);
     }
 
     private void DrawWindow(int x, int y, int width, int height)
