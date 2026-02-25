@@ -92,7 +92,8 @@ public class Obj_GuiSeedDetailPanel : GameElement
         int buttonSpacing = 16;
         int buttonMargin = 12;
         int totalButtonsHeight = buttonLabels.Length * buttonHeight + (buttonLabels.Length - 1) * buttonSpacing;
-        int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - 15;
+        int navBarHeight = 45; // Spazio per la barra di navigazione (35px + padding)
+        int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - navBarHeight;
 
         for (int i = 0; i < buttonLabels.Length; i++)
         {
@@ -296,7 +297,8 @@ public class Obj_GuiSeedDetailPanel : GameElement
         int buttonSpacing = 16;
         int buttonMargin = 12;
         int totalButtonsHeight = buttonLabels.Length * buttonHeight + (buttonLabels.Length - 1) * buttonSpacing;
-        int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - 15;
+        int navBarHeight = 45; // Spazio per la barra di navigazione (35px + padding)
+        int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - navBarHeight;
 
         for (int i = 0; i < buttonLabels.Length; i++)
         {

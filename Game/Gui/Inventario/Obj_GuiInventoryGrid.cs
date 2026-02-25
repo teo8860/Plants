@@ -17,6 +17,7 @@ public class Obj_GuiInventoryGrid : GameElement
     private int startX = 25;
     private int startY = 60;
     private int scrollY = 0;
+    private int bottomMargin = 45; // Spazio per la barra di navigazione (35px + padding)
 
     private int selectedIndex = -1;
     private int hoveredIndex = -1;
@@ -76,8 +77,15 @@ public class Obj_GuiInventoryGrid : GameElement
             return 10;
 
         int screenWidth = Rendering.camera.screenWidth;
-        int usableWidth = GameProperties.windowWidth - detailPanel.panelWidth - startX;
+        int usableWidth = GameProperties.windowWidth - detailPanel.panelWidth - startX - startX;
         return Math.Max(1, usableWidth / (cellSize + spacing));
+    }
+
+    private int GetMaxVisibleRows()
+    {
+        int screenHeight = Rendering.camera.screenHeight;
+        int usableHeight = screenHeight - startY - bottomMargin;
+        return Math.Max(1, usableHeight / (cellSize + spacing));
     }
 
     public void Populate()
@@ -165,12 +173,12 @@ public class Obj_GuiInventoryGrid : GameElement
 
                     if (fusionManager.IsFusionMode)
                     {
-                        // Modalità fusione: seleziona/deseleziona semi
+                        // Modalitï¿½ fusione: seleziona/deseleziona semi
                         fusionManager.ToggleSeedSelection(filteredSeeds[i], i);
                     }
                     else
                     {
-                        // Modalità normale: mostra dettagli
+                        // Modalitï¿½ normale: mostra dettagli
                         selectedIndex = i;
                         detailPanel?.Open(i);
                         OnSeedSelected?.Invoke(i);
@@ -187,8 +195,8 @@ public class Obj_GuiInventoryGrid : GameElement
             return;
 
         int columns = GetCurrentColumns();
-        int maxX = detailPanel != null ? GameProperties.windowWidth - detailPanel.panelWidth : GameProperties.windowWidth;
-        int maxRows = (int)Math.Ceiling(100.0 / columns);
+        int maxRows = GetMaxVisibleRows();
+        int maxX = detailPanel != null ? GameProperties.windowWidth - detailPanel.panelWidth - startX : GameProperties.windowWidth - startX;
 
         var fusionManager = SeedFusionManager.Get();
 
