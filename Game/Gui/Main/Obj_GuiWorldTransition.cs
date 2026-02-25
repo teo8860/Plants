@@ -34,9 +34,6 @@ public class Obj_GuiWorldTransition : GameElement
             isVisible = true;
             WorldManager.PrepareNextWorld();
         }
-        {
-            isVisible = true;
-        }
 
         if (isVisible)
             animationProgress = Math.Min(1f, animationProgress + Time.GetFrameTime() * animationSpeed);
