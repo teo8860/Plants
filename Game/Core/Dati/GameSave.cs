@@ -42,6 +42,7 @@ public class GameSaveData
     public DateTime SaveTime   { get; set; }
     public string Version { get; set; }
     public int essence { get; set; }
+    public int CurrentStage { get; set; } = 1;
     public PlantStats PlantStats { get; set; }
     public SeedType PlantSeedType { get; set; }
     public SeedStats PlantSeedBonus { get; set; }
@@ -91,6 +92,12 @@ public class GameSave
 		}
 
         data.SaveTime = DateTime.Now;
+        data.CurrentStage = WorldManager.GetCurrentStage();
+        
+        SaveHelper.Save(SaveFileName, data);
+        data.CurrentStage = WorldManager.GetCurrentStage();
+        
+        SaveHelper.Save(SaveFileName, data);
 
         SaveHelper.Save(SaveFileName, data);
     }
@@ -123,6 +130,10 @@ public class GameSave
 
 		WorldManager.SetCurrentWorld(saveData.CurrentWorld);
         WorldManager.SetWorldDifficulty(saveData.CurrentWorld, saveData.CurrentDifficulty);
+        int loadedStage = saveData.CurrentStage > 0 ? saveData.CurrentStage : 1;
+        WorldManager.SetCurrentStage(loadedStage);
+        WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
+        WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
         WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
         SeedUpgradeSystem.SetEssence(saveData.essence);

@@ -83,6 +83,8 @@ public struct WorldModifier
 public static class WorldManager
 {
     private static WorldType currentWorld = WorldType.Terra;
+    private static int currentStage = 1;
+    private static WorldType nextWorld = WorldType.Terra;
 
     private static readonly Dictionary<WorldType, WorldModifier> modifiers = new()
     {
@@ -379,8 +381,20 @@ public static class WorldManager
     }
 
     public static WorldType GetCurrentWorld() => currentWorld;
-    public static WorldModifier GetCurrentModifiers() => GetModifiers(currentWorld);
-
+    public static int GetCurrentStage() => currentStage;
+    public static void SetCurrentStage(int stage) { currentStage = Math.Max(1, stage); }
+    public static float GetDifficultyMultiplier(int stage) => 1.0f + (stage / 10) * 0.25f;
+    public static WorldType GetRandomWorld() { var w = new[] { WorldType.Terra, WorldType.Luna, WorldType.Marte, WorldType.Europa, WorldType.Venere, WorldType.Titano, WorldType.ReameMistico, WorldType.GiardinoMistico, WorldType.Origine }; return w[RandomHelper.Int(0, w.Length)]; }
+    public static WorldType GetNextWorld() => nextWorld;
+    public static void PrepareNextWorld() { nextWorld = GetRandomWorld(); }
+    public static Color GetWorldColor(WorldType w) => w switch { WorldType.Terra => new Color(100,200,100,255), WorldType.Luna => new Color(200,200,220,255), WorldType.Marte => new Color(255,120,80,255), WorldType.Europa => new Color(150,200,255,255), WorldType.Venere => new Color(255,200,100,255), WorldType.Titano => new Color(200,150,100,255), WorldType.ReameMistico => new Color(180,100,255,255), WorldType.GiardinoMistico => new Color(100,255,150,255), WorldType.Origine => new Color(255,255,255,255), _ => Color.White };
+    
+    public static WorldModifier GetCurrentModifiers() 
+    { 
+        var m = GetModifiers(currentWorld); 
+        float d = GetDifficultyMultiplier(currentStage); 
+        return new WorldModifier { SolarMultiplier = m.SolarMultiplier / d, GravityMultiplier = m.GravityMultiplier, OxygenLevel = m.OxygenLevel / d, TemperatureModifier = m.TemperatureModifier, IsMeteoOn = RandomHelper.Int(0,2)==1, LimitMultiplier = m.LimitMultiplier / d, GrowthRateMultiplier = m.GrowthRateMultiplier / d, WaterConsumption = m.WaterConsumption * d, OxygenConsumption = m.OxygenConsumption * d, EnergyDrain = m.EnergyDrain * d, ParasiteChance = m.ParasiteChance * d, ParasiteDamage = m.ParasiteDamage * d, StormChance = m.StormChance * d, StormDamage = m.StormDamage * d, TemperatureDamage = m.TemperatureDamage * d, LeafDropRate = m.LeafDropRate * d, HealthRegen = m.HealthRegen / d, HydrationFromRain = m.HydrationFromRain, RequiresOxygenTank = m.RequiresOxygenTank, Difficulty = m.Difficulty }; }
+    
     public static WorldModifier GetModifiers(WorldType world) =>
         modifiers.TryGetValue(world, out var mod) ? mod : new WorldModifier();
 
@@ -786,10 +800,13 @@ public static class WorldManager
     };
 
     public static int GetTotalWorlds() => 10;
+ 
     public static void SetNextWorld() { 
-        SetCurrentWorld(GetNextWorld(currentWorld)); 
-        LeafHarvestSystem.HarvestAndShow("Cambio Mondo"); 
+        currentStage++;
+        SetCurrentWorld(nextWorld); 
+        LeafHarvestSystem.HarvestAndShow($"Stage {currentStage - 1} Completato!"); 
     }
+
     public static void SetPreviousWorld() {
         SetCurrentWorld(GetPreviousWorld(currentWorld)); 
         LeafHarvestSystem.HarvestAndShow("Cambio Mondo"); 
