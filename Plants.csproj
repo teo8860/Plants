@@ -52,6 +52,9 @@
 	  <None Update="Assets\leaf.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Assets\logo.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Assets\seme1.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

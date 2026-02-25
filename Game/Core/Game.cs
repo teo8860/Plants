@@ -61,7 +61,7 @@ public static class Game
         room_inventory = new Room(false);
         room_options = new Room(false);
         room_compost = new Room(false);
-        
+
         AssetLoader.LoadAll();
 
         NotificationManager.Initialize();
@@ -70,7 +70,11 @@ public static class Game
         InitGui();
         InitInventory();
         InitComposter();
+        ManagerMinigames.Init();
         
+        if (SaveHelper.Exists("tutorial.json") == false)
+            GameElement.Create<Obj_Logo>();
+
         Inventario.get().Load();
         GameSave.get().Load();
 

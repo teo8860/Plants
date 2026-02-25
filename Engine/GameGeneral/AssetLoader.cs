@@ -13,6 +13,8 @@ public static class AssetLoader
     public static Sprite spriteCross;
     public static Sprite spriteCheck;
 
+    public static Sprite spriteLogo;
+
     public static Sprite spriteArrowDown;
     public static Sprite spriteArrowUp;
     public static Sprite spriteMenu;
@@ -48,6 +50,8 @@ public static class AssetLoader
         spriteLeaf = new Sprite("leaf.png", 0.5f, new(0.5f, 0.0f));
         spriteCross = new Sprite("x.png", 0.05f, new(0.5f, 0.5f));
         spriteCheck = new Sprite("v.png", 0.05f, new(0.5f, 0.5f));
+        
+        spriteLogo = new Sprite("logo.png", 1f, new(0.5f, 0.5f));
         
         spriteSeed1 = new Sprite("seme1.png", 0.05f, new(0.5f, 0.5f));
         spriteSeed2 = new Sprite("seme2.png", 0.05f, new(0.5f, 0.5f));

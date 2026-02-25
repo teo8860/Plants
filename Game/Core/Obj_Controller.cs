@@ -109,8 +109,34 @@ public class Obj_Controller : GameElement
         }
 
         if (Input.IsKeyDown(KeyboardKey.G))
+        { 
+            Game.pianta.proprieta.Annaffia(0.01f);
+            
+            Game.pianta.proprieta.AggiornaTutto(
+                FaseGiorno.GetCurrentPhase(),
+                WeatherManager.GetCurrentWeather(),
+                WorldManager.GetCurrentModifiers()
+            );
+        }
+
+        
+        if (Input.IsKeyDown(KeyboardKey.K))
         {
-            Game.pianta.Crescita();
+            Game.pianta.Stats.Salute = 0;
+		}
+
+        // Minigiochi: M = casuale, 1 = cerchio, 2 = tieni
+        if (Input.IsKeyPressed(KeyboardKey.M) && !ManagerMinigames.InCorso)
+        {
+            ManagerMinigames.AvviaCasuale();
+        }
+        if (Input.IsKeyPressed(KeyboardKey.One) && !ManagerMinigames.InCorso)
+        {
+            ManagerMinigames.Avvia(TipoMinigioco.Cerchio);
+        }
+        if (Input.IsKeyPressed(KeyboardKey.Two) && !ManagerMinigames.InCorso)
+        {
+            ManagerMinigames.Avvia(TipoMinigioco.Tieni);
         }
 
     }
