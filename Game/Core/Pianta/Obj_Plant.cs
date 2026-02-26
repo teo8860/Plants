@@ -204,9 +204,9 @@ public class Obj_Plant : GameElement
             ederaCreata = true;
         }
 
-        if (Rendering.camera.position.Y <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier && Game.controller.autoscroll == true)
+        if (Game.controller.targetScrollY <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier && Game.controller.autoscroll == true)
         {
-            Rendering.camera.position.Y += incrementoFinale;
+            Game.controller.targetScrollY += incrementoFinale;
         }
     }
 

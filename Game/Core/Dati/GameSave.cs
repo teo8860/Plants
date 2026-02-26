@@ -48,6 +48,9 @@ public class GameSaveData
     public SeedStats PlantSeedBonus { get; set; }
     public int randomSeed {get; set; }
 
+    public float WaterCurrent { get; set; } = 100f;
+    public float WaterMax { get; set; } = 100f;
+
     public PlantSaveData Plant { get; set; }
 
 	public GameSaveData()
@@ -91,13 +94,11 @@ public class GameSave
             data.Plant = Game.pianta.ToSaveData();
 		}
 
+        data.WaterCurrent = WaterSystem.Current;
+        data.WaterMax = WaterSystem.Max;
+
         data.SaveTime = DateTime.Now;
         data.CurrentStage = WorldManager.GetCurrentStage();
-        
-        SaveHelper.Save(SaveFileName, data);
-        data.CurrentStage = WorldManager.GetCurrentStage();
-        
-        SaveHelper.Save(SaveFileName, data);
 
         SaveHelper.Save(SaveFileName, data);
     }
@@ -138,6 +139,8 @@ public class GameSave
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
         SeedUpgradeSystem.SetEssence(saveData.essence);
 
+        WaterSystem.Current = saveData.WaterCurrent;
+        WaterSystem.Max = saveData.WaterMax;
 
 		CalculateOfflineGrowth();
     }
@@ -151,6 +154,8 @@ public class GameSave
         }
 
         TimeSpan timeOffline = DateTime.Now - data.SaveTime;
+
+        WaterSystem.AddOfflineRecharge(timeOffline.TotalSeconds);
 
         if (timeOffline.TotalMinutes < 1)
             return;

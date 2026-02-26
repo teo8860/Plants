@@ -16,6 +16,9 @@ public class Obj_GuiToolbar : GameElement
     private int buttonSize;
     private int spacing;
 
+    private bool hasDropdown;
+    private bool dropUp;
+
     private bool isDropdownOpen = false;
     private bool isMenuOpen = false;
 
@@ -38,14 +41,26 @@ public class Obj_GuiToolbar : GameElement
 
     private float menuButtonAlpha = 255f;
 
-    public Obj_GuiToolbar(int x, int y, int buttonSize = 40, int spacing = 5) : base()
+    public Color ButtonFillColor = new Color(50, 50, 65, 255);
+    public Color ButtonHoverColor = new Color(70, 70, 90, 255);
+    public Color ButtonPressedColor = new Color(60, 60, 75, 255);
+    public bool ShowMenuButton = true;
+
+    public Obj_GuiToolbar(int x, int y, int buttonSize = 40, int spacing = 5, bool hasDropdown = true, bool dropUp = false, bool startOpen = false) : base()
     {
         this.baseX = x;
         this.baseY = y;
         this.buttonSize = buttonSize;
         this.spacing = spacing;
+        this.hasDropdown = hasDropdown;
+        this.dropUp = dropUp;
         this.guiLayer = true;
+
+        if (hasDropdown && startOpen)
+            isDropdownOpen = true;
     }
+
+    public GuiIconButton GetButton(int index) => toolButtons[index];
 
     public void SetIcons(Sprite arrowDown, Sprite arrowUp, Sprite menu)
     {
@@ -56,11 +71,9 @@ public class Obj_GuiToolbar : GameElement
 
     public void AddButton(Sprite iconInactive, Sprite iconActive, string text, Action<bool> onToggle, bool startActive = false)
     {
-        int startY = baseY + buttonSize + spacing;
-
         var button = new GuiIconButton(
             baseX,
-            startY,
+            baseY,
             buttonSize,
             iconInactive,
             iconActive,
@@ -68,24 +81,31 @@ public class Obj_GuiToolbar : GameElement
             true
         );
 
-        button.TargetY = startY;
         button.OnToggle = onToggle;
-        button.IsVisible = false;
-        button.CurrentAlpha = 0;
+
+        if (hasDropdown && !isDropdownOpen)
+        {
+            button.IsVisible = false;
+            button.CurrentAlpha = 0;
+        }
+        else
+        {
+            button.IsVisible = true;
+            button.CurrentAlpha = 255;
+        }
 
         if (startActive)
             button.SetActive(true);
 
         toolButtons.Add(button);
+        UpdateButtonPositions();
     }
 
     public void AddActionButton(Sprite icon, string text, Action onClick)
     {
-        int startY = baseY + buttonSize + spacing;
-
         var button = new GuiIconButton(
             baseX,
-            startY,
+            baseY,
             buttonSize,
             icon,
             icon,
@@ -93,15 +113,31 @@ public class Obj_GuiToolbar : GameElement
             false
         );
 
-        button.TargetY = startY;
         button.OnClick = onClick;
-        button.IsVisible = false;
-        button.CurrentAlpha = 0;
+
+        if (hasDropdown && !isDropdownOpen)
+        {
+            button.IsVisible = false;
+            button.CurrentAlpha = 0;
+        }
+        else
+        {
+            button.IsVisible = true;
+            button.CurrentAlpha = 255;
+        }
+
         button.BorderInactive = new Color(100, 100, 120, 255);
         button.BorderActive = new Color(100, 100, 120, 255);
 
         toolButtons.Add(button);
+        UpdateButtonPositions();
     }
+
+    /// <summary>
+    /// Restituisce la Y del bottone arrow/toggle della toolbar.
+    /// Per dropUp: in basso. Per dropDown: in alto.
+    /// </summary>
+    private int ArrowY => dropUp ? baseY : baseY;
 
     private void UpdateButtonPositions()
     {
@@ -109,21 +145,40 @@ public class Obj_GuiToolbar : GameElement
         {
             var btn = toolButtons[i];
 
-            if (isDropdownOpen)
+            if (!hasDropdown)
             {
-                btn.TargetY = baseY + buttonSize + spacing + i * (buttonSize + spacing);
+                // Senza dropdown: bottoni impilati dalla posizione base
+                if (dropUp)
+                    btn.TargetY = baseY - i * (buttonSize + spacing);
+                else
+                    btn.TargetY = baseY + i * (buttonSize + spacing);
+
+                btn.IsVisible = true;
+                btn.X = baseX;
+            }
+            else if (isDropdownOpen)
+            {
+                if (dropUp)
+                    btn.TargetY = baseY - (i + 1) * (buttonSize + spacing);
+                else
+                    btn.TargetY = baseY + (i + 1) * (buttonSize + spacing);
+
                 btn.IsVisible = true;
                 btn.X = baseX;
             }
             else if (isMenuOpen)
             {
-                btn.TargetY = baseY + buttonSize + spacing + 10 + i * (buttonSize + spacing);
+                if (dropUp)
+                    btn.TargetY = baseY - (i + 1) * (buttonSize + spacing) - 10;
+                else
+                    btn.TargetY = baseY + (i + 1) * (buttonSize + spacing) + 10;
+
                 btn.IsVisible = true;
                 btn.X = baseX + 10;
             }
             else
             {
-                btn.TargetY = baseY + buttonSize + spacing;
+                btn.TargetY = baseY;
                 btn.IsVisible = false;
             }
         }
@@ -131,52 +186,59 @@ public class Obj_GuiToolbar : GameElement
 
     public override void Update()
     {
-        float targetMenu = isMenuOpen ? 1f : 0f;
-        menuProgress += (targetMenu - menuProgress) * Time.GetFrameTime() * animationSpeed;
-        menuProgress = Math.Clamp(menuProgress, 0f, 1f);
-
-        float targetMenuButtonAlpha = (isDropdownOpen || isMenuOpen) ? 255f : 0f;
-        menuButtonAlpha += (targetMenuButtonAlpha - menuButtonAlpha) * Time.GetFrameTime() * 10f;
-        menuButtonAlpha = Math.Clamp(menuButtonAlpha, 0f, 255f);
-
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-        bool isPressed = Input.IsMouseButtonDown(MouseButton.Left);
-
-        bool arrowHovered = mx >= baseX && mx <= baseX + buttonSize &&
-                           my >= baseY && my <= baseY + buttonSize;
-
-        if (arrowHovered && arrowWasPressed && !isPressed)
+        if (hasDropdown)
         {
-            isDropdownOpen = !isDropdownOpen;
-            if (isDropdownOpen) isMenuOpen = false;
-            UpdateButtonPositions();
-        }
-        arrowWasPressed = arrowHovered && isPressed;
+            float targetMenu = isMenuOpen ? 1f : 0f;
+            menuProgress += (targetMenu - menuProgress) * Time.GetFrameTime() * animationSpeed;
+            menuProgress = Math.Clamp(menuProgress, 0f, 1f);
 
-        int menuBtnX = baseX + buttonSize + spacing;
-        bool menuHovered = menuButtonAlpha > 100 &&
-                          mx >= menuBtnX && mx <= menuBtnX + buttonSize &&
-                          my >= baseY && my <= baseY + buttonSize;
+            float targetMenuButtonAlpha = ShowMenuButton && (isDropdownOpen || isMenuOpen) ? 255f : 0f;
+            menuButtonAlpha += (targetMenuButtonAlpha - menuButtonAlpha) * Time.GetFrameTime() * 10f;
+            menuButtonAlpha = Math.Clamp(menuButtonAlpha, 0f, 255f);
 
-        if (menuHovered && menuWasPressed && !isPressed)
-        {
-            if (isMenuOpen)
+            int mx = Input.GetMouseX();
+            int my = Input.GetMouseY();
+            bool isPressed = Input.IsMouseButtonDown(MouseButton.Left);
+
+            bool arrowHovered = mx >= baseX && mx <= baseX + buttonSize &&
+                               my >= ArrowY && my <= ArrowY + buttonSize;
+
+            if (arrowHovered && arrowWasPressed && !isPressed)
             {
-                isMenuOpen = false;
-                isDropdownOpen = true;
+                isDropdownOpen = !isDropdownOpen;
+                if (isDropdownOpen) isMenuOpen = false;
+                UpdateButtonPositions();
             }
-            else
+            arrowWasPressed = arrowHovered && isPressed;
+
+            int menuBtnX = baseX + buttonSize + spacing;
+            bool menuHovered = ShowMenuButton && menuButtonAlpha > 100 &&
+                              mx >= menuBtnX && mx <= menuBtnX + buttonSize &&
+                              my >= ArrowY && my <= ArrowY + buttonSize;
+
+            if (menuHovered && menuWasPressed && !isPressed)
             {
-                isMenuOpen = true;
-                isDropdownOpen = false;
+                if (isMenuOpen)
+                {
+                    isMenuOpen = false;
+                    isDropdownOpen = true;
+                }
+                else
+                {
+                    isMenuOpen = true;
+                    isDropdownOpen = false;
+                }
+                UpdateButtonPositions();
             }
-            UpdateButtonPositions();
+            menuWasPressed = menuHovered && isPressed;
         }
-        menuWasPressed = menuHovered && isPressed;
 
         foreach (var btn in toolButtons)
         {
+            btn.FillColor = ButtonFillColor;
+            btn.HoverColor = ButtonHoverColor;
+            btn.PressedColor = ButtonPressedColor;
+
             btn.UpdateAnimation();
 
             int width = isMenuOpen ? menuWidth - 20 : -1;
@@ -186,30 +248,48 @@ public class Obj_GuiToolbar : GameElement
 
     public override void Draw()
     {
-        if (isMenuOpen && menuProgress > 0.01f)
+        if (hasDropdown)
         {
-            float easedProgress = EaseOutBack(menuProgress);
-            int panelWidth = (int)(menuWidth * easedProgress);
-            int panelHeight = 20 + toolButtons.Count * (buttonSize + spacing);
+            if (isMenuOpen && menuProgress > 0.01f)
+            {
+                float easedProgress = EaseOutBack(menuProgress);
+                int panelWidth = (int)(menuWidth * easedProgress);
+                int panelHeight = 20 + toolButtons.Count * (buttonSize + spacing);
 
-            byte panelAlpha = (byte)(220 * menuProgress);
-            Color bgColor = new Color(panelColor.R, panelColor.G, panelColor.B, panelAlpha);
-            Color borderCol = new Color(panelBorder.R, panelBorder.G, panelBorder.B, panelAlpha);
+                byte panelAlpha = (byte)(220 * menuProgress);
+                Color bgColor = new Color(panelColor.R, panelColor.G, panelColor.B, panelAlpha);
+                Color borderCol = new Color(panelBorder.R, panelBorder.G, panelBorder.B, panelAlpha);
 
-            Graphics.DrawRectangleRounded(
-                new Rectangle(baseX, baseY + buttonSize + spacing, panelWidth, panelHeight),
-                0.1f,
-                8,
-                bgColor
-            );
+                int panelY = dropUp
+                    ? ArrowY - panelHeight - spacing
+                    : ArrowY + buttonSize + spacing;
 
-            Graphics.DrawRectangleRoundedLines(
-                new Rectangle(baseX, baseY + buttonSize + spacing, panelWidth, panelHeight),
-                0.1f,
-                8,
-                2,
-                borderCol
-            );
+                Graphics.DrawRectangleRounded(
+                    new Rectangle(baseX, panelY, panelWidth, panelHeight),
+                    0.1f,
+                    8,
+                    bgColor
+                );
+
+                Graphics.DrawRectangleRoundedLines(
+                    new Rectangle(baseX, panelY, panelWidth, panelHeight),
+                    0.1f,
+                    8,
+                    2,
+                    borderCol
+                );
+            }
+
+            Sprite arrowIcon;
+            if (dropUp)
+                arrowIcon = isDropdownOpen ? arrowDownIcon : arrowUpIcon;
+            else
+                arrowIcon = isDropdownOpen ? arrowUpIcon : arrowDownIcon;
+
+            DrawMainButton(baseX, ArrowY, arrowIcon, isDropdownOpen, 255);
+
+            if (ShowMenuButton && menuButtonAlpha > 5)
+                DrawMainButton(baseX + buttonSize + spacing, ArrowY, menuIcon, isMenuOpen, (byte)menuButtonAlpha);
         }
 
         foreach (var btn in toolButtons)
@@ -219,12 +299,6 @@ public class Obj_GuiToolbar : GameElement
             else
                 btn.Draw();
         }
-
-        DrawMainButton(baseX, baseY, isDropdownOpen ? arrowUpIcon : arrowDownIcon, isDropdownOpen, 255);
-
-        if (menuButtonAlpha > 5)
-            DrawMainButton(baseX + buttonSize + spacing, baseY, menuIcon, isMenuOpen, (byte)menuButtonAlpha);
-
     }
 
     private void DrawMainButton(int x, int y, Sprite icon, bool isActive, byte alpha)
@@ -234,8 +308,9 @@ public class Obj_GuiToolbar : GameElement
         bool hovered = mx >= x && mx <= x + buttonSize && my >= y && my <= y + buttonSize;
         bool pressed = hovered && Input.IsMouseButtonDown(MouseButton.Left);
 
-        Color bgColor = pressed ? new Color(60, 60, 75, alpha) :
-                       (hovered ? new Color(70, 70, 90, alpha) : new Color(50, 50, 65, alpha));
+        Color bgColor = pressed ? new Color(ButtonPressedColor.R, ButtonPressedColor.G, ButtonPressedColor.B, alpha) :
+                       (hovered ? new Color(ButtonHoverColor.R, ButtonHoverColor.G, ButtonHoverColor.B, alpha) :
+                                  new Color(ButtonFillColor.R, ButtonFillColor.G, ButtonFillColor.B, alpha));
 
         Color borderColor = isActive ? new Color(100, 180, 255, alpha) : new Color(100, 100, 120, alpha);
 

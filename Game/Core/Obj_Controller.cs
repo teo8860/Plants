@@ -10,9 +10,12 @@ public class Obj_Controller : GameElement
     public float offsetMinY = 0;
     public float offsetMaxY => (Game.pianta.Stats.EffectiveMaxHeight);
 
-    public float scrollSpeed = 1000f;  
-    public float scrollAcceleration = 5f;  
+    public float scrollSpeed = 1000f;
+    public float scrollAcceleration = 5f;
     private float currentScrollSpeed = 0f;
+
+    public float targetScrollY = 0f;
+    private const float autoscrollLerpSpeed = 10f;
 
     public bool annaffiatoioAttivo = false;
     public bool isButtonRightPressed = false;
@@ -37,11 +40,18 @@ public class Obj_Controller : GameElement
    
 		mouse = CoordinateHelper.ToWorld(mouse, Rendering.camera.position);
         
+        float deltaTime = Time.GetFrameTime();
+        WaterSystem.Update(deltaTime);
+
+        if (Game.toolbarBottom != null)
+            Game.toolbarBottom.GetButton(0).FillLevel = WaterSystem.FillPercent;
+
 		if (Input.IsMouseButtonDown(MouseButton.Right))
         {
             isButtonRightPressed = true;
-            if (annaffiatoioAttivo)
+            if (annaffiatoioAttivo && WaterSystem.CanWater)
             {
+                WaterSystem.Consume(deltaTime);
                 Game.innaffiatoio.EmitParticle(mouse);
                 Game.pianta.proprieta.Annaffia(0.01f);
             }
@@ -56,7 +66,11 @@ public class Obj_Controller : GameElement
             //Game.pianta.Reset();
         }
 
-        float deltaTime = Time.GetFrameTime();
+        float wheel = Input.GetMouseWheelMove();
+        if (wheel != 0)
+        {
+            Scorri(wheel * 200f);
+        }
 
         if (Input.IsKeyDown(KeyboardKey.Down) && Rendering.camera.position.Y > 0)
         {
@@ -68,9 +82,20 @@ public class Obj_Controller : GameElement
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(currentScrollSpeed * deltaTime);
         }
-        else
+        else if (wheel == 0)
         {
             currentScrollSpeed = scrollSpeed;
+        }
+
+        if (autoscroll)
+        {
+            float diff = targetScrollY - Rendering.camera.position.Y;
+            if (Math.Abs(diff) > 0.1f)
+            {
+                Rendering.camera.position.Y += diff * autoscrollLerpSpeed * deltaTime;
+                Rendering.camera.position.Y = Math.Clamp(Rendering.camera.position.Y, offsetMinY, offsetMaxY);
+                Rendering.camera.Update();
+            }
         }
 
         if (Input.IsKeyDown(KeyboardKey.Right))
@@ -153,6 +178,7 @@ public class Obj_Controller : GameElement
     {
         Rendering.camera.position.Y += delta;
         Rendering.camera.position.Y = Math.Clamp(Rendering.camera.position.Y, offsetMinY, offsetMaxY);
+        targetScrollY = Rendering.camera.position.Y;
         Rendering.camera.Update();
     }
 }

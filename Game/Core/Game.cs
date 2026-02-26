@@ -19,7 +19,7 @@ public static class Game
     public static Obj_Plant pianta;
 
     public static Obj_GuiToolbar toolbar;
-    public static Obj_GuiToolbarBottom toolbarBottom;
+    public static Obj_GuiToolbar toolbarBottom;
 
     public static ObjBackground background;
     public static ObjGround ground;
@@ -189,8 +189,6 @@ public static class Game
             AssetLoader.spriteMenu
         );
 
-        // Annaffiatoio rimosso - ora nella toolbar in basso a destra
-
         toolbar.AddActionButton(
             AssetLoader.spritePhaseOff,
             "Cambia Fase",
@@ -215,23 +213,24 @@ public static class Game
             }
         );
 
-        // Toolbar in basso a destra con solo innaffiatoio
+        // Toolbar in basso a destra con innaffiatoio - dropdown verso l'alto, aperta di default
         int bottomToolbarX = Rendering.camera.screenWidth - 46;
         int bottomToolbarY = Rendering.camera.screenHeight - 90;
-        toolbarBottom = new Obj_GuiToolbarBottom(bottomToolbarX, bottomToolbarY, buttonSize: 36);
-        toolbarBottom.depth = -600; // Sopra la navbar
-        toolbarBottom.SetToggleButton(
-            AssetLoader.spriteWateringOff,
-            AssetLoader.spriteWateringOn,
-            (active) => {
-                controller.annaffiatoioAttivo = active;
-            }
+        toolbarBottom = new Obj_GuiToolbar(bottomToolbarX, bottomToolbarY, buttonSize: 36, hasDropdown: true, dropUp: true, startOpen: true);
+        toolbarBottom.depth = -600;
+        toolbarBottom.ButtonFillColor = new Color(140, 140, 160, 255);
+        toolbarBottom.ButtonHoverColor = new Color(170, 170, 190, 255);
+        toolbarBottom.ButtonPressedColor = new Color(120, 120, 140, 255);
+        toolbarBottom.ShowMenuButton = false;
+        toolbarBottom.SetIcons(
+            AssetLoader.spriteArrowDown,
+            AssetLoader.spriteArrowUp,
+            AssetLoader.spriteMenu
         );
-
-        GameElement.Create<Obj_GuiBottomNavigation>(-600);
-        toolbarBottom.SetToggleButton(
+        toolbarBottom.AddButton(
             AssetLoader.spriteWateringOff,
             AssetLoader.spriteWateringOn,
+            "Innaffiatoio",
             (active) => {
                 controller.annaffiatoioAttivo = active;
             }

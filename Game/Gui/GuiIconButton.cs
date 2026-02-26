@@ -38,6 +38,8 @@ public class GuiIconButton
     public Color HoverColor = new Color(70, 70, 85, 240);
     public Color PressedColor = new Color(40, 40, 50, 240);
 
+    public float FillLevel = -1f;
+
     public GuiIconButton(int x, int y, int size, Sprite iconInactive, Sprite iconActive = null, string text = "", bool isToggle = true)
     {
         X = x;
@@ -143,8 +145,33 @@ public class GuiIconButton
         {
             float iconScale = (Size - 10) / (float)icon.texture.Width;
             Vector2 iconPos = new Vector2(X + Size / 2, drawY + Size / 2);
-            GameFunctions.DrawSprite(icon, iconPos, 0, iconScale);
+
+            GameFunctions.DrawSprite(icon, iconPos, 0, iconScale, Color.Black);
+            GameFunctions.DrawSpriteClipped(icon, iconPos, new Rectangle(0, 1f - FillLevel, 1, FillLevel), 0, new Vector2(iconScale,iconScale), Color.Blue);
         }
+    }
+
+    private void DrawFillRect(Vector2 iconPos, float iconScale, int texW, int texH)
+    {
+        float fill = Math.Clamp(FillLevel, 0f, 1f);
+        if (fill < 0.001f) return;
+
+        float scaledW = texW * iconScale;
+        float scaledH = texH * iconScale;
+
+        float iconLeft = iconPos.X - scaledW / 2f;
+        float iconTop = iconPos.Y - scaledH / 2f;
+
+        // Parte piena dal basso verso l'alto
+        float filledH = scaledH * fill;
+        float filledTop = iconTop + scaledH - filledH;
+
+        Color waterColor = new Color((byte)80, (byte)180, (byte)255, (byte)180);
+        Graphics.DrawRectangle(
+            (int)iconLeft, (int)filledTop,
+            (int)Math.Ceiling(scaledW), (int)Math.Ceiling(filledH),
+            waterColor
+        );
     }
 
     public void DrawExpanded(int expandedWidth)
