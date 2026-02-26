@@ -21,6 +21,8 @@ public static class AssetLoader
 
     public static Sprite spriteWaterOff;
     public static Sprite spriteWaterOn;
+    public static Sprite spriteWateringOff;
+    public static Sprite spriteWateringOn;
     public static Sprite spritePhaseOff;
     public static Sprite spritePhaseOn;
     public static Sprite spriteWeatherOff;
@@ -75,6 +77,8 @@ public static class AssetLoader
 
         spriteWaterOff = CreateColoredPlaceholder(new Color(100, 150, 200, 255));
         spriteWaterOn = CreateColoredPlaceholder(new Color(50, 150, 255, 255));
+        spriteWateringOff = new Sprite("watering_off.png", 0.5f, new(0.5f, 0.5f));
+        spriteWateringOn = new Sprite("watering_on.png", 0.5f, new(0.5f, 0.5f));
         spritePhaseOff = CreateColoredPlaceholder(new Color(200, 180, 100, 255));
         spritePhaseOn = CreateColoredPlaceholder(new Color(255, 220, 80, 255));
         spriteWeatherOff = CreateColoredPlaceholder(new Color(150, 150, 180, 255));

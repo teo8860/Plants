@@ -24,6 +24,9 @@ public static class ManagerMinigames
 
         var resta = GameElement.Create<MinigiocoResta>(0, room_minigioco);
         minigiochi[TipoMinigioco.Resta] = resta;
+
+        var semi = GameElement.Create<MinigiocoSemi>(0, room_minigioco);
+        minigiochi[TipoMinigioco.Semi] = semi;
     }
 
     public static Room GetRoom()

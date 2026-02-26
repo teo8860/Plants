@@ -1,4 +1,3 @@
-
 using Raylib_CSharp;
 using Raylib_CSharp.Windowing;
 using Raylib_CSharp.Colors;
@@ -20,6 +19,7 @@ public static class Game
     public static Obj_Plant pianta;
 
     public static Obj_GuiToolbar toolbar;
+    public static Obj_GuiToolbarBottom toolbarBottom;
 
     public static ObjBackground background;
     public static ObjGround ground;
@@ -189,15 +189,7 @@ public static class Game
             AssetLoader.spriteMenu
         );
 
-        toolbar.AddButton(
-            AssetLoader.spriteWaterOff,
-            AssetLoader.spriteWaterOn,
-            "Annaffiatoio",
-            (active) => {
-                controller.annaffiatoioAttivo = active;
-            },
-            false
-        );
+        // Annaffiatoio rimosso - ora nella toolbar in basso a destra
 
         toolbar.AddActionButton(
             AssetLoader.spritePhaseOff,
@@ -220,6 +212,28 @@ public static class Game
             "Cambia Mondo",
             () => {
                 WorldManager.SetNextWorld();
+            }
+        );
+
+        // Toolbar in basso a destra con solo innaffiatoio
+        int bottomToolbarX = Rendering.camera.screenWidth - 46;
+        int bottomToolbarY = Rendering.camera.screenHeight - 90;
+        toolbarBottom = new Obj_GuiToolbarBottom(bottomToolbarX, bottomToolbarY, buttonSize: 36);
+        toolbarBottom.depth = -600; // Sopra la navbar
+        toolbarBottom.SetToggleButton(
+            AssetLoader.spriteWateringOff,
+            AssetLoader.spriteWateringOn,
+            (active) => {
+                controller.annaffiatoioAttivo = active;
+            }
+        );
+
+        GameElement.Create<Obj_GuiBottomNavigation>(-600);
+        toolbarBottom.SetToggleButton(
+            AssetLoader.spriteWateringOff,
+            AssetLoader.spriteWateringOn,
+            (active) => {
+                controller.annaffiatoioAttivo = active;
             }
         );
 

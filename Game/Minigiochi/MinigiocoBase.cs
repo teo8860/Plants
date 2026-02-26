@@ -12,7 +12,8 @@ public enum TipoMinigioco
 {
     Cerchio,
     Tieni,
-    Resta
+    Resta,
+    Semi
 }
 
 public enum MinigiocoStato
