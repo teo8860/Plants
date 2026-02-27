@@ -12,7 +12,8 @@ public enum NavigationTab
 {
     MainGame,
     Inventory,
-    Compost
+    Compost,
+    Upgrade
 }
 
 public class Obj_GuiBottomNavigation : GameElement
@@ -21,8 +22,7 @@ public class Obj_GuiBottomNavigation : GameElement
     private NavigationTab currentTab = NavigationTab.MainGame;
 
     private int barHeight = 35;
-    private int tabWidth = 120;
-    private int tabSpacing = 10;
+    private int tabSpacing = 6;
     private int hoveredTabIndex = -1;
     private bool wasPressed = false;
 
@@ -74,6 +74,14 @@ public class Obj_GuiBottomNavigation : GameElement
             Icon = null
         });
 
+        tabs.Add(new NavTab
+        {
+            Label = "Upgrade",
+            TabType = NavigationTab.Upgrade,
+            OnClick = () => SwitchToUpgrade(),
+            Icon = null
+        });
+
     }
 
     public override void Update()
@@ -89,15 +97,16 @@ public class Obj_GuiBottomNavigation : GameElement
         hoveredTabIndex = -1;
 
         // Controlla hover sui tab
-        int totalWidth = tabs.Count * tabWidth + (tabs.Count - 1) * tabSpacing;
-        int startX = (screenW - totalWidth) / 2;
+        int margin = 10;
+        int tabWidth = (screenW - margin * 2 - (tabs.Count - 1) * tabSpacing) / tabs.Count;
+        int startX = margin;
 
         for (int i = 0; i < tabs.Count; i++)
         {
             int tabX = startX + i * (tabWidth + tabSpacing);
             int tabY = barY + 10;
 
-            if (mx >= tabX && mx <= tabX + tabWidth &&
+            if (mx >= tabX && mx < tabX + tabWidth &&
                 my >= tabY && my <= tabY + (barHeight - 20))
             {
                 hoveredTabIndex = i;
@@ -128,16 +137,17 @@ public class Obj_GuiBottomNavigation : GameElement
         Graphics.DrawLine(0, barY, screenW, barY, barBorder);
 
         // Tabs
-        int totalWidth = tabs.Count * tabWidth + (tabs.Count - 1) * tabSpacing;
-        int startX = (screenW - totalWidth) / 2;
+        int margin = 10;
+        int tabWidth = (screenW - margin * 2 - (tabs.Count - 1) * tabSpacing) / tabs.Count;
+        int startX = margin;
 
         for (int i = 0; i < tabs.Count; i++)
         {
-            DrawTab(tabs[i], i, startX + i * (tabWidth + tabSpacing), barY + 10);
+            DrawTab(tabs[i], i, startX + i * (tabWidth + tabSpacing), barY + 10, tabWidth);
         }
     }
 
-    private void DrawTab(NavTab tab, int index, int x, int y)
+    private void DrawTab(NavTab tab, int index, int x, int y, int tabWidth)
     {
         bool isActive = tab.TabType == currentTab;
         bool isHovered = hoveredTabIndex == index;
@@ -160,12 +170,6 @@ public class Obj_GuiBottomNavigation : GameElement
                 new Rectangle(x, y, tabWidth, tabHeight),
                 0.2f, 8, 3, new Color(150, 200, 255, 255)
             );
-        }
-
-        // Icona (se presente)
-        if (tab.Icon != null)
-        {
-            // TODO: Disegna icona
         }
 
         // Testo
@@ -224,5 +228,11 @@ public class Obj_GuiBottomNavigation : GameElement
     {
         Game.room_compost.SetActiveRoom();
         Console.WriteLine("Switched to Compost");
+    }
+
+    private void SwitchToUpgrade()
+    {
+        Game.room_upgrade.SetActiveRoom();
+        Console.WriteLine("Switched to Upgrade");
     }
 }

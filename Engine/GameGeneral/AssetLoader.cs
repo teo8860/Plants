@@ -79,6 +79,7 @@ public static class AssetLoader
         spriteWaterOn = CreateColoredPlaceholder(new Color(50, 150, 255, 255));
         spriteWateringOff = new Sprite("watering_off.png", 0.5f, new(0.5f, 0.5f));
         spriteWateringOn = new Sprite("watering_on.png", 0.5f, new(0.5f, 0.5f));
+        Console.WriteLine($"[AssetLoader] watering_off: {spriteWateringOff?.texture.Width}x{spriteWateringOff?.texture.Height}, watering_on: {spriteWateringOn?.texture.Width}x{spriteWateringOn?.texture.Height}");
         spritePhaseOff = CreateColoredPlaceholder(new Color(200, 180, 100, 255));
         spritePhaseOn = CreateColoredPlaceholder(new Color(255, 220, 80, 255));
         spriteWeatherOff = CreateColoredPlaceholder(new Color(150, 150, 180, 255));

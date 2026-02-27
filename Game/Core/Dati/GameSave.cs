@@ -48,6 +48,13 @@ public class GameSaveData
     public SeedStats PlantSeedBonus { get; set; }
     public int randomSeed {get; set; }
 
+    public float WaterCurrent { get; set; } = 100f;
+    public float WaterMax { get; set; } = 100f;
+
+    public int UpgradeInnaffiatoio { get; set; }
+    public int UpgradeInventario { get; set; }
+    public int UpgradeSpazioPacchetti { get; set; }
+
     public PlantSaveData Plant { get; set; }
 
 	public GameSaveData()
@@ -91,13 +98,15 @@ public class GameSave
             data.Plant = Game.pianta.ToSaveData();
 		}
 
+        data.WaterCurrent = WaterSystem.Current;
+        data.WaterMax = WaterSystem.Max;
+
+        data.UpgradeInnaffiatoio = UpgradeSystem.GetLevel(UpgradeType.Innaffiatoio);
+        data.UpgradeInventario = UpgradeSystem.GetLevel(UpgradeType.Inventario);
+        data.UpgradeSpazioPacchetti = UpgradeSystem.GetLevel(UpgradeType.SpazioPacchetti);
+
         data.SaveTime = DateTime.Now;
         data.CurrentStage = WorldManager.GetCurrentStage();
-        
-        SaveHelper.Save(SaveFileName, data);
-        data.CurrentStage = WorldManager.GetCurrentStage();
-        
-        SaveHelper.Save(SaveFileName, data);
 
         SaveHelper.Save(SaveFileName, data);
     }
@@ -138,6 +147,12 @@ public class GameSave
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
         SeedUpgradeSystem.SetEssence(saveData.essence);
 
+        UpgradeSystem.SetLevel(UpgradeType.Innaffiatoio, saveData.UpgradeInnaffiatoio);
+        UpgradeSystem.SetLevel(UpgradeType.Inventario, saveData.UpgradeInventario);
+        UpgradeSystem.SetLevel(UpgradeType.SpazioPacchetti, saveData.UpgradeSpazioPacchetti);
+
+        WaterSystem.Max = UpgradeSystem.GetWaterMax();
+        WaterSystem.Current = saveData.WaterCurrent;
 
 		CalculateOfflineGrowth();
     }
@@ -151,6 +166,8 @@ public class GameSave
         }
 
         TimeSpan timeOffline = DateTime.Now - data.SaveTime;
+
+        WaterSystem.AddOfflineRecharge(timeOffline.TotalSeconds);
 
         if (timeOffline.TotalMinutes < 1)
             return;

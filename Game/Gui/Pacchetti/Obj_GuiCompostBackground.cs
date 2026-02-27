@@ -75,17 +75,30 @@ public class Obj_GuiCompostBackground : GameElement
 
         DrawWindow(windowX, windowY, windowWidth, windowHeight);
 
-        // === TAVOLINO PI� LUNGO ===
-        int tableX = screenWidth / 2 - 140;  // Pi� largo
-        int tableY = screenHeight - 180;
-        int tableWidth = 280;  // Molto pi� largo
-        int tableHeight = 60;
+        // === PIEDISTALLI PACCHETTI ===
+        int maxSlots = UpgradeSystem.GetMaxPackages();
+        int slotsPerRow = 4;
+        int pedestalW = 50;
+        int pedestalSpacing = 8;
+        int rowWidth = Math.Min(maxSlots, slotsPerRow) * pedestalW + (Math.Min(maxSlots, slotsPerRow) - 1) * pedestalSpacing;
+        int baseRowX = screenWidth / 2 - rowWidth / 2;
+        int baseRowY = screenHeight - 175;
 
-        DrawTable(tableX, tableY, tableWidth, tableHeight);
+        for (int i = 0; i < maxSlots; i++)
+        {
+            int row = i / slotsPerRow;
+            int col = i % slotsPerRow;
+            int slotsInRow = Math.Min(maxSlots - row * slotsPerRow, slotsPerRow);
+            int thisRowWidth = slotsInRow * pedestalW + (slotsInRow - 1) * pedestalSpacing;
+            int rowX = screenWidth / 2 - thisRowWidth / 2;
+            int px = rowX + col * (pedestalW + pedestalSpacing);
+            int py = baseRowY + row * 70;
+            DrawPedestal(px, py, pedestalW);
+        }
 
         // === SECCHIO COMPOST ===
-        int binX = tableX + 15;
-        int binY = tableY - 45;
+        int binX = baseRowX - 50;
+        int binY = baseRowY - 40;
         DrawCompostBin(binX, binY);
 
         // === DECORAZIONI ===
@@ -154,6 +167,29 @@ public class Obj_GuiCompostBackground : GameElement
                 new Color(90, 170, 90, 255)
             );
         }
+    }
+
+    private void DrawPedestal(int x, int y, int width)
+    {
+        Color tableTop = woodMedium;
+        Color tableSide = woodDark;
+
+        // Piano superiore
+        Graphics.DrawRectangle(x, y, width, 8, tableTop);
+        Graphics.DrawRectangle(x, y + 4, width, 4, new Color(woodDark.R, woodDark.G, woodDark.B, 100));
+        Graphics.DrawRectangle(x, y + 8, width, 3, tableSide);
+
+        // Due gambette
+        int legW = 6;
+        int legH = 40;
+        Graphics.DrawRectangle(x + 8, y + 11, legW, legH, tableSide);
+        Graphics.DrawRectangle(x + 8, y + 11, legW / 2, legH, woodMedium);
+        Graphics.DrawRectangle(x + width - 14, y + 11, legW, legH, tableSide);
+        Graphics.DrawRectangle(x + width - 14, y + 11, legW / 2, legH, woodMedium);
+
+        // Ombra
+        Graphics.DrawEllipse(x + width / 2, y + legH + 15, width / 2 - 2, 8,
+            new Color(0, 0, 0, 35));
     }
 
     private void DrawTable(int x, int y, int width, int height)

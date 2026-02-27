@@ -63,7 +63,7 @@ public class PackageInProgress
         Rarity = rarity;
         TimeElapsed = 0f;
 
-        // Tempi in secondi basati sulla rarità
+        // Tempi in secondi basati sulla raritï¿½
         TimeRequired = rarity switch
         {
             SeedPackageRarity.Common => 1f,      // 5 secondi
@@ -90,7 +90,7 @@ public static class CompostSystem
     private static List<PackageInProgress> _packagesInProgress = new();
     private static OpeningSystem _openingSystem = new(); 
 
-    private const int MAX_PACKAGES = 4;
+    private static int MAX_PACKAGES => UpgradeSystem.GetMaxPackages();
 
     public static List<SeedPackage> GetAvailablePackages() => new(_availablePackages);
     public static List<PackageInProgress> GetPackagesInProgress() => new(_packagesInProgress);
