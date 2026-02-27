@@ -146,6 +146,10 @@ public class Obj_Controller : GameElement
         {
             ManagerMinigames.Avvia(TipoMinigioco.Semi);
         }
+        if (Input.IsKeyPressed(KeyboardKey.Five) && !ManagerMinigames.InCorso)
+        {
+            ManagerMinigames.Avvia(TipoMinigioco.Treni);
+        }
 
     }
 

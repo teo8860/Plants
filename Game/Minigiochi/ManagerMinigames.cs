@@ -27,6 +27,9 @@ public static class ManagerMinigames
 
         var semi = GameElement.Create<MinigiocoSemi>(0, room_minigioco);
         minigiochi[TipoMinigioco.Semi] = semi;
+
+        var treni = GameElement.Create<MinigiocoTreni>(0, room_minigioco);
+        minigiochi[TipoMinigioco.Treni] = treni;
     }
 
     public static Room GetRoom()
