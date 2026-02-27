@@ -39,8 +39,8 @@ public class Obj_GuiCompostPanel : GameElement
     private bool isMenuOpen = false;
     private Rectangle binRect;
     private Rectangle[] menuItems = new Rectangle[5];
-    private Rectangle[] packageButtons = new Rectangle[4]; // Massimo 4
-    private Rectangle[] progressButtons = new Rectangle[4]; // Per pacchetti in creazione
+    private Rectangle[] packageButtons = new Rectangle[7]; // Max con upgrade
+    private Rectangle[] progressButtons = new Rectangle[7]; // Per pacchetti in creazione
 
     public Obj_GuiCompostPanel() : base()
     {
@@ -57,10 +57,16 @@ public class Obj_GuiCompostPanel : GameElement
         int screenWidth = Rendering.camera.screenWidth;
         int screenHeight = Rendering.camera.screenHeight;
 
-        int tableX = screenWidth / 2 - 140;
-        int tableY = screenHeight - 180;
-        int binX = tableX + 15;
-        int binY = tableY - 45;
+        int maxSlots = UpgradeSystem.GetMaxPackages();
+        int slotsPerRow = 4;
+        int pedestalW = 50;
+        int pedestalSpacing = 8;
+        int slotsFirstRow = Math.Min(maxSlots, slotsPerRow);
+        int rowWidth = slotsFirstRow * pedestalW + (slotsFirstRow - 1) * pedestalSpacing;
+        int baseRowX = screenWidth / 2 - rowWidth / 2;
+        int baseRowY = screenHeight - 175;
+        int binX = baseRowX - 50;
+        int binY = baseRowY - 40;
 
         binRect = new Rectangle(binX, binY, 35, 40);
 
@@ -124,9 +130,10 @@ public class Obj_GuiCompostPanel : GameElement
     {
         // Info foglie e slot
         int totalPackages = CompostSystem.GetTotalPackageCount();
+        int maxPackages = UpgradeSystem.GetMaxPackages();
         Graphics.DrawText($"Foglie: {Game.pianta.Stats.FoglieAccumulate}", 10, 10, 16, new Color(100, 180, 100, 255));
-        Graphics.DrawText($"Slot: {totalPackages}/4", 10, 30, 14,
-            totalPackages >= 4 ? new Color(255, 100, 100, 255) : new Color(200, 200, 200, 255));
+        Graphics.DrawText($"Slot: {totalPackages}/{maxPackages}", 10, 30, 14,
+            totalPackages >= maxPackages ? new Color(255, 100, 100, 255) : new Color(200, 200, 200, 255));
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
@@ -138,7 +145,7 @@ public class Obj_GuiCompostPanel : GameElement
         {
             Graphics.DrawRectangleRoundedLines(binRect, 0.2f, 6, 2, new Color(255, 255, 100, 200));
 
-            string hoverText = totalPackages >= 4 ? "Slot pieni!" : "Clicca per creare";
+            string hoverText = totalPackages >= maxPackages ? "Slot pieni!" : "Clicca per creare";
             Graphics.DrawText(hoverText, (int)binRect.X - 15, (int)binRect.Y - 15, 9, Color.White);
         }
 
@@ -208,59 +215,74 @@ public class Obj_GuiCompostPanel : GameElement
 
             if (!canCreate)
             {
-                string blockReason = CompostSystem.GetTotalPackageCount() >= 4 ? "PIENO" : "X";
+                string blockReason = CompostSystem.GetTotalPackageCount() >= UpgradeSystem.GetMaxPackages() ? "PIENO" : "X";
                 Graphics.DrawText(blockReason, menuX + menuWidth - 35, itemY + 12, 10, new Color(200, 80, 80, 255));
             }
         }
     }
 
-    private void DrawPackagesOnTable()
+    private void GetSlotPosition(int slotIndex, out int pkgX, out int pkgY)
     {
         int screenWidth = Rendering.camera.screenWidth;
         int screenHeight = Rendering.camera.screenHeight;
+        int maxSlots = UpgradeSystem.GetMaxPackages();
+        int slotsPerRow = 4;
+        int pedestalW = 50;
+        int pedestalSpacing = 8;
+        int baseRowY = screenHeight - 175;
 
-        int tableX = screenWidth / 2 - 140;
-        int tableY = screenHeight - 180;
+        int row = slotIndex / slotsPerRow;
+        int col = slotIndex % slotsPerRow;
+        int slotsInRow = Math.Min(maxSlots - row * slotsPerRow, slotsPerRow);
+        int thisRowWidth = slotsInRow * pedestalW + (slotsInRow - 1) * pedestalSpacing;
+        int rowX = screenWidth / 2 - thisRowWidth / 2;
 
-        int startX = tableX + 70;
-        int startY = tableY - 35;
+        int pedX = rowX + col * (pedestalW + pedestalSpacing);
+        int pedY = baseRowY + row * 70;
 
+        // Centra il pacchetto sul piedistallo
+        int packageWidth = 32;
+        pkgX = pedX + (pedestalW - packageWidth) / 2;
+        pkgY = pedY - 38;
+    }
+
+    private void DrawPackagesOnTable()
+    {
         int packageWidth = 32;
         int packageHeight = 40;
-        int spacing = 10;
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 
+        int maxPkg = UpgradeSystem.GetMaxPackages();
         int slotIndex = 0;
+        int pkgBtnIndex = 0;
 
         // Disegna pacchetti in creazione (con barra progresso)
         var inProgress = CompostSystem.GetPackagesInProgress();
-        for (int i = 0; i < inProgress.Count && slotIndex < 4; i++)
+        for (int i = 0; i < inProgress.Count && slotIndex < maxPkg; i++)
         {
-            int pkgX = startX + slotIndex * (packageWidth + spacing);
-            int pkgY = startY;
+            GetSlotPosition(slotIndex, out int pkgX, out int pkgY);
 
             progressButtons[slotIndex] = new Rectangle(pkgX, pkgY, packageWidth, packageHeight);
-
             DrawPackageInProgress(pkgX, pkgY, packageWidth, packageHeight, inProgress[i]);
             slotIndex++;
         }
 
         // Disegna pacchetti pronti
         var packages = CompostSystem.GetAvailablePackages();
-        for (int i = 0; i < packages.Count && slotIndex < 4; i++)
+        for (int i = 0; i < packages.Count && slotIndex < maxPkg; i++)
         {
-            int pkgX = startX + slotIndex * (packageWidth + spacing);
-            int pkgY = startY;
+            GetSlotPosition(slotIndex, out int pkgX, out int pkgY);
 
-            packageButtons[i] = new Rectangle(pkgX, pkgY, packageWidth, packageHeight);
+            packageButtons[pkgBtnIndex] = new Rectangle(pkgX, pkgY, packageWidth, packageHeight);
 
             bool hovered = mx >= pkgX && mx <= pkgX + packageWidth &&
                           my >= pkgY && my <= pkgY + packageHeight;
 
             DrawPackage(pkgX, pkgY, packageWidth, packageHeight, packages[i].Rarity, hovered);
             slotIndex++;
+            pkgBtnIndex++;
         }
     }
 
@@ -272,7 +294,7 @@ public class Obj_GuiCompostPanel : GameElement
         Graphics.DrawEllipse(x + width / 2, y + height + 2, width / 2 + 2, 4,
             new Color(0, 0, 0, 60));
 
-        // Corpo pacchetto (più trasparente)
+        // Corpo pacchetto (piï¿½ trasparente)
         Color bodyColor = new Color((byte)(pkgColor.R * 0.4f), (byte)(pkgColor.G * 0.4f), (byte)(pkgColor.B * 0.4f), 200);
 
         Graphics.DrawRectangleRounded(

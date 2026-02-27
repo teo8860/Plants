@@ -13,6 +13,7 @@ public static class Game
     public static Room room_inventory;
     public static Room room_options;
     public static Room room_compost;
+    public static Room room_upgrade;
 
     public static Obj_Controller controller;
     public static ObjWater innaffiatoio;
@@ -51,6 +52,8 @@ public static class Game
     public static Obj_GuiCompostBackground compostBackground;
     public static Obj_GuiPackOpeningAnimation packOpening;
 
+    public static Obj_GuiUpgradePanel upgradePanel;
+
     public static NotificationMonitor notificationMonitor;
 
     public static Obj_GuiLeafHarvestPopup leafHarvestPopup;
@@ -61,6 +64,7 @@ public static class Game
         room_inventory = new Room(false);
         room_options = new Room(false);
         room_compost = new Room(false);
+        room_upgrade = new Room(false);
 
         AssetLoader.LoadAll();
 
@@ -70,6 +74,7 @@ public static class Game
         InitGui();
         InitInventory();
         InitComposter();
+        InitUpgrade();
         ManagerMinigames.Init();
         
         if (SaveHelper.Exists("tutorial.json") == false)
@@ -260,6 +265,11 @@ public static class Game
         inventoryGrid.OnSeedSelected = (index) => {
             seedDetailPanel.Toggle(index);
         };
+    }
+
+    private static void InitUpgrade()
+    {
+        upgradePanel = new Obj_GuiUpgradePanel();
     }
 
     private static void InitComposter()

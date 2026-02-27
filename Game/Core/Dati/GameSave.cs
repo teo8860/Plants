@@ -51,6 +51,10 @@ public class GameSaveData
     public float WaterCurrent { get; set; } = 100f;
     public float WaterMax { get; set; } = 100f;
 
+    public int UpgradeInnaffiatoio { get; set; }
+    public int UpgradeInventario { get; set; }
+    public int UpgradeSpazioPacchetti { get; set; }
+
     public PlantSaveData Plant { get; set; }
 
 	public GameSaveData()
@@ -97,6 +101,10 @@ public class GameSave
         data.WaterCurrent = WaterSystem.Current;
         data.WaterMax = WaterSystem.Max;
 
+        data.UpgradeInnaffiatoio = UpgradeSystem.GetLevel(UpgradeType.Innaffiatoio);
+        data.UpgradeInventario = UpgradeSystem.GetLevel(UpgradeType.Inventario);
+        data.UpgradeSpazioPacchetti = UpgradeSystem.GetLevel(UpgradeType.SpazioPacchetti);
+
         data.SaveTime = DateTime.Now;
         data.CurrentStage = WorldManager.GetCurrentStage();
 
@@ -139,8 +147,12 @@ public class GameSave
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
         SeedUpgradeSystem.SetEssence(saveData.essence);
 
+        UpgradeSystem.SetLevel(UpgradeType.Innaffiatoio, saveData.UpgradeInnaffiatoio);
+        UpgradeSystem.SetLevel(UpgradeType.Inventario, saveData.UpgradeInventario);
+        UpgradeSystem.SetLevel(UpgradeType.SpazioPacchetti, saveData.UpgradeSpazioPacchetti);
+
+        WaterSystem.Max = UpgradeSystem.GetWaterMax();
         WaterSystem.Current = saveData.WaterCurrent;
-        WaterSystem.Max = saveData.WaterMax;
 
 		CalculateOfflineGrowth();
     }
