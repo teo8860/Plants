@@ -7,7 +7,7 @@ public static class WaterSystem
     public static float Current = 100f;
     public static float Max = 100f; // Aggiornato da UpgradeSystem al load
 
-    private const float ConsumeRate = 10; // 1 unità al secondo
+    private const float ConsumeRate = 10; // 1 unità al secondo 
     private const float RechargeRate = 10f / (5f * 60f); // 10 ogni 5 minuti = ~0.0333/sec
 
     public static float FillPercent => Max > 0 ? Math.Clamp(Current / Max, 0f, 1f) : 0f;
