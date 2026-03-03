@@ -716,7 +716,12 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         particles.Clear();
         starParticles.Clear();
         energyWaves.Clear();
-        visualSeed = null;
+        
+        if (visualSeed != null)
+        {
+            visualSeed.Destroy();
+            visualSeed = null;
+        }
     }
 
     public override void Draw()

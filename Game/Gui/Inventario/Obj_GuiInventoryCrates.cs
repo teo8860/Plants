@@ -107,9 +107,11 @@ public class Obj_GuiInventoryCrates : GameElement
 
         if (Game.inventoryGrid != null)
         {
+            Game.inventoryGrid.DestroyAllSeeds();
             Game.inventoryGrid.ClearRarityFilter();
         }
     }
+
 
     public override void Draw()
     {

@@ -61,6 +61,13 @@ public class Obj_GuiInventoryGrid : GameElement
         Populate();
     }
 
+    public void DestroyAllSeeds()
+    {
+        foreach (var seed in visualSeedList)
+            seed.Destroy();
+        visualSeedList.Clear();
+    }
+
     private void UpdateFilteredSeeds()
     {
         if (!rarityFilter.HasValue)
