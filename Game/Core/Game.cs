@@ -215,7 +215,10 @@ public static class Game
             AssetLoader.spriteWorldIcon,
             "Cambia Mondo",
             () => {
+                WorldManager.PrepareNextWorld();
                 WorldManager.SetNextWorld();
+                pianta.Reset();
+                pianta.SetNaturalColors(WorldManager.GetCurrentWorld());
             }
         );
 

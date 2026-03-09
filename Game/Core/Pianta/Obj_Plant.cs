@@ -249,6 +249,8 @@ public class Obj_Plant : GameElement
     public void Reset()
     {
         Rendering.camera.position.Y = 0;
+        Game.controller.targetScrollY = 0;
+        Rendering.camera.Update();
         puntiSpline.Clear();
 
         foreach (var item in rami)
@@ -271,6 +273,8 @@ public class Obj_Plant : GameElement
         Stats.Altezza = 0;
         Stats.FoglieAttuali = 0;
 
+        proprieta.Reset();
+        PosizionaAlCentroInBasso();
         GeneraPuntoIniziale();
     }
 
