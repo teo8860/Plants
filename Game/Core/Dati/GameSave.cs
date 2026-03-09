@@ -40,6 +40,7 @@ public class GameSaveData
     public Weather CurrentWeather   { get; set; }
     public DayPhase CurrentPhase   { get; set; }
     public DateTime SaveTime   { get; set; }
+    public DateTime LastWeatherChange { get; set; }
     public string Version { get; set; }
     public int essence { get; set; }
     public int CurrentStage { get; set; } = 1;
@@ -69,7 +70,7 @@ public class GameSave
 {
     private const string SaveFileName = "savegame.json";
     public  GameSaveData data = new();
-
+    public bool isLoading = false;
 
     private static GameSave instance = null;
 
@@ -89,6 +90,8 @@ public class GameSave
 
      public void Save()
     {
+        if (isLoading) return;
+
         if (Game.pianta != null)
         {
             data.PlantStats = Game.pianta.Stats;
@@ -106,6 +109,7 @@ public class GameSave
         data.UpgradeSpazioPacchetti = UpgradeSystem.GetLevel(UpgradeType.SpazioPacchetti);
 
         data.SaveTime = DateTime.Now;
+        data.LastWeatherChange = WeatherManager.GetLastWeatherChange();
         data.CurrentStage = WorldManager.GetCurrentStage();
 
         SaveHelper.Save(SaveFileName, data);
@@ -122,6 +126,8 @@ public class GameSave
             WorldManager.SetCurrentWorld(WorldType.Terra);
             return;
         }
+
+        isLoading = true;
 
         var saveData = GameSave.get().data;
 
@@ -142,9 +148,9 @@ public class GameSave
         int loadedStage = saveData.CurrentStage > 0 ? saveData.CurrentStage : 1;
         WorldManager.SetCurrentStage(loadedStage);
         WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
-        WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
-        WeatherManager.SetCurrentWeather(saveData.CurrentWeather);
         FaseGiorno.SetCurrentPhase(saveData.CurrentPhase);
+        if (saveData.LastWeatherChange != default(DateTime))
+            WeatherManager.SetLastWeatherChange(saveData.LastWeatherChange);
         SeedUpgradeSystem.SetEssence(saveData.essence);
 
         UpgradeSystem.SetLevel(UpgradeType.Innaffiatoio, saveData.UpgradeInnaffiatoio);
@@ -153,6 +159,8 @@ public class GameSave
 
         WaterSystem.Max = UpgradeSystem.GetWaterMax();
         WaterSystem.Current = saveData.WaterCurrent;
+
+        isLoading = false;
 
 		CalculateOfflineGrowth();
     }
@@ -165,33 +173,13 @@ public class GameSave
             return;
         }
 
-        TimeSpan timeOffline = DateTime.Now - data.SaveTime;
+        var result = OfflineSimulator.Simulate(
+            data.SaveTime,
+            DateTime.Now,
+            data.CurrentWeather,
+            data.LastWeatherChange);
 
-        WaterSystem.AddOfflineRecharge(timeOffline.TotalSeconds);
-
-        if (timeOffline.TotalMinutes < 1)
-            return;
-        SimulateOfflineGrowth(timeOffline);
-    }
-
-    private void SimulateOfflineGrowth(TimeSpan timeOffline)
-    {
-        if (Game.pianta == null || data.PlantStats == null)
-            return;
-
-        int growthTicks = (int)timeOffline.TotalSeconds;
-
-        for (int i = 0; i < growthTicks; i++)
-        {
-            if (Game.pianta.Stats.Altezza >= Game.pianta.Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
-                break;
-
-            Game.pianta.proprieta.AggiornaTutto(
-                FaseGiorno.GetCurrentPhase(),
-                WeatherManager.GetCurrentWeather(),
-                WorldManager.GetCurrentModifiers()
-            );
-        }
+        Console.WriteLine(result.GetSummary());
     }
     public static void DeleteSaveFile()
     {

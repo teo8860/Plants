@@ -204,7 +204,7 @@ public class Obj_Plant : GameElement
             ederaCreata = true;
         }
 
-        if (Game.controller.targetScrollY <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier && Game.controller.autoscroll == true)
+        if (!Game.IsOfflineSimulation && Game.controller.targetScrollY <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier && Game.controller.autoscroll == true)
         {
             Game.controller.targetScrollY += incrementoFinale;
         }
@@ -233,7 +233,7 @@ public class Obj_Plant : GameElement
 
     public void ControlloCrescita()
     {
-        if (Game.isPaused) return;
+        if (Game.isPaused && !Game.IsOfflineSimulation) return;
 
         if (Stats.Altezza >= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier)
             return;

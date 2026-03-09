@@ -8,6 +8,16 @@ public static class OfflineSimulator
     private const int SUB_TICKS_PER_TICK = TICK_MINUTES * 60; // 600 (1 per second)
     private const int WEATHER_DURATION_MINUTES = 30;
 
+    // Auto-watering: when hydration drops below this, use watering can
+    private const float AUTO_WATER_THRESHOLD = 0.5f;
+    // Auto-watering: refill hydration to this level
+    private const float AUTO_WATER_TARGET = 0.95f;
+    // In-game: 0.01 hydration/frame @ 60fps = 0.6 hydration/sec, costs 10 water/sec
+    // So 1.0 hydration = 16.67 water units
+    private const float WATER_PER_HYDRATION = 16.67f;
+    // Watering can passive recharge: 10 per 5 minutes
+    private const float WATER_RECHARGE_RATE = 10f / (5f * 60f);
+
     public static OfflineSimulationResult Simulate(
         DateTime closeTime,
         DateTime openTime,
@@ -43,14 +53,18 @@ public static class OfflineSimulator
         Random weatherRng = new Random(closeTime.GetHashCode());
         int weatherChanges = 0;
 
-        // Enter offline simulation mode
+        // Local water state (don't modify WaterSystem until the end)
+        float waterCurrent = WaterSystem.Current;
+        float waterMax = WaterSystem.Max;
+
+        // Health must not change during offline simulation
+        float originalHealth = plant.Stats.Salute;
+
         Game.IsOfflineSimulation = true;
 
         try
         {
-            bool plantDied = false;
-
-            for (int tick = 0; tick < totalTicks && !plantDied; tick++)
+            for (int tick = 0; tick < totalTicks; tick++)
             {
                 DateTime tickTime = closeTime.AddMinutes((tick + 1) * TICK_MINUTES);
 
@@ -70,28 +84,47 @@ public static class OfflineSimulator
                 DayPhase phase = FaseGiorno.GetPhaseFromTime(tickTime);
                 WorldModifier worldMod = WorldManager.GetCurrentModifiers();
 
-                // Set overrides so ALL internal code sees simulated values
                 FaseGiorno.SetSimulationOverride(phase);
                 WeatherManager.SetSimulationOverride(simWeather);
                 WorldManager.SetSimulationOverride(worldMod);
 
-                // === Run sub-ticks (plant simulation at 1/sec rate) ===
+                // === Run sub-ticks ===
                 for (int sub = 0; sub < SUB_TICKS_PER_TICK; sub++)
                 {
-                    logic.AggiornaTutto(phase, simWeather, worldMod);
+                    // 1. Water consumption
+                    float consumo = logic.CalcolaConsumoAcqua(worldMod);
+                    plant.Stats.Idratazione = Math.Max(0, plant.Stats.Idratazione - consumo);
 
-                    // Check death
-                    if (plant.Stats.Salute <= 0)
+                    // 2. Rain hydration
+                    if (worldMod.IsMeteoOn && (simWeather == Weather.Rainy || simWeather == Weather.Stormy))
                     {
-                        plantDied = true;
-                        break;
+                        float rain = 0.003f * Math.Max(0, worldMod.HydrationFromRain);
+                        plant.Stats.Idratazione = Math.Min(1.0f, plant.Stats.Idratazione + rain);
                     }
+
+                    // 3. Watering can passive recharge
+                    waterCurrent = Math.Min(waterMax, waterCurrent + WATER_RECHARGE_RATE);
+
+                    // 4. Auto-water from can when hydration gets low
+                    if (plant.Stats.Idratazione < AUTO_WATER_THRESHOLD && waterCurrent > 0)
+                    {
+                        float deficit = AUTO_WATER_TARGET - plant.Stats.Idratazione;
+                        float waterNeeded = deficit * WATER_PER_HYDRATION;
+                        float waterUsed = Math.Min(waterNeeded, waterCurrent);
+                        float hydrationGained = waterUsed / WATER_PER_HYDRATION;
+                        plant.Stats.Idratazione += hydrationGained;
+                        waterCurrent -= waterUsed;
+                    }
+
+                    // 5. Growth (ControlloCrescita checks hydration internally)
+                    plant.ControlloCrescita();
+
+                    // 6. Ensure health never changes
+                    plant.Stats.Salute = originalHealth;
                 }
 
                 result.TicksSimulated = tick + 1;
             }
-
-            result.PlantDied = plantDied;
         }
         finally
         {
@@ -105,6 +138,9 @@ public static class OfflineSimulator
             WeatherManager.SetWeatherDirect(simWeather);
             WeatherManager.SetLastWeatherChange(
                 nextWeatherChange.AddMinutes(-WEATHER_DURATION_MINUTES));
+
+            // Apply final water state
+            WaterSystem.Current = waterCurrent;
         }
 
         // Snapshot after
@@ -112,11 +148,7 @@ public static class OfflineSimulator
         result.HydrationAfter = plant.Stats.Idratazione;
         result.HeightAfter = plant.Stats.Altezza;
         result.LeavesAfter = plant.Stats.FoglieAttuali;
-
-        // Water: passive recharge for entire offline period
-        WaterSystem.AddOfflineRecharge(offlineTime.TotalSeconds);
         result.WaterAfter = WaterSystem.Current;
-
         result.WeatherChanges = weatherChanges;
 
         return result;

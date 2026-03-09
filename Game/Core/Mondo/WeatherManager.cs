@@ -9,8 +9,16 @@ public static class WeatherManager
     private static DateTime lastWeatherChange = DateTime.Now;
     private static int weatherDurationMinutes = 30;
 
+    private static Weather? weatherOverride = null;
+
+    public static void SetSimulationOverride(Weather? weather)
+    {
+        weatherOverride = weather;
+    }
+
     public static Weather GetCurrentWeather()
     {
+        if (weatherOverride.HasValue) return weatherOverride.Value;
         UpdateWeatherIfNeeded();
         return currentWeather;
     }
@@ -37,67 +45,24 @@ public static class WeatherManager
         }
     }
 
+    public static Weather GetNextWeather(Weather current, Random rng)
+    {
+        int roll = rng.Next(100);
+        return current switch
+        {
+            Weather.Sunny => roll < 60 ? Weather.Sunny : roll < 80 ? Weather.Cloudy : roll < 90 ? Weather.Rainy : roll < 95 ? Weather.Snowy : Weather.Foggy,
+            Weather.Cloudy => roll < 40 ? Weather.Sunny : roll < 60 ? Weather.Cloudy : roll < 85 ? Weather.Rainy : roll < 95 ? Weather.Stormy : Weather.Foggy,
+            Weather.Rainy => roll < 50 ? Weather.Rainy : roll < 75 ? Weather.Cloudy : roll < 90 ? Weather.Stormy : Weather.Snowy,
+            Weather.Stormy => roll < 40 ? Weather.Stormy : roll < 80 ? Weather.Rainy : roll < 90 ? Weather.Snowy : Weather.Cloudy,
+            Weather.Foggy => roll < 40 ? Weather.Foggy : roll < 70 ? Weather.Cloudy : roll < 90 ? Weather.Rainy : roll < 95 ? Weather.Stormy : Weather.Snowy,
+            Weather.Snowy => roll < 50 ? Weather.Snowy : roll < 80 ? Weather.Cloudy : roll < 90 ? Weather.Rainy : roll < 95 ? Weather.Foggy : Weather.Sunny,
+            _ => Weather.Sunny
+        };
+    }
+
     private static void ChangeWeatherRandomly()
     {
-        Weather newWeather = currentWeather;
-
-        switch (currentWeather)
-        {
-            case Weather.Sunny:
-                int sunnyRoll = random.Next(100);
-                if (sunnyRoll < 60) newWeather = Weather.Sunny;      
-                else if (sunnyRoll < 80) newWeather = Weather.Cloudy;
-                else if (sunnyRoll < 90) newWeather = Weather.Rainy;
-                else if (sunnyRoll < 95) newWeather = Weather.Snowy;
-                else newWeather = Weather.Foggy;                      
-                break;
-
-            case Weather.Cloudy:
-                int cloudyRoll = random.Next(100);
-                if (cloudyRoll < 40) newWeather = Weather.Sunny;    
-                else if (cloudyRoll < 60) newWeather = Weather.Cloudy;
-                else if (cloudyRoll < 85) newWeather = Weather.Rainy; 
-                else if (cloudyRoll < 95) newWeather = Weather.Stormy; 
-                else newWeather = Weather.Foggy;                    
-                break;
-
-            case Weather.Rainy:
-                int rainyRoll = random.Next(100);
-                if (rainyRoll < 50) newWeather = Weather.Rainy;     
-                else if (rainyRoll < 75) newWeather = Weather.Cloudy; 
-                else if (rainyRoll < 90) newWeather = Weather.Stormy; 
-                else if (rainyRoll < 100) newWeather = Weather.Snowy;
-                else newWeather = Weather.Sunny;                      
-                break;
-
-            case Weather.Stormy:
-                int stormyRoll = random.Next(100);
-                if (stormyRoll < 40) newWeather = Weather.Stormy;    
-                else if (stormyRoll < 80) newWeather = Weather.Rainy; 
-                else if (stormyRoll < 90) newWeather = Weather.Snowy; 
-                else newWeather = Weather.Cloudy;                     
-                break;
-
-            case Weather.Foggy:
-                int foggyRoll = random.Next(100);
-                if (foggyRoll < 40) newWeather = Weather.Foggy;      
-                else if (foggyRoll < 70) newWeather = Weather.Cloudy; 
-                else if (foggyRoll < 90) newWeather = Weather.Rainy;  
-                else if (foggyRoll < 95) newWeather = Weather.Stormy;
-                else if (foggyRoll < 100) newWeather = Weather.Snowy;
-                else newWeather = Weather.Sunny;                     
-                break;
-
-            case Weather.Snowy:
-                int snowyRoll = random.Next(100);
-                if (snowyRoll < 50) newWeather = Weather.Snowy;     
-                else if (snowyRoll < 80) newWeather = Weather.Cloudy;
-                else if (snowyRoll < 90) newWeather = Weather.Rainy;  
-                else if (snowyRoll < 95) newWeather = Weather.Foggy;
-                else newWeather = Weather.Sunny;                      
-                break;
-        }
-
+        Weather newWeather = GetNextWeather(currentWeather, random);
         if (newWeather != currentWeather)
         {
             currentWeather = newWeather;
@@ -108,11 +73,14 @@ public static class WeatherManager
     public static void SetCurrentWeather(Weather weather)
     {
         currentWeather = weather;
-        lastWeatherChange = DateTime.Now;
     }
 
     public static void ForceWeatherChange()
     {
         ChangeWeatherRandomly();
     }
+
+    public static DateTime GetLastWeatherChange() => lastWeatherChange;
+    public static void SetLastWeatherChange(DateTime time) { lastWeatherChange = time; }
+    public static void SetWeatherDirect(Weather weather) { currentWeather = weather; }
 }

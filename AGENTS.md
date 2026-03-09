@@ -154,6 +154,8 @@ dotnet publish -c Release
 | find-pattern | "find pattern", "cerca" | Search code patterns |
 | git-status | "git status" | Git operations |
 
+
+
 ## NOTES
 
 - No CI/CD (manual builds only)

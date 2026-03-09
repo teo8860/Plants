@@ -28,6 +28,7 @@ public static class Game
 
     public static bool cambiaPhase = false;
     public static bool isPaused = false;
+    public static bool IsOfflineSimulation = false;
 
     public static Timer Timer;
     public static Timer TimerSave;

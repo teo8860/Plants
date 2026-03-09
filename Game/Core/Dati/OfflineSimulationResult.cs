@@ -18,7 +18,6 @@ public class OfflineSimulationResult
     public int LeavesAfter { get; set; }
 
     // Events
-    public bool PlantDied { get; set; }
     public int WeatherChanges { get; set; }
     public float WaterBefore { get; set; }
     public float WaterAfter { get; set; }
@@ -34,7 +33,6 @@ public class OfflineSimulationResult
         s += $"Foglie: {LeavesBefore} -> {LeavesAfter}\n";
         s += $"Acqua: {WaterBefore:F0} -> {WaterAfter:F0}\n";
         s += $"Cambi meteo: {WeatherChanges}\n";
-        if (PlantDied) s += "!! LA PIANTA E' MORTA DURANTE L'ASSENZA!\n";
         return s;
     }
 }

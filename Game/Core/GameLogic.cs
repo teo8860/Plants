@@ -532,7 +532,7 @@ public class GameLogicPianta
     {
         if (!IsViva)
         {
-            if (stats.FoglieAttuali > 0)
+            if (stats.FoglieAttuali > 0 && !Game.IsOfflineSimulation)
             {
                 LeafHarvestSystem.HarvestAndShow("Pianta morta");
             }
@@ -553,7 +553,7 @@ public class GameLogicPianta
         //AggiornaRigenerazione(worldMod);
 
         stats.ClampAllValues();
-        EventSystem?.CheckAndFireEvents();
+        if (!Game.IsOfflineSimulation) EventSystem?.CheckAndFireEvents();
 
     }
 
