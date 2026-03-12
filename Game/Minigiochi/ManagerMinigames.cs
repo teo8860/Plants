@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Plants;
@@ -9,6 +10,7 @@ public static class ManagerMinigames
     private static Dictionary<TipoMinigioco, MinigiocoBase> minigiochi = new();
     private static Room room_minigioco;
     private static bool inCorso = false;
+    private static Process? processoMinigioco = null;
 
     public static bool InCorso => inCorso;
 
@@ -32,36 +34,61 @@ public static class ManagerMinigames
         minigiochi[TipoMinigioco.Treni] = treni;
     }
 
+    /// <summary>
+    /// Inizializza solo un minigioco specifico per la modalità standalone.
+    /// </summary>
+    public static void InitStandalone(TipoMinigioco tipo)
+    {
+        room_minigioco = new Room(true); // room attiva subito
+
+        MinigiocoBase minigioco = tipo switch
+        {
+            TipoMinigioco.Cerchio => GameElement.Create<MinigiocoCerchio>(0, room_minigioco),
+            TipoMinigioco.Tieni => GameElement.Create<MinigiocoTieni>(0, room_minigioco),
+            TipoMinigioco.Resta => GameElement.Create<MinigiocoResta>(0, room_minigioco),
+            TipoMinigioco.Semi => GameElement.Create<MinigiocoSemi>(0, room_minigioco),
+            TipoMinigioco.Treni => GameElement.Create<MinigiocoTreni>(0, room_minigioco),
+            _ => throw new ArgumentException($"Tipo minigioco sconosciuto: {tipo}")
+        };
+
+        minigiochi[tipo] = minigioco;
+        minigioco.Avvia();
+    }
+
     public static Room GetRoom()
     {
         return room_minigioco;
     }
 
-    public static void Avvia(TipoMinigioco tipo)
+    /// <summary>
+    /// Avvia un processo separato per il minigioco.
+    /// </summary>
+    public static void AvviaProcesso(TipoMinigioco tipo)
     {
         if (inCorso) return;
-        if (!minigiochi.ContainsKey(tipo)) return;
 
         inCorso = true;
 
-        // Prima attiva la room (questo riattiva TUTTI gli elementi nella room)
-        room_minigioco.SetActiveRoom();
+        string exePath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName
+            ?? throw new InvalidOperationException("Impossibile trovare il percorso dell'eseguibile");
 
-        // Poi disattiva e resetta tutti i minigiochi
-        foreach (var mg in minigiochi.Values)
-            mg.Ferma();
+        processoMinigioco = new Process();
+        processoMinigioco.StartInfo.FileName = exePath;
+        processoMinigioco.StartInfo.Arguments = $"--minigioco {tipo}";
+        processoMinigioco.EnableRaisingEvents = true;
+        processoMinigioco.Exited += (s, e) =>
+        {
+            // Il processo minigioco è terminato, controlla i risultati
+            var risultato = MinigameResult.Load();
+            if (risultato != null && risultato.FoglieGuadagnate > 0)
+            {
+                Game.pianta.Stats.FoglieAccumulate += risultato.FoglieGuadagnate;
+            }
+            inCorso = false;
+            processoMinigioco = null;
+        };
 
-        // Infine avvia solo quello scelto
-        minigiochi[tipo].Avvia();
-    }
-
-    public static void AvviaCasuale()
-    {
-        if (inCorso) return;
-
-        var tipi = minigiochi.Keys.ToList();
-        var tipo = tipi[RandomHelper.Int(0, tipi.Count)];
-        Avvia(tipo);
+        processoMinigioco.Start();
     }
 
     public static void OnMinigiocoFinito()

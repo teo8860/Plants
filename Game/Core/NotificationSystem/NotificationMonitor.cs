@@ -93,12 +93,18 @@ public class NotificationMonitor : GameElement
 
         eventSystem.OnWorldTransitionReady += () =>
         {
-            // Per la transizione mondo inviamo sempre la notifica
-            if (!hasNotifiedWorldTransition)
+            if (!WindowStateHelper.IsGameWindowFocused())
             {
-                NotificationManager.ShowWorldTransitionReady();
-                hasNotifiedWorldTransition = true;
-                Console.WriteLine("[Event] Notifica: Transizione mondo pronta");
+                if (!hasNotifiedWorldTransition)
+                {
+                    NotificationManager.ShowWorldTransitionReady();
+                    hasNotifiedWorldTransition = true;
+                    Console.WriteLine("[Event] Notifica: Transizione mondo pronta (app in background)");
+                }
+            }
+            else
+            {
+                Console.WriteLine("[Event] Transizione mondo pronta (app attiva, notifica non inviata)");
             }
         };
 

@@ -17,6 +17,41 @@ internal class Rendering
 {
     public static PixelCamera camera = new(GameProperties.windowWidth, GameProperties.windowHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth);
     
+    /// <summary>
+    /// Loop di rendering per la modalità minigioco standalone.
+    /// </summary>
+    public static void InitMinigame()
+    {
+        Raylib.SetConfigFlags(ConfigFlags.Msaa4XHint);
+        Time.SetTargetFPS(60);
+
+        while (!Window.ShouldClose())
+        {
+            camera.Update();
+            var elements = GameElement.GetList();
+            elements = elements.FindAll((o) => o.active == true);
+
+            foreach (var item in elements)
+                item.Update();
+
+            var layerGui = elements.FindAll((o) => (o.guiLayer == true && o.active == true));
+            layerGui.Sort((GameElement a, GameElement b) => b.depth - a.depth);
+
+            Graphics.BeginDrawing();
+            Graphics.ClearBackground(Color.Black);
+
+            foreach (var item in layerGui)
+                item.Draw();
+
+            GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2(Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);
+
+            Graphics.EndDrawing();
+        }
+
+        Window.Close();
+        Environment.Exit(0);
+    }
+
     public static void Init()
     {
         Raylib.SetConfigFlags(ConfigFlags.Msaa4XHint);

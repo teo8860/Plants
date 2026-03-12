@@ -6,6 +6,7 @@ using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Textures;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Security.Cryptography;
@@ -42,6 +43,19 @@ public class Obj_Plant : GameElement
     public Color colore1, colore2;
 
     public float nextWorldGroundY => Stats.EffectiveMaxHeight + GameProperties.groundHeight - 10;
+
+    // Foglie dorate - minigioco
+    private const float GOLDEN_LEAF_BASE_CHANCE = 0.008f; // 0.8% per foglia che cresce
+    private int fogliaDorata_ramoIdx = -1;
+    private int fogliaDorata_fogliaIdx = -1;
+    private const float CLICK_DISTANCE = 18f; // generoso in coordinate mondo (~100px wide)
+
+    // Animazione click foglia dorata
+    private bool animazioneDorata = false;
+    private float animazioneDorataTimer = 0f;
+    private const float ANIMAZIONE_DORATA_DURATA = 0.6f;
+    private Vector2 animazioneDorataPos = Vector2.Zero;
+    private TipoMinigioco animazioneDorataTipo;
 
 
     public Obj_Plant()
@@ -121,6 +135,7 @@ public class Obj_Plant : GameElement
             if (RandomHelper.DeterministicFloatRangeAt(rseed, Stats.FoglieAttuali + puntiSpline.Count, 0, 1) < probabilitaFoglia)
             {
                 Stats.FoglieAttuali++;
+                TentaFogliaDorata();
             }
         }
 
@@ -206,7 +221,11 @@ public class Obj_Plant : GameElement
 
         if (!Game.IsOfflineSimulation && Game.controller.targetScrollY <= Stats.AltezzaMassima * WorldManager.GetCurrentModifiers().LimitMultiplier && Game.controller.autoscroll == true)
         {
-            Game.controller.targetScrollY += incrementoFinale;
+            float cameraDistFromTarget = Math.Abs(Rendering.camera.position.Y - Game.controller.targetScrollY);
+            if (cameraDistFromTarget < 20f)
+            {
+                Game.controller.targetScrollY += incrementoFinale;
+            }
         }
     }
 
@@ -269,6 +288,9 @@ public class Obj_Plant : GameElement
 
         contatorePuntiPerRamo = 0;
         contatorePuntiPerRadice = 0;
+        fogliaDorata_ramoIdx = -1;
+        fogliaDorata_fogliaIdx = -1;
+        animazioneDorata = false;
 
         Stats.Altezza = 0;
         Stats.FoglieAttuali = 0;
@@ -307,6 +329,8 @@ public class Obj_Plant : GameElement
 
     public override void Update()
     {
+        float dt = Raylib_CSharp.Time.GetFrameTime();
+
         if(Input.IsKeyPressed(KeyboardKey.R))
         {
             Reset();
@@ -315,6 +339,134 @@ public class Obj_Plant : GameElement
                 Crescita();
 
             Rendering.camera.position.Y = 0;
+        }
+
+        // Debug: F rende una foglia casuale dorata
+        if (Input.IsKeyPressed(KeyboardKey.F) && rami.Count > 0)
+        {
+            RendiFogliaDorataCasuale();
+        }
+
+        // Animazione click in corso → aspetta che finisca, poi lancia il minigioco
+        if (animazioneDorata)
+        {
+            animazioneDorataTimer += dt;
+            if (animazioneDorataTimer >= ANIMAZIONE_DORATA_DURATA)
+            {
+                animazioneDorata = false;
+                ManagerMinigames.AvviaProcesso(animazioneDorataTipo);
+            }
+            return; // non processare click durante l'animazione
+        }
+
+        // Click su foglia dorata → avvia animazione
+        if (Input.IsMouseButtonPressed(Raylib_CSharp.Interact.MouseButton.Left) && !ManagerMinigames.InCorso)
+        {
+            ControllaClickFogliaDorata();
+        }
+
+        // Controlla risultati minigioco tornato
+        ControllaRisultatoMinigioco();
+    }
+
+    /// <summary>
+    /// Rende una foglia casuale dorata (debug).
+    /// </summary>
+    public void RendiFogliaDorataCasuale()
+    {
+        var candidati = new List<(int ramoIdx, int fogliaIdx)>();
+        for (int r = 0; r < rami.Count; r++)
+        {
+            var indici = rami[r].GetIndiciFoglieValide();
+            foreach (int fi in indici)
+            {
+                if (!rami[r].IsFogliaDorata(fi))
+                    candidati.Add((r, fi));
+            }
+        }
+
+        if (candidati.Count == 0) return;
+
+        var (ri, fli) = candidati[new Random().Next(candidati.Count)];
+        rami[ri].SetFogliaDorata(fli, true);
+        Console.WriteLine($"[DEBUG] Foglia dorata su ramo {ri}, foglia {fli}");
+    }
+
+    private void TentaFogliaDorata()
+    {
+        float chance = GOLDEN_LEAF_BASE_CHANCE * seedBonus.vegetazione;
+
+        if (RandomHelper.Float(0, 1) < chance && rami.Count > 0)
+        {
+            var ultimoRamo = rami[^1];
+            var indici = ultimoRamo.GetIndiciFoglieValide();
+            if (indici.Count > 0)
+            {
+                int lastIdx = indici[^1];
+                if (!ultimoRamo.IsFogliaDorata(lastIdx))
+                {
+                    ultimoRamo.SetFogliaDorata(lastIdx, true);
+                }
+            }
+        }
+    }
+
+    private void ControllaClickFogliaDorata()
+    {
+        Vector2 mouse = Input.GetMousePosition();
+        mouse = CoordinateHelper.ToWorld(mouse, Rendering.camera.position);
+
+        // Trova la foglia dorata più vicina al click
+        float distMin = float.MaxValue;
+        int bestRamo = -1, bestFoglia = -1;
+        Vector2 bestPos = Vector2.Zero;
+
+        for (int r = 0; r < rami.Count; r++)
+        {
+            var dorate = rami[r].GetIndiciFoglieDorate();
+            foreach (int fi in dorate)
+            {
+                Vector2 pos = rami[r].GetPosizioneFoglia(fi);
+                if (pos == Vector2.Zero) continue;
+
+                float dist = Vector2.Distance(mouse, pos);
+                if (dist < distMin)
+                {
+                    distMin = dist;
+                    bestRamo = r;
+                    bestFoglia = fi;
+                    bestPos = pos;
+                }
+            }
+        }
+
+        if (bestRamo >= 0 && distMin <= CLICK_DISTANCE)
+        {
+            // Salva foglia cliccata
+            fogliaDorata_ramoIdx = bestRamo;
+            fogliaDorata_fogliaIdx = bestFoglia;
+
+            // Scegli minigioco casuale
+            var tipi = ManagerMinigames.GetTipiDisponibili();
+            animazioneDorataTipo = tipi[new Random().Next(tipi.Count)];
+
+            // Avvia animazione prima di aprire il minigioco
+            animazioneDorata = true;
+            animazioneDorataTimer = 0f;
+            animazioneDorataPos = bestPos;
+        }
+    }
+
+    private void ControllaRisultatoMinigioco()
+    {
+        if (fogliaDorata_ramoIdx >= 0 && !ManagerMinigames.InCorso)
+        {
+            if (fogliaDorata_ramoIdx < rami.Count)
+            {
+                rami[fogliaDorata_ramoIdx].SetFogliaDorata(fogliaDorata_fogliaIdx, false);
+            }
+            fogliaDorata_ramoIdx = -1;
+            fogliaDorata_fogliaIdx = -1;
         }
     }
 
@@ -394,6 +546,54 @@ public class Obj_Plant : GameElement
         {
             Vector2 screenPos = posizione;
             Graphics.DrawEllipse((int)screenPos.X, (int)screenPos.Y, 8, 12, Color.DarkBrown);
+        }
+
+        // Animazione burst al click su foglia dorata
+        if (animazioneDorata && ViewCulling.IsValueVisible(animazioneDorataPos.Y, cameraY))
+        {
+            DrawAnimazioneDorata();
+        }
+    }
+
+    private void DrawAnimazioneDorata()
+    {
+        float t = animazioneDorataTimer / ANIMAZIONE_DORATA_DURATA; // 0→1
+        Vector2 pos = animazioneDorataPos;
+
+        // Cerchi che si espandono verso l'esterno
+        float raggio1 = t * 25f;
+        float raggio2 = Math.Max(0, (t - 0.15f)) * 20f;
+        float raggio3 = Math.Max(0, (t - 0.3f)) * 15f;
+        byte alpha1 = (byte)(200 * (1f - t));
+        byte alpha2 = (byte)(160 * Math.Max(0, 1f - (t / 0.85f)));
+        byte alpha3 = (byte)(120 * Math.Max(0, 1f - ((t - 0.15f) / 0.85f)));
+
+        Graphics.DrawCircleV(pos, raggio1, new Color(255, 240, 80, alpha1));
+        if (t > 0.15f)
+            Graphics.DrawCircleV(pos, raggio2, new Color(255, 255, 150, alpha2));
+        if (t > 0.3f)
+            Graphics.DrawCircleV(pos, raggio3, new Color(255, 255, 220, alpha3));
+
+        // Raggi/particelle che partono dal centro
+        int numRaggi = 8;
+        for (int i = 0; i < numRaggi; i++)
+        {
+            float angolo = (MathF.PI * 2f / numRaggi) * i + t * 1.5f;
+            float distanza = t * 18f;
+            float lunghezza = 3f * (1f - t);
+            byte alphaRaggio = (byte)(255 * (1f - t));
+
+            Vector2 start = pos + new Vector2(MathF.Cos(angolo) * distanza, MathF.Sin(angolo) * distanza);
+            Vector2 end = pos + new Vector2(MathF.Cos(angolo) * (distanza + lunghezza), MathF.Sin(angolo) * (distanza + lunghezza));
+
+            Graphics.DrawLineEx(start, end, 1.5f * (1f - t), new Color(255, 230, 50, alphaRaggio));
+        }
+
+        // Flash bianco centrale all'inizio
+        if (t < 0.3f)
+        {
+            float flashAlpha = (1f - t / 0.3f) * 200f;
+            Graphics.DrawCircleV(pos, 4f * (1f - t / 0.3f), new Color(255, 255, 255, (byte)flashAlpha));
         }
     }
 

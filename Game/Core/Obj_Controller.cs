@@ -2,6 +2,7 @@ using Plants;
 using Raylib_CSharp;
 using Raylib_CSharp.Interact;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -30,6 +31,26 @@ public class Obj_Controller : GameElement
 
     public override void Update()
     {
+        // Blocca tutti gli input durante la schermata di morte
+        if (Game.guiMorte != null && Game.guiMorte.active)
+            return;
+
+        // Durante modalita piantaggio: permetti solo navigazione tra room
+        if (Game.IsModalitaPiantaggio)
+        {
+            if (Input.IsKeyDown(KeyboardKey.V))
+            {
+                Game.room_main.SetActiveRoom();
+                Game.guiPiantaggio.Aggiorna();
+                Game.guiPiantaggio.Mostra();
+            }
+            if (Input.IsKeyDown(KeyboardKey.C))
+                Game.room_compost.SetActiveRoom();
+            if (Input.IsKeyDown(KeyboardKey.B))
+                Game.room_inventory.SetActiveRoom();
+            return;
+        }
+
         if (Game.cambiaPhase)
         {
             Game.Phase = FaseGiorno.ChangeDayPhase();
@@ -150,30 +171,23 @@ public class Obj_Controller : GameElement
             Game.pianta.Stats.Salute = 0;
 		}
 
-        // Minigiochi: M = casuale, 1 = cerchio, 2 = tieni
-        if (Input.IsKeyPressed(KeyboardKey.M) && !ManagerMinigames.InCorso)
+        // Minigiochi: M = casuale, 1-5 = specifico — avvia processo separato
+        if (!ManagerMinigames.InCorso)
         {
-            ManagerMinigames.AvviaCasuale();
-        }
-        if (Input.IsKeyPressed(KeyboardKey.One) && !ManagerMinigames.InCorso)
-        {
-            ManagerMinigames.Avvia(TipoMinigioco.Cerchio);
-        }
-        if (Input.IsKeyPressed(KeyboardKey.Two) && !ManagerMinigames.InCorso)
-        {
-            ManagerMinigames.Avvia(TipoMinigioco.Tieni);
-        }
-        if (Input.IsKeyPressed(KeyboardKey.Three) && !ManagerMinigames.InCorso)
-        {
-            ManagerMinigames.Avvia(TipoMinigioco.Resta);
-        }
-        if (Input.IsKeyPressed(KeyboardKey.Four) && !ManagerMinigames.InCorso)
-        {
-            ManagerMinigames.Avvia(TipoMinigioco.Semi);
-        }
-        if (Input.IsKeyPressed(KeyboardKey.Five) && !ManagerMinigames.InCorso)
-        {
-            ManagerMinigames.Avvia(TipoMinigioco.Treni);
+            TipoMinigioco? tipo = null;
+            if (Input.IsKeyPressed(KeyboardKey.M))
+            {
+                var tipi = ManagerMinigames.GetTipiDisponibili();
+                tipo = tipi[new Random().Next(tipi.Count)];
+            }
+            else if (Input.IsKeyPressed(KeyboardKey.One)) tipo = TipoMinigioco.Cerchio;
+            else if (Input.IsKeyPressed(KeyboardKey.Two)) tipo = TipoMinigioco.Tieni;
+            else if (Input.IsKeyPressed(KeyboardKey.Three)) tipo = TipoMinigioco.Resta;
+            else if (Input.IsKeyPressed(KeyboardKey.Four)) tipo = TipoMinigioco.Semi;
+            else if (Input.IsKeyPressed(KeyboardKey.Five)) tipo = TipoMinigioco.Treni;
+
+            if (tipo != null)
+                ManagerMinigames.AvviaProcesso(tipo.Value);
         }
 
     }

@@ -86,6 +86,9 @@ public class Obj_GuiBottomNavigation : GameElement
 
     public override void Update()
     {
+        if (Game.guiMorte != null && Game.guiMorte.active)
+            return;
+
         int screenW = Rendering.camera.screenWidth;
         int screenH = Rendering.camera.screenHeight;
         int barY = screenH - barHeight;
@@ -126,6 +129,9 @@ public class Obj_GuiBottomNavigation : GameElement
 
     public override void Draw()
     {
+        if (Game.guiMorte != null && Game.guiMorte.active)
+            return;
+
         int screenW = Rendering.camera.screenWidth;
         int screenH = Rendering.camera.screenHeight;
         int barY = screenH - barHeight;
@@ -206,6 +212,13 @@ public class Obj_GuiBottomNavigation : GameElement
         if (Game.inventoryCrates != null && Game.inventoryCrates.IsInventoryOpen)
         {
             Game.inventoryCrates.CloseInventory();
+        }
+
+        // Se siamo in modalita piantaggio, rimostra la selezione semi
+        if (Game.IsModalitaPiantaggio)
+        {
+            Game.guiPiantaggio.Aggiorna();
+            Game.guiPiantaggio.Mostra();
         }
 
         Console.WriteLine("Switched to Main Game");

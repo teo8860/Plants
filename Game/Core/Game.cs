@@ -29,6 +29,10 @@ public static class Game
     public static bool cambiaPhase = false;
     public static bool isPaused = false;
     public static bool IsOfflineSimulation = false;
+    public static bool IsModalitaPiantaggio = false;
+
+    public static Obj_GuiPiantaggio guiPiantaggio;
+    public static Obj_GuiMorte guiMorte;
 
     public static Timer Timer;
     public static Timer TimerSave;
@@ -82,7 +86,17 @@ public static class Game
             GameElement.Create<Obj_Logo>();
 
         Inventario.get().Load();
-        GameSave.get().Load();
+
+        bool hasSave = SaveHelper.Exists("savegame.json");
+        if (hasSave)
+        {
+            GameSave.get().Load();
+        }
+        else
+        {
+            // Blocca subito prima che i timer partano
+            isPaused = true;
+        }
 
         notificationMonitor = GameElement.Create<NotificationMonitor>();
 
@@ -93,7 +107,17 @@ public static class Game
         Phase = FaseGiorno.GetCurrentPhase();
 
         Rendering.camera.position.Y = 0;
-        tutorial.StartTutorial();
+
+        if (!hasSave)
+        {
+            WorldManager.SetCurrentWorld(WorldType.Terra);
+            pianta.SetNaturalColors(WorldType.Terra);
+            EntraModalitaPiantaggio();
+        }
+        else
+        {
+            tutorial.StartTutorial();
+        }
         //seedTest();
 	}
 
@@ -246,6 +270,9 @@ public static class Game
         );
 
         GameElement.Create<Obj_GuiBottomNavigation>(-600);
+
+        guiPiantaggio = new Obj_GuiPiantaggio();
+        guiMorte = new Obj_GuiMorte();
     }
 
     private static void InitInventory()
@@ -304,13 +331,14 @@ public static class Game
 
     private static void OnTimedEvent1(Object source, ElapsedEventArgs e)
     {
+        if (IsModalitaPiantaggio) return;
         GameSave.get().Save();
 	}
 
     private static void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
-        if (isPaused) return;
-        
+        if (isPaused || IsModalitaPiantaggio) return;
+
         pianta.proprieta.AggiornaTutto(
             Phase,
             WeatherManager.GetCurrentWeather(),
@@ -330,5 +358,46 @@ public static class Game
     private static void OnTimedEventFase(Object source, ElapsedEventArgs e)
     {
         Phase = FaseGiorno.GetCurrentPhase();
+    }
+
+    public static void EntraModalitaPiantaggio()
+    {
+        IsModalitaPiantaggio = true;
+        isPaused = true;
+
+        room_main.SetActiveRoom();
+
+        // Nascondi elementi del gioco DOPO SetActiveRoom (che li riattiva)
+        pianta.active = false;
+        if (statsPanel != null) statsPanel.active = false;
+        if (toolbar != null) toolbar.active = false;
+        if (toolbarBottom != null) toolbarBottom.active = false;
+        if (innaffiatoio != null) innaffiatoio.active = false;
+
+        guiPiantaggio.Mostra();
+    }
+
+    public static void EsciModalitaPiantaggio()
+    {
+        IsModalitaPiantaggio = false;
+        isPaused = false;
+
+        guiPiantaggio.Nascondi();
+
+        // Riattiva elementi del gioco
+        pianta.active = true;
+        if (statsPanel != null) statsPanel.active = true;
+        if (toolbar != null) toolbar.active = true;
+        if (toolbarBottom != null) toolbarBottom.active = true;
+        if (innaffiatoio != null) innaffiatoio.active = true;
+
+        room_main.SetActiveRoom();
+    }
+
+    public static void MostraMorte()
+    {
+        if (guiMorte.active) return; // gia' mostrata
+        isPaused = true;
+        guiMorte.Mostra();
     }
 }

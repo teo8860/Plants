@@ -271,10 +271,29 @@ public abstract class MinigiocoBase : GameElement
     private void Chiudi()
     {
         int foglie = CalcolaFoglie();
-        AssegnaFoglie(foglie);
-        this.active = false;
-        Game.room_main.SetActiveRoom();
-        ManagerMinigames.OnMinigiocoFinito();
+
+        if (Program.IsMinigameMode)
+        {
+            // Modalità standalone: salva risultato su file e chiudi finestra
+            var risultato = new MinigameResult
+            {
+                Tipo = Tipo,
+                Vinto = stato == MinigiocoStato.Vittoria,
+                Punteggio = punteggio,
+                PunteggioMassimo = punteggioMassimo,
+                FoglieGuadagnate = foglie
+            };
+            risultato.Save();
+            Raylib_CSharp.Windowing.Window.Close();
+            Environment.Exit(0);
+        }
+        else
+        {
+            AssegnaFoglie(foglie);
+            this.active = false;
+            Game.room_main.SetActiveRoom();
+            ManagerMinigames.OnMinigiocoFinito();
+        }
     }
 
     protected int CalcolaFoglie()

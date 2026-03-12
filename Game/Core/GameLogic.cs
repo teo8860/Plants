@@ -536,6 +536,14 @@ public class GameLogicPianta
             {
                 LeafHarvestSystem.HarvestAndShow("Pianta morta");
             }
+
+            if (!Game.IsOfflineSimulation && !Game.IsModalitaPiantaggio
+                && Game.guiMorte != null && !Game.guiMorte.active)
+            {
+                // Cancella il salvataggio e mostra la schermata di morte
+                GameSave.DeleteSaveFile();
+                Game.MostraMorte();
+            }
             return;
         }
 

@@ -35,8 +35,22 @@ internal static class Program
     [DllImport("user32.dll", SetLastError = true)]
     static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
     
-    public static void Main()
+    public static bool IsMinigameMode = false;
+    public static TipoMinigioco MinigameType;
+
+    public static void Main(string[] args)
     {
+        // Controlla se avviato in modalità minigioco standalone
+        if (args.Length >= 2 && args[0] == "--minigioco")
+        {
+            if (Enum.TryParse<TipoMinigioco>(args[1], out var tipo))
+            {
+                IsMinigameMode = true;
+                MinigameType = tipo;
+                AvviaMinigiocoStandalone(tipo);
+                return;
+            }
+        }
 
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
         Window.ClearState(ConfigFlags.ResizableWindow);
@@ -44,7 +58,7 @@ internal static class Program
         // rimuove la possibilità di minimizzare
         IntPtr hwnd = Window.GetHandle();
 		uint style = GetWindowLong(hwnd, GWL_STYLE);
-        style &= ~WS_MINIMIZEBOX; 
+        style &= ~WS_MINIMIZEBOX;
         SetWindowLong(hwnd, GWL_STYLE, style);
 
 
@@ -52,11 +66,37 @@ internal static class Program
         Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
 
         Input.HideCursor();
-        
-     
+
+
 		Game.Init();
         Rendering.Init();
 	}
+
+    private static void AvviaMinigiocoStandalone(TipoMinigioco tipo)
+    {
+        int miniHeight = GameProperties.windowHeight - 80;
+        Window.Init(GameProperties.windowWidth, miniHeight, $"Plants - Minigioco");
+        Window.ClearState(ConfigFlags.ResizableWindow);
+
+        IntPtr hwnd = Window.GetHandle();
+        uint style = GetWindowLong(hwnd, GWL_STYLE);
+        style &= ~WS_MINIMIZEBOX;
+        SetWindowLong(hwnd, GWL_STYLE, style);
+
+        // Centra la finestra
+        int monW = Window.GetMonitorWidth(0);
+        int monH = Window.GetMonitorHeight(0);
+        Window.SetPosition((monW - GameProperties.windowWidth) / 2, (monH - miniHeight) / 2);
+
+        // Aggiorna la camera per le dimensioni ridotte
+        Rendering.camera = new PixelCamera(GameProperties.windowWidth, miniHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth);
+
+        Input.HideCursor();
+
+        AssetLoader.LoadAll();
+        ManagerMinigames.InitStandalone(tipo);
+        Rendering.InitMinigame();
+    }
 
     private static void SetupIcon()
     {

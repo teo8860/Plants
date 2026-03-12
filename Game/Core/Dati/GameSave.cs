@@ -7,6 +7,7 @@ namespace Plants;
 public class RamoSaveData
 {
     public List<Vector2> Punti { get; set; } = new();
+    public List<int> FoglieDorate { get; set; } = new();
 }
 
 public class RadiceSaveData
