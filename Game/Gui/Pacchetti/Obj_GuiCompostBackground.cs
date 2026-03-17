@@ -69,9 +69,9 @@ public class Obj_GuiCompostBackground : GameElement
 
         // === FINESTRA A SINISTRA ===
         int windowX = 30;
-        int windowY = 40;
+        int windowY = 55;
         int windowWidth = 140;
-        int windowHeight = 180;
+        int windowHeight = 165;
 
         DrawWindow(windowX, windowY, windowWidth, windowHeight);
 
@@ -100,6 +100,9 @@ public class Obj_GuiCompostBackground : GameElement
         int binX = baseRowX - 50;
         int binY = baseRowY - 40;
         DrawCompostBin(binX, binY);
+
+        // === TAVOLINO SOTTO IL SECCHIO ===
+        DrawBinTable(binX - 5, binY + 40, 45);
 
         // === DECORAZIONI ===
         DrawWallDecoration();
@@ -274,6 +277,35 @@ public class Obj_GuiCompostBackground : GameElement
 
         Graphics.DrawCircle(frameX + frameW / 2, frameY + frameH / 2, 8,
             new Color(100, 180, 100, 255));
+    }
+
+    private void DrawBinTable(int x, int y, int width)
+    {
+        // Sgabello rustico rotondo - diverso dai piedistalli rettangolari
+        Color stoolTop = woodLight;
+        Color stoolRing = woodMedium;
+        Color stoolLeg = woodDark;
+
+        // Ombra a terra
+        Graphics.DrawEllipse(x + width / 2, y + 48, width / 2 + 2, 6,
+            new Color(0, 0, 0, 40));
+
+        // Gamba centrale
+        int legW = 8;
+        Graphics.DrawRectangle(x + width / 2 - legW / 2, y + 8, legW, 38, stoolLeg);
+        Graphics.DrawRectangle(x + width / 2 - legW / 2, y + 8, legW / 2, 38, stoolRing);
+
+        // Supporti diagonali (due piccoli piedi)
+        Graphics.DrawRectangle(x + width / 2 - 14, y + 30, 6, 18, stoolLeg);
+        Graphics.DrawRectangle(x + width / 2 + 8, y + 30, 6, 18, stoolLeg);
+
+        // Piano rotondo (ellisse)
+        Graphics.DrawEllipse(x + width / 2, y + 6, width / 2, 6, stoolTop);
+        Graphics.DrawEllipse(x + width / 2, y + 8, width / 2, 5, stoolRing);
+
+        // Anello bordo piano
+        Graphics.DrawEllipse(x + width / 2, y + 6, width / 2 + 1, 3,
+            new Color(stoolLeg.R, stoolLeg.G, stoolLeg.B, 120));
     }
 
     private void DrawRoomBorders()

@@ -75,6 +75,11 @@ public class Obj_GuiInventoryBackground : GameElement
 
         // === BORDI STANZA ===
         DrawRoomBorders();
+
+        // === PAVIMENTO BASSO (copre area dietro barra navigazione) ===
+        int bottomFloorHeight = 45;
+        Graphics.DrawRectangle(0, screenHeight - bottomFloorHeight, screenWidth, bottomFloorHeight, woodDark);
+        Graphics.DrawRectangle(0, screenHeight - bottomFloorHeight, screenWidth, 4, woodMedium);
     }
 
     private void DrawRoomBorders()

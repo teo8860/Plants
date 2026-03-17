@@ -899,24 +899,19 @@ public class Obj_GuiPackOpeningAnimation : GameElement
             if (visualSeed != null && alpha > 50)
             {
                 var possibleTypes = Enum.GetValues<SeedType>()
-                .Cast<SeedType>()
-                .Where(t => new Seed(t).rarity == rarity)
-                .ToList();
+                    .Cast<SeedType>()
+                    .Where(t => new Seed(t).rarity == rarity)
+                    .ToList();
 
-                SeedType chosenType = possibleTypes[chosenRarity % possibleTypes.Count];                
+                SeedType chosenType = possibleTypes[chosenRarity % possibleTypes.Count];
+                Seed displaySeed = new Seed(chosenType);
 
                 Vector2 boxCenter = new Vector2(scaledX + scaledSize / 2, scaledY + scaledSize / 2);
-
                 visualSeed.position = boxCenter;
                 visualSeed.scale = 3.0f * scale;
-
-                float totalDuration = ROULETTE_SPIN_DURATION + ROULETTE_SLOW_DURATION + ROULETTE_STOP_DURATION;
-
-                if (phaseTimer >= totalDuration)
-                    visualSeed.color = resultSeed.color;
-                else
-                    visualSeed.color = new Seed(chosenType).color;
-				visualSeed.Draw();
+                visualSeed.dati = displaySeed;
+                visualSeed.color = displaySeed.color;
+                visualSeed.Draw();
             }
         }
 
