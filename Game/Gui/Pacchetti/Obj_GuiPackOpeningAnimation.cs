@@ -898,13 +898,22 @@ public class Obj_GuiPackOpeningAnimation : GameElement
 
             if (visualSeed != null && alpha > 50)
             {
-                var possibleTypes = Enum.GetValues<SeedType>()
-                    .Cast<SeedType>()
-                    .Where(t => new Seed(t).rarity == rarity)
-                    .ToList();
+                Seed displaySeed;
+                if (rarity == resultSeed.rarity)
+                {
+                    // Mostra il seme effettivo quando la rarità corrisponde
+                    displaySeed = resultSeed;
+                }
+                else
+                {
+                    var possibleTypes = Enum.GetValues<SeedType>()
+                        .Cast<SeedType>()
+                        .Where(t => new Seed(t).rarity == rarity)
+                        .ToList();
 
-                SeedType chosenType = possibleTypes[chosenRarity % possibleTypes.Count];
-                Seed displaySeed = new Seed(chosenType);
+                    SeedType chosenType = possibleTypes[chosenRarity % possibleTypes.Count];
+                    displaySeed = new Seed(chosenType);
+                }
 
                 Vector2 boxCenter = new Vector2(scaledX + scaledSize / 2, scaledY + scaledSize / 2);
                 visualSeed.position = boxCenter;
@@ -1006,6 +1015,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         {
             visualSeed.scale = 8f * revealScale;
             visualSeed.position = center;
+            visualSeed.dati = resultSeed;
             visualSeed.color = resultSeed.color;
             visualSeed.Draw();
         }
