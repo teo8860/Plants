@@ -1,4 +1,6 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
+#if WINDOWS
+using Microsoft.Toolkit.Uwp.Notifications;
+#endif
 using Raylib_CSharp.Windowing;
 using System;
 
@@ -10,13 +12,16 @@ public static class NotificationManager
 
     public static void Initialize()
     {
+#if WINDOWS
         // Registra l'app per le notifiche
         ToastNotificationManagerCompat.OnActivated += OnNotificationActivated;
+#endif
 
         // Inizializza il gestore delle azioni
         NotificationActionHandler.Initialize();
     }
 
+#if WINDOWS
     private static void OnNotificationActivated(ToastNotificationActivatedEventArgsCompat e)
     {
         Console.WriteLine($"Notifica cliccata con argomento: {e.Argument}");
@@ -40,9 +45,11 @@ public static class NotificationManager
             }
         }
     }
+#endif
 
     public static void ShowPlantNeedsWater()
     {
+#if WINDOWS
         new ToastContentBuilder()
             .AddText("La tua pianta ha sete! 🌱")
             .AddText("L'idratazione è sotto il 20%")
@@ -53,10 +60,12 @@ public static class NotificationManager
                 .SetContent("Apri gioco")
                 .AddArgument("action", "open"))
             .Show();
+#endif
     }
 
     public static void ShowPlantDying()
     {
+#if WINDOWS
         new ToastContentBuilder()
             .AddText("⚠️ ATTENZIONE!")
             .AddText("La tua pianta sta morendo!")
@@ -68,10 +77,12 @@ public static class NotificationManager
                 .SetContent("Apri gioco")
                 .AddArgument("action", "open"))
             .Show();
+#endif
     }
 
     public static void ShowWorldTransitionReady()
     {
+#if WINDOWS
         var nextWorld = WorldManager.GetNextWorld(WorldManager.GetCurrentWorld());
 
         new ToastContentBuilder()
@@ -84,10 +95,12 @@ public static class NotificationManager
                 .SetContent("Apri gioco")
                 .AddArgument("action", "open"))
             .Show();
+#endif
     }
 
     public static void ShowParasiteInfestation()
     {
+#if WINDOWS
         new ToastContentBuilder()
             .AddText("🐛 Parassiti rilevati!")
             .AddText("La tua pianta è infestata")
@@ -99,10 +112,12 @@ public static class NotificationManager
                 .SetContent("Apri gioco")
                 .AddArgument("action", "open"))
             .Show();
+#endif
     }
 
     public static void ShowTemperatureDanger()
     {
+#if WINDOWS
         string tempStatus = Game.pianta.proprieta.IsGelida ? "GELIDA" : "TORRIDA";
 
         new ToastContentBuilder()
@@ -112,10 +127,13 @@ public static class NotificationManager
                 .SetContent("Controlla")
                 .AddArgument("action", "open"))
             .Show();
+#endif
     }
 
     public static void Cleanup()
     {
+#if WINDOWS
         ToastNotificationManagerCompat.Uninstall();
+#endif
     }
 }

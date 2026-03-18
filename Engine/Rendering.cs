@@ -15,7 +15,7 @@ namespace Plants;
 internal class Rendering
 {
     public static PixelCamera camera = new(GameProperties.windowWidth, GameProperties.windowHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth);
-    
+
     /// <summary>
     /// Loop di rendering per la modalità minigioco standalone.
     /// </summary>
@@ -59,27 +59,25 @@ internal class Rendering
 
         while (true)
         {
-            
+#if WINDOWS
             if (Window.IsMinimized() || Window.IsHidden())
             {
-                
                 Window.SetState(ConfigFlags.HiddenWindow);
-                //Window.Close();
-                //CopperImGui.Shutdown();
-               // break;
             }
 
             if (Window.ShouldClose())
             {
-                
                 Window.SetState(ConfigFlags.HiddenWindow);
-                //Window.Close();
-                //CopperImGui.Shutdown();
-               // break;
             }
 
             Program.trayIcon?.LoopEventRender();
-            
+#else
+            if (Window.ShouldClose())
+            {
+                break;
+            }
+#endif
+
             camera.Update();
             var elements = GameElement.GetList();
             elements = elements.FindAll((o)=> o.active == true);
@@ -117,31 +115,28 @@ internal class Rendering
                 item.Draw();
             }
 
+            GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);
 
-            GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);    
-			
             //Graphics.DrawFPS(0,0);
 			Graphics.EndDrawing();
 
-
+#if WINDOWS
             if (Window.IsMinimized() || Window.IsHidden())
             {
-                
                 Window.SetState(ConfigFlags.HiddenWindow);
-                //Window.Close();
-                //CopperImGui.Shutdown();
-               // break;
             }
 
             if (Window.ShouldClose())
             {
-                
                 Window.SetState(ConfigFlags.HiddenWindow);
-                //Window.Close();
-                //CopperImGui.Shutdown();
-               // break;
             }
+#endif
         }
+
+#if !WINDOWS
+        GameSave.get().Save();
+        Window.Close();
+#endif
     }
 
 }

@@ -1,4 +1,4 @@
-﻿using Raylib_CSharp.Windowing;
+using Raylib_CSharp.Windowing;
 using System;
 using System.Runtime.InteropServices;
 
@@ -9,15 +9,6 @@ namespace Plants;
 /// </summary>
 public static class WindowStateHelper
 {
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetForegroundWindow();
-
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetActiveWindow();
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
     /// <summary>
     /// Verifica se la finestra del gioco è in primo piano
     /// </summary>
@@ -26,30 +17,11 @@ public static class WindowStateHelper
         try
         {
             return !Window.IsHidden();
-            return  Window.IsFocused() &&  !Window.IsHidden();
-
-			/**
-             * 
-            bool foregroundWindow = GetForegroundWindow();
-            bool activeWindow = GetActiveWindow();
-			if (foregroundWindow == IntPtr.Zero || activeWindow == IntPtr.Zero)
-                return false;
-
-            // Ottieni il process ID della finestra in primo piano
-            GetWindowThreadProcessId(foregroundWindow, out uint foregroundProcessId);
-
-            // Ottieni il process ID corrente
-            uint currentProcessId = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
-
-            // Se il processo in primo piano è il nostro, siamo focati
-            return foregroundProcessId == currentProcessId;
-            * 
-             */
-		}
-		catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             Console.WriteLine($"Errore nel controllo focus finestra: {ex.Message}");
-            return false; // In caso di errore, assumiamo non focati
+            return false;
         }
     }
 
@@ -58,6 +30,7 @@ public static class WindowStateHelper
     /// </summary>
     public static bool IsGameWindowMinimized()
     {
+#if WINDOWS
         try
         {
             IntPtr hwnd = GetActiveWindow();
@@ -78,7 +51,20 @@ public static class WindowStateHelper
             Console.WriteLine($"Errore nel controllo minimizzazione: {ex.Message}");
             return false;
         }
+#else
+        return false;
+#endif
     }
+
+#if WINDOWS
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetActiveWindow();
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
     [DllImport("user32.dll")]
     private static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
@@ -95,4 +81,5 @@ public static class WindowStateHelper
         public System.Drawing.Point ptMaxPosition;
         public System.Drawing.Rectangle rcNormalPosition;
     }
+#endif
 }

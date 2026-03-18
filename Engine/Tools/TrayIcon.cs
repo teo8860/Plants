@@ -1,4 +1,5 @@
-﻿
+#if WINDOWS
+
 namespace Plants;
 
 using System;
@@ -50,7 +51,7 @@ public class NativeTrayIcon : IDisposable
         _hMenu = CreatePopupMenu();
         const uint MF_STRING = 0x0000;
 
-        // Aggiungo “Esci” con ID 1000
+        // Aggiungo "Esci" con ID 1000
         AppendMenu(_hMenu, MF_STRING, 1000, "Esci");
     }
 
@@ -107,7 +108,7 @@ public class NativeTrayIcon : IDisposable
         POINT pt;
         GetCursorPos(out pt);
 
-        // La finestra deve essere foreground per far scomparire il menu correttamente :contentReference[oaicite:0]{index=0}
+        // La finestra deve essere foreground per far scomparire il menu correttamente
         SetForegroundWindow(_hWnd);
 
         TrackPopupMenu(_hMenu, TPM_RIGHTBUTTON, pt.X, pt.Y, 0, _hWnd, IntPtr.Zero);
@@ -123,7 +124,7 @@ public class NativeTrayIcon : IDisposable
         DestroyWindow(_hWnd);
     }
 
-    /// <summary> 
+    /// <summary>
     /// Fai partire un loop di lettura eventi per non far chiudere il programma
     /// </summary>
     public void LoopEvent()
@@ -136,7 +137,7 @@ public class NativeTrayIcon : IDisposable
         }
 
     }
-    
+
     public void LoopEventRender()
     {
         MSG msg;
@@ -230,10 +231,10 @@ public class NativeTrayIcon : IDisposable
         public int Y;
     }
 
-    
+
     [DllImport("user32.dll")]
     private static extern bool PeekMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax, uint asdasd );
-    
+
     [DllImport("user32.dll")]
     private static extern bool GetMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
 
@@ -254,3 +255,5 @@ public class NativeTrayIcon : IDisposable
        // public POINT pt;
     }
 }
+
+#endif

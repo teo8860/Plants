@@ -1,22 +1,21 @@
-﻿﻿using NotificationIconSharp;
+﻿#if WINDOWS
+using NotificationIconSharp;
+#endif
 using Plants;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Windowing;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+
 namespace Plants;
-     
 
 
 internal static class Program
 {
+#if WINDOWS
 	public static NativeTrayIcon trayIcon;
-    
-        // Const per stili finestra
+
+    // Const per stili finestra
     const int GWL_STYLE = -16;
     const uint WS_MINIMIZEBOX = 0x00020000;
 
@@ -28,7 +27,8 @@ internal static class Program
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
-    
+#endif
+
     public static bool IsMinigameMode = false;
     public static TipoMinigioco MinigameType;
 
@@ -49,18 +49,18 @@ internal static class Program
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
         Window.ClearState(ConfigFlags.ResizableWindow);
 
+#if WINDOWS
         // rimuove la possibilità di minimizzare
         IntPtr hwnd = Window.GetHandle();
 		uint style = GetWindowLong(hwnd, GWL_STYLE);
         style &= ~WS_MINIMIZEBOX;
         SetWindowLong(hwnd, GWL_STYLE, style);
 
-
         SetupIcon();
         Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
+#endif
 
         Input.HideCursor();
-
 
 		Game.Init();
         Rendering.Init();
@@ -72,6 +72,7 @@ internal static class Program
         Window.Init(GameProperties.windowWidth, miniHeight, $"Plants - Minigioco");
         Window.ClearState(ConfigFlags.ResizableWindow);
 
+#if WINDOWS
         IntPtr hwnd = Window.GetHandle();
         uint style = GetWindowLong(hwnd, GWL_STYLE);
         style &= ~WS_MINIMIZEBOX;
@@ -81,6 +82,7 @@ internal static class Program
         int monW = Window.GetMonitorWidth(0);
         int monH = Window.GetMonitorHeight(0);
         Window.SetPosition((monW - GameProperties.windowWidth) / 2, (monH - miniHeight) / 2);
+#endif
 
         // Aggiorna la camera per le dimensioni ridotte
         Rendering.camera = new PixelCamera(GameProperties.windowWidth, miniHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth);
@@ -92,12 +94,13 @@ internal static class Program
         Rendering.InitMinigame();
     }
 
+#if WINDOWS
     private static void SetupIcon()
     {
         // Carica icona nella barra delle applicazioni
-        Icon icon = Utility.LoadIconFromEmbedded("icon.ico", "Assets");
+        System.Drawing.Icon icon = Utility.LoadIconFromEmbedded("icon.ico", "Assets");
         trayIcon = new NativeTrayIcon(icon, "Plants");
-        
+
         trayIcon.OnClickLeft += ()=>
         {
             Window.ClearState(ConfigFlags.HiddenWindow);
@@ -111,11 +114,11 @@ internal static class Program
             trayIcon.Dispose();
             Window.Close();
         };
-       
+
         AppDomain.CurrentDomain.ProcessExit += (s, e) =>
         {
             trayIcon.Dispose();
         };
     }
+#endif
 }
-

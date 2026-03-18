@@ -15,10 +15,7 @@ public class MinigameResult
 
     private static string GetResultDir()
     {
-        string baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        if (string.IsNullOrEmpty(baseDir))
-            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        string dir = Path.Combine(baseDir, "Plants", "minigame_results");
+        string dir = Path.Combine(SaveHelper.GetBaseDataDir(), "Plants", "minigame_results");
         Directory.CreateDirectory(dir);
         return dir;
     }

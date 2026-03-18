@@ -123,14 +123,24 @@ public static class SaveHelper
     /// </summary>
     private static string GetSavePath(string fileName)
     {
-        // Usa la cartella AppData su Windows, home directory altrove
-        string baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        if (string.IsNullOrEmpty(baseDir))
-            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-        string saveDir = Path.Combine(baseDir, "Plants");
+        string saveDir = Path.Combine(GetBaseDataDir(), "Plants");
         Directory.CreateDirectory(saveDir);
 
         return Path.Combine(saveDir, fileName);
+    }
+
+    /// <summary>
+    /// Restituisce la directory base per i dati dell'app, cross-platform.
+    /// </summary>
+    public static string GetBaseDataDir()
+    {
+        // Su Android, Environment.SpecialFolder.LocalApplicationData
+        // punta alla directory interna dell'app
+        string baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        if (string.IsNullOrEmpty(baseDir))
+            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        if (string.IsNullOrEmpty(baseDir))
+            baseDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        return baseDir;
     }
 }

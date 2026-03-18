@@ -1,6 +1,8 @@
-﻿
+
 using RayImg = Raylib_CSharp.Images;
+#if WINDOWS
 using System.Drawing;
+#endif
 using System.Reflection;
 using System;
 using System.IO;
@@ -10,6 +12,7 @@ namespace Plants;
 
 internal class Utility
 {
+#if WINDOWS
     public static Icon LoadIconFromEmbedded(string resourceName, string path = "")
     {
        var asm = Assembly.GetExecutingAssembly();
@@ -22,15 +25,16 @@ internal class Utility
 
        return new Icon(stream);
     }
+#endif
 
     public static void PrintAssets()
     {
        var asm = Assembly.GetExecutingAssembly();
-    
+
        foreach (var name in asm.GetManifestResourceNames())
             Console.WriteLine("Resource: " + name);
       }
-    
+
     public static RayImg.Image LoadImageFromEmbedded(string resourceName, string path = "")
     {
        var asm = Assembly.GetExecutingAssembly();
@@ -46,8 +50,8 @@ internal class Utility
 
         return RayImg.Image.LoadFromMemory(".png", ms.ToArray());
     }
-    
-    
+
+
     public static string LoadTextFromEmbedded(string resourceName, string path = "")
     {
        var asm = Assembly.GetExecutingAssembly();

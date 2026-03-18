@@ -1,0 +1,95 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <ApplicationId>com.plants.game</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <RuntimeIdentifier>android-arm64</RuntimeIdentifier>
+    <DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+  </PropertyGroup>
+
+  <!-- Raylib-CSharp managed assembly (P/Invoke wrappers) -->
+  <ItemGroup>
+    <PackageReference Include="Raylib-CSharp" Version="4.0.1" />
+  </ItemGroup>
+
+  <!-- Native libraries: raylib + bridge compiled for Android ARM64 -->
+  <ItemGroup>
+    <AndroidNativeLibrary Include="libs\arm64-v8a\libraylib.so" />
+    <AndroidNativeLibrary Include="libs\arm64-v8a\libplants_bridge.so" />
+  </ItemGroup>
+
+  <!-- Shared game source files from main project -->
+  <ItemGroup>
+    <!-- Engine -->
+    <Compile Include="..\Engine\GameGeneral\*.cs" Link="Engine\GameGeneral\%(Filename)%(Extension)" />
+    <Compile Include="..\Engine\PixelCamera.cs" Link="Engine\PixelCamera.cs" />
+    <Compile Include="..\Engine\Tools\CoordinateHelper.cs" Link="Engine\Tools\CoordinateHelper.cs" />
+    <Compile Include="..\Engine\Tools\MathHelper.cs" Link="Engine\Tools\MathHelper.cs" />
+    <Compile Include="..\Engine\Tools\RandomHelper.cs" Link="Engine\Tools\RandomHelper.cs" />
+    <Compile Include="..\Engine\Tools\ViewCulling.cs" Link="Engine\Tools\ViewCulling.cs" />
+    <Compile Include="..\Engine\Tools\SaveHelper.cs" Link="Engine\Tools\SaveHelper.cs" />
+    <Compile Include="..\Engine\Tools\Mouse.cs" Link="Engine\Tools\Mouse.cs" />
+    <Compile Include="..\Engine\Tools\Utils.cs" Link="Engine\Tools\Utils.cs" />
+    <Compile Include="..\Engine\Tools\Windowstatehelper.cs" Link="Engine\Tools\Windowstatehelper.cs" />
+
+    <!-- Game Core -->
+    <Compile Include="..\Game\Core\Game.cs" Link="Game\Core\Game.cs" />
+    <Compile Include="..\Game\Core\GameLogic.cs" Link="Game\Core\GameLogic.cs" />
+    <Compile Include="..\Game\Core\GameProperties.cs" Link="Game\Core\GameProperties.cs" />
+    <Compile Include="..\Game\Core\Obj_Controller.cs" Link="Game\Core\Obj_Controller.cs" />
+    <Compile Include="..\Game\Core\Obj_Tutorial.cs" Link="Game\Core\Obj_Tutorial.cs" />
+    <Compile Include="..\Game\Core\WaterSystem.cs" Link="Game\Core\WaterSystem.cs" />
+    <Compile Include="..\Game\Core\SeedFusionManager.cs" Link="Game\Core\SeedFusionManager.cs" />
+    <Compile Include="..\Game\Core\SeedUpgradeSystem.cs" Link="Game\Core\SeedUpgradeSystem.cs" />
+    <Compile Include="..\Game\Core\UpgradeSystem.cs" Link="Game\Core\UpgradeSystem.cs" />
+
+    <!-- Game Core - Data -->
+    <Compile Include="..\Game\Core\Dati\*.cs" Link="Game\Core\Dati\%(Filename)%(Extension)" />
+
+    <!-- Game Core - World -->
+    <Compile Include="..\Game\Core\Mondo\*.cs" Link="Game\Core\Mondo\%(Filename)%(Extension)" />
+
+    <!-- Game Core - Plant -->
+    <Compile Include="..\Game\Core\Pianta\*.cs" Link="Game\Core\Pianta\%(Filename)%(Extension)" />
+
+    <!-- Game Core - Notifications -->
+    <Compile Include="..\Game\Core\NotificationSystem\*.cs" Link="Game\Core\NotificationSystem\%(Filename)%(Extension)" />
+
+    <!-- Game Core - PackOpening -->
+    <Compile Include="..\Game\Core\PackOpening\*.cs" Link="Game\Core\PackOpening\%(Filename)%(Extension)" />
+
+    <!-- Game Definitions -->
+    <Compile Include="..\Game\Definitions\*.cs" Link="Game\Definitions\%(Filename)%(Extension)" />
+
+    <!-- Game GUI -->
+    <Compile Include="..\Game\Gui\*.cs" Link="Game\Gui\%(Filename)%(Extension)" />
+    <Compile Include="..\Game\Gui\Main\*.cs" Link="Game\Gui\Main\%(Filename)%(Extension)" />
+    <Compile Include="..\Game\Gui\Inventario\*.cs" Link="Game\Gui\Inventario\%(Filename)%(Extension)" />
+    <Compile Include="..\Game\Gui\Upgrade\*.cs" Link="Game\Gui\Upgrade\%(Filename)%(Extension)" />
+    <Compile Include="..\Game\Gui\Pacchetti\*.cs" Link="Game\Gui\Pacchetti\%(Filename)%(Extension)" />
+
+    <!-- Game Effects -->
+    <Compile Include="..\Game\Effects\*.cs" Link="Game\Effects\%(Filename)%(Extension)" />
+
+    <!-- Game Minigames -->
+    <Compile Include="..\Game\Minigiochi\*.cs" Link="Game\Minigiochi\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- Embedded assets (same as desktop) -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\Assets\icon.ico" Link="Assets\icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Assets\**\*" Link="Assets\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

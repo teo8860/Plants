@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
 using Raylib_CSharp.Windowing;
 
 namespace Plants;
@@ -64,9 +63,6 @@ public static class NotificationActionHandler
         Game.pianta.proprieta.Annaffia(0.5f);
 
         Console.WriteLine("Pianta annaffiata da notifica!");
-
-        // Mostra la finestra del gioco
-       //OpenGame();
     }
 
     /// <summary>
@@ -149,6 +145,7 @@ public static class NotificationActionHandler
         {
             if (Window.IsReady())
             {
+#if WINDOWS
                 // Rimuovi lo stato nascosto
                 Window.ClearState(ConfigFlags.HiddenWindow);
 
@@ -160,6 +157,7 @@ public static class NotificationActionHandler
                     ShowWindow(hwnd, SW_RESTORE); // Ripristina se minimizzata
                     BringWindowToTop(hwnd);
                 }
+#endif
             }
         }
         catch (Exception ex)
@@ -168,6 +166,7 @@ public static class NotificationActionHandler
         }
     }
 
+#if WINDOWS
     // P/Invoke per portare la finestra in primo piano
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -182,4 +181,5 @@ public static class NotificationActionHandler
     private static extern bool BringWindowToTop(IntPtr hWnd);
 
     private const int SW_RESTORE = 9;
+#endif
 }

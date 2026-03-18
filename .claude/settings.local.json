@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(xargs grep:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(dotnet tool:*)",
+      "Bash(unzip -l \"$USERPROFILE/.nuget/packages/raylib-csharp/4.0.1/raylib-csharp.4.0.1.nupkg\")",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(chmod +x \"D:/C#/Plants/Native/Android/build.sh\")",
+      "Bash(dotnet sln:*)"
     ]
   }
 }
