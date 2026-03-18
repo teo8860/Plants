@@ -1,4 +1,3 @@
-using CopperDevs.DearImGui;
 using Raylib_CSharp;
 using Raylib_CSharp.Camera.Cam2D;
 using Raylib_CSharp.Colors;
@@ -118,8 +117,6 @@ internal class Rendering
                 item.Draw();
             }
 
-			CopperImGui.Render();
-            
 
             GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);    
 			
