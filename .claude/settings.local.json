@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /c/Dev/Plants/Game/**/*.cs)",
+      "Bash(wc -l /c/Dev/Plants/Engine/**/*.cs)",
+      "Bash(xargs grep:*)",
+      "Bash(find /c/Dev/Plants -type f -name \"*.cs\" -exec grep -l \"InitPlant\\\\|PlantInitial\\\\|PlantStart\\\\|SeedSelect\" {})",
+      "Bash(dotnet build:*)"
+    ]
+  }
+}

@@ -262,8 +262,8 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         Graphics.DrawText(title, panelX + panelWidth / 2 - 60, panelY + 20, 14, Color.White);
 
         // Rarità
-        Color rarityColor = GetRarityColor(currentSeed.rarity);
-        string rarityText = GetRarityName(currentSeed.rarity);
+        Color rarityColor = SeedRarityHelper.GetColor(currentSeed.rarity);
+        string rarityText = SeedRarityHelper.GetName(currentSeed.rarity);
         Graphics.DrawText(rarityText, panelX + panelWidth / 2 - rarityText.Length * 3, panelY + 40, 10, rarityColor);
     }
 
@@ -425,25 +425,6 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         Graphics.DrawCircle(x, y - size / 2, size / 4, new Color(255, 255, 255, (byte)(100 + pulse * 50)));
     }
 
-    private Color GetRarityColor(SeedRarity rarity) => rarity switch
-    {
-        SeedRarity.Comune => new Color(200, 200, 200, 255),
-        SeedRarity.NonComune => new Color(80, 200, 80, 255),
-        SeedRarity.Raro => new Color(80, 150, 255, 255),
-        SeedRarity.Epico => new Color(180, 80, 255, 255),
-        SeedRarity.Leggendario => new Color(255, 180, 50, 255),
-        _ => Color.White
-    };
-
-    private string GetRarityName(SeedRarity rarity) => rarity switch
-    {
-        SeedRarity.Comune => "Comune",
-        SeedRarity.NonComune => "Non Comune",
-        SeedRarity.Raro => "Raro",
-        SeedRarity.Epico => "Epico",
-        SeedRarity.Leggendario => "Leggendario",
-        _ => "???"
-    };
 
     private float EaseOutBack(float x)
     {

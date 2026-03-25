@@ -11,24 +11,38 @@ public class Obj_GuiSeedDetailPanel : GameElement
 {
     private bool isOpen = true;
     private float slideProgress = 0f;
-    private float animationSpeed = 8f;
+    private const float AnimSpeed = 8f;
 
     public int panelWidth = 170;
     private int selectedSeedIndex = -1;
 
-    // Colori stile legno
-    private Color panelColor = new Color(82, 54, 35, 245);
-    private Color panelBorder = new Color(62, 39, 25, 255);
-    private Color buttonColor = new Color(101, 67, 43, 255);
-    private Color buttonHoverColor = new Color(139, 90, 55, 255);
-    private Color buttonActiveColor = new Color(100, 180, 255, 255);
-    private Color buttonBorder = new Color(62, 39, 25, 255);
-    private Color textColor = new Color(245, 235, 220, 255);
+    private Color panelColor    = new Color(82,  54,  35,  245);
+    private Color panelBorder   = new Color(62,  39,  25,  255);
+    private Color buttonColor   = new Color(101, 67,  43,  255);
+    private Color buttonHover   = new Color(139, 90,  55,  255);
+    private Color buttonActive  = new Color(100, 180, 255, 255);
+    private Color buttonBorder  = new Color(62,  39,  25,  255);
+    private Color textColor     = new Color(245, 235, 220, 255);
+    private Color dimTextColor  = new Color(170, 148, 118, 255);
 
-    private string[] buttonLabels = { "Unisci", "Scarta", "Migliora" };
+    private readonly string[] buttonLabels = { "Unisci", "Scarta", "Migliora" };
     private int hoveredButton = -1;
 
     public Action<int, string> OnButtonClicked;
+
+    // Definizioni statistiche: (etichetta, getter, min, max, lowerBetter)
+    // lowerBetter = true solo per Idratazione (meno acqua consumata = meglio)
+    private static readonly (string label, Func<SeedStats, float> get, float min, float max, bool lowerBetter)[] StatDefs =
+    {
+        ("VIT", s => s.vitalita,             0.5f, 2.5f, false),
+        ("IDR", s => s.idratazione,          0.3f, 2.0f, true ),
+        ("MET", s => s.metabolismo,          0.5f, 2.5f, false),
+        ("VEG", s => s.vegetazione,          0.5f, 2.5f, false),
+        ("R.F", s => s.resistenzaFreddo,    -0.5f, 1.0f, false),
+        ("R.C", s => s.resistenzaCaldo,     -0.5f, 1.0f, false),
+        ("R.P", s => s.resistenzaParassiti, -0.5f, 1.0f, false),
+        ("R.V", s => s.resistenzaVuoto,     -0.3f, 1.0f, false),
+    };
 
     public Obj_GuiSeedDetailPanel() : base()
     {
@@ -45,7 +59,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
     public void Close()
     {
-        isOpen = true;
+        isOpen = false;
     }
 
     public void Toggle(int seedIndex)
@@ -69,7 +83,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
         }
 
         float target = isOpen ? 1f : 0f;
-        slideProgress += (target - slideProgress) * Time.GetFrameTime() * animationSpeed;
+        slideProgress += (target - slideProgress) * Time.GetFrameTime() * AnimSpeed;
         slideProgress = Math.Clamp(slideProgress, 0f, 1f);
 
         if (slideProgress < 0.01f)
@@ -78,289 +92,279 @@ public class Obj_GuiSeedDetailPanel : GameElement
             return;
         }
 
-        int screenWidth = Rendering.camera.screenWidth;
-        int screenHeight = Rendering.camera.screenHeight;
-        int panelX = screenWidth - (int)(panelWidth * slideProgress);
-
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
+        int panelX      = Rendering.camera.screenWidth - (int)(panelWidth * slideProgress);
+        int screenH     = Rendering.camera.screenHeight;
+        int mx          = Input.GetMouseX();
+        int my          = Input.GetMouseY();
+        bool clicked    = Input.IsMouseButtonPressed(MouseButton.Left);
 
         hoveredButton = -1;
 
-        int buttonHeight = 36;
-        int buttonSpacing = 16;
-        int buttonMargin = 12;
-        int totalButtonsHeight = buttonLabels.Length * buttonHeight + (buttonLabels.Length - 1) * buttonSpacing;
-        int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - 15;
+        int btnH        = 30;
+        int btnSpacing  = 10;
+        int btnMargin   = 10;
+        int totalH      = buttonLabels.Length * btnH + (buttonLabels.Length - 1) * btnSpacing;
+        int buttonsY    = screenH - totalH - btnMargin - 10;
 
         for (int i = 0; i < buttonLabels.Length; i++)
         {
-            int btnX = panelX + buttonMargin;
-            int btnY = buttonsStartY + i * (buttonHeight + buttonSpacing);
-            int btnWidth = panelWidth - buttonMargin * 2;
+            int btnX = panelX + btnMargin;
+            int btnY = buttonsY + i * (btnH + btnSpacing);
+            int btnW = panelWidth - btnMargin * 2;
 
-            if (mx >= btnX && mx <= btnX + btnWidth && my >= btnY && my <= btnY + buttonHeight)
+            if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH)
             {
                 hoveredButton = i;
-
-                if (clicked)
-                {
-                    HandleButtonClick(i);
-                }
+                if (clicked) HandleButtonClick(i);
                 break;
             }
         }
     }
 
-    private void HandleButtonClick(int buttonIndex)
+    private void HandleButtonClick(int idx)
     {
-        string action = buttonLabels[buttonIndex];
-
-        switch (action)
+        switch (buttonLabels[idx])
         {
-            case "Unisci":
-                HandleFusion();
-                break;
-            case "Scarta":
-                HandleDiscard();
-                break;
-            case "Migliora":
-                HandleUpgrade();
-                break;
+            case "Unisci":   HandleFusion();  break;
+            case "Scarta":   HandleDiscard(); break;
+            case "Migliora": HandleUpgrade(); break;
         }
-
-        OnButtonClicked?.Invoke(selectedSeedIndex, action);
+        OnButtonClicked?.Invoke(selectedSeedIndex, buttonLabels[idx]);
     }
 
     private void HandleFusion()
     {
-        var fusionManager = SeedFusionManager.Get();
-
-        if (fusionManager.IsFusionMode)
+        var fm = SeedFusionManager.Get();
+        if (fm.IsFusionMode)
         {
-            // Se siamo già in modalità fusione e abbiamo 2 semi selezionati, esegui la fusione
-            if (fusionManager.CanFuse)
+            if (fm.CanFuse)
             {
-                Seed fusedSeed = fusionManager.PerformFusion();
-
-                if (fusedSeed != null && Game.inventoryGrid != null)
-                {
-                    // Ripopola la griglia
-                    Game.inventoryGrid.Populate();
-
-                    // Mostra animazione o notifica (opzionale)
-                    Console.WriteLine($"Fusione completata! Nuovo seme: {fusedSeed.name} [{fusedSeed.rarity}]");
-                }
+                if (fm.PerformFusion() != null) Game.inventoryGrid?.Populate();
             }
             else
             {
-                // Cancella la modalità fusione
-                fusionManager.StopFusionMode();
+                fm.StopFusionMode();
             }
         }
         else
         {
-            // Entra in modalità fusione
-            fusionManager.StartFusionMode();
+            fm.StartFusionMode();
         }
     }
 
     private void HandleDiscard()
     {
         if (selectedSeedIndex < 0) return;
-
         var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
-        if (seed != null)
-        {
-            Inventario.get().RemoveSeed(seed);
-            Game.inventoryGrid?.Populate();
-            selectedSeedIndex = -1;
-            Console.WriteLine("Seme scartato");
-        }
+        if (seed == null) return;
+        Inventario.get().RemoveSeed(seed);
+        Game.inventoryGrid?.Populate();
+        selectedSeedIndex = -1;
     }
 
     private void HandleUpgrade()
     {
         if (selectedSeedIndex < 0) return;
-
         var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
-        if (seed == null) return;
-
-        // Apri la schermata di upgrade
-        if (Game.seedUpgradePanel != null)
-        {
-            Game.seedUpgradePanel.OpenForSeed(seed, selectedSeedIndex);
-        }
+        if (seed != null) Game.seedUpgradePanel?.OpenForSeed(seed, selectedSeedIndex);
     }
 
     public override void Draw()
     {
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
-        {
-            Close();
             return;
-        }
 
         if (slideProgress < 0.01f) return;
 
-        int screenWidth = Rendering.camera.screenWidth;
-        int screenHeight = Rendering.camera.screenHeight;
-        int panelX = screenWidth - (int)(panelWidth * slideProgress);
+        int panelX  = Rendering.camera.screenWidth - (int)(panelWidth * slideProgress);
+        int screenH = Rendering.camera.screenHeight;
 
-        // Pannello principale
-        Graphics.DrawRectangle(panelX, 0, panelWidth, screenHeight, panelColor);
-        Graphics.DrawLine(panelX, 0, panelX, screenHeight, panelBorder);
+        // Sfondo pannello
+        Graphics.DrawRectangle(panelX, 0, panelWidth, screenH, panelColor);
+        Graphics.DrawLine(panelX, 0, panelX, screenH, panelBorder);
 
-        // Area stats
-        int statsAreaHeight = 150;
-        Color statsBoxColor = new Color(62, 39, 25, 220);
-        Color statsBoxBorder = new Color(41, 26, 17, 255);
+        Seed seed = selectedSeedIndex >= 0 ? Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) : null;
+
+        DrawSeedInfo(panelX, 10, seed);
+        DrawStats(panelX, 92, seed);
+
+        if (SeedFusionManager.Get().IsFusionMode)
+            DrawFusionInfo(panelX, 264);
+
+        DrawButtons(panelX, screenH);
+    }
+
+    // ── Sezione info seme (nome, rarità, descrizione) ────────────────────────
+
+    private void DrawSeedInfo(int panelX, int y, Seed seed)
+    {
+        Color boxBg     = new Color(55, 35, 22, 230);
+        Color boxBorder = new Color(41, 26, 17, 255);
 
         Graphics.DrawRectangleRounded(
-            new Rectangle(panelX + 10, 15, panelWidth - 20, statsAreaHeight),
-            0.1f,
-            8,
-            statsBoxColor
-        );
+            new Rectangle(panelX + 8, y, panelWidth - 16, 74),
+            0.12f, 6, boxBg);
         Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX + 10, 15, panelWidth - 20, statsAreaHeight),
-            0.1f,
-            8,
-            2,
-            statsBoxBorder
-        );
+            new Rectangle(panelX + 8, y, panelWidth - 16, 74),
+            0.12f, 6, 1, boxBorder);
 
-        // Contenuto stats
-        Graphics.DrawText("STATS", panelX + 18, 25, 14, textColor);
+        if (seed == null)
+        {
+            Graphics.DrawText("Nessun seme", panelX + 14, y + 28, 10, dimTextColor);
+            return;
+        }
+
+        // Nome
+        Graphics.DrawText(seed.name, panelX + 14, y + 8, 11, textColor);
+
+        // Rarità
+        Graphics.DrawText(
+            SeedRarityHelper.GetName(seed.rarity),
+            panelX + 14, y + 25,
+            9, SeedRarityHelper.GetColor(seed.rarity));
+
+        // Descrizione divisa al primo punto
+        string desc = SeedDataType.GetDescription(seed.type);
+        int dotIdx = desc.IndexOf('.');
+        if (dotIdx > 0 && dotIdx < desc.Length - 1)
+        {
+            Graphics.DrawText(desc[..(dotIdx + 1)],     panelX + 14, y + 43, 7, dimTextColor);
+            Graphics.DrawText(desc[(dotIdx + 1)..].Trim(), panelX + 14, y + 55, 7, dimTextColor);
+        }
+        else
+        {
+            Graphics.DrawText(desc, panelX + 14, y + 43, 7, dimTextColor);
+        }
+    }
+
+    // ── Sezione statistiche ───────────────────────────────────────────────────
+
+    private void DrawStats(int panelX, int y, Seed seed)
+    {
+        Graphics.DrawText("STATISTICHE", panelX + 14, y, 9, dimTextColor);
+
+        if (seed == null) return;
+
+        // Layout riga: label(24) + gap(3) + barra(87) + gap(3) + valore(33) = 150px
+        const int labelW = 24;
+        const int barW   = 87;
+        const int gap    = 3;
+        const int barH   = 7;
+        const int rowH   = 18;
+
+        for (int i = 0; i < StatDefs.Length; i++)
+        {
+            var (label, getValue, min, max, lowerBetter) = StatDefs[i];
+            float value    = getValue(seed.stats);
+            float fill     = Math.Clamp((value - min) / (max - min), 0f, 1f);
+            float goodness = lowerBetter ? 1f - fill : fill;
+
+            int rowY  = y + 14 + i * rowH;
+            int baseX = panelX + 10;
+
+            // Etichetta
+            Graphics.DrawText(label, baseX, rowY + 1, 7, dimTextColor);
+
+            // Barra
+            int barX = baseX + labelW + gap;
+            int barY = rowY + (rowH - barH) / 2 - 1;
+            Graphics.DrawRectangle(barX, barY, barW, barH, new Color(30, 18, 10, 200));
+            int fillPx = (int)(barW * fill);
+            if (fillPx > 0)
+                Graphics.DrawRectangle(barX, barY, fillPx, barH, GetStatColor(goodness));
+
+            // Valore numerico
+            bool isResistance = min < 0;
+            string valStr = isResistance
+                ? (value >= 0 ? $"+{value:F2}" : $"{value:F2}")
+                : $"{value:F2}x";
+            Graphics.DrawText(valStr, barX + barW + gap, rowY + 1, 7, GetStatColor(goodness));
+        }
+    }
+
+    private static Color GetStatColor(float goodness)
+    {
+        if (goodness >= 0.62f) return new Color(100, 210, 100, 255); // verde
+        if (goodness >= 0.35f) return new Color(220, 200, 80,  255); // giallo
+        return                        new Color(210, 90,  70,  255); // rosso
+    }
+
+    // ── Sezione info fusione ──────────────────────────────────────────────────
+
+    private void DrawFusionInfo(int panelX, int y)
+    {
+        var fm = SeedFusionManager.Get();
+
+        Graphics.DrawRectangleRounded(
+            new Rectangle(panelX + 8, y, panelWidth - 16, 72),
+            0.12f, 6, new Color(80, 150, 220, 85));
+
+        Graphics.DrawText("FUSIONE", panelX + 14, y + 8, 10, Color.White);
+
+        if (fm.CanFuse)
+        {
+            Graphics.DrawText("Pronti a fondere!", panelX + 14, y + 27, 8, textColor);
+            Graphics.DrawText("Premi Unisci.",     panelX + 14, y + 40, 8, dimTextColor);
+        }
+        else
+        {
+            int count = fm.SelectedSeed1 != null ? 1 : 0;
+            Graphics.DrawText($"Selezionati: {count}/2", panelX + 14, y + 27, 8, textColor);
+            Graphics.DrawText("Scegli 2 semi.",     panelX + 14, y + 40, 8, dimTextColor);
+        }
 
         if (selectedSeedIndex >= 0)
         {
             var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
             if (seed != null)
-            {
-                Color subtextColor = new Color(200, 180, 150, 255);
-                Graphics.DrawText($"Seme #{selectedSeedIndex + 1}", panelX + 18, 50, 12, subtextColor);
-
-                // Mostra rarità
-                Color rarityColor = GetRarityColor(seed.rarity);
-                Graphics.DrawText(GetRarityName(seed.rarity), panelX + 18, 70, 11, rarityColor);
-            }
-        }
-
-        // Info modalità fusione
-        var fusionManager = SeedFusionManager.Get();
-        if (fusionManager.IsFusionMode)
-        {
-            DrawFusionInfo(panelX, statsAreaHeight + 30);
-        }
-
-        // Bottoni
-        DrawButtons(panelX, screenHeight);
-    }
-
-    private void DrawFusionInfo(int panelX, int startY)
-    {
-        var fusionManager = SeedFusionManager.Get();
-
-        Color infoBoxColor = new Color(100, 180, 255, 100);
-        int boxHeight = 80;
-
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX + 10, startY, panelWidth - 20, boxHeight),
-            0.1f, 8, infoBoxColor
-        );
-
-        Graphics.DrawText("FUSIONE", panelX + 18, startY + 8, 12, new Color(255, 255, 255, 255));
-
-        if (fusionManager.CanFuse)
-        {
-            Graphics.DrawText("Semi selezionati: 2", panelX + 18, startY + 28, 9, textColor);
-            Graphics.DrawText("Premi Unisci per", panelX + 18, startY + 43, 9, textColor);
-            Graphics.DrawText("completare", panelX + 18, startY + 58, 9, textColor);
-        }
-        else
-        {
-            int count = fusionManager.SelectedSeed1 != null ? 1 : 0;
-            Graphics.DrawText($"Semi selezionati: {count}/2", panelX + 18, startY + 28, 9, textColor);
-            Graphics.DrawText("Seleziona 2 semi", panelX + 18, startY + 43, 9, textColor);
-            Graphics.DrawText("dalla griglia", panelX + 18, startY + 58, 9, textColor);
+                Graphics.DrawText(
+                    $"Fusioni: {seed.stats.fusionCount}/{Seed.MAX_FUSIONS}",
+                    panelX + 14, y + 56, 7, dimTextColor);
         }
     }
 
-    private void DrawButtons(int panelX, int screenHeight)
-    {
-        var fusionManager = SeedFusionManager.Get();
+    // ── Bottoni ───────────────────────────────────────────────────────────────
 
-        int buttonHeight = 36;
-        int buttonSpacing = 16;
-        int buttonMargin = 12;
-        int totalButtonsHeight = buttonLabels.Length * buttonHeight + (buttonLabels.Length - 1) * buttonSpacing;
-        int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - 15;
+    private void DrawButtons(int panelX, int screenH)
+    {
+        var fm = SeedFusionManager.Get();
+
+        const int btnH       = 30;
+        const int btnSpacing = 10;
+        const int btnMargin  = 10;
+        int totalH   = buttonLabels.Length * btnH + (buttonLabels.Length - 1) * btnSpacing;
+        int buttonsY = screenH - totalH - btnMargin - 10;
+
+        // Divisore sottile
+        Graphics.DrawLine(
+            panelX + 8, buttonsY - 8,
+            panelX + panelWidth - 8, buttonsY - 8,
+            panelBorder);
 
         for (int i = 0; i < buttonLabels.Length; i++)
         {
-            int btnX = panelX + buttonMargin;
-            int btnY = buttonsStartY + i * (buttonHeight + buttonSpacing);
-            int btnWidth = panelWidth - buttonMargin * 2;
+            int btnX = panelX + btnMargin;
+            int btnY = buttonsY + i * (btnH + btnSpacing);
+            int btnW = panelWidth - btnMargin * 2;
 
-            // Colore bottone speciale per "Unisci" in modalità fusione
-            Color bg = buttonColor;
-            if (i == 0 && fusionManager.IsFusionMode) // Bottone "Unisci"
-            {
-                bg = buttonActiveColor;
-            }
-            else if (i == hoveredButton)
-            {
-                bg = buttonHoverColor;
-            }
+            Color bg;
+            if (i == 0 && fm.IsFusionMode)
+                bg = fm.CanFuse ? new Color(80, 160, 240, 255) : buttonActive;
+            else
+                bg = i == hoveredButton ? buttonHover : buttonColor;
 
             Graphics.DrawRectangleRounded(
-                new Rectangle(btnX, btnY, btnWidth, buttonHeight),
-                0.22f,
-                8,
-                bg
-            );
-
+                new Rectangle(btnX, btnY, btnW, btnH),
+                0.25f, 6, bg);
             Graphics.DrawRectangleRoundedLines(
-                new Rectangle(btnX, btnY, btnWidth, buttonHeight),
-                0.22f,
-                8,
-                3,
-                buttonBorder
-            );
+                new Rectangle(btnX, btnY, btnW, btnH),
+                0.25f, 6, 2, buttonBorder);
 
-            // Testo del bottone
             string label = buttonLabels[i];
-            if (i == 0 && fusionManager.IsFusionMode && fusionManager.CanFuse)
-            {
-                label = "FONDI!";
-            }
+            if (i == 0 && fm.IsFusionMode && fm.CanFuse) label = "FONDI!";
 
-            int textWidth = label.Length * 7;
-            int textX = btnX + (btnWidth - textWidth) / 2;
-            int textY = btnY + (buttonHeight - 14) / 2;
-            Graphics.DrawText(label, textX, textY, 14, textColor);
+            int tw = label.Length * 6;
+            Graphics.DrawText(label, btnX + (btnW - tw) / 2, btnY + (btnH - 11) / 2, 11, textColor);
         }
     }
-
-    private Color GetRarityColor(SeedRarity rarity) => rarity switch
-    {
-        SeedRarity.Comune => new Color(200, 200, 200, 255),
-        SeedRarity.NonComune => new Color(80, 200, 80, 255),
-        SeedRarity.Raro => new Color(80, 150, 255, 255),
-        SeedRarity.Epico => new Color(180, 80, 255, 255),
-        SeedRarity.Leggendario => new Color(255, 180, 50, 255),
-        _ => Color.White
-    };
-
-    private string GetRarityName(SeedRarity rarity) => rarity switch
-    {
-        SeedRarity.Comune => "Comune",
-        SeedRarity.NonComune => "Non Comune",
-        SeedRarity.Raro => "Raro",
-        SeedRarity.Epico => "Epico",
-        SeedRarity.Leggendario => "Leggendario",
-        _ => "???"
-    };
 }
