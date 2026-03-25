@@ -131,7 +131,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
                 particleTimer = 0f;
                 int sw = Rendering.camera.screenWidth;
                 int sh = Rendering.camera.screenHeight;
-                int pw = 320;
+                int pw = 280;
                 int ph = GetPanelHeight();
                 SpawnLeafParticle((sw - pw) / 2, (sh - ph) / 2, pw, ph);
             }
@@ -159,7 +159,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
     {
         int sw = Rendering.camera.screenWidth;
         int sh = Rendering.camera.screenHeight;
-        int pw = 320;
+        int pw = 280;
         int ph = GetPanelHeight();
         int px = (sw - pw) / 2;
         int py = (sh - ph) / 2;
@@ -218,7 +218,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
         // Pannello
         float eased = EaseOutBack(animProgress);
-        int pw = (int)(320 * eased);
+        int pw = (int)(280 * eased);
         int ph = (int)(GetPanelHeight() * eased);
         int px = (sw - pw) / 2;
         int py = (sh - ph) / 2;

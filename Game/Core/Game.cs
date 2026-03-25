@@ -1,4 +1,3 @@
-
 using Raylib_CSharp;
 using Raylib_CSharp.Windowing;
 using Raylib_CSharp.Colors;
@@ -14,12 +13,14 @@ public static class Game
     public static Room room_inventory;
     public static Room room_options;
     public static Room room_compost;
+    public static Room room_upgrade;
 
     public static Obj_Controller controller;
     public static ObjWater innaffiatoio;
     public static Obj_Plant pianta;
 
     public static Obj_GuiToolbar toolbar;
+    public static Obj_GuiToolbar toolbarBottom;
 
     public static ObjBackground background;
     public static ObjGround ground;
@@ -27,6 +28,11 @@ public static class Game
 
     public static bool cambiaPhase = false;
     public static bool isPaused = false;
+    public static bool IsOfflineSimulation = false;
+    public static bool IsModalitaPiantaggio = false;
+
+    public static Obj_GuiPiantaggio guiPiantaggio;
+    public static Obj_GuiMorte guiMorte;
 
     public static Timer Timer;
     public static Timer TimerSave;
@@ -51,9 +57,12 @@ public static class Game
     public static Obj_GuiCompostBackground compostBackground;
     public static Obj_GuiPackOpeningAnimation packOpening;
 
+    public static Obj_GuiUpgradePanel upgradePanel;
+
     public static NotificationMonitor notificationMonitor;
 
     public static Obj_GuiLeafHarvestPopup leafHarvestPopup;
+    public static Obj_GuiSeedRecovery guiSeedRecovery;
 
     public static void Init()
     {
@@ -61,7 +70,8 @@ public static class Game
         room_inventory = new Room(false);
         room_options = new Room(false);
         room_compost = new Room(false);
-        
+        room_upgrade = new Room(false);
+
         AssetLoader.LoadAll();
 
         NotificationManager.Initialize();
@@ -70,9 +80,24 @@ public static class Game
         InitGui();
         InitInventory();
         InitComposter();
+        InitUpgrade();
+        ManagerMinigames.Init();
         
+        if (SaveHelper.Exists("tutorial.json") == false)
+            GameElement.Create<Obj_Logo>();
+
         Inventario.get().Load();
-        GameSave.get().Load();
+
+        bool hasSave = SaveHelper.Exists("savegame.json");
+        if (hasSave)
+        {
+            GameSave.get().Load();
+        }
+        else
+        {
+            // Blocca subito prima che i timer partano
+            isPaused = true;
+        }
 
         notificationMonitor = GameElement.Create<NotificationMonitor>();
 
@@ -82,9 +107,18 @@ public static class Game
 
         Phase = FaseGiorno.GetCurrentPhase();
 
-
         Rendering.camera.position.Y = 0;
-        tutorial.StartTutorial();
+
+        if (!hasSave)
+        {
+            WorldManager.SetCurrentWorld(WorldType.Terra);
+            pianta.SetNaturalColors(WorldType.Terra);
+            EntraModalitaPiantaggio();
+        }
+        else
+        {
+            tutorial.StartTutorial();
+        }
         //seedTest();
 	}
 
@@ -186,16 +220,6 @@ public static class Game
             AssetLoader.spriteMenu
         );
 
-        toolbar.AddButton(
-            AssetLoader.spriteWaterOff,
-            AssetLoader.spriteWaterOn,
-            "Annaffiatoio",
-            (active) => {
-                controller.annaffiatoioAttivo = active;
-            },
-            false
-        );
-
         toolbar.AddActionButton(
             AssetLoader.spritePhaseOff,
             "Cambia Fase",
@@ -216,11 +240,53 @@ public static class Game
             AssetLoader.spriteWorldIcon,
             "Cambia Mondo",
             () => {
+                WorldManager.PrepareNextWorld();
                 WorldManager.SetNextWorld();
+                pianta.Reset();
+                pianta.SetNaturalColors(WorldManager.GetCurrentWorld());
+            }
+        );
+
+        // Toolbar in basso a destra con innaffiatoio - dropdown verso l'alto, aperta di default
+        int bottomToolbarX = Rendering.camera.screenWidth - 46;
+        int bottomToolbarY = Rendering.camera.screenHeight - 90;
+        toolbarBottom = new Obj_GuiToolbar(bottomToolbarX, bottomToolbarY, buttonSize: 36, hasDropdown: true, dropUp: true, startOpen: true);
+        toolbarBottom.depth = -600;
+        toolbarBottom.ButtonFillColor = new Color(140, 140, 160, 255);
+        toolbarBottom.ButtonHoverColor = new Color(170, 170, 190, 255);
+        toolbarBottom.ButtonPressedColor = new Color(120, 120, 140, 255);
+        toolbarBottom.ShowMenuButton = false;
+        toolbarBottom.SetIcons(
+            AssetLoader.spriteArrowDown,
+            AssetLoader.spriteArrowUp,
+            AssetLoader.spriteMenu
+        );
+        toolbarBottom.AddButton(
+            AssetLoader.spriteWateringOff,
+            AssetLoader.spriteWateringOn,
+            "Innaffiatoio",
+            (active) => {
+                controller.annaffiatoioAttivo = active;
+            }
+        );
+
+        toolbarBottom.AddActionButton(
+            AssetLoader.spriteSeed1,
+            "Riprendi Seme",
+            () => {
+                if (!SeedRecoverySystem.IsRecovering && !SeedRecoverySystem.IsConfirming
+                    && !IsModalitaPiantaggio && guiSeedRecovery != null)
+                {
+                    guiSeedRecovery.ShowConfirmation();
+                }
             }
         );
 
         GameElement.Create<Obj_GuiBottomNavigation>(-600);
+
+        guiPiantaggio = new Obj_GuiPiantaggio();
+        guiMorte = new Obj_GuiMorte();
+        guiSeedRecovery = new Obj_GuiSeedRecovery();
     }
 
     private static void InitInventory()
@@ -244,6 +310,11 @@ public static class Game
         inventoryGrid.OnSeedSelected = (index) => {
             seedDetailPanel.Toggle(index);
         };
+    }
+
+    private static void InitUpgrade()
+    {
+        upgradePanel = new Obj_GuiUpgradePanel();
     }
 
     private static void InitComposter()
@@ -274,13 +345,15 @@ public static class Game
 
     private static void OnTimedEvent1(Object source, ElapsedEventArgs e)
     {
+        if (IsModalitaPiantaggio) return;
         GameSave.get().Save();
 	}
 
     private static void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
-        if (isPaused) return;
-        
+        if (isPaused || IsModalitaPiantaggio) return;
+        if (SeedRecoverySystem.IsRewinding) return; // Nessun danno/crescita durante il rewind
+
         pianta.proprieta.AggiornaTutto(
             Phase,
             WeatherManager.GetCurrentWeather(),
@@ -300,5 +373,46 @@ public static class Game
     private static void OnTimedEventFase(Object source, ElapsedEventArgs e)
     {
         Phase = FaseGiorno.GetCurrentPhase();
+    }
+
+    public static void EntraModalitaPiantaggio()
+    {
+        IsModalitaPiantaggio = true;
+        isPaused = true;
+
+        room_main.SetActiveRoom();
+
+        // Nascondi elementi del gioco DOPO SetActiveRoom (che li riattiva)
+        pianta.active = false;
+        if (statsPanel != null) statsPanel.active = false;
+        if (toolbar != null) toolbar.active = false;
+        if (toolbarBottom != null) toolbarBottom.active = false;
+        if (innaffiatoio != null) innaffiatoio.active = false;
+
+        guiPiantaggio.Mostra();
+    }
+
+    public static void EsciModalitaPiantaggio()
+    {
+        IsModalitaPiantaggio = false;
+        isPaused = false;
+
+        guiPiantaggio.Nascondi();
+
+        // Riattiva elementi del gioco
+        pianta.active = true;
+        if (statsPanel != null) statsPanel.active = true;
+        if (toolbar != null) toolbar.active = true;
+        if (toolbarBottom != null) toolbarBottom.active = true;
+        if (innaffiatoio != null) innaffiatoio.active = true;
+
+        room_main.SetActiveRoom();
+    }
+
+    public static void MostraMorte()
+    {
+        if (guiMorte.active) return; // gia' mostrata
+        isPaused = true;
+        guiMorte.Mostra();
     }
 }

@@ -11,7 +11,7 @@ namespace Plants;
 public class Inventario
 {
     public List<Seed> seeds = new();
-    public int maxSeeds = 100;
+    public int maxSeeds => UpgradeSystem.GetMaxSeeds();
 
 	public static Inventario get()
     {

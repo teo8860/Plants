@@ -2,69 +2,109 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Build
-
-```bat
-dotnet publish -c Release -r win-x86 --self-contained true -o ./dist
-```
-
-Or use `build.bat`. There are no tests or linters configured.
-
-To run in development: open `Plants.sln` in Visual Studio or use `dotnet run`.
-
 ## Project Overview
 
-A Windows virtual plant care simulation game written in C# (.NET 9.0) using:
-- **Raylib-CSharp** — 2D rendering
-- **CopperDevs.DearImGui** — immediate mode GUI (via Raylib renderer)
-- **Microsoft.Toolkit.Uwp.Notifications** — Windows toast notifications
+**Plants** is a plant simulation game built with C# .NET 9.0 using a custom engine on top of Raylib-CSharp and CopperDevs.DearImGui. Windows-only desktop app with system tray integration.
 
-Window is 400×500 pixels scaled from a 100×125 internal pixel-art resolution at 60 FPS.
+## Build & Run
 
-## Code Architecture
+```bash
+# Run in development
+dotnet run --project Plants.csproj
 
-### Two-Layer Structure
+# Publish single-file executable to ./dist
+./build.bat
+# Or: dotnet publish -c Release -r win-x86 --self-contained true -o ./dist
 
-**Engine/** — reusable framework:
-- `GameElement` — base class for all game objects; has `Update()`, `Draw()`, depth, room assignment, and active flag
-- `Room` — scene container; only elements assigned to the active room are updated/drawn
-- `Rendering.cs` — main loop: update all active elements → sort by depth → draw world (camera-transformed) → draw GUI (screen space) → ImGui overlays
-- `PixelCamera.cs` — pixel-perfect camera with world↔screen coordinate transforms
+# Clean
+dotnet clean
+```
 
-**Game/** — game-specific logic built on the engine.
+No automated tests exist in this project.
 
-### Key Game Singletons (in `Game.cs`)
+## Architecture
 
-- `Game.room_main`, `room_inventory`, `room_options`, `room_compost` — the four rooms/screens
-- `Game.plant` — the `Obj_Plant` instance (the main plant entity)
-- All UI panels are `GameElement` instances registered to rooms
+### Entry Point & Main Loop
+`Program.Main()` → `Game.Init()` → `Rendering.Init()` (infinite `while(true)` loop)
 
-### Plant System (`Game/Core/Pianta/`)
+The main loop in `Rendering.cs` updates all active GameElements, sorts by depth, renders world to a RenderTexture2D via PixelCamera, then renders the ImGui GUI layer on top. Virtual resolution is 100x125, upscaled 4x to a 400x500 window.
 
-The plant is a spline-based 2D entity:
-- `Obj_Plant` — root entity; owns growth state, stats, genetics
-- `Obj_Ramo` / `Obj_RamoEdera` — branch variants; `Obj_Radice` — roots
-- `GameLogicPianta` — AI/simulation tick (runs every `LOGIC_UPDATE_INTERVAL` ~500ms)
-- `LeafHarvestSystem` — handles resource collection from leaves
+### Object System
+- **All game objects** inherit from `GameElement` (in `Engine/GameGeneral/`)
+- Factory: `GameElement.Create<T>()` with optional depth and room binding
+- Objects tracked in static `GameElement.elementList`; call `Destroy()` to remove
+- `Obj_` prefix for game objects, `Obj_Gui` prefix for UI objects
 
-### World & Environment (`Game/Core/Mondo/`)
+### Room System
+- `Room` manages scene activation; only one room active at a time
+- 5 rooms: main, inventory, options, compost, upgrade
+- GameElements bound to a room deactivate when the room does
+- Switch via `room.SetActiveRoom()`
 
-- `WorldManager` — 10 worlds (Terra, Luna, Marte, Europa, Venere, Titano, ReameMistico, GiardinoMistico, Origine, Serra), each described by a `WorldModifier` struct with 17 parameters (gravity, oxygen, temperature, difficulty, etc.)
-- `WeatherManager` — dynamic weather effects
-- `FaseGiorno` — 6-phase day/night cycle (Night, Dawn, Morning, Afternoon, Dusk, Evening)
+### Static Singletons in `Game.cs`
+All major objects are referenced as static fields: `Game.pianta`, `Game.controller`, `Game.room_main`, `Game.statsPanel`, `Game.toolbar`, etc.
 
-### Genetics & Seeds (`Game/Definitions/`, `Game/Core/`)
+### Rendering Pipeline
+- `PixelCamera` handles 2D camera with zoom/pan
+- `BeginWorldMode()` → world render to texture; `BeginScreenMode()` → screen UI
+- Elements sorted by `depth` (higher = drawn on top)
+- Separate `guiLayer` flag distinguishes world vs UI elements
 
-- `SeedType` — 10 genetic types (Normale, Poderoso, Fluviale, Glaciale, Magmatico, Puro, Florido, Rapido, Antico, Cosmico)
-- `SeedRarity` — 7 rarity tiers (Comune → Mitico)
-- `SeedStats` — 8 stat bonuses (Vitalita, Idratazione, Resistenza variants, Vegetazione, Metabolismo)
-- `SeedFusionManager` — hybrid breeding (up to 4 fusions per seed)
-- `SeedUpgradeSystem` — stat enhancement
+### Data Persistence
+- `GameSave` singleton uses JSON serialization, auto-saves every 10 seconds
+- `Inventario` singleton stores seed inventory separately
+- Always call `GameSave.get().Save()` on exit
 
-### Persistence (`Game/Core/Dati/`)
+### Assets
+All PNG/shader files in `Assets/` are embedded as resources (configured in .csproj). Loaded once in `AssetLoader.LoadAll()` during `Game.Init()` — never load assets in the render loop.
 
-- `GameSave` — singleton; binary serialization with SHA256 encryption; auto-saves every ~500ms and on exit
+## Key Conventions
 
-### Naming Convention
+### Naming
+- Classes/Methods: PascalCase (`Obj_Plant`, `LoadTexture()`)
+- Variables: camelCase (`currentPhase`, `worldState`)
+- Game objects: `Obj_` prefix; GUI objects: `Obj_Gui` prefix
+- Some Italian names in code: `Annaffia` (water), `Ramo` (branch), `Radice` (root), `Fase` (phase), `Pianta` (plant), `Seme` (seed), `Inventario` (inventory)
 
-The codebase uses **Italian** for domain names: Pianta=Plant, Ramo=Branch, Radice=Root, Mondo=World, Fase=Phase, Seme=Seed, Inventario=Inventory, Dati=Data, Pacchetti=Packs. Follow this convention when adding new domain concepts.
+### Rules
+- Do NOT use Raylib directly in GUI code — use Engine wrappers
+- Do NOT modify window handles without validation
+- Do NOT skip `GameSave.Save()` on exit
+- Do NOT load assets in the render loop
+- Always `Destroy()` child GameElements before removing parent
+- Inheritance only — no interfaces used in this codebase
+
+## Key Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| Raylib-CSharp 4.0.1 | Graphics/window |
+| CopperDevs.DearImGui 1.4.2 | Immediate-mode GUI |
+| CopperDevs.DearImGui.Renderer.Raylib 2.0.2 | ImGui+Raylib bridge |
+| Microsoft.Toolkit.Uwp.Notifications 7.1.3 | Windows toast notifications |
+| NotificationIconSharp 1.0.1 | System tray icon |
+
+## Seed Selection (Piantaggio)
+
+- `Obj_GuiPiantaggio` shows a centered grid of seeds with rarity-colored borders
+- Selecting a seed shows an info panel (name + rarity + "Pianta!" button) at the bottom
+- Clicking "Pianta!" triggers a falling seed animation (with particles on impact) before actually planting
+- During `IsModalitaPiantaggio`, game logic (timers, notifications, growth) is paused
+- The `isFalling` flag on `Obj_GuiPiantaggio` blocks all input (including room navigation) during the fall animation
+- Death screen (`Obj_GuiMorte`) is the only place that calls `GameSave.DeleteSaveFile()` — do NOT delete the save elsewhere
+
+## Notification System
+
+- `NotificationMonitor` checks plant events every frame and plant status every 30 seconds
+- Notifications are suppressed when the game window is focused, and during `IsModalitaPiantaggio`
+- `NOTIFICATION_TIMEOUT` (300s / 5 min) controls the cooldown between repeated notifications of the same type
+- `PlantEventSystem` fires events based on state transitions (low water, critical health, parasites, temperature, world transition)
+- Toast notifications use `Microsoft.Toolkit.Uwp.Notifications` with action buttons
+
+## Game Systems (for context)
+
+- **Plant growth**: branches (`Obj_Ramo`), roots (`Obj_Radice`), ivy (`Obj_RamoEdera`), stats in `PlantStats`
+- **Seed genetics**: 10 types, 5 rarities, breeding via `SeedFusionManager` (70/30 stat inheritance + mutation)
+- **World**: 3 worlds with different growth modifiers, weather system, 6-hour day/night phases (`FaseGiorno`)
+- **Minigames**: 6 types managed by `ManagerMinigames`, all extend `MinigiocoBase`
+- **Offline simulation**: `OfflineSimulator` simulates growth while game is closed

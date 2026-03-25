@@ -716,7 +716,12 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         particles.Clear();
         starParticles.Clear();
         energyWaves.Clear();
-        visualSeed = null;
+        
+        if (visualSeed != null)
+        {
+            visualSeed.Destroy();
+            visualSeed = null;
+        }
     }
 
     public override void Draw()
@@ -893,25 +898,29 @@ public class Obj_GuiPackOpeningAnimation : GameElement
 
             if (visualSeed != null && alpha > 50)
             {
-                var possibleTypes = Enum.GetValues<SeedType>()
-                .Cast<SeedType>()
-                .Where(t => new Seed(t).rarity == rarity)
-                .ToList();
+                Seed displaySeed;
+                if (rarity == resultSeed.rarity)
+                {
+                    // Mostra il seme effettivo quando la rarità corrisponde
+                    displaySeed = resultSeed;
+                }
+                else
+                {
+                    var possibleTypes = Enum.GetValues<SeedType>()
+                        .Cast<SeedType>()
+                        .Where(t => new Seed(t).rarity == rarity)
+                        .ToList();
 
-                SeedType chosenType = possibleTypes[chosenRarity % possibleTypes.Count];                
+                    SeedType chosenType = possibleTypes[chosenRarity % possibleTypes.Count];
+                    displaySeed = new Seed(chosenType);
+                }
 
                 Vector2 boxCenter = new Vector2(scaledX + scaledSize / 2, scaledY + scaledSize / 2);
-
                 visualSeed.position = boxCenter;
                 visualSeed.scale = 3.0f * scale;
-
-                float totalDuration = ROULETTE_SPIN_DURATION + ROULETTE_SLOW_DURATION + ROULETTE_STOP_DURATION;
-
-                if (phaseTimer >= totalDuration)
-                    visualSeed.color = resultSeed.color;
-                else
-                    visualSeed.color = new Seed(chosenType).color;
-				visualSeed.Draw();
+                visualSeed.dati = displaySeed;
+                visualSeed.color = displaySeed.color;
+                visualSeed.Draw();
             }
         }
 
@@ -1006,6 +1015,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         {
             visualSeed.scale = 8f * revealScale;
             visualSeed.position = center;
+            visualSeed.dati = resultSeed;
             visualSeed.color = resultSeed.color;
             visualSeed.Draw();
         }

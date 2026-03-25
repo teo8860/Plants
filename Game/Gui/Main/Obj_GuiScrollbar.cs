@@ -45,7 +45,7 @@ public class Obj_GuiScrollbar : GameElement
 
     public override void Draw()
     {
-        int trackTop = Rendering.camera.screenHeight - 10;
+        int trackTop = Rendering.camera.screenHeight - 45;
         int trackBottom = 50;
         int trackHeight = trackTop - trackBottom;
         int trackX = 10;

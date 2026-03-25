@@ -848,9 +848,6 @@ namespace Plants
             Color semeColor1 = new Color(139, 90, 43, 255);
             Color semeColor2 = new Color(101, 67, 33, 255);
             
-            //TEST
-            Graphics.DrawEllipse(semeX, 0, 55, 55, semeColor1);
-
             Graphics.DrawEllipse(semeX, (int)semeY, 10, 14, semeColor1);
             Graphics.DrawEllipse(semeX - 2, (int)semeY - 2, 6, 8, semeColor2);
 

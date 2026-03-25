@@ -93,6 +93,34 @@ public class Obj_RamoEdera: GameElement
         }
     }
 
+    public EderaSaveData ToSaveData()
+    {
+        return new EderaSaveData { Punti = new List<Vector2>(Punti) };
+    }
+
+    public static Obj_RamoEdera FromSaveData(EderaSaveData data, Color colore)
+    {
+        return new Obj_RamoEdera(data, colore);
+    }
+
+    private Obj_RamoEdera(EderaSaveData data, Color colore)
+    {
+        Punti = new List<Vector2>(data.Punti);
+        StartX = Punti.Count > 0 ? Punti[0].X : 0;
+        StartY = Punti.Count > 0 ? Punti[0].Y : 0;
+        Direction = Punti.Count >= 2 ? Math.Sign(Punti[1].X - Punti[0].X) : 1;
+        Colore = colore;
+        GrowthProgress = 1f;
+        MaxSegments = Punti.Count;
+        rng = new Random();
+
+        for (int i = 0; i < Punti.Count; i += 2)
+        {
+            float leafAngle = (float)(rng.NextDouble() * MathF.PI - MathF.PI / 2);
+            MiniFoglie.Add((Punti[i], 4 + (float)rng.NextDouble() * 2, leafAngle));
+        }
+    }
+
     private void DrawMiniLeaf(float x, float y, float size, float angle, Color color)
     {
         float cos = MathF.Cos(angle);

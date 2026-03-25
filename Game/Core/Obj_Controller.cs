@@ -2,6 +2,7 @@ using Plants;
 using Raylib_CSharp;
 using Raylib_CSharp.Interact;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -10,9 +11,12 @@ public class Obj_Controller : GameElement
     public float offsetMinY = 0;
     public float offsetMaxY => (Game.pianta.Stats.EffectiveMaxHeight);
 
-    public float scrollSpeed = 1000f;  
-    public float scrollAcceleration = 5f;  
+    public float scrollSpeed = 1000f;
+    public float scrollAcceleration = 5f;
     private float currentScrollSpeed = 0f;
+
+    public float targetScrollY = 0f;
+    private const float autoscrollLerpSpeed = 10f;
 
     public bool annaffiatoioAttivo = false;
     public bool isButtonRightPressed = false;
@@ -27,6 +31,34 @@ public class Obj_Controller : GameElement
 
     public override void Update()
     {
+        // Blocca tutti gli input durante la schermata di morte
+        if (Game.guiMorte != null && Game.guiMorte.active)
+            return;
+
+        // Blocca input durante il rewind visivo o la conferma (NON durante il countdown)
+        if (SeedRecoverySystem.IsRewinding || SeedRecoverySystem.IsConfirming)
+            return;
+
+        // Durante modalita piantaggio: permetti solo navigazione tra room
+        // ma blocca tutto durante l'animazione di caduta del seme
+        if (Game.IsModalitaPiantaggio)
+        {
+            if (Game.guiPiantaggio != null && Game.guiPiantaggio.isFalling)
+                return;
+
+            if (Input.IsKeyPressed(KeyboardKey.V))
+            {
+                Game.room_main.SetActiveRoom();
+                Game.guiPiantaggio.Aggiorna();
+                Game.guiPiantaggio.Mostra();
+            }
+            if (Input.IsKeyPressed(KeyboardKey.C))
+                Game.room_compost.SetActiveRoom();
+            if (Input.IsKeyPressed(KeyboardKey.B))
+                Game.room_inventory.SetActiveRoom();
+            return;
+        }
+
         if (Game.cambiaPhase)
         {
             Game.Phase = FaseGiorno.ChangeDayPhase();
@@ -37,11 +69,18 @@ public class Obj_Controller : GameElement
    
 		mouse = CoordinateHelper.ToWorld(mouse, Rendering.camera.position);
         
+        float deltaTime = Time.GetFrameTime();
+        WaterSystem.Update(deltaTime);
+
+        if (Game.toolbarBottom != null)
+            Game.toolbarBottom.GetButton(0).FillLevel = WaterSystem.FillPercent;
+
 		if (Input.IsMouseButtonDown(MouseButton.Right))
         {
             isButtonRightPressed = true;
-            if (annaffiatoioAttivo)
+            if (annaffiatoioAttivo && WaterSystem.CanWater)
             {
+                WaterSystem.Consume(deltaTime);
                 Game.innaffiatoio.EmitParticle(mouse);
                 Game.pianta.proprieta.Annaffia(0.01f);
             }
@@ -56,7 +95,11 @@ public class Obj_Controller : GameElement
             //Game.pianta.Reset();
         }
 
-        float deltaTime = Time.GetFrameTime();
+        float wheel = Input.GetMouseWheelMove();
+        if (wheel != 0)
+        {
+            Scorri(wheel * 200f);
+        }
 
         if (Input.IsKeyDown(KeyboardKey.Down) && Rendering.camera.position.Y > 0)
         {
@@ -68,9 +111,20 @@ public class Obj_Controller : GameElement
             currentScrollSpeed = Math.Min(currentScrollSpeed + scrollAcceleration, scrollSpeed * 3);
             Scorri(currentScrollSpeed * deltaTime);
         }
-        else
+        else if (wheel == 0)
         {
             currentScrollSpeed = scrollSpeed;
+        }
+
+        if (autoscroll)
+        {
+            float diff = targetScrollY - Rendering.camera.position.Y;
+            if (Math.Abs(diff) > 0.1f)
+            {
+                Rendering.camera.position.Y += diff * autoscrollLerpSpeed * deltaTime;
+                Rendering.camera.position.Y = Math.Clamp(Rendering.camera.position.Y, offsetMinY, offsetMaxY);
+                Rendering.camera.Update();
+            }
         }
 
         if (Input.IsKeyDown(KeyboardKey.Right))
@@ -83,29 +137,49 @@ public class Obj_Controller : GameElement
               Rendering.camera.position.Y = 0;
         }
 
-        if (Input.IsKeyDown(KeyboardKey.B))
+        if (Input.IsKeyPressed(KeyboardKey.B))
         {
             Game.room_inventory.SetActiveRoom();
         }
 
-        if (Input.IsKeyDown(KeyboardKey.N) && Game.inventoryCrates != null && Game.inventoryCrates.IsInventoryOpen && Room.GetActiveId() == Game.room_inventory.id)
+        if (Input.IsKeyPressed(KeyboardKey.N) && Game.inventoryCrates != null && Game.inventoryCrates.IsInventoryOpen && Room.GetActiveId() == Game.room_inventory.id)
         {
             Game.inventoryCrates.CloseInventory();
         }
 
-        if (Input.IsKeyDown(KeyboardKey.C))
+        if (Input.IsKeyPressed(KeyboardKey.C))
         {
             Game.room_compost.SetActiveRoom();
         }
-         
-        if (Input.IsKeyDown(KeyboardKey.V))
+
+        if (Input.IsKeyPressed(KeyboardKey.V))
         {
             Game.room_main.SetActiveRoom();
         }
 
-        if (Input.IsKeyDown(KeyboardKey.Space))
+        if (Input.IsKeyPressed(KeyboardKey.Space))
         {
             autoscroll = !autoscroll;
+        }
+
+
+        // Minigiochi: M = casuale, 1-5 = specifico — avvia processo separato
+        if (!ManagerMinigames.InCorso)
+        {
+            TipoMinigioco? tipo = null;
+            if (Input.IsKeyPressed(KeyboardKey.M))
+            {
+                var tipi = ManagerMinigames.GetTipiDisponibili();
+                tipo = tipi[RandomHelper.Int(0, tipi.Count)];
+            }
+            else if (Input.IsKeyPressed(KeyboardKey.One)) tipo = TipoMinigioco.Cerchio;
+            else if (Input.IsKeyPressed(KeyboardKey.Two)) tipo = TipoMinigioco.Tieni;
+            else if (Input.IsKeyPressed(KeyboardKey.Three)) tipo = TipoMinigioco.Resta;
+            else if (Input.IsKeyPressed(KeyboardKey.Four)) tipo = TipoMinigioco.Semi;
+            else if (Input.IsKeyPressed(KeyboardKey.Five)) tipo = TipoMinigioco.Treni;
+
+            if (tipo != null)
+                ManagerMinigames.AvviaProcesso(tipo.Value);
         }
 
     }
@@ -113,6 +187,8 @@ public class Obj_Controller : GameElement
     public void Scorri(float delta)
     {
         Rendering.camera.position.Y += delta;
+        Rendering.camera.position.Y = Math.Clamp(Rendering.camera.position.Y, offsetMinY, offsetMaxY);
+        targetScrollY = Rendering.camera.position.Y;
         Rendering.camera.Update();
     }
 }

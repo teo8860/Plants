@@ -80,7 +80,7 @@ public class Seed
         _ => "Seme"
     };
 
-    private static SeedRarity GetRarityFromType(SeedType type) => type switch
+    public static SeedRarity GetRarityFromType(SeedType type) => type switch
     {
         SeedType.Normale => SeedRarity.Comune,
         SeedType.Poderoso => SeedRarity.NonComune,

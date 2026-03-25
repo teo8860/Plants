@@ -25,8 +25,16 @@ public enum Weather
 
 public static class FaseGiorno
 {
+    private static DayPhase? phaseOverride = null;
+
+    public static void SetSimulationOverride(DayPhase? phase)
+    {
+        phaseOverride = phase;
+    }
+
     public static DayPhase GetCurrentPhase()
     {
+        if (phaseOverride.HasValue) return phaseOverride.Value;
         return GetPhaseFromTime(DateTime.Now);
     }
 
@@ -97,11 +105,7 @@ public static class FaseGiorno
 
     public static void SetCurrentPhase(DayPhase phase)
     {
-        // Set the current phase (for save/load system)
-        // Note: This is a simplified implementation
-        // In a full implementation, you might need to update internal timing
-
-        GameSave.get().Save();
+        Game.Phase = phase;
     }
 
 }

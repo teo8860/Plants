@@ -37,8 +37,8 @@ public class PlantEventSystem
             return;
    
         // Evento acqua bassa
-        bool isLowWater = gameLogic.IsDisidratata;   
-        if (isLowWater)
+        bool isLowWater = gameLogic.IsDisidratata;
+        if (isLowWater && !wasLowWater)
         {
 			OnLowWater?.Invoke();
         }

@@ -19,7 +19,7 @@ public class NotificationMonitor : GameElement
     private float dyingTimer = 0f;
     private float parasitesTimer = 0f;
     private float temperatureTimer = 0f;
-    private const float NOTIFICATION_TIMEOUT = 3f; // 5 minuti (300 secondi)
+    private const float NOTIFICATION_TIMEOUT = 300f; // 5 minuti
 
     public NotificationMonitor()
     {
@@ -93,12 +93,18 @@ public class NotificationMonitor : GameElement
 
         eventSystem.OnWorldTransitionReady += () =>
         {
-            // Per la transizione mondo inviamo sempre la notifica
-            if (!hasNotifiedWorldTransition)
+            if (!WindowStateHelper.IsGameWindowFocused())
             {
-                NotificationManager.ShowWorldTransitionReady();
-                hasNotifiedWorldTransition = true;
-                Console.WriteLine("[Event] Notifica: Transizione mondo pronta");
+                if (!hasNotifiedWorldTransition)
+                {
+                    NotificationManager.ShowWorldTransitionReady();
+                    hasNotifiedWorldTransition = true;
+                    Console.WriteLine("[Event] Notifica: Transizione mondo pronta (app in background)");
+                }
+            }
+            else
+            {
+                Console.WriteLine("[Event] Transizione mondo pronta (app attiva, notifica non inviata)");
             }
         };
 
@@ -122,6 +128,9 @@ public class NotificationMonitor : GameElement
 
     public override void Update()
     {
+        // Non controllare notifiche durante la selezione del seme
+        if (Game.IsModalitaPiantaggio) return;
+
         float deltaTime = Raylib_CSharp.Time.GetFrameTime();
         checkTimer += deltaTime;
 

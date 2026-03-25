@@ -4,6 +4,7 @@ using Raylib_CSharp.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Windows.Devices.Radios;
 
 namespace Plants;
 
@@ -63,6 +64,19 @@ public class Obj_Radice : GameElement
 
         ConfiguraParametri();
         segmenti.Add(new SegmentoRadice(origine, origine, spessoreBase, generazione == 0));
+    }
+    ~Obj_Radice()
+    {
+        foreach (var item in ramificazioni)
+            item.Destroy();
+    }
+
+    public new void Destroy()
+    {
+        foreach (var item in ramificazioni)
+            item.Destroy();
+        ramificazioni.Clear();
+        base.Destroy();
     }
 
     private void ConfiguraParametri()
@@ -162,7 +176,7 @@ public class Obj_Radice : GameElement
             mediaPosizioni /= count;
 
             float offsetDalCentro = posizione.X - origine.X;
-            dir.X += Math.Sign(offsetDalCentro) * 0.1f;
+            dir.X -= Math.Sign(offsetDalCentro) * 0.1f;
         }
 
         return Vector2.Normalize(dir);
@@ -303,4 +317,59 @@ public class Obj_Radice : GameElement
     }
 
     public bool IsComplete => completamenteCresta && ramificazioni.TrueForAll(r => r.IsComplete);
+
+    public RadiceSaveData ToSaveData()
+    {
+        var data = new RadiceSaveData();
+        data.Generazione = generazione;
+
+        foreach (var seg in segmenti)
+        {
+            data.Start.Add(seg.Start);
+            data.End.Add(seg.End);
+        }
+
+        foreach (var ramo in ramificazioni)
+            data.Rami.Add(ramo.ToSaveData());
+
+        return data;
+    }
+
+    public static Obj_Radice FromSaveData(RadiceSaveData data)
+    {
+        return new Obj_Radice(data);
+    }
+
+    private Obj_Radice(RadiceSaveData data)
+    {
+        this.generazione = data.Generazione;
+        this.rng = new Random();
+
+        ConfiguraParametri();
+
+        segmenti.Clear();
+        for (int i = 0; i < data.Start.Count; i++)
+        {
+            float progressione = data.Start.Count > 1 ? (float)i / (data.Start.Count - 1) : 0;
+            float spessore = spessoreBase * (1f - progressione * 0.7f);
+            spessore = Math.Max(0.5f, spessore);
+
+            var seg = new SegmentoRadice(data.Start[i], data.End[i], spessore, data.Generazione == 0);
+            segmenti.Add(seg);
+        }
+
+        if (segmenti.Count > 0)
+            this.origine = segmenti[0].Start;
+
+        this.profonditaAttuale = profonditaMassima;
+        this.completamenteCresta = true;
+
+        foreach (var ramoData in data.Rami)
+        {
+            var ramo = Obj_Radice.FromSaveData(ramoData);
+            ramificazioni.Add(ramo);
+        }
+
+        UpdateBounds();
+    }
 }

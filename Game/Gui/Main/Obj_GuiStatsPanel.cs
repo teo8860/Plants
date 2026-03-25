@@ -22,17 +22,19 @@ public class Obj_GuiStatsPanel : GameElement
 
         Color bg = Color.Black;
         bg.A = 180;
-        int panelHeight = expanded ? 160 : 25;
+        int panelHeight = expanded ? 130 : 25;
         Graphics.DrawRectangleRounded(
             new Rectangle(x - 5, y - 5, 140, panelHeight),
             0.2f, 16, bg
         );
 
-        Graphics.DrawText($"[{WorldManager.GetCurrentWorld()}]", x, y, 12, Color.Gold);
+        int stage = WorldManager.GetCurrentStage();
+        float diff = WorldManager.GetDifficultyMultiplier(stage);
+        Graphics.DrawText($"Stage {stage} x{diff:F2}", x + 5, y + 2, 9, new Color(192, 192, 192, 255));
 
         if (!expanded) return;
 
-        int yOff = y + 20;
+        int yOff = y + 16;
         int lineH = 15;
 
         DrawStatBar("Salute", stats.Salute, Color.Red, ref yOff, lineH);

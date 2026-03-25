@@ -15,6 +15,7 @@ struct ParametriFoglie
     public Vector2 posizioneRelativa;
     public float dimensione;
     public float faseOscillazione;
+    public bool isDorata;
 
     public ParametriFoglie(float Scostamento, float Rotazione, float Flip, Vector2 PosizioneRelativa, float Dimensione = 1f)
     {
@@ -24,6 +25,7 @@ struct ParametriFoglie
         this.posizioneRelativa = PosizioneRelativa;
         this.dimensione = Dimensione;
         this.faseOscillazione = RandomHelper.Float(0, MathF.PI * 2);
+        this.isDorata = false;
     }
 }
 
@@ -56,13 +58,16 @@ public class Obj_Ramo: GameElement
     private Color coloreRamo = Color.DarkBrown;
     private Color coloreRamoChiaro = new Color(100, 70, 50, 255);
 
-    public Obj_Ramo(Vector2 puntoIniziale, Direzione direzione)
+    public Obj_Ramo(Vector2 puntoIniziale, Direzione direzione, bool restore = false)
     {
         this.direzione = direzione;
         this.puntoIniziale = puntoIniziale;
-        this.punti.Add(puntoIniziale);
 
-        maxCrescita = 5 + RandomHelper.DeterministicIntRange(Game.pianta.rseed, 4, 0, 3);
+        if (!restore)
+        {
+            this.punti.Add(puntoIniziale);
+            maxCrescita = 5 + RandomHelper.DeterministicIntRange(Game.pianta.rseed, 4, 0, 3);
+        }
 
         UpdateBounds();
     }
@@ -167,19 +172,17 @@ public class Obj_Ramo: GameElement
 
         spessoreBase = Math.Max(2f, 7f - fattoreAltezza * 4f);
 
-        for (int i = 0; i < punti.Count - 1; i++)
+        for (int i = 0; i < puntiSpan.Length - 1; i++)
         {
-            if(puntiSpan.Length < i +1) continue;
-
 			Vector2 pStart = puntiSpan[i];
             Vector2 pEnd = puntiSpan[i + 1];
 
             float oscillazione = MathF.Sin(tempoVita * 1.2f + i * 0.4f) * 5f;
-            float fattoreOscillazione = (float)(i + 1) / punti.Count;
+            float fattoreOscillazione = (float)(i + 1) / puntiSpan.Length;
             pStart.X += oscillazione * fattoreOscillazione * 0.5f;
             pEnd.X += oscillazione * fattoreOscillazione;
 
-            float fattoreSegmento = (float)(punti.Count - 1 - i) / Math.Max(1, punti.Count - 1);
+            float fattoreSegmento = (float)(puntiSpan.Length - 1 - i) / Math.Max(1, puntiSpan.Length - 1);
             spessoreAttuale = spessoreBase * (0.25f + fattoreSegmento * 0.6f);
             spessoreAttuale = Math.Max(1f, spessoreAttuale);
 
@@ -202,6 +205,75 @@ public class Obj_Ramo: GameElement
 
             DrawFoglia(sprite, i, pStart, pEnd, oscillazione);
         }
+    }
+
+    private static readonly Color gialloDorato = new Color(255, 230, 50, 255);
+    private static readonly Color gialloBrillante = new Color(255, 255, 150, 255);
+    private static readonly Color auraEsterna = new Color(255, 220, 50, 40);
+    private static readonly Color auraInterna = new Color(255, 240, 100, 70);
+    private static readonly Color scintillaColor = new Color(255, 255, 200, 255);
+
+    /// <summary>
+    /// Calcola la posizione mondo di una foglia (senza oscillazione animata).
+    /// </summary>
+    public Vector2 GetPosizioneFoglia(int indice)
+    {
+        if (indice >= parametriFoglie.Count || indice < 1) return Vector2.Zero;
+        if (punti.Count < 2 || indice >= punti.Count - 1) return Vector2.Zero;
+
+        var paramsFoglia = parametriFoglie[indice];
+        Vector2 pStart = punti[indice];
+        Vector2 pEnd = punti[indice + 1];
+        Vector2 posizioneRamo = Vector2.Lerp(pStart, pEnd, paramsFoglia.posizioneRelativa.X);
+
+        float deltaY = pEnd.Y - pStart.Y;
+        float deltaX = pEnd.X - pStart.X;
+        float rotazioneBase = MathF.Atan2(deltaY, deltaX) * (180.0f / MathF.PI);
+        float angoloPerpendicolareRad = rotazioneBase * (MathF.PI / 180.0f);
+
+        Vector2 offset = new Vector2(
+            MathF.Cos(angoloPerpendicolareRad) * paramsFoglia.scostamento * paramsFoglia.flip,
+            MathF.Sin(angoloPerpendicolareRad) * paramsFoglia.scostamento * paramsFoglia.flip
+        );
+
+        return posizioneRamo + offset;
+    }
+
+    public bool IsFogliaDorata(int indice)
+    {
+        if (indice < 0 || indice >= parametriFoglie.Count) return false;
+        return parametriFoglie[indice].isDorata;
+    }
+
+    public void SetFogliaDorata(int indice, bool dorata)
+    {
+        if (indice < 0 || indice >= parametriFoglie.Count) return;
+        var p = parametriFoglie[indice];
+        p.isDorata = dorata;
+        parametriFoglie[indice] = p;
+    }
+
+    /// <summary>
+    /// Restituisce gli indici delle foglie valide (indice >= 1).
+    /// </summary>
+    public List<int> GetIndiciFoglieValide()
+    {
+        var result = new List<int>();
+        for (int i = 1; i < parametriFoglie.Count; i++)
+            result.Add(i);
+        return result;
+    }
+
+    /// <summary>
+    /// Restituisce gli indici delle foglie dorate.
+    /// </summary>
+    public List<int> GetIndiciFoglieDorate()
+    {
+        var result = new List<int>();
+        for (int i = 0; i < parametriFoglie.Count; i++)
+            if (parametriFoglie[i].isDorata)
+                result.Add(i);
+        return result;
     }
 
     private void DrawFoglia(Sprite sprite, int indice, Vector2 pStart, Vector2 pEnd, float oscillazione)
@@ -230,9 +302,89 @@ public class Obj_Ramo: GameElement
 
         float scala = paramsFoglia.dimensione * 0.65f;
 
-        GameFunctions.DrawSprite(sprite, posizioneFinale, rotazioneFinale, new Vector2(scala, scala));
+        if (paramsFoglia.isDorata)
+        {
+            float pulse = (MathF.Sin(tempoVita * 3f + paramsFoglia.faseOscillazione) + 1f) * 0.5f;
+            float pulse2 = (MathF.Sin(tempoVita * 4.5f + paramsFoglia.faseOscillazione + 1f) + 1f) * 0.5f;
+
+            // Centro visivo della foglia: offset dallo stem lungo la direzione della rotazione
+            float rotRad = rotazioneFinale * MathF.PI / 180f;
+            float offsetCentro = scala * 5f; // circa metà della lunghezza foglia
+            Vector2 centroFoglia = posizioneFinale + new Vector2(
+                MathF.Cos(rotRad) * offsetCentro,
+                MathF.Sin(rotRad) * offsetCentro
+            );
+
+            // Alone esterno grande pulsante centrato sulla foglia
+            Graphics.DrawCircleV(centroFoglia, 7f + pulse * 3f, auraEsterna);
+            // Alone interno più luminoso
+            Graphics.DrawCircleV(centroFoglia, 4f + pulse2 * 2f, auraInterna);
+
+            // Foglia gialla brillante, leggermente più grande
+            float scalaDorata = scala * 1.15f;
+            GameFunctions.DrawSprite(sprite, posizioneFinale, rotazioneFinale, new Vector2(scalaDorata, scalaDorata), gialloDorato);
+
+            // Scintille che orbitano attorno al centro della foglia
+            for (int s = 0; s < 3; s++)
+            {
+                float angolo = tempoVita * (2.5f + s * 0.7f) + s * MathF.PI * 0.66f + paramsFoglia.faseOscillazione;
+                float raggio = 3f + pulse * 1.5f;
+                float sparkAlpha = (MathF.Sin(tempoVita * 4f + s * 2f) + 1f) * 0.5f;
+                if (sparkAlpha > 0.5f)
+                {
+                    float sparkSize = 0.8f + (sparkAlpha - 0.5f) * 2f;
+                    Vector2 sparkPos = centroFoglia + new Vector2(
+                        MathF.Cos(angolo) * raggio,
+                        MathF.Sin(angolo) * raggio
+                    );
+                    Graphics.DrawCircleV(sparkPos, sparkSize, scintillaColor);
+                }
+            }
+
+            // Lampo bianco intermittente
+            if (pulse > 0.85f)
+            {
+                float flashSize = (pulse - 0.85f) * 15f;
+                Graphics.DrawCircleV(centroFoglia, flashSize, new Color(255, 255, 255, 60));
+            }
+        }
+        else
+        {
+            GameFunctions.DrawSprite(sprite, posizioneFinale, rotazioneFinale, new Vector2(scala, scala));
+        }
     }
 
     public bool IsComplete => crescitaAttuale >= maxCrescita;
     public int NumeroFoglie => parametriFoglie.Count;
+
+    public RamoSaveData ToSaveData()
+    {
+        var data = new RamoSaveData { Punti = new List<Vector2>(punti) };
+        data.FoglieDorate = GetIndiciFoglieDorate();
+        return data;
+    }
+
+    public static Obj_Ramo FromSaveData(RamoSaveData data)
+    {
+        Direzione dir = data.Punti.Count >= 2 && data.Punti[1].X >= data.Punti[0].X
+            ? Direzione.Destra : Direzione.Sinistra;
+
+        var ramo = new Obj_Ramo(data.Punti[0], dir, restore: true);
+        ramo.punti = new List<Vector2>(data.Punti);
+        ramo.crescitaAttuale = data.Punti.Count - 1;
+        ramo.maxCrescita = 5 + RandomHelper.DeterministicIntRange(Game.pianta.rseed, 4, 0, 3);
+
+        for (int i = 1; i < ramo.punti.Count; i++)
+            ramo.GeneraParametriFoglia();
+
+        // Ripristina foglie dorate
+        if (data.FoglieDorate != null)
+        {
+            foreach (int idx in data.FoglieDorate)
+                ramo.SetFogliaDorata(idx, true);
+        }
+
+        ramo.UpdateBounds();
+        return ramo;
+    }
 }

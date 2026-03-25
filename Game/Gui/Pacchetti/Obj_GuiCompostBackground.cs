@@ -69,30 +69,52 @@ public class Obj_GuiCompostBackground : GameElement
 
         // === FINESTRA A SINISTRA ===
         int windowX = 30;
-        int windowY = 40;
+        int windowY = 55;
         int windowWidth = 140;
-        int windowHeight = 180;
+        int windowHeight = 165;
 
         DrawWindow(windowX, windowY, windowWidth, windowHeight);
 
-        // === TAVOLINO PIÙ LUNGO ===
-        int tableX = screenWidth / 2 - 140;  // Più largo
-        int tableY = screenHeight - 180;
-        int tableWidth = 280;  // Molto più largo
-        int tableHeight = 60;
+        // === PIEDISTALLI PACCHETTI ===
+        int maxSlots = UpgradeSystem.GetMaxPackages();
+        int slotsPerRow = 4;
+        int pedestalW = 50;
+        int pedestalSpacing = 8;
+        int rowWidth = Math.Min(maxSlots, slotsPerRow) * pedestalW + (Math.Min(maxSlots, slotsPerRow) - 1) * pedestalSpacing;
+        int baseRowX = screenWidth / 2 - rowWidth / 2;
+        int baseRowY = screenHeight - 175;
 
-        DrawTable(tableX, tableY, tableWidth, tableHeight);
+        for (int i = 0; i < maxSlots; i++)
+        {
+            int row = i / slotsPerRow;
+            int col = i % slotsPerRow;
+            int slotsInRow = Math.Min(maxSlots - row * slotsPerRow, slotsPerRow);
+            int thisRowWidth = slotsInRow * pedestalW + (slotsInRow - 1) * pedestalSpacing;
+            int rowX = screenWidth / 2 - thisRowWidth / 2;
+            int px = rowX + col * (pedestalW + pedestalSpacing);
+            int py = baseRowY + row * 70;
+            DrawPedestal(px, py, pedestalW);
+        }
 
         // === SECCHIO COMPOST ===
-        int binX = tableX + 15;
-        int binY = tableY - 45;
+        int binX = baseRowX - 50;
+        int binY = baseRowY - 40;
         DrawCompostBin(binX, binY);
+
+        // === TAVOLINO SOTTO IL SECCHIO ===
+        DrawBinTable(binX - 5, binY + 40, 45);
 
         // === DECORAZIONI ===
         DrawWallDecoration();
 
         // === BORDI STANZA ===
         DrawRoomBorders();
+
+        // === RIGA DI PAVIMENTO IN BASSO PER COPRIRE LA BARRA BIANCA DELLA SCROLLBAR ===
+        int bottomFloorHeight = 45;
+        Graphics.DrawRectangle(0, screenHeight - bottomFloorHeight, screenWidth, bottomFloorHeight, woodDark);
+        // Riga superiore della striscia di pavimento
+        Graphics.DrawRectangle(0, screenHeight - bottomFloorHeight, screenWidth, 4, woodMedium);
     }
 
     private void DrawWindow(int x, int y, int width, int height)
@@ -148,6 +170,29 @@ public class Obj_GuiCompostBackground : GameElement
                 new Color(90, 170, 90, 255)
             );
         }
+    }
+
+    private void DrawPedestal(int x, int y, int width)
+    {
+        Color tableTop = woodMedium;
+        Color tableSide = woodDark;
+
+        // Piano superiore
+        Graphics.DrawRectangle(x, y, width, 8, tableTop);
+        Graphics.DrawRectangle(x, y + 4, width, 4, new Color(woodDark.R, woodDark.G, woodDark.B, 100));
+        Graphics.DrawRectangle(x, y + 8, width, 3, tableSide);
+
+        // Due gambette
+        int legW = 6;
+        int legH = 40;
+        Graphics.DrawRectangle(x + 8, y + 11, legW, legH, tableSide);
+        Graphics.DrawRectangle(x + 8, y + 11, legW / 2, legH, woodMedium);
+        Graphics.DrawRectangle(x + width - 14, y + 11, legW, legH, tableSide);
+        Graphics.DrawRectangle(x + width - 14, y + 11, legW / 2, legH, woodMedium);
+
+        // Ombra
+        Graphics.DrawEllipse(x + width / 2, y + legH + 15, width / 2 - 2, 8,
+            new Color(0, 0, 0, 35));
     }
 
     private void DrawTable(int x, int y, int width, int height)
@@ -232,6 +277,35 @@ public class Obj_GuiCompostBackground : GameElement
 
         Graphics.DrawCircle(frameX + frameW / 2, frameY + frameH / 2, 8,
             new Color(100, 180, 100, 255));
+    }
+
+    private void DrawBinTable(int x, int y, int width)
+    {
+        // Sgabello rustico rotondo - diverso dai piedistalli rettangolari
+        Color stoolTop = woodLight;
+        Color stoolRing = woodMedium;
+        Color stoolLeg = woodDark;
+
+        // Ombra a terra
+        Graphics.DrawEllipse(x + width / 2, y + 48, width / 2 + 2, 6,
+            new Color(0, 0, 0, 40));
+
+        // Gamba centrale
+        int legW = 8;
+        Graphics.DrawRectangle(x + width / 2 - legW / 2, y + 8, legW, 38, stoolLeg);
+        Graphics.DrawRectangle(x + width / 2 - legW / 2, y + 8, legW / 2, 38, stoolRing);
+
+        // Supporti diagonali (due piccoli piedi)
+        Graphics.DrawRectangle(x + width / 2 - 14, y + 30, 6, 18, stoolLeg);
+        Graphics.DrawRectangle(x + width / 2 + 8, y + 30, 6, 18, stoolLeg);
+
+        // Piano rotondo (ellisse)
+        Graphics.DrawEllipse(x + width / 2, y + 6, width / 2, 6, stoolTop);
+        Graphics.DrawEllipse(x + width / 2, y + 8, width / 2, 5, stoolRing);
+
+        // Anello bordo piano
+        Graphics.DrawEllipse(x + width / 2, y + 6, width / 2 + 1, 3,
+            new Color(stoolLeg.R, stoolLeg.G, stoolLeg.B, 120));
     }
 
     private void DrawRoomBorders()

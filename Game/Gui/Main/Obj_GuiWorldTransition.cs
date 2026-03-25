@@ -32,6 +32,7 @@ public class Obj_GuiWorldTransition : GameElement
         if (shouldShow && !isVisible)
         {
             isVisible = true;
+            WorldManager.PrepareNextWorld();
         }
 
         if (isVisible)

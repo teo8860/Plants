@@ -1,10 +1,4 @@
-﻿﻿using CopperDevs.Core.Utility;
-using CopperDevs.DearImGui;
-using CopperDevs.DearImGui.Renderer.Raylib;
-using CopperDevs.DearImGui.Renderer.Raylib.Raylib_CSharp;
-using CopperDevs.DearImGui.Rendering;
-using Hexa.NET.ImGui;
-using NotificationIconSharp;
+﻿﻿using NotificationIconSharp;
 using Plants;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Windowing;
@@ -35,41 +29,79 @@ internal static class Program
     [DllImport("user32.dll", SetLastError = true)]
     static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
     
-    public static void Main()
+    public static bool IsMinigameMode = false;
+    public static TipoMinigioco MinigameType;
+
+    public static void Main(string[] args)
     {
+        // Controlla se avviato in modalità minigioco standalone
+        if (args.Length >= 2 && args[0] == "--minigioco")
+        {
+            if (Enum.TryParse<TipoMinigioco>(args[1], out var tipo))
+            {
+                IsMinigameMode = true;
+                MinigameType = tipo;
+                AvviaMinigiocoStandalone(tipo);
+                return;
+            }
+        }
 
         Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
         Window.ClearState(ConfigFlags.ResizableWindow);
 
+        // rimuove la possibilità di minimizzare
         IntPtr hwnd = Window.GetHandle();
 		uint style = GetWindowLong(hwnd, GWL_STYLE);
-        style &= ~WS_MINIMIZEBOX; // rimuove la possibilità di minimizzare
+        style &= ~WS_MINIMIZEBOX;
         SetWindowLong(hwnd, GWL_STYLE, style);
 
 
         SetupIcon();
-        Window.SetState(ConfigFlags.HiddenWindow);
+        Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
 
         Input.HideCursor();
-        
-     
+
+
 		Game.Init();
-        Window.SetState(ConfigFlags.HiddenWindow);
         Rendering.Init();
 	}
+
+    private static void AvviaMinigiocoStandalone(TipoMinigioco tipo)
+    {
+        int miniHeight = GameProperties.windowHeight - 80;
+        Window.Init(GameProperties.windowWidth, miniHeight, $"Plants - Minigioco");
+        Window.ClearState(ConfigFlags.ResizableWindow);
+
+        IntPtr hwnd = Window.GetHandle();
+        uint style = GetWindowLong(hwnd, GWL_STYLE);
+        style &= ~WS_MINIMIZEBOX;
+        SetWindowLong(hwnd, GWL_STYLE, style);
+
+        // Centra la finestra
+        int monW = Window.GetMonitorWidth(0);
+        int monH = Window.GetMonitorHeight(0);
+        Window.SetPosition((monW - GameProperties.windowWidth) / 2, (monH - miniHeight) / 2);
+
+        // Aggiorna la camera per le dimensioni ridotte
+        Rendering.camera = new PixelCamera(GameProperties.windowWidth, miniHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth);
+
+        Input.HideCursor();
+
+        AssetLoader.LoadAll();
+        ManagerMinigames.InitStandalone(tipo);
+        Rendering.InitMinigame();
+    }
 
     private static void SetupIcon()
     {
         // Carica icona nella barra delle applicazioni
         Icon icon = Utility.LoadIconFromEmbedded("icon.ico", "Assets");
-        trayIcon = new NativeTrayIcon(icon, "Tooltip icona");
+        trayIcon = new NativeTrayIcon(icon, "Plants");
         
         trayIcon.OnClickLeft += ()=>
         {
-           Window.ClearState(ConfigFlags.HiddenWindow);
-           var m = MouseHelper.GetMousePosition();
-
-           Window.SetPosition((int)m.X-(GameProperties.windowWidth/2), (int)m.Y-GameProperties.windowHeight-50);
+            Window.ClearState(ConfigFlags.HiddenWindow);
+            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
         };
 
         trayIcon.OnExit  += () =>
