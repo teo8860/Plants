@@ -14,7 +14,11 @@ namespace Plants;
 
 internal class Rendering
 {
-    public static PixelCamera camera = new(GameProperties.windowWidth, GameProperties.windowHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth);
+    public static PixelCamera camera
+#if !ANDROID
+        = new(GameProperties.windowWidth, GameProperties.windowHeight, (float)GameProperties.windowWidth / (float)GameProperties.viewWidth)
+#endif
+    ;
 
     /// <summary>
     /// Loop di rendering per la modalità minigioco standalone.

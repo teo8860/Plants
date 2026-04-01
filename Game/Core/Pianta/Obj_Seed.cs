@@ -19,6 +19,7 @@ public class Obj_Seed : GameElement
 	public Vector3 color = new Vector3( 0.0f, 1.0f, 1.0f ); 
 	double time = 0;
 
+#if !ANDROID
 	int un_time = AssetLoader.shaderSeed.GetLocation("time");
 	int un_color = AssetLoader.shaderSeed.GetLocation("color");
 	int un_type = AssetLoader.shaderSeed.GetLocation("type");
@@ -28,6 +29,7 @@ public class Obj_Seed : GameElement
 	int un_noise4 = AssetLoader.shaderSeed.GetLocation("tex_noise4");
 	int un_noise5 = AssetLoader.shaderSeed.GetLocation("tex_noise5");
 	int un_noise6 = AssetLoader.shaderSeed.GetLocation("tex_noise6");
+#endif
 
 	public Obj_Seed()
 	{
@@ -46,9 +48,12 @@ public class Obj_Seed : GameElement
 
 	public override void Draw()
 	{
-
+#if ANDROID
+		// Su Android non abbiamo shader custom, disegna senza
+		GameFunctions.DrawSprite(AssetLoader.spriteSeed1, position, 0, scale);
+#else
         Graphics.BeginShaderMode(AssetLoader.shaderSeed);
-		
+
 			AssetLoader.shaderSeed.SetValue(un_time, (float)Time.GetTime()*2, ShaderUniformDataType.Float);
 			AssetLoader.shaderSeed.SetValue(un_color, color, ShaderUniformDataType.Vec3);
 			AssetLoader.shaderSeed.SetValue(un_type, dati.type, ShaderUniformDataType.Int);
@@ -58,9 +63,10 @@ public class Obj_Seed : GameElement
 			AssetLoader.shaderSeed.SetValueTexture(un_noise4, AssetLoader.spriteNoise4.texture);
 			AssetLoader.shaderSeed.SetValueTexture(un_noise5, AssetLoader.spriteNoise5.texture);
 			AssetLoader.shaderSeed.SetValueTexture(un_noise6, AssetLoader.spriteNoise6.texture);
-		
+
             GameFunctions.DrawSprite(AssetLoader.spriteSeed1, position,0,scale);
 
        Graphics.EndShaderMode();
+#endif
 	}
 }

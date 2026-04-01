@@ -1,9 +1,12 @@
 using Android.App;
 using Android.Content.PM;
+using Android.Graphics;
 using Android.OS;
 using Android.Views;
 using Android.Runtime;
 using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Plants;
@@ -13,6 +16,7 @@ namespace Plants;
 /// e avvia il game loop su un thread separato.
 /// </summary>
 [Activity(
+    Name = "plants.game.MainActivity",
     Label = "Plants",
     MainLauncher = true,
     Theme = "@android:style/Theme.NoTitleBar.Fullscreen",
@@ -24,6 +28,25 @@ public class MainActivity : Activity, ISurfaceHolderCallback
     private SurfaceView surfaceView;
     private Thread gameThread;
     private bool isRunning = false;
+    private IntPtr assetManagerHandle;
+    private string internalDataPath;
+
+    private static bool resolverRegistered = false;
+
+    private static void RegisterNativeResolver()
+    {
+        if (resolverRegistered) return;
+        resolverRegistered = true;
+
+        // Mappa "raylib" → "plants_bridge" per il pacchetto Raylib-CSharp
+        NativeLibrary.SetDllImportResolver(typeof(Raylib_CSharp.Textures.RenderTexture2D).Assembly,
+            (libraryName, assembly, searchPath) =>
+            {
+                if (libraryName == "raylib")
+                    return NativeLibrary.Load("plants_bridge");
+                return IntPtr.Zero;
+            });
+    }
 
     protected override void OnCreate(Bundle savedInstanceState)
     {
@@ -35,6 +58,10 @@ public class MainActivity : Activity, ISurfaceHolderCallback
             SystemUiFlags.HideNavigation |
             SystemUiFlags.ImmersiveSticky
         );
+
+        // Cattura AssetManager handle per il thread GL
+        assetManagerHandle = Assets.Handle;
+        internalDataPath = FilesDir.AbsolutePath;
 
         // Crea la SurfaceView per il rendering
         surfaceView = new SurfaceView(this);
@@ -50,7 +77,7 @@ public class MainActivity : Activity, ISurfaceHolderCallback
         gameThread.Start();
     }
 
-    public void SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
+    public void SurfaceChanged(ISurfaceHolder holder, global::Android.Graphics.Format format, int width, int height)
     {
         // Notifica il bridge del cambio dimensioni
         AndroidBridge.SetScreenSize(width, height);
@@ -76,6 +103,16 @@ public class MainActivity : Activity, ISurfaceHolderCallback
     {
         try
         {
+            // Registra resolver PRIMA di qualsiasi chiamata P/Invoke a raylib
+            RegisterNativeResolver();
+
+            // Inizializza AssetManager per raylib (necessario per LoadImage/LoadTexture)
+            AndroidBridge.InitAssetManagerJni(
+                Java.Interop.JniEnvironment.EnvironmentPointer,
+                assetManagerHandle,
+                internalDataPath
+            );
+
             // Ottieni il native window dalla Surface Android
             IntPtr nativeWindow = AndroidBridge.GetNativeWindow(
                 Java.Interop.JniEnvironment.EnvironmentPointer,
@@ -116,7 +153,7 @@ public class MainActivity : Activity, ISurfaceHolderCallback
                 // Update + Draw
                 AndroidGameInit.Frame(deltaTime);
 
-                // Swap buffers
+                // Swap buffers direttamente via EGL
                 AndroidBridge.SwapBuffers();
 
                 // Cap a ~60 FPS

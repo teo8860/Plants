@@ -67,9 +67,11 @@ public static class AssetLoader
 
         spriteShine = new Sprite("shine.png", 0.05f, new(0.5f, 0.5f));  
 
+#if !ANDROID
         shaderBase = LoadShader("base");
         shaderRecolor = LoadShader("recolor");
         shaderSeed = LoadShader("seed");
+#endif
         
         spriteArrowDown = CreateColoredPlaceholder(new Color(200, 200, 220, 255));
         spriteArrowUp = CreateColoredPlaceholder(new Color(220, 200, 200, 255));

@@ -58,14 +58,7 @@ if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
 REM Configura CMake
 echo ^>^>^> Configurazione CMake...
-cmake -B "%BUILD_DIR%" -S "%SCRIPT_DIR%" ^
-    -G "Ninja" ^
-    -DCMAKE_TOOLCHAIN_FILE="%ANDROID_NDK%\build\cmake\android.toolchain.cmake" ^
-    -DANDROID_ABI=arm64-v8a ^
-    -DANDROID_PLATFORM=android-24 ^
-    -DANDROID_STL=c++_static ^
-    -DCMAKE_BUILD_TYPE=Release ^
-    -DCMAKE_MAKE_PROGRAM="%ANDROID_NDK%\prebuilt\windows-x86_64\bin\ninja.exe"
+cmake -B "%BUILD_DIR%" -S "%SCRIPT_DIR%" -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="%ANDROID_NDK%\build\cmake\android.toolchain.cmake" -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 -DANDROID_STL=c++_static -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM="ninja"
 
 if errorlevel 1 (
     echo ERRORE nella configurazione CMake

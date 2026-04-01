@@ -20,6 +20,9 @@ public class Obj_Logo : GameElement
     {
         guiLayer = true;
         depth = -2000;
+#if ANDROID
+        isActive = false;
+#endif
     }
 
     public override void Update()

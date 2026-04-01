@@ -20,7 +20,6 @@
 
   <!-- Native libraries: raylib + bridge compiled for Android ARM64 -->
   <ItemGroup>
-    <AndroidNativeLibrary Include="libs\arm64-v8a\libraylib.so" />
     <AndroidNativeLibrary Include="libs\arm64-v8a\libplants_bridge.so" />
   </ItemGroup>
 
@@ -29,6 +28,7 @@
     <!-- Engine -->
     <Compile Include="..\Engine\GameGeneral\*.cs" Link="Engine\GameGeneral\%(Filename)%(Extension)" />
     <Compile Include="..\Engine\PixelCamera.cs" Link="Engine\PixelCamera.cs" />
+    <Compile Include="..\Engine\Rendering.cs" Link="Engine\Rendering.cs" />
     <Compile Include="..\Engine\Tools\CoordinateHelper.cs" Link="Engine\Tools\CoordinateHelper.cs" />
     <Compile Include="..\Engine\Tools\MathHelper.cs" Link="Engine\Tools\MathHelper.cs" />
     <Compile Include="..\Engine\Tools\RandomHelper.cs" Link="Engine\Tools\RandomHelper.cs" />
@@ -81,15 +81,9 @@
     <Compile Include="..\Game\Minigiochi\*.cs" Link="Game\Minigiochi\%(Filename)%(Extension)" />
   </ItemGroup>
 
-  <!-- Embedded assets (same as desktop) -->
+  <!-- Embedded assets - su Android tutto deve essere embedded -->
   <ItemGroup>
-    <EmbeddedResource Include="..\Assets\icon.ico" Link="Assets\icon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Assets\**\*" Link="Assets\%(RecursiveDir)%(Filename)%(Extension)">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="..\Assets\**\*" Link="Assets\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

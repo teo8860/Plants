@@ -366,3 +366,6 @@ FodyWeavers.xsd
 desktop.ini
 /desktop.ini
 .opencode
+
+# Android native build output
+Native/Android/build/

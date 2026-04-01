@@ -272,6 +272,7 @@ public abstract class MinigiocoBase : GameElement
     {
         int foglie = CalcolaFoglie();
 
+#if WINDOWS
         if (Program.IsMinigameMode)
         {
             // Modalità standalone: salva risultato su file e chiudi finestra
@@ -288,6 +289,7 @@ public abstract class MinigiocoBase : GameElement
             Environment.Exit(0);
         }
         else
+#endif
         {
             AssegnaFoglie(foglie);
             this.active = false;

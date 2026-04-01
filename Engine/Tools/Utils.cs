@@ -12,12 +12,27 @@ namespace Plants;
 
 internal class Utility
 {
+    private static string ResourcePrefix
+    {
+        get
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            return asm.GetName().Name + ".";
+        }
+    }
+
+    private static string GetResourceName(string path, string resourceName)
+    {
+        string dotPath = path.Replace('/', '.').Replace('\\', '.');
+        return ResourcePrefix + dotPath + "." + resourceName;
+    }
+
 #if WINDOWS
     public static Icon LoadIconFromEmbedded(string resourceName, string path = "")
     {
        var asm = Assembly.GetExecutingAssembly();
 
-       using var stream = asm.GetManifestResourceStream("Plants."+path+"."+resourceName);
+       using var stream = asm.GetManifestResourceStream(GetResourceName(path, resourceName));
        if (stream == null)
        {
             return new Icon(resourceName);
@@ -39,7 +54,7 @@ internal class Utility
     {
        var asm = Assembly.GetExecutingAssembly();
 
-       using var stream = asm.GetManifestResourceStream("Plants."+path+"."+resourceName);
+       using var stream = asm.GetManifestResourceStream(GetResourceName(path, resourceName));
        if (stream == null)
        {
             return RayImg.Image.Load(path+"/"+resourceName);
@@ -56,7 +71,7 @@ internal class Utility
     {
        var asm = Assembly.GetExecutingAssembly();
 
-       using var stream = asm.GetManifestResourceStream("Plants."+path+"."+resourceName);
+       using var stream = asm.GetManifestResourceStream(GetResourceName(path, resourceName));
       if (stream != null)
 		{
 			using var reader = new StreamReader(stream);
