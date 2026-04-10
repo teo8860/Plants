@@ -385,8 +385,11 @@ public class Obj_GuiPiantaggio : GameElement
     {
         Game.pianta.SetSeed(seed.type);
         Game.pianta.seedBonus = seed.stats ?? SeedDataType.GetBonus(seed.type);
+        Game.pianta.equippedItemIds = new List<string>(seed.equippedItems ?? new List<string> { null, null, null });
         Game.pianta.Reset();
         Game.pianta.SetNaturalColors(WorldManager.GetCurrentWorld());
+
+        ItemHookCaller.CallOnStart(Game.pianta);
 
         Inventario.get().RemoveSeed(seed);
         Inventario.get().Save();

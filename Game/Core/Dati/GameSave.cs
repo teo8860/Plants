@@ -48,6 +48,7 @@ public class GameSaveData
     public PlantStats PlantStats { get; set; }
     public SeedType PlantSeedType { get; set; }
     public SeedStats PlantSeedBonus { get; set; }
+    public List<string> PlantEquippedItems { get; set; } = new() { null, null, null };
     public int randomSeed {get; set; }
 
     public float WaterCurrent { get; set; } = 100f;
@@ -98,6 +99,7 @@ public class GameSave
             data.PlantStats = Game.pianta.Stats;
             data.PlantSeedType = Game.pianta.TipoSeme;
             data.PlantSeedBonus = Game.pianta.seedBonus;
+            data.PlantEquippedItems = Game.pianta.equippedItemIds;
             data.randomSeed = Game.pianta.rseed;
             data.Plant = Game.pianta.ToSaveData();
 		}
@@ -135,6 +137,7 @@ public class GameSave
         Game.pianta.Stats = saveData.PlantStats;
         Game.pianta.TipoSeme = saveData.PlantSeedType;
         Game.pianta.seedBonus = saveData.PlantSeedBonus;
+        Game.pianta.equippedItemIds = saveData.PlantEquippedItems ?? new List<string> { null, null, null };
         Game.pianta.rseed = saveData.randomSeed;
 
         if (saveData.Plant != null && saveData.Plant.PuntiSpline.Count > 0)

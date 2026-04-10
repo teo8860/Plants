@@ -64,6 +64,9 @@ public static class Game
     public static Obj_GuiLeafHarvestPopup leafHarvestPopup;
     public static Obj_GuiSeedRecovery guiSeedRecovery;
 
+    public static Obj_GuiItemBoard itemBoard;
+    public static Obj_GuiItemSlots itemSlots;
+
     public static void Init()
     {
         room_main = new Room();
@@ -73,6 +76,8 @@ public static class Game
         room_upgrade = new Room(false);
 
         AssetLoader.LoadAll();
+
+        ItemRegistry.Init();
 
         NotificationManager.Initialize();
 
@@ -87,6 +92,8 @@ public static class Game
             GameElement.Create<Obj_Logo>();
 
         Inventario.get().Load();
+        ItemInventory.get().Load();
+        AddTestItems();
 
         bool hasSave = SaveHelper.Exists("savegame.json");
         if (hasSave)
@@ -121,6 +128,18 @@ public static class Game
         }
         //seedTest();
 	}
+
+    private static void AddTestItems()
+    {
+        // Aggiunge oggetti di test all'inventario ad ogni avvio
+        ItemInventory.get().Add("fertilizzante");
+        ItemInventory.get().Add("scudo_gelo");
+        ItemInventory.get().Add("acceleratore_rami");
+        ItemInventory.get().Add("parapioggia");
+        ItemInventory.get().Add("radicatore");
+        ItemInventory.get().Add("fotosintesi");
+        Console.WriteLine("[Test] 6 oggetti di prova aggiunti all'inventario");
+    }
 
     private static void seedTest()
     {
@@ -303,6 +322,9 @@ public static class Game
         seedDetailPanel = new Obj_GuiSeedDetailPanel();
 
         seedUpgradePanel = new Obj_GuiSeedUpgradePanel();
+
+        itemBoard = new Obj_GuiItemBoard();
+        itemSlots = new Obj_GuiItemSlots();
 
         // Collega il pannello alla griglia per dimensionamento dinamico
         inventoryGrid.detailPanel = seedDetailPanel;

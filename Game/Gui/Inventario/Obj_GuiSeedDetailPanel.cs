@@ -88,6 +88,10 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
         hoveredButton = -1;
 
+        // Blocca interazione bottoni se il picker oggetti e' aperto
+        if (Game.itemSlots != null && Game.itemSlots.IsPickerOpen)
+            return;
+
         int buttonHeight = 36;
         int buttonSpacing = 16;
         int buttonMargin = 12;
@@ -174,10 +178,20 @@ public class Obj_GuiSeedDetailPanel : GameElement
         var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
         if (seed != null)
         {
+            // Restituisci gli oggetti equipaggiati all'inventario
+            if (seed.equippedItems != null)
+            {
+                foreach (var itemId in seed.equippedItems)
+                {
+                    if (!string.IsNullOrEmpty(itemId))
+                        ItemInventory.get().Add(itemId);
+                }
+            }
+
             Inventario.get().RemoveSeed(seed);
             Game.inventoryGrid?.Populate();
             selectedSeedIndex = -1;
-            Console.WriteLine("Seme scartato");
+            Console.WriteLine("Seme scartato (oggetti restituiti)");
         }
     }
 

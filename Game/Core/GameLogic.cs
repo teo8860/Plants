@@ -532,6 +532,8 @@ public class GameLogicPianta
     {
         if (!IsViva)
         {
+            ItemHookCaller.CallOnEnd(pianta);
+
             if (stats.FoglieAttuali > 0 && !Game.IsOfflineSimulation)
             {
                 LeafHarvestSystem.HarvestAndShow("Pianta morta");
@@ -555,6 +557,12 @@ public class GameLogicPianta
         AggiornaParassiti(meteo, worldMod);
         AggiornaFoglie(meteo, worldMod);
         ApplicaDanniTempesta(meteo, worldMod);
+
+        // Hook oggetti equipaggiati per meteo
+        if (meteo == Weather.Rainy || meteo == Weather.Stormy)
+            ItemHookCaller.CallOnWeatherRain(pianta);
+        if (meteo == Weather.Sunny)
+            ItemHookCaller.CallOnWeatherSun(pianta);
 
         //AggiornaRigenerazione(worldMod);
 

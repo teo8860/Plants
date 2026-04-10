@@ -65,8 +65,12 @@ public static class WeatherManager
         Weather newWeather = GetNextWeather(currentWeather, random);
         if (newWeather != currentWeather)
         {
+            Weather oldWeather = currentWeather;
             currentWeather = newWeather;
             lastWeatherChange = DateTime.Now;
+
+            if (Game.pianta != null)
+                ItemHookCaller.CallOnWeatherChange(Game.pianta, newWeather);
         }
     }
 

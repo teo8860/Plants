@@ -69,9 +69,12 @@ public class Obj_GuiInventoryBackground : GameElement
         Graphics.DrawRectangle(0, floorY - 8, screenWidth, 8, woodDark);
         Graphics.DrawLine(0, floorY - 8, screenWidth, floorY - 8, woodMedium);
 
-        // === TITOLO ===
-        Graphics.DrawText("MAGAZZINO SEMI", screenWidth / 2 - 70, 20, 18, woodDark);
-        Graphics.DrawText("Scegli una cassa", screenWidth / 2 - 45, 42, 11, new Color(100, 80, 60, 255));
+        // === TITOLO (solo nella vista casse/griglia semi) ===
+        if (Game.inventoryCrates != null && Game.inventoryCrates.IsInventoryOpen)
+        {
+            Graphics.DrawText("MAGAZZINO SEMI", screenWidth / 2 - 70, 20, 18, woodDark);
+        }
+        // Quando le casse non sono aperte, lo schermo digitale gestisce il suo titolo
 
         // === BORDI STANZA ===
         DrawRoomBorders();

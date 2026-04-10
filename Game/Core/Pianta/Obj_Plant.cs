@@ -35,6 +35,7 @@ public class Obj_Plant : GameElement
 
     public SeedType TipoSeme = SeedType.Normale;
     public SeedStats seedBonus = new SeedStats();
+    public List<string> equippedItemIds = new() { null, null, null };
 
     public PlantStats Stats = new PlantStats();
 
@@ -129,12 +130,15 @@ public class Obj_Plant : GameElement
 
         Stats.Altezza += incrementoFinale;
 
+        ItemHookCaller.CallOnGrow(this);
+
         if (Stats.FoglieAttuali < proprieta.FoglieMassime)
         {
             float probabilitaFoglia = velocita * 0.15f * (1f - (float)Stats.FoglieAttuali / proprieta.FoglieMassime);
             if (RandomHelper.DeterministicFloatRangeAt(rseed, Stats.FoglieAttuali + puntiSpline.Count, 0, 1) < probabilitaFoglia)
             {
                 Stats.FoglieAttuali++;
+                ItemHookCaller.CallOnLeafNew(this);
                 TentaFogliaDorata();
             }
         }
@@ -172,6 +176,7 @@ public class Obj_Plant : GameElement
             var ramo = new Obj_Ramo(puntoAttacco, direction);
             ramo.roomId = Game.room_main.id;
             rami.Add(ramo);
+            ItemHookCaller.CallOnBranchNew(this);
 
             contatorePuntiPerRamo = 0;
         }
@@ -207,6 +212,8 @@ public class Obj_Plant : GameElement
         {
             ramo.Cresci();
         }
+        ItemHookCaller.CallOnBranchGrow(this);
+        ItemHookCaller.CallOnLeafGrow(this);
 
         foreach (var radice in radici)
         {
