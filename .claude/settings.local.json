@@ -3,7 +3,13 @@
     "allow": [
       "Bash(xargs grep:*)",
       "Bash(dotnet build:*)",
-      "mcp__plugin_claude-mem_mcp-search__smart_outline"
+      "mcp__plugin_claude-mem_mcp-search__smart_outline",
+      "WebFetch(domain:sm64-conspiracies.fandom.com)",
+      "WebFetch(domain:www.mariowiki.com)",
+      "WebFetch(domain:www.google.com)",
+      "WebSearch",
+      "WebFetch(domain:strategywiki.org)",
+      "WebFetch(domain:en.wikibooks.org)"
     ]
   }
 }

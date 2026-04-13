@@ -32,6 +32,12 @@ public static class ManagerMinigames
 
         var treni = GameElement.Create<MinigiocoTreni>(0, room_minigioco);
         minigiochi[TipoMinigioco.Treni] = treni;
+
+        var blackjack = GameElement.Create<MinigiocoBlackjack>(0, room_minigioco);
+        minigiochi[TipoMinigioco.Blackjack] = blackjack;
+
+        var picturePoker = GameElement.Create<MinigiocoPicturePoker>(0, room_minigioco);
+        minigiochi[TipoMinigioco.PicturePoker] = picturePoker;
     }
 
     /// <summary>
@@ -48,6 +54,8 @@ public static class ManagerMinigames
             TipoMinigioco.Resta => GameElement.Create<MinigiocoResta>(0, room_minigioco),
             TipoMinigioco.Semi => GameElement.Create<MinigiocoSemi>(0, room_minigioco),
             TipoMinigioco.Treni => GameElement.Create<MinigiocoTreni>(0, room_minigioco),
+            TipoMinigioco.Blackjack => GameElement.Create<MinigiocoBlackjack>(0, room_minigioco),
+            TipoMinigioco.PicturePoker => GameElement.Create<MinigiocoPicturePoker>(0, room_minigioco),
             _ => throw new ArgumentException($"Tipo minigioco sconosciuto: {tipo}")
         };
 
@@ -93,6 +101,32 @@ public static class ManagerMinigames
 
     public static void OnMinigiocoFinito()
     {
+        inCorso = false;
+    }
+
+    public static void AvviaInline(TipoMinigioco tipo)
+    {
+        if (inCorso) return;
+        if (!minigiochi.ContainsKey(tipo)) return;
+
+        inCorso = true;
+        minigiochi[tipo].Avvia();
+    }
+
+    public static void FermaMinigiocoAttivo()
+    {
+        foreach (var mg in minigiochi.Values)
+        {
+            if (mg.active)
+                mg.Ferma();
+        }
+
+        if (processoMinigioco != null && !processoMinigioco.HasExited)
+        {
+            try { processoMinigioco.Kill(); } catch { }
+            processoMinigioco = null;
+        }
+
         inCorso = false;
     }
 
