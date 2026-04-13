@@ -149,6 +149,7 @@ public class SeedFusionManager
         int resultFusionCount = Math.Max(SelectedSeed1.stats.fusionCount, SelectedSeed2.stats.fusionCount) + 1;
 
         return $"Fusione: {GetRarityName(SelectedSeed1.rarity)} + {GetRarityName(SelectedSeed2.rarity)}\n" +
+               $"Media: ~{avgRarity}\n" +
                $"Risultato: ~{GetRarityName(resultRarity)}\n" +
                $"Fusioni risultanti: {resultFusionCount}/{Seed.MAX_FUSIONS}";
     }

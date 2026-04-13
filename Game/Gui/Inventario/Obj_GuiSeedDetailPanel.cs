@@ -227,47 +227,97 @@ public class Obj_GuiSeedDetailPanel : GameElement
         Graphics.DrawRectangle(panelX, 0, panelWidth, screenHeight, panelColor);
         Graphics.DrawLine(panelX, 0, panelX, screenHeight, panelBorder);
 
-        // Area stats
-        int statsAreaHeight = 150;
-        Color statsBoxColor = new Color(62, 39, 25, 220);
-        Color statsBoxBorder = new Color(41, 26, 17, 255);
-
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX + 10, 15, panelWidth - 20, statsAreaHeight),
-            0.1f,
-            8,
-            statsBoxColor
-        );
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX + 10, 15, panelWidth - 20, statsAreaHeight),
-            0.1f,
-            8,
-            2,
-            statsBoxBorder
-        );
-
         // Contenuto stats
-        Graphics.DrawText("STATS", panelX + 18, 25, 14, textColor);
-
         if (selectedSeedIndex >= 0)
         {
             var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
             if (seed != null)
             {
-                Color subtextColor = new Color(200, 180, 150, 255);
-                Graphics.DrawText($"Seme #{selectedSeedIndex + 1}", panelX + 18, 50, 12, subtextColor);
+                // Header: nome e rarita
+                int headerY = 12;
+                Color statsBoxColor = new Color(62, 39, 25, 220);
+                Color statsBoxBorder = new Color(41, 26, 17, 255);
 
-                // Mostra rarità
-                Color rarityColor = GetRarityColor(seed.rarity);
-                Graphics.DrawText(GetRarityName(seed.rarity), panelX + 18, 70, 11, rarityColor);
+                string seedName = SeedDataType.GetName(seed.type);
+                Graphics.DrawText(seedName, panelX + 18, headerY, 11, textColor);
+
+                Color rarityColor = SeedRarityHelper.GetColor(seed.rarity);
+                string rarityName = SeedRarityHelper.GetName(seed.rarity);
+                Graphics.DrawText(rarityName, panelX + 18, headerY + 14, 9, rarityColor);
+
+                // Descrizione tipo seme
+                string desc = SeedDataType.GetDescription(seed.type);
+                Color descColor = new Color(180, 170, 150, 200);
+                // Wrap manuale per descrizione corta
+                int descY = headerY + 28;
+                int maxCharsPerLine = (panelWidth - 36) / 5;
+                string[] words = desc.Split(' ');
+                string line = "";
+                int lineCount = 0;
+                foreach (var word in words)
+                {
+                    if ((line + " " + word).Trim().Length > maxCharsPerLine && line.Length > 0)
+                    {
+                        Graphics.DrawText(line, panelX + 18, descY + lineCount * 10, 8, descColor);
+                        line = word;
+                        lineCount++;
+                    }
+                    else
+                    {
+                        line = line.Length == 0 ? word : line + " " + word;
+                    }
+                }
+                if (line.Length > 0)
+                {
+                    Graphics.DrawText(line, panelX + 18, descY + lineCount * 10, 8, descColor);
+                    lineCount++;
+                }
+
+                // Separatore
+                int sepY = descY + lineCount * 10 + 4;
+                Graphics.DrawRectangle(panelX + 15, sepY, panelWidth - 30, 1, new Color(100, 80, 60, 120));
+
+                // Box statistiche (compact per stare sopra gli item slots a Y=160)
+                int statsStartY = sepY + 4;
+                int statsBoxWidth = panelWidth - 36;
+
+                // Disegna statistiche con barre (compact = 2 colonne)
+                if (seed.stats != null)
+                {
+                    SeedStatsDrawer.Draw(seed.stats, panelX + 18, statsStartY, statsBoxWidth, compact: true);
+                }
+
+                // Fusion count e upgrade sotto gli item slots
+                int infoY = 218;
+                if (seed.stats != null && seed.stats.fusionCount > 0)
+                {
+                    string fusionText = $"Fusioni: {seed.stats.fusionCount}/{Seed.MAX_FUSIONS}";
+                    Color fusionColor = seed.CanBeFused ? new Color(100, 200, 255, 255) : new Color(200, 80, 80, 255);
+                    Graphics.DrawText(fusionText, panelX + 18, infoY, 9, fusionColor);
+                    infoY += 14;
+                }
+
+                if (seed.upgradeLevel > 0)
+                {
+                    string upgradeText = $"Livello: +{seed.upgradeLevel}";
+                    Graphics.DrawText(upgradeText, panelX + 18, infoY, 9, new Color(255, 200, 50, 255));
+                }
             }
+        }
+        else
+        {
+            // Nessun seme selezionato
+            Color hintColor = new Color(160, 150, 130, 180);
+            Graphics.DrawText("Seleziona un", panelX + 18, 40, 10, hintColor);
+            Graphics.DrawText("seme dalla", panelX + 18, 55, 10, hintColor);
+            Graphics.DrawText("griglia", panelX + 18, 70, 10, hintColor);
         }
 
         // Info modalità fusione
         var fusionManager = SeedFusionManager.Get();
         if (fusionManager.IsFusionMode)
         {
-            DrawFusionInfo(panelX, statsAreaHeight + 30);
+            DrawFusionInfo(panelX, 220);
         }
 
         // Bottoni
@@ -360,23 +410,4 @@ public class Obj_GuiSeedDetailPanel : GameElement
         }
     }
 
-    private Color GetRarityColor(SeedRarity rarity) => rarity switch
-    {
-        SeedRarity.Comune => new Color(200, 200, 200, 255),
-        SeedRarity.NonComune => new Color(80, 200, 80, 255),
-        SeedRarity.Raro => new Color(80, 150, 255, 255),
-        SeedRarity.Epico => new Color(180, 80, 255, 255),
-        SeedRarity.Leggendario => new Color(255, 180, 50, 255),
-        _ => Color.White
-    };
-
-    private string GetRarityName(SeedRarity rarity) => rarity switch
-    {
-        SeedRarity.Comune => "Comune",
-        SeedRarity.NonComune => "Non Comune",
-        SeedRarity.Raro => "Raro",
-        SeedRarity.Epico => "Epico",
-        SeedRarity.Leggendario => "Leggendario",
-        _ => "???"
-    };
 }

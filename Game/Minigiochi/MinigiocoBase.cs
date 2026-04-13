@@ -14,7 +14,9 @@ public enum TipoMinigioco
     Tieni,
     Resta,
     Semi,
-    Treni
+    Treni,
+    Blackjack,
+    PicturePoker
 }
 
 public enum MinigiocoStato

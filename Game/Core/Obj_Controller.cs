@@ -31,6 +31,10 @@ public class Obj_Controller : GameElement
 
     public override void Update()
     {
+        // Blocca tutti gli input durante la debug console
+        if (DebugConsole.IsOpen)
+            return;
+
         // Blocca tutti gli input durante la schermata di morte
         if (Game.guiMorte != null && Game.guiMorte.active)
             return;

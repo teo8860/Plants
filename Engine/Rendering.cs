@@ -118,8 +118,13 @@ internal class Rendering
             }
 
 
-            GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);    
-			
+            // Debug console (update + draw on top of everything)
+            DebugConsole.Update();
+            DebugConsole.Draw();
+
+            if (!DebugConsole.IsOpen)
+                GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);
+
             //Graphics.DrawFPS(0,0);
 			Graphics.EndDrawing();
 

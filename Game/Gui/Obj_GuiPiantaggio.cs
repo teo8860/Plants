@@ -205,7 +205,7 @@ public class Obj_GuiPiantaggio : GameElement
             int columns = GetColumns();
             int rows = (int)Math.Ceiling((float)seeds.Count / columns);
             int contentHeight = rows * (cellSize + spacing);
-            int visibleHeight = sh - startY - 120;
+            int visibleHeight = sh - startY - 220;
             int minScroll = Math.Min(0, visibleHeight - contentHeight);
             scrollY = Math.Clamp(scrollY, minScroll, 0);
 
@@ -236,7 +236,7 @@ public class Obj_GuiPiantaggio : GameElement
         // Bottone "Pianta" (coordinate allineate con DrawSelectedInfo)
         if (selectedIndex >= 0 && selectedIndex < seeds.Count)
         {
-            int panelH = 55;
+            int panelH = 160;
             int panelY = sh - panelH - 5;
             int btnW = 120;
             int btnH = 22;
@@ -502,7 +502,7 @@ public class Obj_GuiPiantaggio : GameElement
                 int x = gridStartX + col * (cellSize + spacing);
                 int y = startY + row * (cellSize + spacing) + scrollY;
 
-                if (y + cellSize < startY - 10 || y > sh - 110) continue;
+                if (y + cellSize < startY - 10 || y > sh - 215) continue;
 
                 Seed seed = seeds[i];
                 Color rarityColor = SeedRarityHelper.GetColor(seed.rarity);
@@ -555,7 +555,7 @@ public class Obj_GuiPiantaggio : GameElement
             int col = i % columns;
             int row = i / columns;
             int y = startY + row * (cellSize + spacing) + scrollY;
-            if (y + cellSize < startY - 10 || y > sh - 110) continue;
+            if (y + cellSize < startY - 10 || y > sh - 215) continue;
 
             visualSeeds[i].Draw();
         }
@@ -569,8 +569,8 @@ public class Obj_GuiPiantaggio : GameElement
         Color rarityColor = SeedRarityHelper.GetColor(sel.rarity);
         string rarityName = SeedRarityHelper.GetName(sel.rarity);
 
-        // Pannellino info in basso
-        int panelH = 55;
+        // Pannellino info in basso (piu alto per contenere le stats)
+        int panelH = 160;
         int panelY = sh - panelH - 5;
         int panelX = 10;
         int panelW = sw - 20;
@@ -578,10 +578,10 @@ public class Obj_GuiPiantaggio : GameElement
         // Sfondo pannello info
         Graphics.DrawRectangleRounded(
             new Rectangle(panelX, panelY, panelW, panelH),
-            0.15f, 8, new Color(30, 35, 25, 230));
+            0.1f, 8, new Color(30, 35, 25, 235));
         Graphics.DrawRectangleRoundedLines(
             new Rectangle(panelX, panelY, panelW, panelH),
-            0.15f, 8, 1, new Color(80, 120, 80, 150));
+            0.1f, 8, 1, new Color(80, 120, 80, 150));
 
         // Nome del seme
         string nome = SeedDataType.GetName(sel.type);
@@ -590,7 +590,19 @@ public class Obj_GuiPiantaggio : GameElement
 
         // Rarita
         int rarW = rarityName.Length * 4;
-        Graphics.DrawText(rarityName, (sw - rarW) / 2, panelY + 20, 8, rarityColor);
+        Graphics.DrawText(rarityName, (sw - rarW) / 2, panelY + 19, 8, rarityColor);
+
+        // Separatore
+        Graphics.DrawRectangle(panelX + 10, panelY + 30, panelW - 20, 1, new Color(80, 100, 80, 100));
+
+        // Statistiche compact (2 colonne)
+        if (sel.stats != null)
+        {
+            int statsX = panelX + 12;
+            int statsY = panelY + 34;
+            int statsW = panelW - 24;
+            SeedStatsDrawer.Draw(sel.stats, statsX, statsY, statsW, compact: true);
+        }
 
         // Bottone "Pianta"
         int btnW = 120;

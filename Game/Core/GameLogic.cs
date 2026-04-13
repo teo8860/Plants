@@ -547,6 +547,19 @@ public class GameLogicPianta
             return;
         }
 
+        // God mode: skip all damage/consumption, keep stats maxed, only grow
+        if (DebugConsole.GodMode)
+        {
+            stats.Salute = VitalitaMax;
+            stats.Idratazione = 1f;
+            stats.Ossigeno = 1f;
+            stats.Metabolismo = 1f;
+            stats.Infestata = false;
+            stats.IntensitaInfestazione = 0f;
+            pianta.ControlloCrescita();
+            return;
+        }
+
         AggiornaTemperatura(fase, meteo, worldMod);
         ApplicaDanniTemperatura(worldMod);
 
