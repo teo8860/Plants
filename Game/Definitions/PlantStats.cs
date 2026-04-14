@@ -56,12 +56,12 @@ public class SeedStats
     {
         vitalita = 1.0f;
         idratazione = 1.0f;
-        resistenzaFreddo = 0.0f;
-        resistenzaCaldo = 0.0f;
-        resistenzaParassiti = 0.0f;
+        resistenzaFreddo = 0.3f;
+        resistenzaCaldo = 0.3f;
+        resistenzaParassiti = 0.2f;
         vegetazione = 1.0f;
         metabolismo = 1.0f;
-        resistenzaVuoto = 0.0f;
+        resistenzaVuoto = 0.1f;
         fusionCount = 0;
     }
 }

@@ -51,15 +51,24 @@ public static class SeedUpgradeSystem
     {
         if (seed == null) return 0;
 
-        int essenceGained = CalculateSeedEssenceValue(seed);
+        int essenceGained;
 
-        // Bonus essenza basato sui livelli di upgrade del seme
-        if (seed.upgradeLevel > 0)
+        if (seed.id == StarterSeedSystem.STARTER_SEED_ID)
         {
-            int totalLevels = seed.upgradeLevel;
-            essenceGained += totalLevels * 25; // +25 essenza per livello
+            essenceGained = StarterSeedSystem.STARTER_SEED_ESSENCE_VALUE;
         }
-        
+        else
+        {
+            essenceGained = CalculateSeedEssenceValue(seed);
+
+            // Bonus essenza basato sui livelli di upgrade del seme
+            if (seed.upgradeLevel > 0)
+            {
+                int totalLevels = seed.upgradeLevel;
+                essenceGained += totalLevels * 25; // +25 essenza per livello
+            }
+        }
+
         SetEssence(Essence+essenceGained);
 
         // Rimuovi dall'inventario
@@ -123,6 +132,9 @@ public static class SeedUpgradeSystem
     public static int PreviewSacrificeValue(Seed seed)
     {
         if (seed == null) return 0;
+
+        if (seed.id == StarterSeedSystem.STARTER_SEED_ID)
+            return StarterSeedSystem.STARTER_SEED_ESSENCE_VALUE;
 
         int baseValue = CalculateSeedEssenceValue(seed);
 

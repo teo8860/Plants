@@ -63,6 +63,10 @@ public static class Game
 
     public static Obj_GuiLeafHarvestPopup leafHarvestPopup;
     public static Obj_GuiSeedRecovery guiSeedRecovery;
+    public static Obj_GuiOpzioniPopup guiOpzioniPopup;
+    public static Obj_GuiPostaPopup guiPostaPopup;
+    public static Obj_GuiRewardPopup guiRewardPopup;
+    public static Obj_GuiPostaBadge guiPostaBadge;
 
     public static Obj_GuiItemBoard itemBoard;
     public static Obj_GuiItemSlots itemSlots;
@@ -301,11 +305,37 @@ public static class Game
             }
         );
 
+        toolbarBottom.AddActionButton(
+            AssetLoader.spriteSeed2,
+            "Posta Giornaliera",
+            () => {
+                if (guiPostaPopup != null && !guiPostaPopup.IsVisible)
+                    guiPostaPopup.Show();
+            }
+        );
+
+        toolbarBottom.AddActionButton(
+            AssetLoader.spriteMenu,
+            "Opzioni",
+            () => {
+                if (guiOpzioniPopup != null && !guiOpzioniPopup.IsVisible)
+                    guiOpzioniPopup.Show();
+            }
+        );
+
         GameElement.Create<Obj_GuiBottomNavigation>(-600);
 
         guiPiantaggio = new Obj_GuiPiantaggio();
         guiMorte = new Obj_GuiMorte();
         guiSeedRecovery = new Obj_GuiSeedRecovery();
+        guiOpzioniPopup = GameElement.Create<Obj_GuiOpzioniPopup>(-2000);
+        guiPostaPopup = GameElement.Create<Obj_GuiPostaPopup>(-2000);
+        guiRewardPopup = GameElement.Create<Obj_GuiRewardPopup>(-3000);
+        guiPostaBadge = GameElement.Create<Obj_GuiPostaBadge>(-650);
+        guiPostaBadge.PostaButtonIndex = 2;
+
+        MailSystem.Load();
+        MailSystem.RefreshRecurringMails();
     }
 
     private static void InitInventory()

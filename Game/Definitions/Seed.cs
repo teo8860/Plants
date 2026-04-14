@@ -31,6 +31,8 @@ public class Seed
     public int upgradeLevel { get; set; } = 0;
     public List<SeedStatType> upgradedStats { get; set; }
 
+    public int id { get; set; } = 0;
+
     public const int MAX_ITEM_SLOTS = 3;
     public List<string> equippedItems { get; set; } = new() { null, null, null };
 

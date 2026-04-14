@@ -81,6 +81,7 @@ public class Obj_GuiPiantaggio : GameElement
         fallImpacted = false;
         particles.Clear();
         pulse = 0f;
+        StarterSeedSystem.GrantIfNeeded();
         Aggiorna();
     }
 
