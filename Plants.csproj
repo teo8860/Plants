@@ -25,10 +25,16 @@
 
 	<ItemGroup>
 	  <Compile Remove="dist\**" />
+	  <Compile Remove="logs\**" />
+	  <EmbeddedResource Remove="logs\**" />
 	  <EmbeddedResource Include="Assets\icon.ico" />
 	  <None Remove="dist\**" />
+	  <None Remove="logs\**" />
 	</ItemGroup>
-	
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove=".gitattributes" />
 	  <None Remove=".gitignore" />

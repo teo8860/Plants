@@ -19,7 +19,7 @@ public class Obj_Logo : GameElement
     public Obj_Logo()
     {
         guiLayer = true;
-        depth = -2000;
+        depth = -5000;
     }
 
     public override void Update()

@@ -23,7 +23,7 @@ public class Obj_GuiPostaBadge : GameElement
 
     public override void Draw()
     {
-        if (Game.toolbarBottom == null) return;
+        if (Game.toolbarBottom == null || !Game.toolbarBottom.active) return;
         if (PostaButtonIndex < 0) return;
 
         GuiIconButton btn;

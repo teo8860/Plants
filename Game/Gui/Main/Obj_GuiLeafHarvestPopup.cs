@@ -16,6 +16,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 {
     private bool isVisible = false;
     private HarvestResult currentResult = null;
+    private bool afterDeath = false;
 
     // Animazione
     private float animProgress = 0f;
@@ -68,6 +69,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
         currentResult = result;
         isVisible = true;
+        afterDeath = false;
         animProgress = 0f;
         scrollOffset = 0;
         animatedLeaves = 0f;
@@ -77,10 +79,21 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         pulseTime = 0f;
     }
 
+    public void ShowAfterDeath(HarvestResult result)
+    {
+        Show(result);
+        afterDeath = true;
+    }
+
     public void Hide()
     {
+        bool wasAfterDeath = afterDeath;
         isVisible = false;
         currentResult = null;
+        afterDeath = false;
+
+        if (wasAfterDeath)
+            Game.FinalizeDeathReset();
     }
 
     private void SpawnLeafParticle(int panelX, int panelY, int panelW, int panelH)

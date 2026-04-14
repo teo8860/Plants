@@ -83,6 +83,14 @@ public class Obj_GuiPiantaggio : GameElement
         pulse = 0f;
         StarterSeedSystem.GrantIfNeeded();
         Aggiorna();
+
+        // Disabilita elementi del gioco dietro al popup (SetActiveRoom li riattiva,
+        // quindi serve rifarlo ogni volta che si torna al giardino in piantaggio)
+        if (Game.pianta != null) Game.pianta.active = false;
+        if (Game.statsPanel != null) Game.statsPanel.active = false;
+        if (Game.toolbar != null) Game.toolbar.active = false;
+        if (Game.toolbarBottom != null) Game.toolbarBottom.active = false;
+        if (Game.innaffiatoio != null) Game.innaffiatoio.active = false;
     }
 
     public void Nascondi()
@@ -160,6 +168,10 @@ public class Obj_GuiPiantaggio : GameElement
         if (Game.IsModalitaPiantaggio && active && Room.GetActiveId() != Game.room_main.id)
         {
             active = false;
+            DestroyVisualSeeds();
+            DestroyFallingSeed();
+            isFalling = false;
+            particles.Clear();
             return;
         }
 
@@ -238,7 +250,7 @@ public class Obj_GuiPiantaggio : GameElement
         if (selectedIndex >= 0 && selectedIndex < seeds.Count)
         {
             int panelH = 160;
-            int panelY = sh - panelH - 5;
+            int panelY = sh - panelH - 5 - Obj_GuiBottomNavigation.BAR_HEIGHT;
             int btnW = 120;
             int btnH = 22;
             int btnX = (sw - btnW) / 2;
@@ -414,8 +426,9 @@ public class Obj_GuiPiantaggio : GameElement
     {
         if (!active) return;
 
-        // Overlay sfondo scuro
-        Graphics.DrawRectangle(0, 0, sw, sh, new Color(0, 0, 0, 200));
+        // Overlay sfondo scuro (lascia scoperta la navbar in basso)
+        int overlayH = sh - Obj_GuiBottomNavigation.BAR_HEIGHT;
+        Graphics.DrawRectangle(0, 0, sw, overlayH, new Color(0, 0, 0, 200));
 
         // Particelle (sempre visibili)
         DrawParticles();
@@ -572,7 +585,7 @@ public class Obj_GuiPiantaggio : GameElement
 
         // Pannellino info in basso (piu alto per contenere le stats)
         int panelH = 160;
-        int panelY = sh - panelH - 5;
+        int panelY = sh - panelH - 5 - Obj_GuiBottomNavigation.BAR_HEIGHT;
         int panelX = 10;
         int panelW = sw - 20;
 

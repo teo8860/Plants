@@ -61,19 +61,8 @@ public class Obj_GuiMorte : GameElement
 
         if (canClick && (Input.IsMouseButtonPressed(MouseButton.Left) || Input.IsKeyPressed(KeyboardKey.Enter)))
         {
-            // Cancella il salvataggio
-            GameSave.DeleteSaveFile();
-
-            // Torna al mondo 0
-            WorldManager.SetCurrentWorld(WorldType.Terra);
-            Game.pianta.SetNaturalColors(WorldType.Terra);
-
-            // Reset camera
-            Rendering.camera.position.Y = 0;
-            Game.controller.targetScrollY = 0;
-
             Nascondi();
-            Game.EntraModalitaPiantaggio();
+            Game.OnDeathConfirmed();
         }
     }
 

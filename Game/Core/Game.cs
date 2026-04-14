@@ -31,6 +31,9 @@ public static class Game
     public static bool IsOfflineSimulation = false;
     public static bool IsModalitaPiantaggio = false;
 
+    public static bool pendingDeath = false;
+    public static HarvestResult pendingDeathHarvest = null;
+
     public static Obj_GuiPiantaggio guiPiantaggio;
     public static Obj_GuiMorte guiMorte;
 
@@ -466,5 +469,38 @@ public static class Game
         if (guiMorte.active) return; // gia' mostrata
         isPaused = true;
         guiMorte.Mostra();
+    }
+
+    public static void OnDeathConfirmed()
+    {
+        GameSave.DeleteSaveFile();
+
+        if (pianta != null)
+        {
+            pianta.Stats.Salute = 0;
+            pianta.Reset();
+        }
+
+        if (pendingDeathHarvest != null && pendingDeathHarvest.TotalLeaves > 0 && leafHarvestPopup != null)
+        {
+            leafHarvestPopup.ShowAfterDeath(pendingDeathHarvest);
+        }
+        else
+        {
+            FinalizeDeathReset();
+        }
+    }
+
+    public static void FinalizeDeathReset()
+    {
+        pendingDeath = false;
+        pendingDeathHarvest = null;
+
+        WorldManager.SetCurrentWorld(WorldType.Terra);
+        if (pianta != null) pianta.SetNaturalColors(WorldType.Terra);
+        Rendering.camera.position.Y = 0;
+        if (controller != null) controller.targetScrollY = 0;
+
+        EntraModalitaPiantaggio();
     }
 }

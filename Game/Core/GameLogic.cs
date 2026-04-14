@@ -532,15 +532,20 @@ public class GameLogicPianta
     {
         if (!IsViva)
         {
-            ItemHookCaller.CallOnEnd(pianta);
-
-            if (stats.FoglieAttuali > 0 && !Game.IsOfflineSimulation)
+            if (!Game.pendingDeath)
             {
-                LeafHarvestSystem.HarvestAndShow("Pianta morta");
+                Game.pendingDeath = true;
+                ItemHookCaller.CallOnEnd(pianta);
+
+                if (stats.FoglieAttuali > 0 && !Game.IsOfflineSimulation)
+                {
+                    Game.pendingDeathHarvest = LeafHarvestSystem.Harvest("Pianta morta");
+                }
             }
 
             if (!Game.IsOfflineSimulation && !Game.IsModalitaPiantaggio
-                && Game.guiMorte != null && !Game.guiMorte.active)
+                && Game.guiMorte != null && !Game.guiMorte.active
+                && Room.IsActive() && Room.GetActiveId() == Game.room_main.id)
             {
                 Game.MostraMorte();
             }

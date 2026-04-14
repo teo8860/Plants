@@ -21,7 +21,8 @@ public class Obj_GuiBottomNavigation : GameElement
     private List<NavTab> tabs = new();
     private NavigationTab currentTab = NavigationTab.MainGame;
 
-    private int barHeight = 35;
+    public const int BAR_HEIGHT = 35;
+    private int barHeight = BAR_HEIGHT;
     private int tabSpacing = 6;
     private int hoveredTabIndex = -1;
     private bool wasPressed = false;
