@@ -84,7 +84,8 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
-        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
+        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left)
+            && (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked);
 
         hoveredButton = -1;
 

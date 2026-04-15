@@ -541,6 +541,17 @@ public class GameLogicPianta
                 {
                     Game.pendingDeathHarvest = LeafHarvestSystem.Harvest("Pianta morta");
                 }
+
+                // Persisti subito lo stato "pianta morta": se il gioco viene chiuso
+                // in qualsiasi momento prima che l'utente pianti un nuovo seme, al
+                // riavvio si torna alla selezione del seme (preservando foglie,
+                // essence, upgrade, inventario, ecc.). I popup successivi sono
+                // pura conferma visiva.
+                if (!Game.IsOfflineSimulation)
+                {
+                    GameSave.get().data.PlantDead = true;
+                    GameSave.get().Save();
+                }
             }
 
             if (!Game.IsOfflineSimulation && !Game.IsModalitaPiantaggio

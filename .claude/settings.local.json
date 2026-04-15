@@ -11,7 +11,10 @@
       "WebFetch(domain:strategywiki.org)",
       "WebFetch(domain:en.wikibooks.org)",
       "Bash(sed -n '1,40p' C:/Dev/Plants/Game/Gui/Main/Obj_GuiToolbar.cs)",
-      "Bash(grep -n \"TargetX\\\\|TargetY\\\\|CurrentAlpha\\\\|public.*X\\\\|public.*Y\\\\|class GuiIconButton\" C:/Dev/Plants/Game/Gui/Main/*.cs)"
+      "Bash(grep -n \"TargetX\\\\|TargetY\\\\|CurrentAlpha\\\\|public.*X\\\\|public.*Y\\\\|class GuiIconButton\" C:/Dev/Plants/Game/Gui/Main/*.cs)",
+      "Bash(dotnet msbuild:*)",
+      "Bash(dotnet publish:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File check_subsystem.ps1)"
     ]
   }
 }

@@ -123,7 +123,11 @@ public static class Game
 
         Rendering.camera.position.Y = 0;
 
-        if (!hasSave)
+        // Nessun save, o save con pianta morta → selezione seme.
+        // In entrambi i casi i dati di progressione (foglie, essence, upgrade,
+        // inventario) vengono preservati se presenti nel save.
+        bool needsPiantaggio = !hasSave || GameSave.get().data.PlantDead;
+        if (needsPiantaggio)
         {
             WorldManager.SetCurrentWorld(WorldType.Terra);
             pianta.SetNaturalColors(WorldType.Terra);
@@ -237,41 +241,6 @@ public static class Game
 
         statsPanel = new Obj_GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
 
-        toolbar = new Obj_GuiToolbar(10, 5, buttonSize: 36, spacing: 4);
-        toolbar.depth = -50;
-
-        toolbar.SetIcons(
-            AssetLoader.spriteArrowDown,
-            AssetLoader.spriteArrowUp,
-            AssetLoader.spriteMenu
-        );
-
-        toolbar.AddActionButton(
-            AssetLoader.spritePhaseOff,
-            "Cambia Fase",
-            () => {
-                cambiaPhase = true;
-            }
-        );
-
-        toolbar.AddActionButton(
-            AssetLoader.spriteWeatherOff,
-            "Cambia Meteo",
-            () => {
-                WeatherManager.ForceWeatherChange();
-            }
-        );
-
-        toolbar.AddActionButton(
-            AssetLoader.spriteWorldIcon,
-            "Cambia Mondo",
-            () => {
-                WorldManager.PrepareNextWorld();
-                WorldManager.SetNextWorld();
-                pianta.Reset();
-                pianta.SetNaturalColors(WorldManager.GetCurrentWorld());
-            }
-        );
 
         // Toolbar in basso a destra con innaffiatoio - dropdown verso l'alto, aperta di default
         int bottomToolbarX = Rendering.camera.screenWidth - 46;
@@ -473,8 +442,10 @@ public static class Game
 
     public static void OnDeathConfirmed()
     {
-        GameSave.DeleteSaveFile();
-
+        // Il save e' stato gia' persistito con PlantDead=true al momento della
+        // morte (vedi GameLogic.AggiornaTutto). Non cancelliamo il file: serve
+        // per preservare foglie accumulate, essence, upgrade, ecc. Il flag
+        // PlantDead garantisce che al prossimo avvio si entri in piantaggio.
         if (pianta != null)
         {
             pianta.Stats.Salute = 0;

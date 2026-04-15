@@ -21,8 +21,8 @@ public class Obj_Plant : GameElement
     public List<Vector2> puntiSpline = new();
     private const int margineMinimo = 40;
 
-    private List<Obj_Ramo> rami = new();
-    private List<Obj_Radice> radici = new();
+    public List<Obj_Ramo> rami = new();
+    public List<Obj_Radice> radici = new();
     private int contatorePuntiPerRamo = 0;
     private int contatorePuntiPerRadice = 0;
 

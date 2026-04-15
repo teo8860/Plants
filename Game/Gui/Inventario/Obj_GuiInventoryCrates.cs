@@ -46,6 +46,10 @@ public class Obj_GuiInventoryCrates : GameElement
     public SeedRarity? SelectedRarity { get; private set; } = null;
     public bool IsInventoryOpen { get; private set; } = false;
 
+    // Blocca i click per 1 frame dopo l'apertura dell'inventario
+    private int clickCooldownFrames = 0;
+    public bool IsClickBlocked => clickCooldownFrames > 0;
+
     public Obj_GuiInventoryCrates() : base()
     {
         this.roomId = Game.room_inventory.id;
@@ -55,6 +59,9 @@ public class Obj_GuiInventoryCrates : GameElement
 
     public override void Update()
     {
+        if (clickCooldownFrames > 0)
+            clickCooldownFrames--;
+
         if (IsInventoryOpen)
         {
             // Chiudi inventario
@@ -92,6 +99,7 @@ public class Obj_GuiInventoryCrates : GameElement
     {
         SelectedRarity = rarity;
         IsInventoryOpen = true;
+        clickCooldownFrames = 2;
 
         if (Game.inventoryGrid != null)
         {
@@ -218,8 +226,8 @@ public class Obj_GuiInventoryCrates : GameElement
             new Vector2(x + width, y + height)
         };
 
-        Graphics.DrawTriangle(sidePoints[0], sidePoints[1], sidePoints[2], crateSide);
-        Graphics.DrawTriangle(sidePoints[0], sidePoints[2], sidePoints[3], crateSide);
+        Graphics.DrawTriangle(sidePoints[2], sidePoints[1], sidePoints[0], crateSide);
+        Graphics.DrawTriangle(sidePoints[0], sidePoints[3], sidePoints[2], crateSide);
 
         // Linee laterali
         Graphics.DrawLineEx(sidePoints[0], sidePoints[1], 1, new Color(woodMedium.R, woodMedium.G, woodMedium.B, 100));

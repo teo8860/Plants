@@ -32,6 +32,7 @@ public class Obj_GuiPiantaggio : GameElement
     public bool isFalling = false;
     private float fallSemeY = 0f;
     private float fallSemeX = 0f;
+    private float fallStartY = 0f;
     private float fallTargetY = 0f;
     private float fallSpeed = 0f;
     private Seed fallingSeed = null;
@@ -39,6 +40,10 @@ public class Obj_GuiPiantaggio : GameElement
     private float fallOscillation = 0f;
     private bool fallImpacted = false;
     private float postImpactTimer = 0f;
+    private float fallElapsed = 0f; // tempo dall'inizio animazione (per skip)
+    private const float FALL_SCALE_START = 3.0f;
+    private const float FALL_SCALE_END = 1.5f;
+    private const float FALL_SKIP_DELAY = 0.3f;
 
     // Particelle
     private List<TutorialParticle> particles = new();
@@ -141,7 +146,9 @@ public class Obj_GuiPiantaggio : GameElement
             seedVisual.guiLayer = true;
             seedVisual.persistent = true;
             seedVisual.roomId = uint.MaxValue;
-            seedVisual.active = true;
+            // active=false: il render loop automatico li ignora, vengono disegnati
+            // manualmente da DrawGrid() con il corretto culling dello scroll
+            seedVisual.active = false;
             seedVisual.position = new Vector2(x + (cellSize / 2), y + (cellSize / 2));
 
             seedVisual.dati = seeds[i];
@@ -290,11 +297,15 @@ public class Obj_GuiPiantaggio : GameElement
         fallImpacted = false;
         fallingSeed = seed;
         fallSemeX = sw / 2f;
-        fallSemeY = -20f;
-        fallTargetY = sh / 2f + 40f;
+        fallStartY = -20f;
+        fallSemeY = fallStartY;
+        // Punto di atterraggio piu' in basso, dove si trova il terreno visibile
+        // dietro l'overlay (coerente con il tutorial che usa ~350 su schermo 500).
+        fallTargetY = sh - 150f;
         fallSpeed = 0f;
         fallOscillation = 0f;
         postImpactTimer = 0f;
+        fallElapsed = 0f;
         particles.Clear();
 
         // Nascondi la griglia visuale
@@ -303,12 +314,13 @@ public class Obj_GuiPiantaggio : GameElement
 
         // Crea il seme visuale che cade
         fallingSeedVisual = new Obj_Seed();
-        fallingSeedVisual.scale = 3.0f;
+        fallingSeedVisual.scale = FALL_SCALE_START;
         fallingSeedVisual.depth = -2002;
         fallingSeedVisual.guiLayer = true;
         fallingSeedVisual.persistent = true;
         fallingSeedVisual.roomId = uint.MaxValue;
-        fallingSeedVisual.active = true;
+        // active=false: evita il doppio disegno (render loop + DrawFalling)
+        fallingSeedVisual.active = false;
         fallingSeedVisual.dati = seed;
         fallingSeedVisual.color = seed.color;
         fallingSeedVisual.position = new Vector2(fallSemeX, fallSemeY);
@@ -316,6 +328,16 @@ public class Obj_GuiPiantaggio : GameElement
 
     private void UpdateFalling(float deltaTime)
     {
+        fallElapsed += deltaTime;
+
+        // Skip con click dopo un breve delay iniziale: salta direttamente a Pianta
+        if (fallElapsed > FALL_SKIP_DELAY && Input.IsMouseButtonPressed(MouseButton.Left))
+        {
+            DestroyFallingSeed();
+            Pianta(fallingSeed);
+            return;
+        }
+
         if (!fallImpacted)
         {
             fallOscillation += deltaTime * 6f;
@@ -325,9 +347,6 @@ public class Obj_GuiPiantaggio : GameElement
             fallSpeed += 200f * deltaTime;
             fallSemeY += fallSpeed * deltaTime;
 
-            if (fallingSeedVisual != null)
-                fallingSeedVisual.position = new Vector2(fallSemeX, fallSemeY);
-
             if (fallSemeY >= fallTargetY)
             {
                 fallSemeY = fallTargetY;
@@ -336,9 +355,17 @@ public class Obj_GuiPiantaggio : GameElement
 
                 // Particelle impatto
                 SpawnImpactParticles(fallSemeX, fallTargetY);
+            }
 
-                if (fallingSeedVisual != null)
-                    fallingSeedVisual.position = new Vector2(fallSemeX, fallSemeY);
+            if (fallingSeedVisual != null)
+            {
+                fallingSeedVisual.position = new Vector2(fallSemeX, fallSemeY);
+                // Shrink progressivo con la profondita' (prospettiva)
+                float range = fallTargetY - fallStartY;
+                float progress = range > 0f
+                    ? Math.Clamp((fallSemeY - fallStartY) / range, 0f, 1f)
+                    : 1f;
+                fallingSeedVisual.scale = MathHelper.Lerp(FALL_SCALE_START, FALL_SCALE_END, progress);
             }
         }
         else
@@ -572,6 +599,20 @@ public class Obj_GuiPiantaggio : GameElement
             if (y + cellSize < startY - 10 || y > sh - 215) continue;
 
             visualSeeds[i].Draw();
+        }
+
+        // Scrollbar
+        int listY = startY;
+        int listH = sh - 215 - startY;
+        int contentH = rows * (cellSize + spacing);
+        if (contentH > listH && listH > 0)
+        {
+            int gridW = columns * (cellSize + spacing) - spacing;
+            int sbX = gridStartX + gridW + 2;
+            int sbH = Math.Max(12, listH * listH / contentH);
+            float progress = (float)(-scrollY) / (contentH - listH);
+            int sbY = listY + (int)(progress * (listH - sbH));
+            Graphics.DrawRectangle(sbX, sbY, 2, sbH, new Color(120, 140, 100, 200));
         }
     }
 

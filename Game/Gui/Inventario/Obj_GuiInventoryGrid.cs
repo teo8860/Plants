@@ -19,6 +19,11 @@ public class Obj_GuiInventoryGrid : GameElement
     private int scrollY = 0;
     private int bottomMargin = 45; // Spazio per la barra di navigazione (35px + padding)
 
+    private int scrollbarWidth = 5;
+    private int scrollbarPadding = 3;
+    private bool isDraggingScrollbar = false;
+    private float dragMouseOffsetFromThumbTop = 0;
+
     private int selectedIndex = -1;
     private int hoveredIndex = -1;
 
@@ -94,6 +99,68 @@ public class Obj_GuiInventoryGrid : GameElement
         return Math.Max(1, usableHeight / (cellSize + spacing));
     }
 
+    private int GetVisibleHeight()
+    {
+        return Rendering.camera.screenHeight - startY - bottomMargin;
+    }
+
+    private int GetContentHeight()
+    {
+        int columns = GetCurrentColumns();
+        int rows = (int)Math.Ceiling((float)filteredSeeds.Count / columns);
+        return rows * (cellSize + spacing);
+    }
+
+    private int GetMaxScrollY()
+    {
+        return Math.Min(0, GetVisibleHeight() - GetContentHeight());
+    }
+
+    private int GetGridMaxX()
+    {
+        return detailPanel != null
+            ? GameProperties.windowWidth - detailPanel.panelWidth
+            : GameProperties.windowWidth;
+    }
+
+    private void ApplyScrollToSeeds()
+    {
+        int columns = GetCurrentColumns();
+        for (int i = 0; i < visualSeedList.Count; i++)
+        {
+            int col = i % columns;
+            int row = i / columns;
+            visualSeedList[i].position.Y =
+                startY + row * (cellSize + spacing) + scrollY + (cellSize / 2);
+        }
+    }
+
+    private Rectangle GetScrollbarTrackRect()
+    {
+        int maxX = GetGridMaxX();
+        int trackX = maxX - scrollbarWidth - scrollbarPadding;
+        int trackY = startY;
+        int trackH = GetVisibleHeight();
+        return new Rectangle(trackX, trackY, scrollbarWidth, trackH);
+    }
+
+    private Rectangle GetScrollbarThumbRect()
+    {
+        var track = GetScrollbarTrackRect();
+        int contentHeight = GetContentHeight();
+        int visibleHeight = GetVisibleHeight();
+
+        if (contentHeight <= visibleHeight || contentHeight <= 0)
+            return new Rectangle(track.X, track.Y, track.Width, track.Height);
+
+        float ratio = (float)visibleHeight / contentHeight;
+        int thumbH = Math.Max(12, (int)(track.Height * ratio));
+        int scrollRange = contentHeight - visibleHeight;
+        float scrollProgress = scrollRange > 0 ? (-scrollY) / (float)scrollRange : 0f;
+        int thumbY = (int)(track.Y + (track.Height - thumbH) * scrollProgress);
+        return new Rectangle(track.X, thumbY, track.Width, thumbH);
+    }
+
     public void Populate()
     {
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
@@ -122,6 +189,7 @@ public class Obj_GuiInventoryGrid : GameElement
                 roomId = Game.room_inventory.id,
                 scale = 1.8f,
                 depth = -50,
+                drawManually = true,
                 position = new Vector2(x + (cellSize / 2), y + (cellSize / 2))
             };
 
@@ -138,40 +206,81 @@ public class Obj_GuiInventoryGrid : GameElement
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
             return;
 
+        int mx = Input.GetMouseX();
+        int my = Input.GetMouseY();
+
+        // === Scrollbar drag ===
+        var track = GetScrollbarTrackRect();
+        var thumb = GetScrollbarThumbRect();
+        int contentHeight = GetContentHeight();
+        int visibleHeight = GetVisibleHeight();
+        bool hasOverflow = contentHeight > visibleHeight;
+
+        if (isDraggingScrollbar)
+        {
+            if (!Input.IsMouseButtonDown(MouseButton.Left))
+            {
+                isDraggingScrollbar = false;
+            }
+            else if (hasOverflow)
+            {
+                int thumbH = (int)thumb.Height;
+                int trackRange = (int)track.Height - thumbH;
+                if (trackRange > 0)
+                {
+                    int scrollRange = contentHeight - visibleHeight;
+                    int thumbYTarget = (int)Math.Clamp(my - dragMouseOffsetFromThumbTop, track.Y, track.Y + trackRange);
+                    float p = (thumbYTarget - track.Y) / (float)trackRange;
+                    scrollY = Math.Clamp((int)(-p * scrollRange), -scrollRange, 0);
+                    ApplyScrollToSeeds();
+                }
+            }
+        }
+        else if (Input.IsMouseButtonPressed(MouseButton.Left) && hasOverflow
+            && mx >= track.X && mx <= track.X + track.Width
+            && my >= track.Y && my <= track.Y + track.Height
+            && (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked))
+        {
+            if (my >= thumb.Y && my <= thumb.Y + thumb.Height)
+            {
+                isDraggingScrollbar = true;
+                dragMouseOffsetFromThumbTop = my - thumb.Y;
+            }
+            else
+            {
+                // Jump: centra il thumb sul click
+                int thumbH = (int)thumb.Height;
+                int trackRange = (int)track.Height - thumbH;
+                int thumbYTarget = (int)Math.Clamp(my - thumbH / 2, track.Y, track.Y + trackRange);
+                int scrollRange = contentHeight - visibleHeight;
+                float p = trackRange > 0 ? (thumbYTarget - track.Y) / (float)trackRange : 0f;
+                scrollY = Math.Clamp((int)(-p * scrollRange), -scrollRange, 0);
+                ApplyScrollToSeeds();
+                isDraggingScrollbar = true;
+                dragMouseOffsetFromThumbTop = thumbH / 2;
+            }
+        }
+
+        // === Mouse wheel scroll ===
         float wheelDelta = Input.GetMouseWheelMove();
 
         if (wheelDelta != 0)
         {
             scrollY += (int)(wheelDelta * 20);
-
-            int columns = GetCurrentColumns();
-            int rows = (int)Math.Ceiling((float)visualSeedList.Count / columns);
-
-            int contentHeight = rows * (cellSize + spacing);
-            int visibleHeight = Rendering.camera.screenHeight - startY;
-
-            int minScroll = Math.Min(0, visibleHeight - contentHeight);
-            int maxScroll = 0;
-
-            scrollY = Math.Clamp(scrollY, minScroll, maxScroll);
-
-            for (int i = 0; i < visualSeedList.Count; i++)
-            {
-                int col = i % columns;
-                int row = i / columns;
-
-                visualSeedList[i].position.Y =
-                    startY + row * (cellSize + spacing) + scrollY + (cellSize / 2);
-            }
+            scrollY = Math.Clamp(scrollY, GetMaxScrollY(), 0);
+            ApplyScrollToSeeds();
         }
 
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
+        // === Cell hover / click ===
+        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left)
+            && !isDraggingScrollbar
+            && (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked);
 
         hoveredIndex = -1;
 
         int columnsCurrent = GetCurrentColumns();
+        int gridTop = startY;
+        int gridBottom = startY + visibleHeight;
         var fusionManager = SeedFusionManager.Get();
 
         for (int i = 0; i < visualSeedList.Count; i++)
@@ -182,7 +291,12 @@ public class Obj_GuiInventoryGrid : GameElement
             int x = startX + col * (cellSize + spacing);
             int y = startY + row * (cellSize + spacing) + scrollY;
 
-            if (mx >= x && mx <= x + cellSize && my >= y && my <= y + cellSize)
+            // Skip cells outside visible area (clipped by scissor)
+            if (y + cellSize <= gridTop || y >= gridBottom)
+                continue;
+
+            if (mx >= x && mx <= x + cellSize && my >= y && my <= y + cellSize
+                && my >= gridTop && my <= gridBottom)
             {
                 hoveredIndex = i;
 
@@ -209,9 +323,18 @@ public class Obj_GuiInventoryGrid : GameElement
             return;
 
         int columns = GetCurrentColumns();
-        int maxX = detailPanel != null
-            ? GameProperties.windowWidth - detailPanel.panelWidth
-            : GameProperties.windowWidth;
+        int maxX = GetGridMaxX();
+        int visibleHeight = GetVisibleHeight();
+
+        // Riserva spazio per la scrollbar se c'è overflow
+        int contentHeight = GetContentHeight();
+        bool hasOverflow = contentHeight > visibleHeight;
+        int gridRight = hasOverflow ? maxX - scrollbarWidth - scrollbarPadding * 2 : maxX;
+
+        // Scissor clip: celle e semi tagliati ai bordi della griglia visibile
+        int scissorX = startX - 2;
+        int scissorW = Math.Max(1, gridRight - scissorX);
+        Graphics.BeginScissorMode(scissorX, startY, scissorW, visibleHeight);
 
         int rows = (int)Math.Ceiling((float)filteredSeeds.Count / columns);
         var fusionManager = SeedFusionManager.Get();
@@ -227,7 +350,11 @@ public class Obj_GuiInventoryGrid : GameElement
                 int x = startX + col * (cellSize + spacing);
                 int y = startY + row * (cellSize + spacing) + scrollY;
 
-                if (x + cellSize > maxX)
+                if (x + cellSize > gridRight)
+                    continue;
+
+                // Skip righe completamente fuori (ottimizzazione)
+                if (y + cellSize < startY || y > startY + visibleHeight)
                     continue;
 
                 Seed seed = filteredSeeds[i];
@@ -281,13 +408,40 @@ public class Obj_GuiInventoryGrid : GameElement
         for (int i = 0; i < visualSeedList.Count; i++)
         {
             int col = i % columns;
+            int row = i / columns;
             int x = startX + col * (cellSize + spacing);
+            int y = startY + row * (cellSize + spacing) + scrollY;
 
-            if (x + cellSize > maxX)
+            if (x + cellSize > gridRight)
                 continue;
 
-            visualSeedList[i].Draw();
+            // Skip semi completamente fuori dall'area visibile
+            if (y + cellSize < startY || y > startY + visibleHeight)
+                continue;
+
+            visualSeedList[i].DrawNow();
         }
+
+        Graphics.EndScissorMode();
+
+        if (hasOverflow)
+            DrawScrollbar();
+    }
+
+    private void DrawScrollbar()
+    {
+        var track = GetScrollbarTrackRect();
+        var thumb = GetScrollbarThumbRect();
+
+        Color trackBg = new Color(41, 26, 17, 200);
+        Color thumbBg = isDraggingScrollbar
+            ? new Color(200, 150, 80, 255)
+            : new Color(139, 90, 55, 240);
+        Color thumbBorder = new Color(62, 39, 25, 255);
+
+        Graphics.DrawRectangleRounded(track, 0.4f, 4, trackBg);
+        Graphics.DrawRectangleRounded(thumb, 0.4f, 4, thumbBg);
+        Graphics.DrawRectangleRoundedLines(thumb, 0.4f, 4, 1, thumbBorder);
     }
 
     private void DrawFusionBar(int x, int y, int fusionCount)

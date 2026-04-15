@@ -16,7 +16,8 @@ public class Obj_Seed : GameElement
 	public Seed dati;
 	public Vector2 position = new Vector2(0,0);
 	public float scale = 8;
-	public Vector3 color = new Vector3( 0.0f, 1.0f, 1.0f ); 
+	public Vector3 color = new Vector3( 0.0f, 1.0f, 1.0f );
+	public bool drawManually = false;
 	double time = 0;
 
 	int un_time = AssetLoader.shaderSeed.GetLocation("time");
@@ -45,6 +46,12 @@ public class Obj_Seed : GameElement
 	}
 
 	public override void Draw()
+	{
+		if (drawManually) return;
+		DrawNow();
+	}
+
+	public void DrawNow()
 	{
 
         Graphics.BeginShaderMode(AssetLoader.shaderSeed);

@@ -46,7 +46,7 @@ public class Obj_GuiScrollbar : GameElement
     public override void Draw()
     {
         int trackTop = Rendering.camera.screenHeight - 45;
-        int trackBottom = 50;
+        int trackBottom = 15;
         int trackHeight = trackTop - trackBottom;
         int trackX = 10;
         int trackWidth = 6;
@@ -59,7 +59,7 @@ public class Obj_GuiScrollbar : GameElement
 
         DrawCurrentMarker(trackX, trackBottom, trackWidth, trackHeight);
 
-        DrawAltitudeInfo(20,57);
+        DrawAltitudeInfo(20,22);
     }
 
     private void DrawTrackBackground(int x, int y, int width, int height)

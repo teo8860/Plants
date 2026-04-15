@@ -106,7 +106,10 @@ internal static class Program
 
         trayIcon.OnExit  += () =>
         {
-            GameSave.get().Save();
+            // Non salvare durante la selezione del seme: il save e' stato appena
+            // cancellato dalla morte e salverebbe dati stale della vecchia pianta
+            if (!Game.IsModalitaPiantaggio)
+                GameSave.get().Save();
             NotificationManager.Cleanup();
             trayIcon.Dispose();
             Window.Close();

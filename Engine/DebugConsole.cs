@@ -50,6 +50,8 @@ public static class DebugConsole
         "godmode",
         "minigame start",
         "minigame end",
+        "add golden leaf",
+        "plant info",
         "help"
     };
 
@@ -539,6 +541,14 @@ public static class DebugConsole
             {
                 CmdGodMode();
             }
+            else if (input == "add golden leaf")
+            {
+                CmdAddGoldenLeaf();
+            }
+            else if (input == "plant info")
+            {
+                CmdPlantInfo();
+            }
             else if (input == "minigame end")
             {
                 CmdMinigameEnd();
@@ -595,6 +605,8 @@ public static class DebugConsole
         outputLines.Add("  tick reset          - Reset tick to default (1000ms)");
         outputLines.Add("  kill                - Kill the plant instantly");
         outputLines.Add("  godmode             - Toggle god mode (no damage, only growth)");
+        outputLines.Add("  add golden leaf      - Spawn a golden leaf on a random branch");
+        outputLines.Add("  plant info           - Print plant and seed info to console");
         outputLines.Add("  minigame start <t>  - Start a minigame (Blackjack, Cerchio, etc.)");
         outputLines.Add("  minigame end        - Stop all active minigames");
     }
@@ -788,5 +800,30 @@ public static class DebugConsole
             Game.pianta.Stats.IntensitaInfestazione = 0f;
         }
         outputLines.Add($"[OK] God mode {(GodMode ? "ON" : "OFF")}");
+    }
+
+    private static void CmdAddGoldenLeaf()
+    {
+        if (Game.pianta == null) { outputLines.Add("[ERR] No plant exists."); return; }
+        if (Game.pianta.rami.Count == 0) { outputLines.Add("[ERR] Plant has no branches."); return; }
+        Game.pianta.RendiFogliaDorataCasuale();
+        outputLines.Add("[OK] Golden leaf spawned on a random branch.");
+    }
+
+    private static void CmdPlantInfo()
+    {
+        if (Game.pianta == null) { outputLines.Add("[ERR] No plant exists."); return; }
+
+        var p = Game.pianta;
+        var s = p.Stats;
+        var b = p.seedBonus;
+
+        outputLines.Add($"[OK] --- Plant: {p.TipoSeme} ({Seed.GetRarityFromType(p.TipoSeme)}) ---");
+        outputLines.Add($"  H:{s.Altezza:F0}/{s.EffectiveMaxHeight:F0}  HP:{s.Salute:P0}  Water:{s.Idratazione:P0}  O2:{s.Ossigeno:P0}");
+        outputLines.Add($"  Meta:{s.Metabolismo:F2}  Temp:{s.Temperatura:F1}C  Infested:{s.Infestata}({s.IntensitaInfestazione:P0})");
+        outputLines.Add($"  Leaves:{s.FoglieAttuali} cur/{s.FoglieAccumulate} harv  Branches:{p.rami.Count}  Roots:{p.radici.Count}");
+        outputLines.Add($"  --- Seed Bonus (fusions:{b.fusionCount}/{Seed.MAX_FUSIONS}) ---");
+        outputLines.Add($"  VIT:{b.vitalita:F2} HYD:{b.idratazione:F2} VEG:{b.vegetazione:F2} META:{b.metabolismo:F2}");
+        outputLines.Add($"  Cold:{b.resistenzaFreddo:F2} Heat:{b.resistenzaCaldo:F2} Para:{b.resistenzaParassiti:F2} Vac:{b.resistenzaVuoto:F2}");
     }
 }

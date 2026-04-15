@@ -228,21 +228,21 @@ void main()
 
 	if(type == 7) // RAPIDO
 	{
-		vec3 baseColor = vec3(0.710, 0.588, 0.588);
+		vec3 baseColor = vec3(0.410, 0.888, 0.888);
 		realPixel.rgb *= baseColor;
 	}
 	
 
 	if(type == 8) // ANTICO
 	{
-		vec3 baseColor = vec3(0.710, 0.588, 0.588);
+		vec3 baseColor = vec3(0.910, 0.488, 0.588);
 		realPixel.rgb *= baseColor;
 	}
 	
 
 	if(type == 9) // COSMICO
 	{
-		vec3 baseColor = vec3(0.710, 0.588, 0.588);
+		vec3 baseColor = vec3(0.710, 0.588, 0.988);
 		realPixel.rgb *= baseColor;
 
 		vec2 p=fragTexCoord-vec2(12.,0.);

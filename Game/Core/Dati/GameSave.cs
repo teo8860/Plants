@@ -60,6 +60,12 @@ public class GameSaveData
 
     public PlantSaveData Plant { get; set; }
 
+    // Quando true, al prossimo avvio il gioco entra in ModalitaPiantaggio
+    // ignorando la geometria salvata (ma preservando FoglieAccumulate, essence,
+    // upgrade, ecc.). Viene impostato alla morte della pianta e azzerato quando
+    // si pianta un nuovo seme.
+    public bool PlantDead { get; set; } = false;
+
 	public GameSaveData()
     {
         Version = "1.0.0";
@@ -140,7 +146,7 @@ public class GameSave
         Game.pianta.equippedItemIds = saveData.PlantEquippedItems ?? new List<string> { null, null, null };
         Game.pianta.rseed = saveData.randomSeed;
 
-        if (saveData.Plant != null && saveData.Plant.PuntiSpline.Count > 0)
+        if (!saveData.PlantDead && saveData.Plant != null && saveData.Plant.PuntiSpline.Count > 0)
         {
             Game.pianta.RestoreFromSaveData(saveData.Plant);
             int ramiMassimi = Math.Max(1, Game.pianta.proprieta.FoglieMassime / 5);
