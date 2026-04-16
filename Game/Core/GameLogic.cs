@@ -9,27 +9,29 @@ public class GameLogicPianta
     public int contatoreSecondi = 0;
     public PlantEventSystem EventSystem { get; set; }
 
-    public const float CONSUMO_ACQUA_BASE = 0.0012f;
-    public const float CONSUMO_OSSIGENO_BASE = 0.0006f;
-    public const float CONSUMO_ENERGIA_BASE = 0.0008f;
-    public const float RIGENERAZIONE_SALUTE_BASE = 0.0006f;
+    // Alias alle costanti centrali in ClimateDefinitions (per retrocompatibilità
+    // con eventuali riferimenti esterni come LeafHarvestSystem)
+    public const float CONSUMO_ACQUA_BASE         = ClimateDefinitions.CONSUMO_ACQUA_BASE;
+    public const float CONSUMO_OSSIGENO_BASE       = ClimateDefinitions.CONSUMO_OSSIGENO_BASE;
+    public const float CONSUMO_ENERGIA_BASE        = ClimateDefinitions.CONSUMO_ENERGIA_BASE;
+    public const float RIGENERAZIONE_SALUTE_BASE   = ClimateDefinitions.RIGENERAZIONE_SALUTE_BASE;
 
-    public const float SOGLIA_DISIDRATAZIONE = 0.85f;
-    public const float SOGLIA_SOFFOCAMENTO = 0.15f;
-    public const float SOGLIA_CRITICA_SALUTE = 0.20f;
-    public const float SOGLIA_FAME_ENERGIA = 0.10f;
+    public const float SOGLIA_DISIDRATAZIONE   = ClimateDefinitions.SOGLIA_DISIDRATAZIONE;
+    public const float SOGLIA_SOFFOCAMENTO     = ClimateDefinitions.SOGLIA_SOFFOCAMENTO;
+    public const float SOGLIA_CRITICA_SALUTE   = ClimateDefinitions.SOGLIA_CRITICA_SALUTE;
+    public const float SOGLIA_FAME_ENERGIA     = ClimateDefinitions.SOGLIA_FAME_ENERGIA;
 
-    public const float TEMPERATURA_GELIDA = -15.0f;
-    public const float TEMPERATURA_FREDDA = 2.0f;
-    public const float TEMPERATURA_FRESCA = 10.0f;
-    public const float TEMPERATURA_IDEALE_MIN = 18.0f;
-    public const float TEMPERATURA_IDEALE_MAX = 26.0f;
-    public const float TEMPERATURA_CALDA = 34.0f;
-    public const float TEMPERATURA_TORRIDA = 45.0f;
+    public const float TEMPERATURA_GELIDA     = ClimateDefinitions.TEMPERATURA_GELIDA;
+    public const float TEMPERATURA_FREDDA     = ClimateDefinitions.TEMPERATURA_FREDDA;
+    public const float TEMPERATURA_FRESCA     = ClimateDefinitions.TEMPERATURA_FRESCA;
+    public const float TEMPERATURA_IDEALE_MIN = ClimateDefinitions.TEMPERATURA_IDEALE_MIN;
+    public const float TEMPERATURA_IDEALE_MAX = ClimateDefinitions.TEMPERATURA_IDEALE_MAX;
+    public const float TEMPERATURA_CALDA      = ClimateDefinitions.TEMPERATURA_CALDA;
+    public const float TEMPERATURA_TORRIDA    = ClimateDefinitions.TEMPERATURA_TORRIDA;
 
-    public const float PROBABILITA_PARASSITI_BASE = 0.0006f;
-    public const float DANNO_PARASSITI_BASE = 0.006f;
-    public const float DROP_FOGLIE_BASE = 0.004f;
+    public const float PROBABILITA_PARASSITI_BASE = ClimateDefinitions.PROBABILITA_PARASSITI_BASE;
+    public const float DANNO_PARASSITI_BASE       = ClimateDefinitions.DANNO_PARASSITI_BASE;
+    public const float DROP_FOGLIE_BASE           = ClimateDefinitions.DROP_FOGLIE_BASE;
 
     public GameLogicPianta(Obj_Plant Pianta)
     {
@@ -37,15 +39,8 @@ public class GameLogicPianta
         EventSystem = new PlantEventSystem(this);
     }
 
-    private static readonly Dictionary<DayPhase, float> TemperatureBaseFase = new()
-    {
-        { DayPhase.Night, 10f },
-        { DayPhase.Dawn, 13f },
-        { DayPhase.Morning, 18f },
-        { DayPhase.Afternoon, 24f },
-        { DayPhase.Dusk, 19f },
-        { DayPhase.Evening, 14f }
-    };
+    private static Dictionary<DayPhase, float> TemperatureBaseFase
+        => ClimateDefinitions.TemperatureBaseFase;
 
     public SeedStats bonus => pianta.seedBonus;
     public PlantStats stats => pianta.Stats;
@@ -81,16 +76,7 @@ public class GameLogicPianta
 
         if (worldMod.IsMeteoOn)
         {
-            tempBase += meteo switch
-            {
-                Weather.Sunny => 4f,
-                Weather.Cloudy => -2f,
-                Weather.Rainy => -5f,
-                Weather.Stormy => -8f,
-                Weather.Foggy => -3f,
-                Weather.Snowy => -15f,
-                _ => 0f
-            };
+            tempBase += ClimateDefinitions.WeatherTemperatureModifiers.GetValueOrDefault(meteo, 0f);
         }
 
         tempBase += worldMod.TemperatureModifier;
@@ -357,28 +343,13 @@ public class GameLogicPianta
 
     public float CalcolaFotosintesi(DayPhase fase, Weather meteo, WorldModifier worldMod)
     {
-        float energiaBase = fase switch
-        {
-            DayPhase.Morning => 0.002f,
-            DayPhase.Afternoon => 0.0025f,
-            DayPhase.Dawn => 0.001f,
-            DayPhase.Dusk => 0.001f,
-            _ => -0.0005f
-        };
+        float energiaBase = ClimateDefinitions.FotosinteisiEnergia.GetValueOrDefault(fase, -0.0005f);
 
         energiaBase *= worldMod.SolarMultiplier;
 
         if (worldMod.IsMeteoOn)
         {
-            energiaBase *= meteo switch
-            {
-                Weather.Foggy => 0.3f,
-                Weather.Cloudy => 0.5f,
-                Weather.Rainy => 0.35f,
-                Weather.Stormy => 0.15f,
-                Weather.Snowy => 0.4f,
-                _ => 1.0f
-            };
+            energiaBase *= ClimateDefinitions.WeatherFotosinteisiMult.GetValueOrDefault(meteo, 1.0f);
         }
 
         if (IsFredda) energiaBase *= 0.5f;
@@ -631,9 +602,9 @@ public class GameLogicPianta
         if (IsFame) status += "FAME ";
         if (stats.Infestata) status += $"INFESTATO ({stats.IntensitaInfestazione:P0}) ";
 
-        string difficolta = WorldManager.GetDifficultyName(worldMod.Difficulty);
+        string difficolta = WorldDefinitions.GetDifficultyName(worldMod.Difficulty);
 
-        return $"[{SeedDataType.GetName(Game.pianta.TipoSeme)}] - {difficolta}\n" +
+        return $"[{SeedDefinitions.GetSeedName(Game.pianta.TipoSeme)}] - {difficolta}\n" +
                $"Salute: {PercentualeSalute:P0}\n" +
                $"Idratazione: {stats.Idratazione:P0}\n" +
                $"Ossigeno: {stats.Ossigeno:P0}\n" +

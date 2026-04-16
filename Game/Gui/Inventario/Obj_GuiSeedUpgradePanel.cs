@@ -262,8 +262,8 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         Graphics.DrawText(title, panelX + panelWidth / 2 - 60, panelY + 20, 14, Color.White);
 
         // Rarità
-        Color rarityColor = SeedRarityHelper.GetColor(currentSeed.rarity);
-        string rarityText = SeedRarityHelper.GetName(currentSeed.rarity);
+        Color rarityColor = SeedDefinitions.GetRarityColor(currentSeed.rarity);
+        string rarityText = SeedDefinitions.GetRarityName(currentSeed.rarity);
         Graphics.DrawText(rarityText, panelX + panelWidth / 2 - rarityText.Length * 3, panelY + 40, 10, rarityColor);
     }
 

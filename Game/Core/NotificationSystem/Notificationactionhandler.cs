@@ -134,7 +134,7 @@ public static class NotificationActionHandler
             Game.pianta.SetNaturalColors(WorldManager.GetCurrentWorld());
         }
 
-        Console.WriteLine($"Viaggio verso {WorldManager.GetWorldName(WorldManager.GetCurrentWorld())}!");
+        Console.WriteLine($"Viaggio verso {WorldDefinitions.GetWorldName(WorldManager.GetCurrentWorld())}!");
 
         // Mostra la finestra del gioco
         OpenGame();

@@ -97,12 +97,12 @@ public class Obj_GuiScrollbar : GameElement
                 Color textColor = new Color(255, 255, 255, 255);
                 if (milestone.name == "Inizio")
                 { 
-                    Graphics.DrawText(WorldManager.GetWorldName(WorldManager.GetCurrentWorld()), x + 2, markerY - 4, 8, textColor);
+                    Graphics.DrawText(WorldDefinitions.GetWorldName(WorldManager.GetCurrentWorld()), x + 2, markerY - 4, 8, textColor);
                     continue;
                 }
                 if (milestone.name == "Fine")
                 {
-                    Graphics.DrawText(WorldManager.GetWorldName(WorldManager.GetNextWorld(WorldManager.GetCurrentWorld())), x + 2, markerY - 8, 8, textColor);
+                    Graphics.DrawText(WorldDefinitions.GetWorldName(WorldDefinitions.GetNextWorld(WorldManager.GetCurrentWorld())), x + 2, markerY - 8, 8, textColor);
                     continue;
                 }
                 Graphics.DrawText(milestone.name, x + 2, markerY - 4, 8, textColor);

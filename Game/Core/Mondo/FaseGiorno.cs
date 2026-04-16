@@ -2,27 +2,6 @@ using System;
 
 namespace Plants;
 
-public enum DayPhase
-{
-    Night,      // 0:00 - 5:59
-    Dawn,       // 6:00 - 7:59
-    Morning,    // 8:00 - 11:59
-    Afternoon,  // 12:00 - 17:59
-    Dusk,       // 18:00 - 19:59
-    Evening     // 20:00 - 23:59
-}
-
-public enum Weather
-{
-    Sunny,      // Soleggiato
-    Cloudy,     // Nuvoloso
-    Rainy,      // Pioggia
-    Stormy,      // Tempesta
-    Windy,      // Ventoso
-    Foggy,      // Nebbioso
-    Snowy       // Neve
-}
-
 public static class FaseGiorno
 {
     private static DayPhase? phaseOverride = null;

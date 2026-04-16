@@ -55,6 +55,7 @@ public static class Game
     public static Obj_GuiInventoryCrates inventoryCrates;
     public static Obj_GuiInventoryCratesBackground inventoryCratesBackground;
     public static Obj_GuiSeedUpgradePanel seedUpgradePanel;
+    public static Obj_GuiFusionResultPopup guiFusionResultPopup;
 
     public static Obj_GuiCompostPanel compostPanel;
     public static Obj_GuiCompostBackground compostBackground;
@@ -324,6 +325,8 @@ public static class Game
         seedDetailPanel = new Obj_GuiSeedDetailPanel();
 
         seedUpgradePanel = new Obj_GuiSeedUpgradePanel();
+
+        guiFusionResultPopup = new Obj_GuiFusionResultPopup();
 
         itemBoard = new Obj_GuiItemBoard();
         itemSlots = new Obj_GuiItemSlots();

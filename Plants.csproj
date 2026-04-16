@@ -14,8 +14,12 @@
   </PropertyGroup>
 
 	<PropertyGroup>
-		<PublishTrimmed>false</PublishTrimmed>
+		
+	 <PublishTrimmed>true</PublishTrimmed> 
+		<TrimMode>partial</TrimMode>
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+		<!-- Embed PDB directly into the single-file exe for crash debugging -->
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup>

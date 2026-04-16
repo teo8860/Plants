@@ -1022,7 +1022,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
 
         if (revealScale > 0.7f)
         {
-            string seedName = SeedDataType.GetName(resultSeed.type);
+            string seedName = SeedDefinitions.GetSeedName(resultSeed.type);
             int nameWidth = seedName.Length * 8;
             Graphics.DrawText(
                 seedName,

@@ -62,6 +62,11 @@ public class Obj_GuiInventoryCrates : GameElement
         if (clickCooldownFrames > 0)
             clickCooldownFrames--;
 
+        // Blocca input mentre il popup di fusione e' aperto
+        // (evita che ESC chiuda sia il popup che l'inventario)
+        if (Game.guiFusionResultPopup != null && Game.guiFusionResultPopup.IsVisible)
+            return;
+
         if (IsInventoryOpen)
         {
             // Chiudi inventario

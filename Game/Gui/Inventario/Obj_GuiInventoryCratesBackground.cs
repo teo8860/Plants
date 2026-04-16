@@ -20,7 +20,11 @@ public class Obj_GuiInventoryCratesBackground : GameElement
     {
         this.roomId = Game.room_inventory.id;
         this.guiLayer = true;
-        this.depth = -40; // Dietro alla griglia ma davanti ad altri elementi
+        // -42: dietro alla griglia (-50) ma strettamente SOPRA l'InventoryBackground (-40).
+        // Non usare lo stesso depth dell'InventoryBackground: il sort del render loop
+        // non e' stabile e l'ordine tra elementi con depth uguale puo' invertirsi
+        // (visto dopo Populate() in seguito a fusioni), facendo sparire lo sfondo.
+        this.depth = -42;
     }
 
     public override void Update()

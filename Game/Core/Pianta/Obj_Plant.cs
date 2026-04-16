@@ -104,7 +104,7 @@ public class Obj_Plant : GameElement
     public void SetSeed(SeedType seedType)
     {
         TipoSeme = seedType;
-        seedBonus = SeedDataType.GetBonus(seedType);
+        seedBonus = SeedDefinitions.GetTypeBonus(seedType);
     }
 
     public void PosizionaAlCentroInBasso()

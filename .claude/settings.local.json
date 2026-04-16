@@ -14,7 +14,9 @@
       "Bash(grep -n \"TargetX\\\\|TargetY\\\\|CurrentAlpha\\\\|public.*X\\\\|public.*Y\\\\|class GuiIconButton\" C:/Dev/Plants/Game/Gui/Main/*.cs)",
       "Bash(dotnet msbuild:*)",
       "Bash(dotnet publish:*)",
-      "Bash(powershell -ExecutionPolicy Bypass -File check_subsystem.ps1)"
+      "Bash(powershell -ExecutionPolicy Bypass -File check_subsystem.ps1)",
+      "Bash(python *)",
+      "Bash(pip install *)"
     ]
   }
 }

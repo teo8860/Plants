@@ -15,9 +15,13 @@ public class Obj_GuiInventoryGrid : GameElement
     private int cellSize = 50;
     private int spacing = 9;
     private int startX = 25;
-    private int startY = 60;
+    private int startY = 70;
     private int scrollY = 0;
     private int bottomMargin = 45; // Spazio per la barra di navigazione (35px + padding)
+
+    // Ordinamento (rarita esclusa perche' le casse gia' filtrano per rarita)
+    private SeedSorter sorter = new SeedSorter { IncludeRarity = false };
+    private Seed selectedSeedRef = null;
 
     private int scrollbarWidth = 5;
     private int scrollbarPadding = 3;
@@ -50,6 +54,12 @@ public class Obj_GuiInventoryGrid : GameElement
         this.roomId = Game.room_inventory.id;
         this.guiLayer = true;
         this.depth = -50;
+
+        sorter.OnChanged = () =>
+        {
+            scrollY = 0;
+            Populate();
+        };
     }
 
     public void SetRarityFilter(SeedRarity rarity)
@@ -75,12 +85,19 @@ public class Obj_GuiInventoryGrid : GameElement
 
     private void UpdateFilteredSeeds()
     {
-        if (!rarityFilter.HasValue)
-            filteredSeeds = Inventario.get().GetAllSeeds();
-        else
-            filteredSeeds = Inventario.get().GetAllSeeds()
-                .Where(seed => seed.rarity == rarityFilter.Value)
-                .ToList();
+        IEnumerable<Seed> source = Inventario.get().GetAllSeeds();
+        if (rarityFilter.HasValue)
+            source = source.Where(seed => seed.rarity == rarityFilter.Value);
+
+        filteredSeeds = sorter.Apply(source);
+
+        // Mantieni la selezione sul seme stesso quando cambia l'ordine
+        if (selectedSeedRef != null)
+        {
+            int newIdx = filteredSeeds.IndexOf(selectedSeedRef);
+            selectedIndex = newIdx;
+            if (newIdx < 0) selectedSeedRef = null;
+        }
     }
 
     private int GetCurrentColumns()
@@ -206,8 +223,17 @@ public class Obj_GuiInventoryGrid : GameElement
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
             return;
 
+        // Blocca input mentre il popup di fusione e' aperto
+        if (Game.guiFusionResultPopup != null && Game.guiFusionResultPopup.IsVisible)
+            return;
+
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
+
+        // === Sort controls ===
+        bool sortConsumed = false;
+        if (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked)
+            sortConsumed = sorter.HandleInput();
 
         // === Scrollbar drag ===
         var track = GetScrollbarTrackRect();
@@ -274,7 +300,10 @@ public class Obj_GuiInventoryGrid : GameElement
         // === Cell hover / click ===
         bool clicked = Input.IsMouseButtonPressed(MouseButton.Left)
             && !isDraggingScrollbar
+            && !sortConsumed
             && (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked);
+
+        bool overSort = sorter.IsMouseOverControls(mx, my);
 
         hoveredIndex = -1;
 
@@ -296,7 +325,7 @@ public class Obj_GuiInventoryGrid : GameElement
                 continue;
 
             if (mx >= x && mx <= x + cellSize && my >= y && my <= y + cellSize
-                && my >= gridTop && my <= gridBottom)
+                && my >= gridTop && my <= gridBottom && !overSort)
             {
                 hoveredIndex = i;
 
@@ -307,6 +336,7 @@ public class Obj_GuiInventoryGrid : GameElement
                     else
                     {
                         selectedIndex = i;
+                        selectedSeedRef = filteredSeeds[i];
                         detailPanel?.Open(i);
                         OnSeedSelected?.Invoke(i);
                     }
@@ -325,6 +355,12 @@ public class Obj_GuiInventoryGrid : GameElement
         int columns = GetCurrentColumns();
         int maxX = GetGridMaxX();
         int visibleHeight = GetVisibleHeight();
+
+        // Sort bar sopra la griglia
+        int sortX = startX;
+        int sortW = Math.Max(120, maxX - startX - 10);
+        if (sortW > 260) sortW = 260;
+        sorter.Draw(sortX, 44, sortW);
 
         // Riserva spazio per la scrollbar se c'è overflow
         int contentHeight = GetContentHeight();
@@ -476,6 +512,7 @@ public class Obj_GuiInventoryGrid : GameElement
     public void ClearSelection()
     {
         selectedIndex = -1;
+        selectedSeedRef = null;
     }
 
     public int GetSelectedIndex()

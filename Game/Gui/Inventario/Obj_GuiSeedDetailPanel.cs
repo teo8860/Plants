@@ -56,6 +56,11 @@ public class Obj_GuiSeedDetailPanel : GameElement
             Open(seedIndex);
     }
 
+    public void ClearSeed()
+    {
+        selectedSeedIndex = -1;
+    }
+
     public bool IsOpen => isOpen;
     public float SlideProgress => slideProgress;
     public int PanelWidth => panelWidth;
@@ -91,6 +96,10 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
         // Blocca interazione bottoni se il picker oggetti e' aperto
         if (Game.itemSlots != null && Game.itemSlots.IsPickerOpen)
+            return;
+
+        // Blocca interazione bottoni se il popup di fusione e' aperto
+        if (Game.guiFusionResultPopup != null && Game.guiFusionResultPopup.IsVisible)
             return;
 
         int buttonHeight = 36;
@@ -148,12 +157,20 @@ public class Obj_GuiSeedDetailPanel : GameElement
             // Se siamo già in modalità fusione e abbiamo 2 semi selezionati, esegui la fusione
             if (fusionManager.CanFuse)
             {
+                // Cattura i riferimenti ai genitori PRIMA della fusione
+                // (PerformFusion() svuota la selezione del manager).
+                Seed parent1 = fusionManager.SelectedSeed1;
+                Seed parent2 = fusionManager.SelectedSeed2;
+
                 Seed fusedSeed = fusionManager.PerformFusion();
 
                 if (fusedSeed != null && Game.inventoryGrid != null)
                 {
                     // Ripopola la griglia
                     Game.inventoryGrid.Populate();
+
+                    // Mostra il popup con il risultato della fusione
+                    Game.guiFusionResultPopup?.Show(parent1, parent2, fusedSeed);
 
                     // Mostra animazione o notifica (opzionale)
                     Console.WriteLine($"Fusione completata! Nuovo seme: {fusedSeed.name} [{fusedSeed.rarity}]");
@@ -167,8 +184,26 @@ public class Obj_GuiSeedDetailPanel : GameElement
         }
         else
         {
-            // Entra in modalità fusione
-            fusionManager.StartFusionMode();
+            // Entra in modalità fusione: se c'e' un seme selezionato, diventa
+            // automaticamente il primo seme della fusione. In ogni caso la
+            // selezione "base" viene rimossa per evitare confusione visiva
+            // (bordo arancione vs bordo blu di fusione).
+            Seed preSelected = null;
+            int preSelectedIndex = -1;
+
+            if (Game.inventoryGrid != null)
+            {
+                preSelectedIndex = Game.inventoryGrid.GetSelectedIndex();
+                preSelected = Game.inventoryGrid.GetSeedAtIndex(preSelectedIndex);
+            }
+
+            if (preSelected != null && preSelected.CanBeFused)
+                fusionManager.StartFusionMode(preSelected, preSelectedIndex);
+            else
+                fusionManager.StartFusionMode();
+
+            Game.inventoryGrid?.ClearSelection();
+            ClearSeed();
         }
     }
 
@@ -239,15 +274,15 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 Color statsBoxColor = new Color(62, 39, 25, 220);
                 Color statsBoxBorder = new Color(41, 26, 17, 255);
 
-                string seedName = SeedDataType.GetName(seed.type);
+                string seedName = SeedDefinitions.GetSeedName(seed.type);
                 Graphics.DrawText(seedName, panelX + 18, headerY, 11, textColor);
 
-                Color rarityColor = SeedRarityHelper.GetColor(seed.rarity);
-                string rarityName = SeedRarityHelper.GetName(seed.rarity);
+                Color rarityColor = SeedDefinitions.GetRarityColor(seed.rarity);
+                string rarityName = SeedDefinitions.GetRarityName(seed.rarity);
                 Graphics.DrawText(rarityName, panelX + 18, headerY + 14, 9, rarityColor);
 
                 // Descrizione tipo seme
-                string desc = SeedDataType.GetDescription(seed.type);
+                string desc = SeedDefinitions.GetSeedDescription(seed.type);
                 Color descColor = new Color(180, 170, 150, 200);
                 // Wrap manuale per descrizione corta
                 int descY = headerY + 28;

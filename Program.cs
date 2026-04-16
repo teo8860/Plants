@@ -6,16 +6,17 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 namespace Plants;
-     
+
 
 
 internal static class Program
 {
 	public static NativeTrayIcon trayIcon;
-    
+     
         // Const per stili finestra
     const int GWL_STYLE = -16;
     const uint WS_MINIMIZEBOX = 0x00020000;
@@ -34,36 +35,52 @@ internal static class Program
 
     public static void Main(string[] args)
     {
-        // Controlla se avviato in modalità minigioco standalone
-        if (args.Length >= 2 && args[0] == "--minigioco")
+        // Initialize crash logging FIRST before anything else
+        string exeDir = AppContext.BaseDirectory;
+        CrashLogger.Init(exeDir);
+        CrashLogger.SetupGlobalHandlers();
+        CrashLogger.LogInfo("Program", $"Plants starting - Version: {typeof(Program).Assembly.GetName().Version}");
+        CrashLogger.LogInfo("Program", $"Executable: {exeDir}");
+        
+        try
         {
-            if (Enum.TryParse<TipoMinigioco>(args[1], out var tipo))
+            // Controlla se avviato in modalità minigioco standalone
+            if (args.Length >= 2 && args[0] == "--minigioco")
             {
-                IsMinigameMode = true;
-                MinigameType = tipo;
-                AvviaMinigiocoStandalone(tipo);
-                return;
+                if (Enum.TryParse<TipoMinigioco>(args[1], out var tipo))
+                {
+                    IsMinigameMode = true;
+                    MinigameType = tipo;
+                    AvviaMinigiocoStandalone(tipo);
+                    return;
+                }
             }
+
+            Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
+            Window.ClearState(ConfigFlags.ResizableWindow);
+
+            // rimuove la possibilità di minimizzare
+            IntPtr hwnd = Window.GetHandle();
+            uint style = GetWindowLong(hwnd, GWL_STYLE);
+            style &= ~WS_MINIMIZEBOX;
+            SetWindowLong(hwnd, GWL_STYLE, style);
+
+
+            SetupIcon();
+            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
+
+            Input.HideCursor();
+
+
+            Game.Init();
+            Rendering.Init();
         }
-
-        Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
-        Window.ClearState(ConfigFlags.ResizableWindow);
-
-        // rimuove la possibilità di minimizzare
-        IntPtr hwnd = Window.GetHandle();
-		uint style = GetWindowLong(hwnd, GWL_STYLE);
-        style &= ~WS_MINIMIZEBOX;
-        SetWindowLong(hwnd, GWL_STYLE, style);
-
-
-        SetupIcon();
-        Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
-
-        Input.HideCursor();
-
-
-		Game.Init();
-        Rendering.Init();
+        catch (Exception ex)
+        {
+            CrashLogger.LogFatal("Main", ex, true);
+            CrashLogger.DumpGameState("Unhandled exception in Main");
+            // Don't use Environment.Exit here - let it crash naturally so the log is written
+        }
 	}
 
     private static void AvviaMinigiocoStandalone(TipoMinigioco tipo)

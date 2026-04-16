@@ -61,59 +61,24 @@ public class Seed
 
     public Seed(Seed seed1, Seed seed2)
     {
-		this.stats = GenStats(seed1, seed2);
-		this.name = "Seme ibrido";
+        // Il setter di `type` sovrascrive name, rarity e color in base al tipo,
+        // quindi impostiamo prima il tipo e poi sovrascriviamo i campi specifici
+        // dell'ibrido. Senza questa ordine il seme fuso sarebbe sempre Comune.
+        // Il tipo viene ereditato casualmente da uno dei due genitori (50/50).
+        this.type = RandomHelper.Float(0, 1) < 0.5f ? seed1.type : seed2.type;
+
+        this.stats = GenStats(seed1, seed2);
         this.rarity = CalculateBreedingRarity(seed1.rarity, seed2.rarity);
-        this.type = SeedType.Normale; //da capire
-		this.color = BlendColors(seed1.color, seed2.color);
+        this.color = BlendColors(seed1.color, seed2.color);
         this.upgradeLevel = 0;
         this.upgradedStats = new List<SeedStatType>();
     }
 
-    private static string GetNameFromType(SeedType type) => type switch
-    {
-        SeedType.Normale => "Seme Normale",
-        SeedType.Poderoso => "Seme Poderoso",
-        SeedType.Fluviale => "Seme Fluviale",
-        SeedType.Florido => "Seme Florido",
-        SeedType.Glaciale => "Seme Glaciale",
-        SeedType.Magmatico => "Seme Magmatico",
-        SeedType.Rapido => "Seme Rapido",
-        SeedType.Puro => "Seme Puro",
-        SeedType.Antico => "Seme Antico",
-        SeedType.Cosmico => "Seme Cosmico",
-        _ => "Seme"
-    };
+    private static string GetNameFromType(SeedType type) => SeedDefinitions.GetSeedName(type);
 
-    public static SeedRarity GetRarityFromType(SeedType type) => type switch
-    {
-        SeedType.Normale => SeedRarity.Comune,
-        SeedType.Poderoso => SeedRarity.NonComune,
-        SeedType.Fluviale => SeedRarity.NonComune,
-        SeedType.Florido => SeedRarity.NonComune,
-        SeedType.Glaciale => SeedRarity.Raro,
-        SeedType.Magmatico => SeedRarity.Raro,
-        SeedType.Rapido => SeedRarity.Raro,
-        SeedType.Puro => SeedRarity.Epico,
-        SeedType.Antico => SeedRarity.Epico,
-        SeedType.Cosmico => SeedRarity.Leggendario,
-        _ => SeedRarity.Comune
-    };
+    public static SeedRarity GetRarityFromType(SeedType type) => SeedDefinitions.GetRarityForType(type);
 
-    private static Vector3 GetColorFromType(SeedType type) => type switch
-    {
-        SeedType.Normale => new Vector3(0.6f, 0.6f, 0.6f), // grigio neutro
-        SeedType.Poderoso => new Vector3(0.9f, 0.2f, 0.2f), // rosso intenso (forza)
-        SeedType.Fluviale => new Vector3(0.2f, 0.5f, 0.9f), // blu acqua
-        SeedType.Florido => new Vector3(0.2f, 0.8f, 0.3f), // verde vivo
-        SeedType.Glaciale => new Vector3(0.7f, 0.9f, 1.0f), // azzurro ghiaccio
-        SeedType.Magmatico => new Vector3(1.0f, 0.4f, 0.0f), // arancione lava
-        SeedType.Rapido => new Vector3(1.0f, 1.0f, 0.2f), // giallo elettrico
-        SeedType.Puro => new Vector3(1.0f, 1.0f, 1.0f), // bianco puro
-        SeedType.Antico => new Vector3(0.5f, 0.4f, 0.2f), // marrone/oro spento
-        SeedType.Cosmico => new Vector3(0.6f, 0.2f, 0.8f), // viola cosmico
-        _ => new Vector3(0.6f, 0.6f, 0.6f)
-    };
+    private static Vector3 GetColorFromType(SeedType type) => SeedDefinitions.GetSeedColor(type);
 
     private SeedStats GenStats()
     {
@@ -177,114 +142,9 @@ public class Seed
         return finalStats;
     }
 
-    private SeedStats GetTypeBonuses(SeedType type)
-    {
-        return type switch
-        {
-            SeedType.Normale => new SeedStats()
-            {
-                vitalita = RandomHelper.Float(-0.05f, 0.05f),
-                idratazione = RandomHelper.Float(-0.05f, 0.05f),
-                metabolismo = RandomHelper.Float(-0.05f, 0.05f),
-                vegetazione = RandomHelper.Float(-0.05f, 0.05f),
-            },
+    private SeedStats GetTypeBonuses(SeedType type) => SeedDefinitions.GetTypeGenerationBonus(type);
 
-            SeedType.Poderoso => new SeedStats()
-            {
-                vitalita = RandomHelper.Float(0.4f, 0.6f),
-                idratazione = RandomHelper.Float(0.05f, 0.15f),
-                metabolismo = RandomHelper.Float(-0.25f, -0.15f),
-                resistenzaParassiti = RandomHelper.Float(0.05f, 0.15f),
-                vegetazione = RandomHelper.Float(-0.15f, -0.05f),
-            },
-
-            SeedType.Fluviale => new SeedStats()
-            {
-                idratazione = RandomHelper.Float(-0.6f, -0.4f),
-                vegetazione = RandomHelper.Float(0.15f, 0.25f),
-                resistenzaCaldo = RandomHelper.Float(-0.25f, -0.15f),
-                resistenzaFreddo = RandomHelper.Float(0.05f, 0.15f),
-            },
-
-            SeedType.Florido => new SeedStats()
-            {
-                vegetazione = RandomHelper.Float(0.6f, 0.8f),
-                idratazione = RandomHelper.Float(0.2f, 0.3f), 
-                vitalita = RandomHelper.Float(-0.1f, 0.0f),
-                resistenzaParassiti = RandomHelper.Float(-0.2f, -0.1f),
-            },
-
-            SeedType.Glaciale => new SeedStats()
-            {
-                resistenzaFreddo = RandomHelper.Float(0.6f, 0.7f),
-                resistenzaCaldo = RandomHelper.Float(-0.35f, -0.25f),
-                vitalita = RandomHelper.Float(0.05f, 0.15f),
-                idratazione = RandomHelper.Float(-0.2f, -0.1f),
-                metabolismo = RandomHelper.Float(-0.2f, -0.1f),
-                resistenzaVuoto = RandomHelper.Float(0.2f, 0.3f),
-            },
-
-            SeedType.Magmatico => new SeedStats()
-            {
-                resistenzaCaldo = RandomHelper.Float(0.6f, 0.7f),
-                resistenzaFreddo = RandomHelper.Float(-0.35f, -0.25f),
-                vitalita = RandomHelper.Float(0.05f, 0.15f),
-                idratazione = RandomHelper.Float(0.3f, 0.5f),
-                metabolismo = RandomHelper.Float(0.05f, 0.15f),
-                resistenzaParassiti = RandomHelper.Float(0.2f, 0.3f),
-            },
-
-            SeedType.Rapido => new SeedStats()
-            {
-                metabolismo = RandomHelper.Float(0.5f, 0.7f),
-                vitalita = RandomHelper.Float(-0.3f, -0.2f),
-                idratazione = RandomHelper.Float(0.4f, 0.6f), 
-                resistenzaParassiti = RandomHelper.Float(-0.15f, -0.05f),
-            },
-
-            SeedType.Puro => new SeedStats()
-            {
-                resistenzaParassiti = RandomHelper.Float(0.75f, 0.85f),
-                vitalita = RandomHelper.Float(-0.15f, -0.05f),
-                vegetazione = RandomHelper.Float(0.05f, 0.15f),
-            },
-
-            SeedType.Antico => new SeedStats()
-            {
-                vitalita = RandomHelper.Float(0.1f, 0.2f),
-                idratazione = RandomHelper.Float(-0.15f, -0.05f),
-                metabolismo = RandomHelper.Float(-0.15f, -0.05f),
-                resistenzaFreddo = RandomHelper.Float(0.15f, 0.25f),
-                resistenzaCaldo = RandomHelper.Float(0.15f, 0.25f),
-                resistenzaParassiti = RandomHelper.Float(0.15f, 0.25f),
-                vegetazione = RandomHelper.Float(0.05f, 0.15f),
-                resistenzaVuoto = RandomHelper.Float(0.1f, 0.2f),
-            },
-
-            SeedType.Cosmico => new SeedStats()
-            {
-                resistenzaVuoto = RandomHelper.Float(0.65f, 0.75f),
-                resistenzaFreddo = RandomHelper.Float(0.4f, 0.5f),
-                resistenzaCaldo = RandomHelper.Float(0.25f, 0.35f),
-                resistenzaParassiti = RandomHelper.Float(0.3f, 0.4f),
-                idratazione = RandomHelper.Float(-0.45f, -0.35f),
-                metabolismo = RandomHelper.Float(-0.25f, -0.15f),
-                vegetazione = RandomHelper.Float(-0.35f, -0.25f),
-            },
-
-            _ => new SeedStats()
-        };
-    }
-
-    private float GetRarityMultiplier(SeedRarity rarity) => rarity switch
-    {
-        SeedRarity.Comune => 1.0f,
-        SeedRarity.NonComune => 1.1f,   // +10%
-        SeedRarity.Raro => 1.25f,       // +25%
-        SeedRarity.Epico => 1.5f,       // +50%
-        SeedRarity.Leggendario => 2.0f, // +100%
-        _ => 1.0f
-    };
+    private float GetRarityMultiplier(SeedRarity rarity) => SeedDefinitions.GetRarityMultiplier(rarity);
 
     private SeedStats GenStats(Seed seed1, Seed seed2)
     {
@@ -340,11 +200,14 @@ public class Seed
     {
         float bonus = 0f;
 
-        int rarityDiff = Math.Abs((int)seed1.rarity - (int)seed2.rarity);
+        // Usa il rank canonico, non l'int dell'enum (Esotico=100, Mitico=101
+        // romperebbero il calcolo della differenza).
+        int rarityDiff = Math.Abs(SeedDefinitions.GetRarityRank(seed1.rarity)
+                                - SeedDefinitions.GetRarityRank(seed2.rarity));
         if (rarityDiff == 0)
             bonus += 0.3f;
         else if (rarityDiff == 1)
-            bonus += 0.15f; 
+            bonus += 0.15f;
 
         if (AreTypesComplementary(seed1.type, seed2.type))
             bonus += 0.2f;
@@ -352,44 +215,42 @@ public class Seed
         return bonus;
     }
 
-    private bool AreTypesComplementary(SeedType type1, SeedType type2)
-    {
-        var complementaryPairs = new List<(SeedType, SeedType)>
-        {
-            (SeedType.Glaciale, SeedType.Magmatico),
-            (SeedType.Fluviale, SeedType.Florido),
-            (SeedType.Rapido, SeedType.Poderoso),
-            (SeedType.Puro, SeedType.Antico),
-        };
-
-        foreach (var pair in complementaryPairs)
-        {
-            if ((type1 == pair.Item1 && type2 == pair.Item2) ||
-                (type1 == pair.Item2 && type2 == pair.Item1))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    private bool AreTypesComplementary(SeedType type1, SeedType type2) =>
+        SeedDefinitions.AreTypesComplementary(type1, type2);
 
     private SeedRarity CalculateBreedingRarity(SeedRarity rarity1, SeedRarity rarity2)
     {
-        int avgRarity = ((int)rarity1 + (int)rarity2) / 2;
+        // Usa il rank canonico (SeedDefinitions.RarityOrder) invece del valore int
+        // dell'enum, che non e' sequenziale (Esotico=100, Mitico=101).
+        int rank1 = SeedDefinitions.GetRarityRank(rarity1);
+        int rank2 = SeedDefinitions.GetRarityRank(rarity2);
+        int minRank = Math.Min(rank1, rank2);
+        int maxRank = Math.Max(rank1, rank2);
 
-        int higherRarity = Math.Max((int)rarity1, (int)rarity2);
-        if (RandomHelper.Float(0, 1) < 0.2f)
+        int resultRank;
+        if (minRank == maxRank)
         {
-            avgRarity = higherRarity;
+            // Stessa rarità: risultato garantito della stessa rarità
+            // (es. 2 Leggendari -> sempre Leggendario).
+            resultRank = maxRank;
+        }
+        else
+        {
+            // Rarità diverse: il risultato tende verso quella più alta (70%),
+            // ma con 30% puo' scendere a quella più bassa.
+            resultRank = RandomHelper.Float(0, 1) < 0.3f ? minRank : maxRank;
         }
 
-        if (RandomHelper.Float(0, 1) < 0.05f && avgRarity < (int)SeedRarity.Leggendario)
+        // 5% di probabilità di upgrade al tier successivo, fino al massimo
+        // ottenibile tramite fusione (Leggendario). Mitico non e' raggiungibile
+        // tramite fusione: per 2 Leggendari il risultato sara' sempre Leggendario.
+        if (resultRank < SeedDefinitions.MAX_BREEDING_RANK
+            && RandomHelper.Float(0, 1) < 0.05f)
         {
-            avgRarity++;
+            resultRank++;
         }
 
-        return (SeedRarity)Math.Clamp(avgRarity, 0, (int)SeedRarity.Leggendario);
+        return SeedDefinitions.GetRarityAtRank(resultRank);
     }
 
     private Vector3 BlendColors(Vector3 color1, Vector3 color2)

@@ -17,13 +17,17 @@ public class Obj_GuiPiantaggio : GameElement
 {
     private int cellSize = 50;
     private int spacing = 9;
-    private int startY = 80;
+    private int startY = 82;
     private int scrollY = 0;
 
     private int selectedIndex = -1;
     private int hoveredIndex = -1;
     private List<Seed> seeds = new();
     private List<Obj_Seed> visualSeeds = new();
+
+    // Ordinamento
+    private SeedSorter sorter = new SeedSorter { IncludeRarity = true };
+    private Seed selectedSeedRef = null;
 
     // Bottone "Pianta"
     private bool buttonHovered = false;
@@ -80,12 +84,14 @@ public class Obj_GuiPiantaggio : GameElement
     {
         this.active = true;
         selectedIndex = -1;
+        selectedSeedRef = null;
         hoveredIndex = -1;
         scrollY = 0;
         isFalling = false;
         fallImpacted = false;
         particles.Clear();
         pulse = 0f;
+        sorter.OnChanged = () => { scrollY = 0; Aggiorna(); };
         StarterSeedSystem.GrantIfNeeded();
         Aggiorna();
 
@@ -126,7 +132,15 @@ public class Obj_GuiPiantaggio : GameElement
     public void Aggiorna()
     {
         DestroyVisualSeeds();
-        seeds = Inventario.get().GetAllSeeds();
+        seeds = sorter.Apply(Inventario.get().GetAllSeeds());
+
+        // Mantieni la selezione sul seme stesso anche dopo il sort
+        if (selectedSeedRef != null)
+        {
+            int newIdx = seeds.IndexOf(selectedSeedRef);
+            selectedIndex = newIdx;
+            if (newIdx < 0) selectedSeedRef = null;
+        }
 
         int columns = GetColumns();
         int gridW = columns * (cellSize + spacing) - spacing;
@@ -199,7 +213,15 @@ public class Obj_GuiPiantaggio : GameElement
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
-        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
+
+        // Sort controls: intercetta eventuali click prima della griglia
+        bool sortConsumed = false;
+        if (seeds.Count > 0 || sorter.Criterion != SeedSortCriterion.Default)
+        {
+            sortConsumed = sorter.HandleInput();
+        }
+
+        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left) && !sortConsumed;
 
         if (seeds.Count == 0)
         {
@@ -236,6 +258,8 @@ public class Obj_GuiPiantaggio : GameElement
         int cols = GetColumns();
         int gridStartX = GetGridStartX();
 
+        bool overSort = sorter.IsMouseOverControls(mx, my);
+
         for (int i = 0; i < seeds.Count; i++)
         {
             int col = i % cols;
@@ -244,11 +268,14 @@ public class Obj_GuiPiantaggio : GameElement
             int x = gridStartX + col * (cellSize + spacing);
             int y = startY + row * (cellSize + spacing) + scrollY;
 
-            if (mx >= x && mx <= x + cellSize && my >= y && my <= y + cellSize)
+            if (mx >= x && mx <= x + cellSize && my >= y && my <= y + cellSize && !overSort)
             {
                 hoveredIndex = i;
                 if (clicked)
+                {
                     selectedIndex = i;
+                    selectedSeedRef = seeds[i];
+                }
                 break;
             }
         }
@@ -424,7 +451,7 @@ public class Obj_GuiPiantaggio : GameElement
     private void Pianta(Seed seed)
     {
         Game.pianta.SetSeed(seed.type);
-        Game.pianta.seedBonus = seed.stats ?? SeedDataType.GetBonus(seed.type);
+        Game.pianta.seedBonus = seed.stats ?? SeedDefinitions.GetTypeBonus(seed.type);
         Game.pianta.equippedItemIds = new List<string>(seed.equippedItems ?? new List<string> { null, null, null });
         Game.pianta.Reset();
         Game.pianta.SetNaturalColors(WorldManager.GetCurrentWorld());
@@ -497,6 +524,12 @@ public class Obj_GuiPiantaggio : GameElement
             return;
         }
 
+        // --- Sort bar ---
+        int sortW = Math.Min(sw - 30, 260);
+        int sortX = (sw - sortW) / 2;
+        int sortY = 61;
+        sorter.Draw(sortX, sortY, sortW);
+
         // --- Griglia semi ---
         DrawGrid();
 
@@ -546,7 +579,7 @@ public class Obj_GuiPiantaggio : GameElement
                 if (y + cellSize < startY - 10 || y > sh - 215) continue;
 
                 Seed seed = seeds[i];
-                Color rarityColor = SeedRarityHelper.GetColor(seed.rarity);
+                Color rarityColor = SeedDefinitions.GetRarityColor(seed.rarity);
 
                 Color bg = cellColor;
                 Color border = borderColor;
@@ -621,8 +654,8 @@ public class Obj_GuiPiantaggio : GameElement
         if (selectedIndex < 0 || selectedIndex >= seeds.Count) return;
 
         Seed sel = seeds[selectedIndex];
-        Color rarityColor = SeedRarityHelper.GetColor(sel.rarity);
-        string rarityName = SeedRarityHelper.GetName(sel.rarity);
+        Color rarityColor = SeedDefinitions.GetRarityColor(sel.rarity);
+        string rarityName = SeedDefinitions.GetRarityName(sel.rarity);
 
         // Pannellino info in basso (piu alto per contenere le stats)
         int panelH = 160;
@@ -639,7 +672,7 @@ public class Obj_GuiPiantaggio : GameElement
             0.1f, 8, 1, new Color(80, 120, 80, 150));
 
         // Nome del seme
-        string nome = SeedDataType.GetName(sel.type);
+        string nome = SeedDefinitions.GetSeedName(sel.type);
         int nomeW = nome.Length * 6;
         Graphics.DrawText(nome, (sw - nomeW) / 2, panelY + 5, 12, bianco);
 

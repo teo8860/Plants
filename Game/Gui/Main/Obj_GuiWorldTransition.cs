@@ -168,7 +168,7 @@ public class Obj_GuiWorldTransition : GameElement
 
         if (animationProgress < 0.5f) return;
 
-        WorldType nextWorld = WorldManager.GetNextWorld(WorldManager.GetCurrentWorld());
+        WorldType nextWorld = WorldDefinitions.GetNextWorld(WorldManager.GetCurrentWorld());
         WorldModifier nextMod = WorldManager.GetModifiers(nextWorld);
 
         string title = GetWorldName(nextWorld);

@@ -31,6 +31,18 @@ public class SeedFusionManager
         ClearSelection();
     }
 
+    public void StartFusionMode(Seed preSelected, int preSelectedIndex)
+    {
+        IsFusionMode = true;
+        ClearSelection();
+
+        if (preSelected != null && preSelected.CanBeFused && preSelectedIndex >= 0)
+        {
+            SelectedSeed1 = preSelected;
+            SelectedIndex1 = preSelectedIndex;
+        }
+    }
+
     public void StopFusionMode()
     {
         IsFusionMode = false;
@@ -148,19 +160,9 @@ public class SeedFusionManager
 
         int resultFusionCount = Math.Max(SelectedSeed1.stats.fusionCount, SelectedSeed2.stats.fusionCount) + 1;
 
-        return $"Fusione: {GetRarityName(SelectedSeed1.rarity)} + {GetRarityName(SelectedSeed2.rarity)}\n" +
+        return $"Fusione: {SeedDefinitions.GetRarityName(SelectedSeed1.rarity)} + {SeedDefinitions.GetRarityName(SelectedSeed2.rarity)}\n" +
                $"Media: ~{avgRarity}\n" +
-               $"Risultato: ~{GetRarityName(resultRarity)}\n" +
+               $"Risultato: ~{SeedDefinitions.GetRarityName(resultRarity)}\n" +
                $"Fusioni risultanti: {resultFusionCount}/{Seed.MAX_FUSIONS}";
     }
-
-    private string GetRarityName(SeedRarity rarity) => rarity switch
-    {
-        SeedRarity.Comune => "Comune",
-        SeedRarity.NonComune => "Non Comune",
-        SeedRarity.Raro => "Raro",
-        SeedRarity.Epico => "Epico",
-        SeedRarity.Leggendario => "Leggendario",
-        _ => "???"
-    };
 }

@@ -40,7 +40,7 @@ public class Room
 
 	public static uint GetActiveId()
 	{
-		return Room.activeRoom.id;
+		return Room.activeRoom?.id ?? 0;
 	}
 
 	public void SetActiveRoom()
@@ -62,9 +62,9 @@ public class Room
 
 	private void Activate()
 	{
-		for(int i=GameElement.elementList.Count-1; i>-1; i--)
+		var elements = GameElement.GetList();  // Returns a safe copy with lock
+		foreach(var item in elements)
 		{
-			var item = GameElement.elementList[i];
 			if(item.roomId == this.id)
 			{
 				item.active = true;
@@ -74,34 +74,42 @@ public class Room
 
 	private void Deactivate()
 	{
-		for(int i=GameElement.elementList.Count-1; i>-1; i--)
+		var elements = GameElement.GetList();  // Returns a safe copy with lock
+		foreach(var item in elements)
 		{
-			var item = GameElement.elementList[i];
-		
 			if(item.roomId == this.id)
 			{
 				if(item.persistent == false)
-				item.active = false;
+					item.active = false;
 			}
 		}
 	}
 
 	~Room()
     {
-        Room.list.Remove(this);
-
-		for(int i=GameElement.elementList.Count-1; i>-1; i--)
+		// Finalizer runs on GC thread - be safe
+		try
 		{
-			if(GameElement.elementList[i].roomId == this.id)
+			Room.list.Remove(this);
+
+			var elements = GameElement.GetList();
+			foreach(var element in elements)
 			{
-				Room.list.RemoveAt(i);
+				if(element.roomId == this.id)
+				{
+					element.Destroy();
+				}
+			}
+
+			if(Room.activeRoom == this)
+			{
+				Room.activeRoom = Room.list.LastOrDefault();
+				Room.activeRoom?.Activate();
 			}
 		}
-
-		if(Room.activeRoom == this)
+		catch
 		{
-			Room.activeRoom = Room.list.Last();
-			Room.activeRoom.Activate();
+			// Best effort during shutdown
 		}
 	}
 }

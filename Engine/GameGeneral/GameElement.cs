@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Plants;
@@ -12,6 +13,15 @@ public class GameElement
 {
     
 	public static List<GameElement> elementList = new();
+	private static readonly object _elementLock = new();
+    
+    // Static constructor to ensure proper initialization
+    static GameElement()
+    {
+        // Force initialization of static fields
+        if (elementList == null)
+            elementList = new List<GameElement>();
+    }
 
     public bool persistent = false;
     public bool active = true;
@@ -38,7 +48,7 @@ public class GameElement
 
     public static T Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T >(int depth = 0, Room room = null) where T : GameElement
     {
-        T obj =  Activator.CreateInstance<T>();
+        T obj = Activator.CreateInstance<T>();
 
         if(depth != 0)
             obj.depth = depth;
@@ -58,23 +68,71 @@ public class GameElement
 
 	public static List<GameElement> GetList()
     {
-        return elementList;
+        try
+        {
+            if (_elementLock == null || elementList == null)
+                return new List<GameElement>();
+                
+            lock (_elementLock)
+            {
+                return new List<GameElement>(elementList);
+            }
+        }
+        catch
+        {
+            // Defensive fallback
+            return new List<GameElement>();
+        }
     }
 
     public GameElement()
     {
-        GameElement.elementList.Add(this);
-        roomId = Room.GetActiveId();
+        lock (_elementLock)
+        {
+            if (elementList == null)
+                elementList = new List<GameElement>();
+            GameElement.elementList.Add(this);
+        }
+        
+        try
+        {
+            roomId = Room.GetActiveId();
+        }
+        catch
+        {
+            _roomId = 0;
+        }
     }
 
     ~GameElement()
     {
-        elementList.Remove(this);
+        // Finalizer runs on GC thread - be extra safe
+        try
+        {
+            lock (_elementLock)
+            {
+                elementList?.Remove(this);
+            }
+        }
+        catch
+        {
+            // Best effort - list may already be cleared
+        }
     }
 
     public void Destroy()
     {
-        elementList.Remove(this);
+        try
+        {
+            lock (_elementLock)
+            {
+                elementList?.Remove(this);
+            }
+        }
+        catch
+        {
+            // Best effort
+        }
     }
 
     public virtual void Update()

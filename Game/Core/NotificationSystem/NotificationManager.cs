@@ -72,11 +72,11 @@ public static class NotificationManager
 
     public static void ShowWorldTransitionReady()
     {
-        var nextWorld = WorldManager.GetNextWorld(WorldManager.GetCurrentWorld());
+        var nextWorld = WorldDefinitions.GetNextWorld(WorldManager.GetCurrentWorld());
 
         new ToastContentBuilder()
             .AddText("🚀 Nuovo mondo disponibile!")
-            .AddText($"Puoi viaggiare verso {WorldManager.GetWorldName(nextWorld)}")
+            .AddText($"Puoi viaggiare verso {WorldDefinitions.GetWorldName(nextWorld)}")
             .AddButton(new ToastButton()
                 .SetContent("Viaggia")
                 .AddArgument("action", "travel"))
