@@ -45,7 +45,6 @@ public class GameElement
         }
     }
    
-
     public static T Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T >(int depth = 0, Room room = null) where T : GameElement
     {
         T obj = Activator.CreateInstance<T>();

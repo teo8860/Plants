@@ -66,6 +66,11 @@
 	  <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
 	</ItemGroup>
 
+	<!-- Trimmer configuration to preserve reflection-created types -->
+	<ItemGroup>
+	  <TrimmerRootDescriptor Include="linker.xml" />
+	</ItemGroup>
+
 	<ItemGroup>
 	  <None Update="Assets\leaf.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
