@@ -200,62 +200,65 @@ public static class SeedDefinitions
     /// Rappresentano l'identità meccanica del tipo. Usati come moltiplicatori
     /// sulle stats base della pianta.
     /// </summary>
+    // Scala 0-99. Primarie baseline 10 (neutro), resistenze baseline 0 (nessun bonus).
+    // Nessun valore negativo: le specializzazioni danno bonus forti su 1-2 stat e
+    // zero sulle altre (opportunita' mancata, non penalita').
     private static readonly Dictionary<SeedType, SeedStats> _typeBonuses = new()
     {
         { SeedType.Normale, new SeedStats() },
 
         { SeedType.Poderoso, new SeedStats {
-            vitalita = 1.5f, idratazione = 1.1f, resistenzaFreddo = 0.1f,
-            resistenzaCaldo = 0.1f, resistenzaParassiti = 0.1f,
-            vegetazione = 0.9f, metabolismo = 0.8f, resistenzaVuoto = 0.1f
+            vitalita = 15f, idratazione = 11f, resistenzaFreddo = 10f,
+            resistenzaCaldo = 10f, resistenzaParassiti = 10f,
+            vegetazione = 9f, metabolismo = 8f, resistenzaVuoto = 10f
         }},
 
         { SeedType.Fluviale, new SeedStats {
-            vitalita = 1.0f, idratazione = 0.5f, resistenzaFreddo = 0.1f,
-            resistenzaCaldo = -0.2f, resistenzaParassiti = 0.0f,
-            vegetazione = 1.2f, metabolismo = 1.0f, resistenzaVuoto = 0.0f
+            vitalita = 10f, idratazione = 5f, resistenzaFreddo = 10f,
+            resistenzaCaldo = 0f, resistenzaParassiti = 0f,
+            vegetazione = 11f, metabolismo = 10f, resistenzaVuoto = 0f
         }},
 
         { SeedType.Glaciale, new SeedStats {
-            vitalita = 1.1f, idratazione = 0.85f, resistenzaFreddo = 0.65f,
-            resistenzaCaldo = -0.3f, resistenzaParassiti = 0.15f,
-            vegetazione = 0.85f, metabolismo = 0.85f, resistenzaVuoto = 0.25f
+            vitalita = 11f, idratazione = 8.5f, resistenzaFreddo = 55f,
+            resistenzaCaldo = 0f, resistenzaParassiti = 15f,
+            vegetazione = 8.5f, metabolismo = 8.5f, resistenzaVuoto = 25f
         }},
 
         { SeedType.Magmatico, new SeedStats {
-            vitalita = 1.1f, idratazione = 1.4f, resistenzaFreddo = -0.3f,
-            resistenzaCaldo = 0.65f, resistenzaParassiti = 0.25f,
-            vegetazione = 0.8f, metabolismo = 1.1f, resistenzaVuoto = 0.15f
+            vitalita = 11f, idratazione = 14f, resistenzaFreddo = 0f,
+            resistenzaCaldo = 55f, resistenzaParassiti = 25f,
+            vegetazione = 8f, metabolismo = 11f, resistenzaVuoto = 15f
         }},
 
         { SeedType.Puro, new SeedStats {
-            vitalita = 0.9f, idratazione = 1.0f, resistenzaFreddo = 0.0f,
-            resistenzaCaldo = 0.0f, resistenzaParassiti = 0.8f,
-            vegetazione = 1.1f, metabolismo = 1.0f, resistenzaVuoto = 0.0f
+            vitalita = 9f, idratazione = 10f, resistenzaFreddo = 0f,
+            resistenzaCaldo = 0f, resistenzaParassiti = 75f,
+            vegetazione = 11f, metabolismo = 10f, resistenzaVuoto = 0f
         }},
 
         { SeedType.Florido, new SeedStats {
-            vitalita = 0.95f, idratazione = 1.25f, resistenzaFreddo = -0.1f,
-            resistenzaCaldo = -0.1f, resistenzaParassiti = -0.15f,
-            vegetazione = 1.7f, metabolismo = 1.0f, resistenzaVuoto = 0.0f
+            vitalita = 9.5f, idratazione = 12.5f, resistenzaFreddo = 0f,
+            resistenzaCaldo = 0f, resistenzaParassiti = 0f,
+            vegetazione = 15f, metabolismo = 10f, resistenzaVuoto = 0f
         }},
 
         { SeedType.Rapido, new SeedStats {
-            vitalita = 0.75f, idratazione = 1.5f, resistenzaFreddo = -0.1f,
-            resistenzaCaldo = -0.1f, resistenzaParassiti = -0.1f,
-            vegetazione = 1.0f, metabolismo = 1.6f, resistenzaVuoto = 0.0f
+            vitalita = 7.5f, idratazione = 15f, resistenzaFreddo = 0f,
+            resistenzaCaldo = 0f, resistenzaParassiti = 0f,
+            vegetazione = 10f, metabolismo = 15f, resistenzaVuoto = 0f
         }},
 
         { SeedType.Antico, new SeedStats {
-            vitalita = 1.15f, idratazione = 0.9f, resistenzaFreddo = 0.2f,
-            resistenzaCaldo = 0.2f, resistenzaParassiti = 0.2f,
-            vegetazione = 1.1f, metabolismo = 0.9f, resistenzaVuoto = 0.15f
+            vitalita = 11.5f, idratazione = 9f, resistenzaFreddo = 20f,
+            resistenzaCaldo = 20f, resistenzaParassiti = 20f,
+            vegetazione = 11f, metabolismo = 9f, resistenzaVuoto = 15f
         }},
 
         { SeedType.Cosmico, new SeedStats {
-            vitalita = 1.0f, idratazione = 0.6f, resistenzaFreddo = 0.45f,
-            resistenzaCaldo = 0.3f, resistenzaParassiti = 0.35f,
-            vegetazione = 0.7f, metabolismo = 0.8f, resistenzaVuoto = 0.7f
+            vitalita = 10f, idratazione = 6f, resistenzaFreddo = 40f,
+            resistenzaCaldo = 25f, resistenzaParassiti = 30f,
+            vegetazione = 7f, metabolismo = 8f, resistenzaVuoto = 65f
         }}
     };
 
@@ -271,97 +274,96 @@ public static class SeedDefinitions
     /// (Seed.GenStats). Ogni valore è un range [min, max] da cui pescare con
     /// RandomHelper.Float.
     /// </summary>
+    // Scala 0-99: primarie ×10 (baseline 10), resistenze ×100 (baseline 0).
+    // Le resistenze NON possono essere negative. Le primarie possono avere
+    // contributi negativi (semantici: Fluviale idratazione=5 significa basso
+    // consumo d'acqua, quindi "efficiente"), mai sotto i min di SeedStatScaling.
     public static SeedStats GetTypeGenerationBonus(SeedType type) => type switch
     {
         SeedType.Normale => new SeedStats()
         {
-            vitalita = RandomHelper.Float(-0.05f, 0.05f),
-            idratazione = RandomHelper.Float(-0.05f, 0.05f),
-            metabolismo = RandomHelper.Float(-0.05f, 0.05f),
-            vegetazione = RandomHelper.Float(-0.05f, 0.05f),
+            vitalita = RandomHelper.Float(-0.5f, 0.5f),
+            idratazione = RandomHelper.Float(-0.5f, 0.5f),
+            metabolismo = RandomHelper.Float(-0.5f, 0.5f),
+            vegetazione = RandomHelper.Float(-0.5f, 0.5f),
         },
 
         SeedType.Poderoso => new SeedStats()
         {
-            vitalita = RandomHelper.Float(0.4f, 0.6f),
-            idratazione = RandomHelper.Float(0.05f, 0.15f),
-            metabolismo = RandomHelper.Float(-0.25f, -0.15f),
-            resistenzaParassiti = RandomHelper.Float(0.05f, 0.15f),
-            vegetazione = RandomHelper.Float(-0.15f, -0.05f),
+            vitalita = RandomHelper.Float(4f, 6f),
+            idratazione = RandomHelper.Float(0.5f, 1.5f),
+            metabolismo = RandomHelper.Float(-2.5f, -1.5f),
+            resistenzaParassiti = RandomHelper.Float(5f, 15f),
+            vegetazione = RandomHelper.Float(-1.5f, -0.5f),
         },
 
         SeedType.Fluviale => new SeedStats()
         {
-            idratazione = RandomHelper.Float(-0.6f, -0.4f),
-            vegetazione = RandomHelper.Float(0.15f, 0.25f),
-            resistenzaCaldo = RandomHelper.Float(-0.25f, -0.15f),
-            resistenzaFreddo = RandomHelper.Float(0.05f, 0.15f),
+            idratazione = RandomHelper.Float(-6f, -4f),
+            vegetazione = RandomHelper.Float(1f, 2f),
+            resistenzaFreddo = RandomHelper.Float(5f, 15f),
         },
 
         SeedType.Florido => new SeedStats()
         {
-            vegetazione = RandomHelper.Float(0.6f, 0.8f),
-            idratazione = RandomHelper.Float(0.2f, 0.3f),
-            vitalita = RandomHelper.Float(-0.1f, 0.0f),
-            resistenzaParassiti = RandomHelper.Float(-0.2f, -0.1f),
+            vegetazione = RandomHelper.Float(5f, 7f),
+            idratazione = RandomHelper.Float(2f, 3f),
+            vitalita = RandomHelper.Float(-1f, 0f),
         },
 
         SeedType.Glaciale => new SeedStats()
         {
-            resistenzaFreddo = RandomHelper.Float(0.6f, 0.7f),
-            resistenzaCaldo = RandomHelper.Float(-0.35f, -0.25f),
-            vitalita = RandomHelper.Float(0.05f, 0.15f),
-            idratazione = RandomHelper.Float(-0.2f, -0.1f),
-            metabolismo = RandomHelper.Float(-0.2f, -0.1f),
-            resistenzaVuoto = RandomHelper.Float(0.2f, 0.3f),
+            resistenzaFreddo = RandomHelper.Float(50f, 60f),
+            vitalita = RandomHelper.Float(0.5f, 1.5f),
+            idratazione = RandomHelper.Float(-2f, -1f),
+            metabolismo = RandomHelper.Float(-2f, -1f),
+            resistenzaVuoto = RandomHelper.Float(20f, 30f),
         },
 
         SeedType.Magmatico => new SeedStats()
         {
-            resistenzaCaldo = RandomHelper.Float(0.6f, 0.7f),
-            resistenzaFreddo = RandomHelper.Float(-0.35f, -0.25f),
-            vitalita = RandomHelper.Float(0.05f, 0.15f),
-            idratazione = RandomHelper.Float(0.3f, 0.5f),
-            metabolismo = RandomHelper.Float(0.05f, 0.15f),
-            resistenzaParassiti = RandomHelper.Float(0.2f, 0.3f),
+            resistenzaCaldo = RandomHelper.Float(50f, 60f),
+            vitalita = RandomHelper.Float(0.5f, 1.5f),
+            idratazione = RandomHelper.Float(3f, 5f),
+            metabolismo = RandomHelper.Float(0.5f, 1.5f),
+            resistenzaParassiti = RandomHelper.Float(20f, 30f),
         },
 
         SeedType.Rapido => new SeedStats()
         {
-            metabolismo = RandomHelper.Float(0.5f, 0.7f),
-            vitalita = RandomHelper.Float(-0.3f, -0.2f),
-            idratazione = RandomHelper.Float(0.4f, 0.6f),
-            resistenzaParassiti = RandomHelper.Float(-0.15f, -0.05f),
+            metabolismo = RandomHelper.Float(4f, 6f),
+            vitalita = RandomHelper.Float(-3f, -2f),
+            idratazione = RandomHelper.Float(4f, 6f),
         },
 
         SeedType.Puro => new SeedStats()
         {
-            resistenzaParassiti = RandomHelper.Float(0.75f, 0.85f),
-            vitalita = RandomHelper.Float(-0.15f, -0.05f),
-            vegetazione = RandomHelper.Float(0.05f, 0.15f),
+            resistenzaParassiti = RandomHelper.Float(65f, 75f),
+            vitalita = RandomHelper.Float(-1.5f, -0.5f),
+            vegetazione = RandomHelper.Float(0.5f, 1.5f),
         },
 
         SeedType.Antico => new SeedStats()
         {
-            vitalita = RandomHelper.Float(0.1f, 0.2f),
-            idratazione = RandomHelper.Float(-0.15f, -0.05f),
-            metabolismo = RandomHelper.Float(-0.15f, -0.05f),
-            resistenzaFreddo = RandomHelper.Float(0.15f, 0.25f),
-            resistenzaCaldo = RandomHelper.Float(0.15f, 0.25f),
-            resistenzaParassiti = RandomHelper.Float(0.15f, 0.25f),
-            vegetazione = RandomHelper.Float(0.05f, 0.15f),
-            resistenzaVuoto = RandomHelper.Float(0.1f, 0.2f),
+            vitalita = RandomHelper.Float(1f, 2f),
+            idratazione = RandomHelper.Float(-1.5f, -0.5f),
+            metabolismo = RandomHelper.Float(-1.5f, -0.5f),
+            resistenzaFreddo = RandomHelper.Float(15f, 25f),
+            resistenzaCaldo = RandomHelper.Float(15f, 25f),
+            resistenzaParassiti = RandomHelper.Float(15f, 25f),
+            vegetazione = RandomHelper.Float(0.5f, 1.5f),
+            resistenzaVuoto = RandomHelper.Float(10f, 20f),
         },
 
         SeedType.Cosmico => new SeedStats()
         {
-            resistenzaVuoto = RandomHelper.Float(0.65f, 0.75f),
-            resistenzaFreddo = RandomHelper.Float(0.4f, 0.5f),
-            resistenzaCaldo = RandomHelper.Float(0.25f, 0.35f),
-            resistenzaParassiti = RandomHelper.Float(0.3f, 0.4f),
-            idratazione = RandomHelper.Float(-0.45f, -0.35f),
-            metabolismo = RandomHelper.Float(-0.25f, -0.15f),
-            vegetazione = RandomHelper.Float(-0.35f, -0.25f),
+            resistenzaVuoto = RandomHelper.Float(55f, 65f),
+            resistenzaFreddo = RandomHelper.Float(30f, 40f),
+            resistenzaCaldo = RandomHelper.Float(15f, 25f),
+            resistenzaParassiti = RandomHelper.Float(20f, 30f),
+            idratazione = RandomHelper.Float(-4.5f, -3.5f),
+            metabolismo = RandomHelper.Float(-2.5f, -1.5f),
+            vegetazione = RandomHelper.Float(-3.5f, -2.5f),
         },
 
         _ => new SeedStats()

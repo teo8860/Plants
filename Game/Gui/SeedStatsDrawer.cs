@@ -38,23 +38,24 @@ public static class SeedStatsDrawer
     {
         if (stats == null) return 0;
 
+        // Scala unificata 0-99 (SeedStatScaling).
         var entries = new StatEntry[]
         {
-            new() { Label = "Vitalità", ShortLabel = "VIT", Value = stats.vitalita, MinVal = 0f, MaxVal = 2.5f,
+            new() { Label = "Vitalità", ShortLabel = "VIT", Value = stats.vitalita, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
                      BarColor = new Color(220, 60, 60, 255) },
-            new() { Label = "Idratazione", ShortLabel = "IDR", Value = stats.idratazione, MinVal = 0f, MaxVal = 2.5f,
+            new() { Label = "Idratazione", ShortLabel = "IDR", Value = stats.idratazione, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
                      BarColor = new Color(60, 140, 220, 255) },
-            new() { Label = "Metabolismo", ShortLabel = "MET", Value = stats.metabolismo, MinVal = 0f, MaxVal = 2.5f,
+            new() { Label = "Metabolismo", ShortLabel = "MET", Value = stats.metabolismo, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
                      BarColor = new Color(220, 180, 50, 255) },
-            new() { Label = "Vegetazione", ShortLabel = "VEG", Value = stats.vegetazione, MinVal = 0f, MaxVal = 2.5f,
+            new() { Label = "Vegetazione", ShortLabel = "VEG", Value = stats.vegetazione, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
                      BarColor = new Color(60, 200, 80, 255) },
-            new() { Label = "Res. Freddo", ShortLabel = "FRD", Value = stats.resistenzaFreddo, MinVal = -0.5f, MaxVal = 1.0f,
+            new() { Label = "Res. Freddo", ShortLabel = "FRD", Value = stats.resistenzaFreddo, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
                      BarColor = new Color(120, 200, 255, 255) },
-            new() { Label = "Res. Caldo", ShortLabel = "CLD", Value = stats.resistenzaCaldo, MinVal = -0.5f, MaxVal = 1.0f,
+            new() { Label = "Res. Caldo", ShortLabel = "CLD", Value = stats.resistenzaCaldo, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
                      BarColor = new Color(255, 130, 50, 255) },
-            new() { Label = "Res. Parassiti", ShortLabel = "PAR", Value = stats.resistenzaParassiti, MinVal = -0.5f, MaxVal = 1.0f,
+            new() { Label = "Res. Parassiti", ShortLabel = "PAR", Value = stats.resistenzaParassiti, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
                      BarColor = new Color(180, 100, 220, 255) },
-            new() { Label = "Res. Vuoto", ShortLabel = "VUO", Value = stats.resistenzaVuoto, MinVal = -0.3f, MaxVal = 1.0f,
+            new() { Label = "Res. Vuoto", ShortLabel = "VUO", Value = stats.resistenzaVuoto, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
                      BarColor = new Color(160, 160, 200, 255) },
         };
 
@@ -155,9 +156,8 @@ public static class SeedStatsDrawer
 
     private static string FormatValue(float value)
     {
-        if (value >= 0)
-            return value.ToString("F2");
-        return value.ToString("F2");
+        // Scala 0-99: visualizzazione intera (sempre 2 cifre max).
+        return ((int)Math.Round(value)).ToString();
     }
 
     private static Color GetValueColor(float value, float min, float max)

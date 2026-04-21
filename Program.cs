@@ -56,8 +56,16 @@ internal static class Program
                 }
             }
 
-            Window.Init(GameProperties.windowWidth, GameProperties.windowHeight, "Plants");
+            // Carica config prima di creare la finestra per applicare la scala
+            var cfg = GameConfig.get();
+            GameProperties.uiScale = cfg.UiScale;
+
+            Window.Init(GameProperties.physicalWindowWidth, GameProperties.physicalWindowHeight, "Plants");
             Window.ClearState(ConfigFlags.ResizableWindow);
+
+            // Scala input mouse in modo che GetMouseX/Y restituiscano coordinate logiche
+            float invMul = 1f / GameProperties.uiScaleMultiplier;
+            Input.SetMouseScale(invMul, invMul);
 
             // rimuove la possibilità di minimizzare
             IntPtr hwnd = Window.GetHandle();
@@ -67,7 +75,11 @@ internal static class Program
 
 
             SetupIcon();
-            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
+            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.physicalWindowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.physicalWindowHeight - 50);
+
+            // Avvio nascosto nella tray se l'utente ha attivato l'opzione
+            if (cfg.StartHidden)
+                Window.SetState(ConfigFlags.HiddenWindow);
 
             Input.HideCursor();
 
@@ -109,6 +121,18 @@ internal static class Program
         Rendering.InitMinigame();
     }
 
+    public static void ExitGame()
+    {
+        // Non salvare durante la selezione del seme: il save e' stato appena
+        // cancellato dalla morte e salverebbe dati stale della vecchia pianta
+        if (!Game.IsModalitaPiantaggio)
+            GameSave.get().Save();
+        NotificationManager.Cleanup();
+        trayIcon?.Dispose();
+        Window.Close();
+        Environment.Exit(0);
+    }
+
     private static void SetupIcon()
     {
         // Carica icona nella barra delle applicazioni
@@ -118,18 +142,12 @@ internal static class Program
         trayIcon.OnClickLeft += ()=>
         {
             Window.ClearState(ConfigFlags.HiddenWindow);
-            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.windowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.windowHeight - 50);
+            Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.physicalWindowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.physicalWindowHeight - 50);
         };
 
         trayIcon.OnExit  += () =>
         {
-            // Non salvare durante la selezione del seme: il save e' stato appena
-            // cancellato dalla morte e salverebbe dati stale della vecchia pianta
-            if (!Game.IsModalitaPiantaggio)
-                GameSave.get().Save();
-            NotificationManager.Cleanup();
-            trayIcon.Dispose();
-            Window.Close();
+            ExitGame();
         };
        
         AppDomain.CurrentDomain.ProcessExit += (s, e) =>

@@ -124,19 +124,22 @@ public static class Game
 
         Rendering.camera.position.Y = 0;
 
-        // Nessun save, o save con pianta morta → selezione seme.
-        // In entrambi i casi i dati di progressione (foglie, essence, upgrade,
-        // inventario) vengono preservati se presenti nel save.
-        bool needsPiantaggio = !hasSave || GameSave.get().data.PlantDead;
-        if (needsPiantaggio)
+        // Priorità: tutorial non completato → sempre tutorial (anche al primo avvio).
+        // Altrimenti, se non c'è save o la pianta è morta → selezione seme.
+        // I dati di progressione (foglie, essence, upgrade, inventario) vengono
+        // preservati se presenti nel save.
+        bool tutorialPending = !Obj_Tutorial.IsTutorialCompleted();
+        bool plantDead = hasSave && GameSave.get().data.PlantDead;
+
+        if (tutorialPending)
+        {
+            tutorial.StartTutorial();
+        }
+        else if (!hasSave || plantDead)
         {
             WorldManager.SetCurrentWorld(WorldType.Terra);
             pianta.SetNaturalColors(WorldType.Terra);
             EntraModalitaPiantaggio();
-        }
-        else
-        {
-            tutorial.StartTutorial();
         }
         //seedTest();
 	}

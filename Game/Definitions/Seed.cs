@@ -98,28 +98,28 @@ public class Seed
         }
         else
         {
-            // Valori base per il primo seme mai generato
-            baseValues.vitalita = 1.0f;
-            baseValues.idratazione = 1.0f;
-            baseValues.metabolismo = 1.0f;
-            baseValues.vegetazione = 1.0f;
-            baseValues.resistenzaFreddo = 0.0f;
-            baseValues.resistenzaCaldo = 0.0f;
-            baseValues.resistenzaParassiti = 0.0f;
-            baseValues.resistenzaVuoto = 0.0f;
+            // Primo seme generato: baseline 10 (primarie) / 0 (resistenze) su scala 0-99.
+            baseValues.vitalita            = SeedStatScaling.PrimaryNeutralReference;
+            baseValues.idratazione         = SeedStatScaling.PrimaryNeutralReference;
+            baseValues.metabolismo         = SeedStatScaling.PrimaryNeutralReference;
+            baseValues.vegetazione         = SeedStatScaling.PrimaryNeutralReference;
+            baseValues.resistenzaFreddo    = 0f;
+            baseValues.resistenzaCaldo     = 0f;
+            baseValues.resistenzaParassiti = 0f;
+            baseValues.resistenzaVuoto     = 0f;
         }
 
 
         var randomVariation = new SeedStats()
         {
-            vitalita = RandomHelper.Float(-0.1f, 0.1f),
-            idratazione = RandomHelper.Float(-0.1f, 0.1f),
-            metabolismo = RandomHelper.Float(-0.1f, 0.1f),
-            resistenzaCaldo = RandomHelper.Float(-0.05f, 0.05f),
-            resistenzaFreddo = RandomHelper.Float(-0.05f, 0.05f),
-            resistenzaParassiti = RandomHelper.Float(-0.05f, 0.05f),
-            resistenzaVuoto = RandomHelper.Float(-0.05f, 0.05f),
-            vegetazione = RandomHelper.Float(-0.1f, 0.1f),
+            vitalita = RandomHelper.Float(-1f, 1f),
+            idratazione = RandomHelper.Float(-1f, 1f),
+            metabolismo = RandomHelper.Float(-1f, 1f),
+            resistenzaCaldo = RandomHelper.Float(-2f, 2f),
+            resistenzaFreddo = RandomHelper.Float(-2f, 2f),
+            resistenzaParassiti = RandomHelper.Float(-2f, 2f),
+            resistenzaVuoto = RandomHelper.Float(-2f, 2f),
+            vegetazione = RandomHelper.Float(-1f, 1f),
         };
 
         var typeBonus = GetTypeBonuses(this.type);
@@ -128,14 +128,14 @@ public class Seed
 
         var finalStats = new SeedStats()
         {
-            vitalita = Math.Max(0.5f, (baseValues.vitalita + randomVariation.vitalita + typeBonus.vitalita) * rarityMultiplier),
-            idratazione = Math.Max(0.3f, (baseValues.idratazione + randomVariation.idratazione + typeBonus.idratazione) * rarityMultiplier),
-            metabolismo = Math.Max(0.5f, (baseValues.metabolismo + randomVariation.metabolismo + typeBonus.metabolismo) * rarityMultiplier),
-            vegetazione = Math.Max(0.5f, (baseValues.vegetazione + randomVariation.vegetazione + typeBonus.vegetazione) * rarityMultiplier),
-            resistenzaFreddo = Math.Clamp((baseValues.resistenzaFreddo + randomVariation.resistenzaFreddo + typeBonus.resistenzaFreddo) * rarityMultiplier, -0.5f, 1.0f),
-            resistenzaCaldo = Math.Clamp((baseValues.resistenzaCaldo + randomVariation.resistenzaCaldo + typeBonus.resistenzaCaldo) * rarityMultiplier, -0.5f, 1.0f),
-            resistenzaParassiti = Math.Clamp((baseValues.resistenzaParassiti + randomVariation.resistenzaParassiti + typeBonus.resistenzaParassiti) * rarityMultiplier, -0.5f, 1.0f),
-            resistenzaVuoto = Math.Clamp((baseValues.resistenzaVuoto + randomVariation.resistenzaVuoto + typeBonus.resistenzaVuoto) * rarityMultiplier, -0.3f, 1.0f),
+            vitalita     = SeedStatScaling.ClampPrimary((baseValues.vitalita     + randomVariation.vitalita     + typeBonus.vitalita)     * rarityMultiplier, SeedStatScaling.VitalitaMin),
+            idratazione  = SeedStatScaling.ClampPrimary((baseValues.idratazione  + randomVariation.idratazione  + typeBonus.idratazione)  * rarityMultiplier, SeedStatScaling.IdratazioneMin),
+            metabolismo  = SeedStatScaling.ClampPrimary((baseValues.metabolismo  + randomVariation.metabolismo  + typeBonus.metabolismo)  * rarityMultiplier, SeedStatScaling.MetabolismoMin),
+            vegetazione  = SeedStatScaling.ClampPrimary((baseValues.vegetazione  + randomVariation.vegetazione  + typeBonus.vegetazione)  * rarityMultiplier, SeedStatScaling.VegetazioneMin),
+            resistenzaFreddo    = SeedStatScaling.ClampResistance((baseValues.resistenzaFreddo    + randomVariation.resistenzaFreddo    + typeBonus.resistenzaFreddo)    * rarityMultiplier),
+            resistenzaCaldo     = SeedStatScaling.ClampResistance((baseValues.resistenzaCaldo     + randomVariation.resistenzaCaldo     + typeBonus.resistenzaCaldo)     * rarityMultiplier),
+            resistenzaParassiti = SeedStatScaling.ClampResistance((baseValues.resistenzaParassiti + randomVariation.resistenzaParassiti + typeBonus.resistenzaParassiti) * rarityMultiplier),
+            resistenzaVuoto     = SeedStatScaling.ClampResistance((baseValues.resistenzaVuoto     + randomVariation.resistenzaVuoto     + typeBonus.resistenzaVuoto)     * rarityMultiplier),
             fusionCount = 0
         };
 
@@ -167,19 +167,23 @@ public class Seed
             hybrid.metabolismo *= (1f + compatibilityBonus * 0.1f);
         }
 
-        hybrid.vitalita = Math.Max(0.5f, hybrid.vitalita);
-        hybrid.idratazione = Math.Max(0.3f, hybrid.idratazione);
-        hybrid.metabolismo = Math.Max(0.5f, hybrid.metabolismo);
-        hybrid.vegetazione = Math.Max(0.5f, hybrid.vegetazione);
-        hybrid.resistenzaFreddo = Math.Clamp(hybrid.resistenzaFreddo, -0.5f, 1.0f);
-        hybrid.resistenzaCaldo = Math.Clamp(hybrid.resistenzaCaldo, -0.5f, 1.0f);
-        hybrid.resistenzaParassiti = Math.Clamp(hybrid.resistenzaParassiti, -0.5f, 1.0f);
-        hybrid.resistenzaVuoto = Math.Clamp(hybrid.resistenzaVuoto, -0.3f, 1.0f);
+        hybrid.vitalita     = SeedStatScaling.ClampPrimary(hybrid.vitalita,     SeedStatScaling.VitalitaMin);
+        hybrid.idratazione  = SeedStatScaling.ClampPrimary(hybrid.idratazione,  SeedStatScaling.IdratazioneMin);
+        hybrid.metabolismo  = SeedStatScaling.ClampPrimary(hybrid.metabolismo,  SeedStatScaling.MetabolismoMin);
+        hybrid.vegetazione  = SeedStatScaling.ClampPrimary(hybrid.vegetazione,  SeedStatScaling.VegetazioneMin);
+        hybrid.resistenzaFreddo    = SeedStatScaling.ClampResistance(hybrid.resistenzaFreddo);
+        hybrid.resistenzaCaldo     = SeedStatScaling.ClampResistance(hybrid.resistenzaCaldo);
+        hybrid.resistenzaParassiti = SeedStatScaling.ClampResistance(hybrid.resistenzaParassiti);
+        hybrid.resistenzaVuoto     = SeedStatScaling.ClampResistance(hybrid.resistenzaVuoto);
         hybrid.fusionCount = Math.Max(seed1.stats.fusionCount, seed2.stats.fusionCount) + 1;
 
         return hybrid;
     }
 
+    // 70/30 pesato su migliore/peggiore: la media tende al genitore migliore
+    // senza salti grandi. Mutazione ±15% lo rende un po' proporzionale alla scala
+    // corrente del valore. Compatibilita' (vedi CalculateCompatibilityBonus)
+    // aggiunge un piccolo bonus moltiplicativo a vitalita/metabolismo.
     private float BreedStat(float stat1, float stat2, float mutationChance)
     {
         float better = Math.Max(stat1, stat2);

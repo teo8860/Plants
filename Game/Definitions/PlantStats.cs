@@ -16,14 +16,15 @@ public class SeedStats
 
     public SeedStats()
     {
-        vitalita = 1.0f;
-        idratazione = 1.0f;
-        resistenzaFreddo = 0.3f;
-        resistenzaCaldo = 0.3f;
-        resistenzaParassiti = 0.2f;
-        vegetazione = 1.0f;
-        metabolismo = 1.0f;
-        resistenzaVuoto = 0.1f;
+        // Scala 0-99: primarie baseline 10 (neutro), resistenze baseline 0 (nessun bonus).
+        vitalita = SeedStatScaling.PrimaryNeutralReference;
+        idratazione = SeedStatScaling.PrimaryNeutralReference;
+        resistenzaFreddo = 0f;
+        resistenzaCaldo = 0f;
+        resistenzaParassiti = 0f;
+        vegetazione = SeedStatScaling.PrimaryNeutralReference;
+        metabolismo = SeedStatScaling.PrimaryNeutralReference;
+        resistenzaVuoto = 0f;
         fusionCount = 0;
     }
 }

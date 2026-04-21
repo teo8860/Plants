@@ -97,18 +97,20 @@ public static class SeedUpgradeSystem
     {
         var stats = seed.stats;
 
-        float vitalitaScore = Math.Clamp((stats.vitalita - 0.5f) / 1.5f, 0f, 1f); // Range tipico: 0.5-2.0
-        float vegetazioneScore = Math.Clamp((stats.vegetazione - 0.5f) / 1.5f, 0f, 1f);
-        float metabolismoScore = Math.Clamp((stats.metabolismo - 0.5f) / 1.5f, 0f, 1f);
+        // Scala 0-99: primarie baseline 10, range tipico 5-25 (fusioni possono portare piu' in alto).
+        // Score normalizzato sulla porzione di barra oltre il baseline.
+        float vitalitaScore = Math.Clamp((stats.vitalita - SeedStatScaling.PrimaryNeutralReference) / 15f, 0f, 1f);
+        float vegetazioneScore = Math.Clamp((stats.vegetazione - SeedStatScaling.PrimaryNeutralReference) / 15f, 0f, 1f);
+        float metabolismoScore = Math.Clamp((stats.metabolismo - SeedStatScaling.PrimaryNeutralReference) / 15f, 0f, 1f);
 
-        // Idratazione: più basso = meglio (meno consumo)
-        float idratazioneScore = Math.Clamp(1f - ((stats.idratazione - 0.3f) / 1.7f), 0f, 1f); // Range tipico: 0.3-2.0
+        // Idratazione: piu' basso = meglio (meno consumo acqua).
+        float idratazioneScore = Math.Clamp(1f - ((stats.idratazione - 3f) / 22f), 0f, 1f);
 
-        // Resistenze: valori centrati su 0, range tipico: -0.5 a 1.0
-        float resistenzaFreddoScore = Math.Clamp((stats.resistenzaFreddo + 0.5f) / 1.5f, 0f, 1f);
-        float resistenzaCaldoScore = Math.Clamp((stats.resistenzaCaldo + 0.5f) / 1.5f, 0f, 1f);
-        float resistenzaParassitiScore = Math.Clamp((stats.resistenzaParassiti + 0.5f) / 1.5f, 0f, 1f);
-        float resistenzaVuotoScore = Math.Clamp((stats.resistenzaVuoto + 0.3f) / 1.3f, 0f, 1f);
+        // Resistenze: 0 = neutro, 99 = max. Score lineare.
+        float resistenzaFreddoScore = Math.Clamp(stats.resistenzaFreddo / SeedStatScaling.StatMax, 0f, 1f);
+        float resistenzaCaldoScore = Math.Clamp(stats.resistenzaCaldo / SeedStatScaling.StatMax, 0f, 1f);
+        float resistenzaParassitiScore = Math.Clamp(stats.resistenzaParassiti / SeedStatScaling.StatMax, 0f, 1f);
+        float resistenzaVuotoScore = Math.Clamp(stats.resistenzaVuoto / SeedStatScaling.StatMax, 0f, 1f);
 
         // Peso diverso per ogni statistica (totale = 1.0)
         float weightedScore =
@@ -197,23 +199,23 @@ public static class SeedUpgradeSystem
 		switch (stat)
         {
             case SeedStatType.Vitalita:
-                seed.stats.vitalita += seed.stats.vitalita * multiplier;
+                seed.stats.vitalita = SeedStatScaling.ClampPrimary(seed.stats.vitalita + seed.stats.vitalita * multiplier, SeedStatScaling.VitalitaMin);
                 break;
 
             case SeedStatType.Idratazione:
-                seed.stats.idratazione += seed.stats.idratazione * multiplier;
+                seed.stats.idratazione = SeedStatScaling.ClampPrimary(seed.stats.idratazione + seed.stats.idratazione * multiplier, SeedStatScaling.IdratazioneMin);
                 break;
 
             case SeedStatType.ResistenzaParassiti:
-                seed.stats.resistenzaParassiti += seed.stats.resistenzaParassiti * multiplier;
+                seed.stats.resistenzaParassiti = SeedStatScaling.ClampResistance(seed.stats.resistenzaParassiti + seed.stats.resistenzaParassiti * multiplier);
                 break;
 
             case SeedStatType.Vegetazione:
-                seed.stats.vegetazione += seed.stats.vegetazione * multiplier;
+                seed.stats.vegetazione = SeedStatScaling.ClampPrimary(seed.stats.vegetazione + seed.stats.vegetazione * multiplier, SeedStatScaling.VegetazioneMin);
                 break;
 
             case SeedStatType.Metabolismo:
-                seed.stats.metabolismo += seed.stats.metabolismo * multiplier;
+                seed.stats.metabolismo = SeedStatScaling.ClampPrimary(seed.stats.metabolismo + seed.stats.metabolismo * multiplier, SeedStatScaling.MetabolismoMin);
                 break;
         }
     }

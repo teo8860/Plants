@@ -68,6 +68,8 @@ public class Inventario
             foreach (var item in seeds)
             {
                 item.type = item.type;
+                // Migra stats seme dal vecchio formato 0-2.5 al nuovo 0-99 se necessario.
+                SeedStatScaling.MigrateLegacyStats(item.stats);
             }
         }
     }

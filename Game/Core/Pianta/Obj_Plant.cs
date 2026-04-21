@@ -335,7 +335,7 @@ public class Obj_Plant : GameElement
 
         float velocita = proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
 
-        if (velocita > 0.01f && RandomHelper.DeterministicFloatRangeAt(rseed, puntiSpline.Count, 0, 1) < velocita)
+        if (velocita > 0.01f && RandomHelper.Float(0, 1) < velocita)
         {
             Crescita();
         }
@@ -454,7 +454,7 @@ public class Obj_Plant : GameElement
 
     private void TentaFogliaDorata()
     {
-        float chance = GOLDEN_LEAF_BASE_CHANCE * seedBonus.vegetazione;
+        float chance = GOLDEN_LEAF_BASE_CHANCE * SeedStatScaling.EffectiveMultiplier(seedBonus.vegetazione, WorldManager.GetCurrentStage());
 
         if (RandomHelper.Float(0, 1) < chance && rami.Count > 0)
         {

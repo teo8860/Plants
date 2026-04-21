@@ -51,7 +51,7 @@ public static class ClimateDefinitions
     public const float RIGENERAZIONE_SALUTE_BASE   = 0.0006f;
 
     // === Soglie stato pianta ===
-    public const float SOGLIA_DISIDRATAZIONE   = 0.85f;
+    public const float SOGLIA_DISIDRATAZIONE   = 0.05f;
     public const float SOGLIA_SOFFOCAMENTO     = 0.15f;
     public const float SOGLIA_CRITICA_SALUTE   = 0.20f;
     public const float SOGLIA_FAME_ENERGIA     = 0.10f;

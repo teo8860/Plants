@@ -823,7 +823,7 @@ public static class DebugConsole
         outputLines.Add($"  Meta:{s.Metabolismo:F2}  Temp:{s.Temperatura:F1}C  Infested:{s.Infestata}({s.IntensitaInfestazione:P0})");
         outputLines.Add($"  Leaves:{s.FoglieAttuali} cur/{s.FoglieAccumulate} harv  Branches:{p.rami.Count}  Roots:{p.radici.Count}");
         outputLines.Add($"  --- Seed Bonus (fusions:{b.fusionCount}/{Seed.MAX_FUSIONS}) ---");
-        outputLines.Add($"  VIT:{b.vitalita:F2} HYD:{b.idratazione:F2} VEG:{b.vegetazione:F2} META:{b.metabolismo:F2}");
-        outputLines.Add($"  Cold:{b.resistenzaFreddo:F2} Heat:{b.resistenzaCaldo:F2} Para:{b.resistenzaParassiti:F2} Vac:{b.resistenzaVuoto:F2}");
+        outputLines.Add($"  VIT:{b.vitalita:F0} HYD:{b.idratazione:F0} VEG:{b.vegetazione:F0} META:{b.metabolismo:F0}");
+        outputLines.Add($"  Cold:{b.resistenzaFreddo:F0} Heat:{b.resistenzaCaldo:F0} Para:{b.resistenzaParassiti:F0} Vac:{b.resistenzaVuoto:F0}");
     }
 }

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs ls *)",
+      "Read(//c/Users/Simone/.nuget/packages/raylib-csharp/**)",
+      "Read(//d//**)",
+      "Read(//c/Users/Simone/.nuget/packages/**)",
+      "Bash(dotnet-ildasm Raylib-CSharp.dll)",
+      "Bash(powershell -c '[System.Reflection.Assembly]::LoadFile\\('\\\\''C:\\\\Users\\\\Simone\\\\.nuget\\\\packages\\\\raylib-csharp\\\\4.0.1\\\\lib\\\\net8.0\\\\Raylib-CSharp.dll'\\\\''\\).GetTypes\\(\\) | Where-Object { $_.Name -eq '\\\\''Input'\\\\'' } | ForEach-Object { $_.GetMethods\\(\\) | Where-Object { $_.Name -like '\\\\''*Mouse*'\\\\'' } | Select-Object -ExpandProperty Name }')",
+      "Bash(powershell -c 'try { [System.Reflection.Assembly]::LoadFile\\('\\\\''C:\\\\Users\\\\Simone\\\\.nuget\\\\packages\\\\raylib-csharp\\\\4.0.1\\\\lib\\\\net8.0\\\\Raylib-CSharp.dll'\\\\''\\).GetTypes\\(\\) | Where-Object { $_.Name -eq '\\\\''Input'\\\\'' } | ForEach-Object { $_.GetMethods\\(\\) | Where-Object { $_.Name -like '\\\\''*Mouse*'\\\\'' } | Select-Object -ExpandProperty Name } } catch { $_.Exception.LoaderExceptions[0].Message }')",
+      "Bash(powershell -c '$asm = [System.Reflection.Assembly]::LoadFile\\('\\\\''C:\\\\Users\\\\Simone\\\\.nuget\\\\packages\\\\raylib-csharp\\\\4.0.1\\\\lib\\\\net8.0\\\\Raylib-CSharp.dll'\\\\''\\); try { $asm.GetTypes\\(\\) | Select-Object -ExpandProperty FullName | Where-Object { $_ -like '\\\\''*Input*'\\\\'' -or $_ -like '\\\\''*Mouse*'\\\\'' } } catch [System.Reflection.ReflectionTypeLoadException] { $_.Exception.Types | Where-Object { $_ -ne $null } | Select-Object -ExpandProperty FullName | Where-Object { $_ -like '\\\\''*Input*'\\\\'' -or $_ -like '\\\\''*Mouse*'\\\\'' } }')",
+      "Bash(powershell -c '$asm = [System.Reflection.Assembly]::LoadFile\\('\\\\''C:\\\\Users\\\\Simone\\\\.nuget\\\\packages\\\\raylib-csharp\\\\4.0.1\\\\lib\\\\net8.0\\\\Raylib-CSharp.dll'\\\\''\\); $types = @\\(\\); try { $types = $asm.GetTypes\\(\\) } catch { $types = $_.Exception.Types | Where-Object { $_ -ne $null } }; $types | Where-Object { $_.FullName -like '\\\\''*Interact*Input*'\\\\'' } | ForEach-Object { Write-Host $_.FullName; $_.GetMethods\\(\\) | Where-Object { $_.Name -like '\\\\''*Mouse*'\\\\'' } | Select-Object -ExpandProperty Name }')",
+      "Bash(powershell -c '$asm = [System.Reflection.Assembly]::LoadFile\\('\\\\''C:\\\\Users\\\\Simone\\\\.nuget\\\\packages\\\\raylib-csharp\\\\4.0.1\\\\lib\\\\net8.0\\\\Raylib-CSharp.dll'\\\\''\\); $types = @\\(\\); try { $types = $asm.GetTypes\\(\\) } catch [System.Reflection.ReflectionTypeLoadException] { $types = $_.Exception.Types | Where-Object { $_ -ne $null } }; Write-Host \"Count: $\\($types.Count\\)\"; $types | Select-Object -First 10 -ExpandProperty FullName')",
+      "Bash(powershell -c '$bytes = [System.IO.File]::ReadAllBytes\\('\\\\''C:\\\\Users\\\\Simone\\\\.nuget\\\\packages\\\\raylib-csharp\\\\4.0.1\\\\lib\\\\net8.0\\\\Raylib-CSharp.dll'\\\\''\\); $text = [System.Text.Encoding]::UTF8.GetString\\($bytes\\); [regex]::Matches\\($text, '\\\\''SetMouse\\\\w*'\\\\''\\) | Select-Object -ExpandProperty Value -Unique')",
+      "Bash(powershell -c '$bytes = [System.IO.File]::ReadAllBytes\\('\\\\''C:\\\\Users\\\\Simone\\\\.nuget\\\\packages\\\\raylib-csharp\\\\4.0.1\\\\lib\\\\net8.0\\\\Raylib-CSharp.dll'\\\\''\\); $text = [System.Text.Encoding]::UTF8.GetString\\($bytes\\); [regex]::Matches\\($text, '\\\\''Set\\(Window|Size\\)\\\\w*'\\\\''\\) | Select-Object -ExpandProperty Value -Unique')"
+    ]
+  }
+}

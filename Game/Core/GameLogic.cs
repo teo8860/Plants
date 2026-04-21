@@ -45,15 +45,25 @@ public class GameLogicPianta
     public SeedStats bonus => pianta.seedBonus;
     public PlantStats stats => pianta.Stats;
 
-    public float VitalitaMax => 1.0f * bonus.vitalita;
-    public float ConsumoAcquaMult => bonus.idratazione;
+    // Stage corrente del loop mondi: piu' alto = stats seme meno efficaci.
+    private static int Stage => WorldManager.GetCurrentStage();
 
-    public float ResistenzaFreddoTotale => Math.Clamp(stats.ResistenzaFreddo + bonus.resistenzaFreddo, -1f, 1f);
-    public float ResistenzaCaldoTotale => Math.Clamp(stats.ResistenzaCaldo + bonus.resistenzaCaldo, -1f, 1f);
-    public float ResistenzaParassitiTotale => Math.Clamp(stats.ResistenzaParassiti + bonus.resistenzaParassiti, -1f, 1f);
+    // Stat seme → moltiplicatore efficace tramite SeedStatScaling.
+    // Primarie: stat / requirement (neutro a stat == requirement, requirement cresce con stage).
+    // Resistenze: stat / (100 + stage-1), clampato a 0.95.
+    public float VitalitaBonusMult => SeedStatScaling.EffectiveMultiplier(bonus.vitalita, Stage);
+    public float ConsumoAcquaMult => SeedStatScaling.EffectiveMultiplier(bonus.idratazione, Stage);
+    public float VegetazioneMult => SeedStatScaling.EffectiveMultiplier(bonus.vegetazione, Stage);
+    public float MetabolismoMult => SeedStatScaling.EffectiveMultiplier(bonus.metabolismo, Stage);
 
-    public int FoglieMassime => (int)(stats.FoglieBase * bonus.vegetazione);
-    public float MetabolismoEffettivo => Math.Clamp(stats.Metabolismo * bonus.metabolismo, 0.1f, 3f);
+    public float VitalitaMax => 1.0f * VitalitaBonusMult;
+
+    public float ResistenzaFreddoTotale => Math.Clamp(stats.ResistenzaFreddo + SeedStatScaling.EffectiveResistance(bonus.resistenzaFreddo, Stage), -1f, 1f);
+    public float ResistenzaCaldoTotale => Math.Clamp(stats.ResistenzaCaldo + SeedStatScaling.EffectiveResistance(bonus.resistenzaCaldo, Stage), -1f, 1f);
+    public float ResistenzaParassitiTotale => Math.Clamp(stats.ResistenzaParassiti + SeedStatScaling.EffectiveResistance(bonus.resistenzaParassiti, Stage), -1f, 1f);
+
+    public int FoglieMassime => (int)(stats.FoglieBase * VegetazioneMult);
+    public float MetabolismoEffettivo => Math.Clamp(stats.Metabolismo * MetabolismoMult, 0.1f, 3f);
     public float PercentualeSalute => stats.Salute / VitalitaMax;
 
     public bool IsViva => stats.Salute > 0;
@@ -108,7 +118,7 @@ public class GameLogicPianta
     {
         float temp = stats.Temperatura;
 
-        if (temp <= TEMPERATURA_GELIDA) return 0f;
+        if (temp <= TEMPERATURA_GELIDA) return 0.05f;
         if (temp < TEMPERATURA_FREDDA)
         {
             float t = (temp - TEMPERATURA_GELIDA) / (TEMPERATURA_FREDDA - TEMPERATURA_GELIDA);
@@ -138,7 +148,7 @@ public class GameLogicPianta
             float t = (temp - TEMPERATURA_CALDA) / (TEMPERATURA_TORRIDA - TEMPERATURA_CALDA);
             return 0.7f - t * 0.5f;
         }
-        return Math.Max(0f, 0.2f - (temp - TEMPERATURA_TORRIDA) * 0.02f);
+        return Math.Max(0.05f, 0.2f - (temp - TEMPERATURA_TORRIDA) * 0.02f);
     }
 
     public void ApplicaDanniTemperatura(WorldModifier worldMod)
@@ -383,12 +393,24 @@ public class GameLogicPianta
         velocita *= worldMod.GrowthRateMultiplier;
         velocita *= GetMoltiplicatoreCrescitaTemperatura();
 
+        // Salute bassa: riduzione graduale (a 20% = 0.4x, a 5% = 0.1x)
         if (PercentualeSalute < 0.5f)
         {
             velocita *= PercentualeSalute * 2f;
         }
 
-        if (IsCritica || IsDisidratata || IsSoffocamento || IsFame)
+        // Risorse basse: riduzione graduale per ciascuna
+        if (stats.Idratazione < 0.30f)
+            velocita *= stats.Idratazione / 0.30f;
+
+        if (stats.Ossigeno < 0.30f)
+            velocita *= stats.Ossigeno / 0.30f;
+
+        if (stats.Metabolismo < 0.30f)
+            velocita *= stats.Metabolismo / 0.30f;
+
+        // Blocco totale solo se una risorsa e' completamente esaurita
+        if (stats.Idratazione < 0.01f || stats.Ossigeno < 0.01f || stats.Metabolismo < 0.01f)
         {
             velocita = 0;
         }

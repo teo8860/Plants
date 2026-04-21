@@ -13,7 +13,8 @@ public class ItemRadicatore : ItemDefinition
 
     public override void OnStart(Obj_Plant pianta)
     {
-        pianta.seedBonus.vitalita += 0.2f;
+        // Scala 0-99: +2 vitalita (circa +20% del baseline 10).
+        pianta.seedBonus.vitalita = Math.Min(SeedStatScaling.StatMax, pianta.seedBonus.vitalita + 2f);
         Console.WriteLine("[Item] Radicatore Profondo: vitalita' aumentata!");
     }
 

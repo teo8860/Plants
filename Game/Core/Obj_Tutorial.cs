@@ -467,23 +467,20 @@ namespace Plants
         {
             // Salva che il tutorial è stato completato (anche se saltato)
             SaveTutorialCompleted();
-            
+
             // Togli la pausa
             Game.isPaused = false;
-            
-            // Vai direttamente su Terra
+
+            // Reset pianta e vai su Terra, poi mostra selezione seme
+            // (il seme starter viene concesso automaticamente da Obj_GuiPiantaggio)
             WorldManager.SetCurrentWorld(WorldType.Terra);
             Game.pianta.Reset();
             Game.pianta.SetNaturalColors(WorldType.Terra);
-            
-            // Fai crescere un po' la pianta
-            for (int i = 0; i < 400; i++)
-            {
-                Game.pianta.Crescita();
-            }
-            
+
             isTutorialActive = false;
             currentPhase = TutorialPhase.Fine;
+
+            Game.EntraModalitaPiantaggio();
         }
 
         private void CheckCompletatoButton()

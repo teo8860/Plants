@@ -24,6 +24,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
     private Color buttonActiveColor = new Color(100, 180, 255, 255);
     private Color buttonBorder = new Color(62, 39, 25, 255);
     private Color textColor = new Color(245, 235, 220, 255);
+    private Color essenceColor = new Color(180, 100, 255, 255);
 
     private string[] buttonLabels = { "Unisci", "Scarta", "Migliora" };
     private int hoveredButton = -1;
@@ -212,23 +213,51 @@ public class Obj_GuiSeedDetailPanel : GameElement
         if (selectedSeedIndex < 0) return;
 
         var seed = Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex);
-        if (seed != null)
-        {
-            // Restituisci gli oggetti equipaggiati all'inventario
-            if (seed.equippedItems != null)
-            {
-                foreach (var itemId in seed.equippedItems)
-                {
-                    if (!string.IsNullOrEmpty(itemId))
-                        ItemInventory.get().Add(itemId);
-                }
-            }
+        if (seed == null) return;
 
-            Inventario.get().RemoveSeed(seed);
-            Game.inventoryGrid?.Populate();
-            selectedSeedIndex = -1;
-            Console.WriteLine("Seme scartato (oggetti restituiti)");
+        // Restituisci gli oggetti equipaggiati all'inventario prima del sacrificio.
+        if (seed.equippedItems != null)
+        {
+            foreach (var itemId in seed.equippedItems)
+            {
+                if (!string.IsNullOrEmpty(itemId))
+                    ItemInventory.get().Add(itemId);
+            }
         }
+
+        // Sacrifica invece di scartare: converte il seme in essenza.
+        int gained = SeedUpgradeSystem.SacrificeSeed(seed);
+
+        // Spawn animazione "+N essenza" al centro del bottone Scarta.
+        SpawnEssenceGainFx(gained);
+
+        Game.inventoryGrid?.Populate();
+        selectedSeedIndex = -1;
+        Console.WriteLine($"Seme sacrificato (oggetti restituiti). Essenza: +{gained}");
+    }
+
+    private void SpawnEssenceGainFx(int amount)
+    {
+        if (amount <= 0) return;
+
+        int screenW = Rendering.camera.screenWidth;
+        int screenH = Rendering.camera.screenHeight;
+        int panelX = screenW - (int)(panelWidth * Math.Max(slideProgress, 1f));
+
+        int buttonHeight = 36;
+        int buttonSpacing = 16;
+        int buttonMargin = 12;
+        int totalButtonsHeight = buttonLabels.Length * buttonHeight + (buttonLabels.Length - 1) * buttonSpacing;
+        int navBarHeight = 45;
+        int buttonsStartY = screenH - totalButtonsHeight - buttonMargin - navBarHeight;
+
+        // Scarta = indice 1
+        int btnX = panelX + buttonMargin;
+        int btnY = buttonsStartY + 1 * (buttonHeight + buttonSpacing);
+        int btnWidth = panelWidth - buttonMargin * 2;
+
+        var pos = new System.Numerics.Vector2(btnX + btnWidth / 2f - 10, btnY);
+        new Obj_EssenceGainFx(pos, amount);
     }
 
     private void HandleUpgrade()
@@ -439,11 +468,49 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 label = "FONDI!";
             }
 
-            int textWidth = label.Length * 7;
-            int textX = btnX + (btnWidth - textWidth) / 2;
-            int textY = btnY + (buttonHeight - 14) / 2;
-            Graphics.DrawText(label, textX, textY, 14, textColor);
+            // Bottone Scarta: mostra label sopra e preview essenza + icona sotto.
+            if (i == 1)
+            {
+                int labelW = label.Length * 6;
+                Graphics.DrawText(label, btnX + (btnWidth - labelW) / 2, btnY + 4, 11, textColor);
+
+                Seed sel = selectedSeedIndex >= 0 ? Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) : null;
+                if (sel != null)
+                {
+                    int preview = SeedUpgradeSystem.PreviewSacrificeValue(sel);
+                    string previewText = $"+{preview}";
+                    int pvTextW = previewText.Length * 5;
+                    int iconSize = 5;
+                    int totalW = pvTextW + 4 + iconSize * 2;
+                    int startX = btnX + (btnWidth - totalW) / 2;
+                    Graphics.DrawText(previewText, startX, btnY + 20, 9, essenceColor);
+                    DrawEssenceIcon(startX + pvTextW + 4 + iconSize, btnY + 25, iconSize);
+                }
+            }
+            else
+            {
+                int textWidth = label.Length * 7;
+                int textX = btnX + (btnWidth - textWidth) / 2;
+                int textY = btnY + (buttonHeight - 14) / 2;
+                Graphics.DrawText(label, textX, textY, 14, textColor);
+            }
         }
+    }
+
+    private void DrawEssenceIcon(int x, int y, int size)
+    {
+        Graphics.DrawTriangle(
+            new System.Numerics.Vector2(x, y - size),
+            new System.Numerics.Vector2(x - size / 2f, y),
+            new System.Numerics.Vector2(x + size / 2f, y),
+            essenceColor
+        );
+        Graphics.DrawTriangle(
+            new System.Numerics.Vector2(x, y + size),
+            new System.Numerics.Vector2(x - size / 2f, y),
+            new System.Numerics.Vector2(x + size / 2f, y),
+            essenceColor
+        );
     }
 
 }

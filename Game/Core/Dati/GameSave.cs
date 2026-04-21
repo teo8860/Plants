@@ -143,6 +143,8 @@ public class GameSave
         Game.pianta.Stats = saveData.PlantStats;
         Game.pianta.TipoSeme = saveData.PlantSeedType;
         Game.pianta.seedBonus = saveData.PlantSeedBonus;
+        // Migra stats seme dal vecchio formato 0-2.5 al nuovo 0-99 se necessario.
+        SeedStatScaling.MigrateLegacyStats(Game.pianta.seedBonus);
         Game.pianta.equippedItemIds = saveData.PlantEquippedItems ?? new List<string> { null, null, null };
         Game.pianta.rseed = saveData.randomSeed;
 

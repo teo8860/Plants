@@ -36,6 +36,7 @@ public class Obj_GuiFusionResultPopup : GameElement
     private readonly Color buttonColor = new Color(90, 130, 200, 255);
     private readonly Color buttonHover = new Color(120, 170, 240, 255);
     private readonly Color betterColor = new Color(100, 220, 100, 255);
+    private readonly Color midColor = new Color(230, 200, 90, 255);
     private readonly Color worseColor = new Color(220, 100, 100, 255);
     private readonly Color tickColor = new Color(230, 230, 230, 200);
 
@@ -273,14 +274,14 @@ public class Obj_GuiFusionResultPopup : GameElement
     {
         var stats = new StatInfo[]
         {
-            new() { Label = "VIT", P1 = parent1.stats.vitalita,             P2 = parent2.stats.vitalita,             New = fused.stats.vitalita,             Min =  0f,   Max = 2.5f },
-            new() { Label = "IDR", P1 = parent1.stats.idratazione,          P2 = parent2.stats.idratazione,          New = fused.stats.idratazione,          Min =  0f,   Max = 2.5f },
-            new() { Label = "MET", P1 = parent1.stats.metabolismo,          P2 = parent2.stats.metabolismo,          New = fused.stats.metabolismo,          Min =  0f,   Max = 2.5f },
-            new() { Label = "VEG", P1 = parent1.stats.vegetazione,          P2 = parent2.stats.vegetazione,          New = fused.stats.vegetazione,          Min =  0f,   Max = 2.5f },
-            new() { Label = "FRD", P1 = parent1.stats.resistenzaFreddo,     P2 = parent2.stats.resistenzaFreddo,     New = fused.stats.resistenzaFreddo,     Min = -0.5f, Max = 1.0f },
-            new() { Label = "CLD", P1 = parent1.stats.resistenzaCaldo,      P2 = parent2.stats.resistenzaCaldo,      New = fused.stats.resistenzaCaldo,      Min = -0.5f, Max = 1.0f },
-            new() { Label = "PAR", P1 = parent1.stats.resistenzaParassiti,  P2 = parent2.stats.resistenzaParassiti,  New = fused.stats.resistenzaParassiti,  Min = -0.5f, Max = 1.0f },
-            new() { Label = "VUO", P1 = parent1.stats.resistenzaVuoto,      P2 = parent2.stats.resistenzaVuoto,      New = fused.stats.resistenzaVuoto,      Min = -0.3f, Max = 1.0f },
+            new() { Label = "VIT", P1 = parent1.stats.vitalita,             P2 = parent2.stats.vitalita,             New = fused.stats.vitalita,             Min = SeedStatScaling.StatMin, Max = SeedStatScaling.StatMax },
+            new() { Label = "IDR", P1 = parent1.stats.idratazione,          P2 = parent2.stats.idratazione,          New = fused.stats.idratazione,          Min = SeedStatScaling.StatMin, Max = SeedStatScaling.StatMax },
+            new() { Label = "MET", P1 = parent1.stats.metabolismo,          P2 = parent2.stats.metabolismo,          New = fused.stats.metabolismo,          Min = SeedStatScaling.StatMin, Max = SeedStatScaling.StatMax },
+            new() { Label = "VEG", P1 = parent1.stats.vegetazione,          P2 = parent2.stats.vegetazione,          New = fused.stats.vegetazione,          Min = SeedStatScaling.StatMin, Max = SeedStatScaling.StatMax },
+            new() { Label = "FRD", P1 = parent1.stats.resistenzaFreddo,     P2 = parent2.stats.resistenzaFreddo,     New = fused.stats.resistenzaFreddo,     Min = SeedStatScaling.StatMin, Max = SeedStatScaling.StatMax },
+            new() { Label = "CLD", P1 = parent1.stats.resistenzaCaldo,      P2 = parent2.stats.resistenzaCaldo,      New = fused.stats.resistenzaCaldo,      Min = SeedStatScaling.StatMin, Max = SeedStatScaling.StatMax },
+            new() { Label = "PAR", P1 = parent1.stats.resistenzaParassiti,  P2 = parent2.stats.resistenzaParassiti,  New = fused.stats.resistenzaParassiti,  Min = SeedStatScaling.StatMin, Max = SeedStatScaling.StatMax },
+            new() { Label = "VUO", P1 = parent1.stats.resistenzaVuoto,      P2 = parent2.stats.resistenzaVuoto,      New = fused.stats.resistenzaVuoto,      Min = SeedStatScaling.StatMin, Max = SeedStatScaling.StatMax },
         };
 
         int rowH = 14;
@@ -300,24 +301,33 @@ public class Obj_GuiFusionResultPopup : GameElement
             // Label
             Graphics.DrawText(s.Label, x, ry + 2, 9, dimText);
 
-            // Genitori (piccoli, grigi)
-            string p1 = s.P1.ToString("F2");
-            string p2 = s.P2.ToString("F2");
-            Graphics.DrawText(p1, x + labelW, ry + 3, 8, dimText);
-            Graphics.DrawText("|", x + labelW + 28, ry + 3, 8, dimText);
-            Graphics.DrawText(p2, x + labelW + 36, ry + 3, 8, dimText);
+            // Genitori (piccoli, grigi) — scala 0-99 intera.
+            // p1 allineato a destra verso il separatore, p2 a sinistra del separatore.
+            string p1 = ((int)Math.Round(s.P1)).ToString();
+            string p2 = ((int)Math.Round(s.P2)).ToString();
+            int p1W = p1.Length * 5;
+            int sepX = x + labelW + 28;
+            Graphics.DrawText(p1, sepX - 4 - p1W, ry + 3, 8, dimText);
+            Graphics.DrawText("|", sepX, ry + 3, 8, dimText);
+            Graphics.DrawText(p2, sepX + 8, ry + 3, 8, dimText);
 
             // Freccia
             Graphics.DrawText("->", x + labelW + parentBlockW, ry + 3, 8, dimText);
 
-            // Valore nuovo (colorato)
+            // Valore nuovo (colorato):
+            //   verde  = sopra max genitori
+            //   bianco = ≈ max genitori
+            //   giallo = tra min e max
+            //   rosso  = sotto min genitori
             float maxP = Math.Max(s.P1, s.P2);
             float minP = Math.Min(s.P1, s.P2);
-            Color newColor = textColor;
-            if (s.New > maxP + 0.01f)      newColor = betterColor;
-            else if (s.New < minP - 0.01f) newColor = worseColor;
+            Color newColor;
+            if (s.New > maxP + 0.5f)       newColor = betterColor;
+            else if (s.New >= maxP - 0.5f) newColor = textColor;
+            else if (s.New > minP + 0.5f)  newColor = midColor;
+            else                           newColor = worseColor;
 
-            string newStr = s.New.ToString("F2");
+            string newStr = ((int)Math.Round(s.New)).ToString();
             Graphics.DrawText(newStr, x + labelW + parentBlockW + arrowW, ry + 2, 9, newColor);
 
             // Barra con marker dei genitori sovrapposti

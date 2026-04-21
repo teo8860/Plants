@@ -31,6 +31,7 @@ public class Obj_GuiSeedUpgradePanel : GameElement
     // Layout
     private int panelWidth = 350;
     private int panelHeight = 480;
+    private const int NAV_BAR_HEIGHT = 45;
 
     // Interazione
     private int hoveredStatIndex = -1;
@@ -102,7 +103,7 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         int screenW = Rendering.camera.screenWidth;
         int screenH = Rendering.camera.screenHeight;
         int panelX = (screenW - panelWidth) / 2;
-        int panelY = (screenH - panelHeight) / 2;
+        int panelY = (screenH - NAV_BAR_HEIGHT - panelHeight) / 2;
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
@@ -214,11 +215,11 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         byte overlayAlpha = (byte)(150 * slideProgress);
         Graphics.DrawRectangle(0, 0, screenW, screenH, new Color(0, 0, 0, overlayAlpha));
 
-        // Posizione pannello
+        // Posizione pannello (riserva spazio per la navbar in basso).
         float eased = EaseOutBack(slideProgress);
         int currentPanelH = (int)(panelHeight * eased);
         int panelX = (screenW - panelWidth) / 2;
-        int panelY = (screenH - currentPanelH) / 2;
+        int panelY = (screenH - NAV_BAR_HEIGHT - currentPanelH) / 2;
 
         if (currentPanelH < 50)
             return;
