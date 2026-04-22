@@ -71,6 +71,7 @@ public static class Game
     public static Obj_GuiPostaPopup guiPostaPopup;
     public static Obj_GuiRewardPopup guiRewardPopup;
     public static Obj_GuiPostaBadge guiPostaBadge;
+    public static Obj_GuiTutorialSlideshow tutorialSlideshow;
 
     public static Obj_GuiItemBoard itemBoard;
     public static Obj_GuiItemSlots itemSlots;
@@ -309,6 +310,7 @@ public static class Game
         guiRewardPopup = GameElement.Create<Obj_GuiRewardPopup>(-3000);
         guiPostaBadge = GameElement.Create<Obj_GuiPostaBadge>(-650);
         guiPostaBadge.PostaButtonIndex = 2;
+        tutorialSlideshow = GameElement.Create<Obj_GuiTutorialSlideshow>(-5000);
 
         MailSystem.Load();
         MailSystem.RefreshRecurringMails();

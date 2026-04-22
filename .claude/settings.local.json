@@ -16,7 +16,8 @@
       "Bash(dotnet publish:*)",
       "Bash(powershell -ExecutionPolicy Bypass -File check_subsystem.ps1)",
       "Bash(python *)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "mcp__plugin_claude-mem_mcp-search__get_observations"
     ]
   }
 }

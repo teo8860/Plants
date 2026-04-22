@@ -174,8 +174,8 @@ namespace Plants
             switch (currentPhase)
             {
                 case TutorialPhase.Intro:
-                    CheckIntroButton();
-                    CheckSkipButton();
+                    if (!Game.tutorialSlideshow.IsVisible)
+                        CheckSkipButton();
                     break;
 
                 case TutorialPhase.SemeFluttuante:
@@ -192,19 +192,11 @@ namespace Plants
                 case TutorialPhase.SpiegaTemperatura:
                 case TutorialPhase.SpiegaParassiti:
                 case TutorialPhase.SpiegaFoglie:
-                    if (Game.isPaused && currentPhase != TutorialPhase.CrescitaIniziale)
-                    {
-                        // Mostra messaggio e aspetta input utente
-                        CheckMessageContinue();
-                    }
-                    else
-                    {
+                    if (!Game.isPaused)
                         UpdateFaseSpiegazione(deltaTime);
-                    }
                     break;
 
                 case TutorialPhase.Completato:
-                    CheckCompletatoButton();
                     break;
 
                 case TutorialPhase.MostraPopupTerra:
@@ -401,17 +393,13 @@ namespace Plants
 
             if (newPhase != currentPhase)
             {
-                // Quando cambiamo fase messaggio, metti in pausa per mostrare il messaggio
                 Game.isPaused = true;
                 speedTransitionTime = 0f;
                 currentPhase = newPhase;
                 messageAlpha = 0f;
 
-                // Se è una fase messaggio, assicurati che sia in pausa
                 if (newPhase != TutorialPhase.CrescitaIniziale)
-                {
-                    Game.isPaused = true;
-                }
+                    ShowSlideshowForPhase(newPhase);
             }
         }
 
@@ -582,12 +570,10 @@ namespace Plants
             switch (currentPhase)
             {
                 case TutorialPhase.Intro:
-                    DrawPopup("Benvenuto in Plants!", GetIntroText(), "INIZIA", true, true);
                     break;
 
                 case TutorialPhase.SemeFluttuante:
                     DrawSeme();
-                    DrawMessageBox("Il Seme", new[] { "Clicca il seme per piantarlo!" });
                     break;
 
                 case TutorialPhase.SemeCade:
@@ -599,19 +585,9 @@ namespace Plants
                 case TutorialPhase.SpiegaTemperatura:
                 case TutorialPhase.SpiegaParassiti:
                 case TutorialPhase.SpiegaFoglie:
-                    if (Game.isPaused && currentPhase != TutorialPhase.CrescitaIniziale)
-                    {
-                        // Mostra messaggio in pausa con "Clicca per continuare"
-                        if (messaggi.TryGetValue(currentPhase, out var msg))
-                        {
-                            DrawMessageBox(msg.titolo, msg.righe);
-                            DrawContinuePrompt();
-                        }
-                    }
                     break;
 
                 case TutorialPhase.Completato:
-                    DrawPopup("Tutorial Completato!", GetCompletatoText(), "CONTINUA", true, false);
                     break;
 
                 case TutorialPhase.MostraPopupTerra:
@@ -965,6 +941,84 @@ namespace Plants
             speedTransitionTime = 0f;
         }
 
+        private void ShowSlideshowForPhase(TutorialPhase phase)
+        {
+            TutorialSlide[] slides = phase switch
+            {
+                TutorialPhase.SpiegaIdratazione => new[]
+                {
+                    TutorialPresets.InnaffiatoioOff(new[] {
+                        "La pianta ha bisogno di ACQUA!",
+                        "",
+                        "Se l'idratazione scende troppo",
+                        "la pianta soffrirà."
+                    }),
+                    TutorialPresets.InnaffiatoioOn(new[] {
+                        "Usa l'annaffiatoio per innaffiare.",
+                        "",
+                        "Clicca il bottone in basso",
+                        "a sinistra per attivarlo."
+                    }),
+                },
+                TutorialPhase.SpiegaTemperatura => new[]
+                {
+                    new TutorialSlide("Temperatura", new[] {
+                        "Attenzione alla TEMPERATURA!",
+                        "",
+                        "Troppo freddo o troppo caldo",
+                        "danneggia la pianta.",
+                        "",
+                        "Temperatura ideale: 18-26°C"
+                    }),
+                },
+                TutorialPhase.SpiegaParassiti => new[]
+                {
+                    new TutorialSlide("Parassiti", new[] {
+                        "I PARASSITI sono un pericolo!",
+                        "",
+                        "Possono infestare la pianta.",
+                        "Tienila in salute per",
+                        "prevenirli!"
+                    }),
+                },
+                TutorialPhase.SpiegaFoglie => new[]
+                {
+                    new TutorialSlide("Foglie", new[] {
+                        "Le FOGLIE producono energia",
+                        "attraverso la fotosintesi.",
+                        "",
+                        "Proteggile da tempeste",
+                        "e parassiti!"
+                    }),
+                    TutorialPresets.FogliaDorata(new[] {
+                        "Le foglie dorate nascondono",
+                        "mini-giochi speciali.",
+                        "",
+                        "Cliccale quando appaiono!"
+                    }),
+                },
+                TutorialPhase.Completato => new[]
+                {
+                    new TutorialSlide("Tutorial Completato!", new[] {
+                        "Ottimo lavoro!",
+                        "",
+                        "Hai imparato le basi.",
+                        "Ora sei pronto per",
+                        "la vera avventura!"
+                    }),
+                },
+                _ => Array.Empty<TutorialSlide>()
+            };
+
+            if (slides.Length == 0) return;
+
+            Action onDone = phase == TutorialPhase.Completato
+                ? () => { currentPhase = TutorialPhase.MostraPopupTerra; animationProgress = 0f; }
+                : ResumeGrowth;
+
+            Game.tutorialSlideshow.Show(slides, onDone);
+        }
+
         public float GetGrowthSpeed()
         {
             float velocita = Game.pianta.proprieta.CalcolaVelocitaCrescita(WorldManager.GetCurrentModifiers());
@@ -1005,9 +1059,28 @@ namespace Plants
             speedTransitionTime = 0f;
 
             WorldManager.SetCurrentWorld(WorldType.Serra);
+            Game.isPaused = true;
 
-			// Metti in pausa il gioco durante il tutorial iniziale
-			Game.isPaused = true;
+            Game.tutorialSlideshow.Show(new TutorialSlide[]
+            {
+                new("Benvenuto in Plants!", new[] {
+                    "In questo gioco coltiverai piante",
+                    "attraverso diversi mondi!",
+                    "",
+                    "Ogni mondo porta nuove sfide:",
+                    "temperatura, siccità e parassiti."
+                }),
+                new("Il tuo primo seme", new[] {
+                    "Tra poco apparirà il tuo seme.",
+                    "",
+                    "Cliccalo per piantarlo",
+                    "e iniziare la crescita!"
+                }),
+            }, onDone: () =>
+            {
+                currentPhase = TutorialPhase.SemeFluttuante;
+                animationProgress = 0f;
+            });
         }
     }
 
