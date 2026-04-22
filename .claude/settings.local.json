@@ -17,7 +17,9 @@
       "Bash(powershell -ExecutionPolicy Bypass -File check_subsystem.ps1)",
       "Bash(python *)",
       "Bash(pip install *)",
-      "mcp__plugin_claude-mem_mcp-search__get_observations"
+      "mcp__plugin_claude-mem_mcp-search__get_observations",
+      "Read(//c/Users/Stage/.claude/plugins/cache/caveman/caveman/84cc3c14fa1e/skills/compress/**)",
+      "Bash(python3 -m scripts \"C:\\\\Dev\\\\Plants\\\\CLAUDE.md\")"
     ]
   }
 }

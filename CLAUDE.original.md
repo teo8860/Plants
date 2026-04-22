@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-Guidance for Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-**Plants** = plant simulation game. C# .NET 9.0, custom engine on Raylib-CSharp. Windows-only desktop app, system tray. UI fully rendered via Raylib (custom panels, sprites, text) — no ImGui despite NuGet ref. All text Italian.
+**Plants** is a plant simulation game built with C# .NET 9.0 using a custom engine on top of Raylib-CSharp. Windows-only desktop app with system tray integration. The entire UI is rendered via Raylib (custom drawn panels, sprites, text) — no ImGui is used despite the NuGet reference being present. All text in the game is in Italian.
 
 ## Build & Run
 
@@ -20,18 +20,18 @@ dotnet run --project Plants.csproj
 dotnet clean
 ```
 
-No automated tests. Verify changes by running game manually.
+No automated tests exist. To verify changes, run the game and test manually.
 
-**Trimming**: Project uses `PublishTrimmed` with `partial` trim mode. `linker.xml` preserves all types in `Plants` namespace (needed for `GameElement.Create<T>()` reflection). New assembly with reflection-created types → update `linker.xml`.
+**Trimming**: The project uses `PublishTrimmed` with `partial` trim mode. `linker.xml` preserves all types in the `Plants` namespace (needed for `GameElement.Create<T>()` reflection). If you add a new assembly with types created via reflection, update `linker.xml`.
 
-**Standalone minigame mode**: `Plants.exe --minigioco <TipoMinigioco>` launches single minigame in separate window.
+**Standalone minigame mode**: `Plants.exe --minigioco <TipoMinigioco>` launches a single minigame in a separate window.
 
 ## Architecture
 
 ### Entry Point & Main Loop
 `Program.Main()` → `Game.Init()` → `Rendering.Init()` (infinite `while(true)` loop at 60 FPS)
 
-Main loop in `Rendering.cs`:
+The main loop in `Rendering.cs`:
 1. Updates all active GameElements
 2. Splits into `layerBase` (world, `guiLayer=false`) and `layerGui` (UI, `guiLayer=true`)
 3. Sorts each layer by `depth` (higher = drawn on top)
@@ -39,7 +39,7 @@ Main loop in `Rendering.cs`:
 5. Renders GUI layer directly on screen
 6. Draws `DebugConsole` overlay last
 
-Virtual resolution: 100x125, upscaled 4x to 400x500 window. `PixelCamera` handles world-to-screen projection via `RenderTexture2D`.
+Virtual resolution: 100x125, upscaled 4x to 400x500 window. `PixelCamera` handles the world-to-screen projection using a `RenderTexture2D`.
 
 Window never truly closes — minimize/close hides to system tray (`ConfigFlags.HiddenWindow`). Exit only via tray icon context menu.
 
@@ -49,16 +49,16 @@ Window never truly closes — minimize/close hides to system tray (`ConfigFlags.
 - Constructor auto-registers in static `GameElement.elementList` (thread-safe with `_elementLock`)
 - Call `Destroy()` to remove; finalizer also removes from list
 - `Obj_` prefix for game objects, `Obj_Gui` prefix for UI objects
-- `persistent = true` keeps element active across room switches
+- `persistent = true` keeps an element active across room switches
 
 ### Room System
-- `Room` manages scene activation; one room active at a time
+- `Room` manages scene activation; only one room active at a time
 - 6 rooms: `room_main`, `room_inventory`, `room_options`, `room_compost`, `room_upgrade`, plus `room_minigioco` (created by `ManagerMinigames`)
-- `room.SetActiveRoom()` activates its elements, deactivates all others (except `persistent`)
-- Elements auto-bind to active room at creation unless room passed to `Create<T>()`
+- `room.SetActiveRoom()` activates its elements and deactivates all others (except `persistent` ones)
+- Elements auto-bind to the active room at creation unless a room is passed to `Create<T>()`
 
 ### Static Singletons in `Game.cs`
-All major objects referenced as static fields: `Game.pianta`, `Game.controller`, `Game.room_main`, `Game.statsPanel`, `Game.toolbar`, etc. `Game.Init()` creates everything in order: rooms → `AssetLoader.LoadAll()` → `ItemRegistry.Init()` → `NotificationManager.Initialize()` → game objects → GUI → inventory → composter → upgrades → minigames → load save.
+All major objects are referenced as static fields: `Game.pianta`, `Game.controller`, `Game.room_main`, `Game.statsPanel`, `Game.toolbar`, etc. `Game.Init()` creates everything in order: rooms → `AssetLoader.LoadAll()` → `ItemRegistry.Init()` → `NotificationManager.Initialize()` → game objects → GUI → inventory → composter → upgrades → minigames → load save.
 
 ### Timers (System.Timers.Timer, run on thread pool)
 | Timer | Interval | Purpose |
@@ -67,7 +67,7 @@ All major objects referenced as static fields: `Game.pianta`, `Game.controller`,
 | `TimerSave` | 10s | Auto-save (`GameSave.get().Save()`) |
 | `TimerFase` | 1h | Day phase update |
 
-All timers pause during `IsModalitaPiantaggio` or `isPaused`. 1s timer = core simulation tick — **all plant damage, growth, weather effects happen here**, not in render loop.
+All timers pause during `IsModalitaPiantaggio` or `isPaused`. The 1s timer is the core simulation tick — **all plant damage, growth, weather effects happen here**, not in the render loop.
 
 ### Data Persistence
 - `GameSave` singleton — JSON to `%APPDATA%/Plants/savegame.json` via `SaveHelper`
@@ -75,10 +75,10 @@ All timers pause during `IsModalitaPiantaggio` or `isPaused`. 1s timer = core si
 - `ItemInventory` singleton — JSON to `%APPDATA%/Plants/items.json` (equipped items)
 - `SaveHelper` uses `System.Text.Json` with `WriteIndented`, `camelCase` naming, `IncludeFields`
 - Always call `GameSave.get().Save()` on exit; auto-save runs every 10s
-- `PlantDead` flag in save triggers piantaggio mode on next launch (preserves leaves, essence, upgrades)
+- `PlantDead` flag in save data triggers piantaggio mode on next launch (preserves leaves, essence, upgrades)
 
 ### Assets
-All PNG/shader files in `Assets/` copied to output (configured in .csproj `CopyToOutputDirectory`). Loaded once in `AssetLoader.LoadAll()` during `Game.Init()`. Sprites wrap `Texture2D` with scale and origin. **Never load assets in render loop.**
+All PNG/shader files in `Assets/` are copied to output (configured in .csproj `CopyToOutputDirectory`). Loaded once in `AssetLoader.LoadAll()` during `Game.Init()`. Sprites wrap `Texture2D` with scale and origin. **Never load assets in the render loop.**
 
 Shaders: `base.vert/frag`, `recolor.frag` (plant coloring), `seed.frag` (seed rendering).
 
@@ -89,13 +89,13 @@ Shaders: `base.vert/frag`, `recolor.frag` (plant coloring), `seed.frag` (seed re
 - `GameLogicPianta` (in `GameLogic.cs`) runs every 1s tick: temperature → damage → hydration → oxygen → metabolism → parasites → leaves → storms → item hooks → clamp → events
 - Plant geometry: trunk = spline points, branches = `Obj_Ramo` (with leaves), roots = `Obj_Radice`, ivy = `Obj_RamoEdera`
 - Growth limited by `Stats.EffectiveMaxHeight` (= `AltezzaMassima * WorldModifier.LimitMultiplier`)
-- Death: when `Salute <= 0`, sets `PlantDead=true` in save, shows death screen, enters piantaggio
+- Death: when `Salute <= 0`, sets `PlantDead=true` in save, shows death screen, then enters piantaggio
 
 ### Seed System (`Game/Definitions/`)
 - 10 types: Normale, Poderoso, Fluviale, Glaciale, Magmatico, Puro, Florido, Rapido, Antico, Cosmico
 - 7 rarities (non-sequential enum!): Comune(1), NonComune(2), Raro(3), Esotico(100), Epico(4), Leggendario(5), Mitico(101)
 - **Use `SeedDefinitions.RarityOrder[]` and `GetRarityRank()` for ordering** — never compare enum int values directly
-- `SeedDefinitions` = single source of truth for all seed data: names, colors, bonuses, generation ranges, rarity multipliers
+- `SeedDefinitions` is the single source of truth for all seed data: names, colors, bonuses, generation ranges, rarity multipliers
 - Breeding via `SeedFusionManager`: 70/30 stat inheritance + mutation, max 4 fusions per seed, Mitico not reachable via fusion
 - Complementary pairs get compatibility bonus: Glaciale↔Magmatico, Fluviale↔Florido, Rapido↔Poderoso, Puro↔Antico
 
@@ -118,7 +118,7 @@ Shaders: `base.vert/frag`, `recolor.frag` (plant coloring), `seed.frag` (seed re
 - Day phases: Night(0-5), Dawn(6-7), Morning(8-11), Afternoon(12-17), Dusk(18-19), Evening(20-23) — real clock
 
 ### Climate Constants (`Game/Definitions/ClimateDefinitions.cs`)
-All balancing constants for temperature thresholds, resource consumption rates, parasite chances, photosynthesis energy per day phase, weather modifiers live here. `GameLogic.cs` re-exports them as aliases for compatibility.
+All balancing constants for temperature thresholds, resource consumption rates, parasite chances, photosynthesis energy per day phase, and weather modifiers live here. `GameLogic.cs` re-exports them as aliases for compatibility.
 
 ### Item System (`Game/Items/`)
 - `ItemDefinition` abstract base with lifecycle hooks: `OnStart`, `OnEnd`, `OnGrow`, `OnBranchNew`, `OnWeatherRain`, etc.
@@ -139,10 +139,10 @@ All balancing constants for temperature thresholds, resource consumption rates, 
 - 7 types: Cerchio, Tieni, Resta, Semi, Treni, Blackjack, PicturePoker
 - All extend `MinigiocoBase` (states: Intro → InCorso → Vittoria/Sconfitta)
 - Triggered by clicking golden leaves on branches
-- Standalone via `--minigioco` command-line arg
+- Can run standalone via `--minigioco` command-line arg
 
 ### Seed Selection (Piantaggio)
-- `Game.EntraModalitaPiantaggio()` / `Game.EsciModalitaPiantaggio()` toggle mode
+- `Game.EntraModalitaPiantaggio()` / `Game.EsciModalitaPiantaggio()` toggle the mode
 - During `IsModalitaPiantaggio`: game logic paused, plant hidden, timers skip
 - `Obj_GuiPiantaggio` shows seed grid; `isFalling` flag blocks all input during fall animation
 - Death screen (`Obj_GuiMorte`) — do NOT call `GameSave.DeleteSaveFile()` elsewhere
@@ -168,7 +168,7 @@ All balancing constants for temperature thresholds, resource consumption rates, 
 - Toggle with backtick key (`` ` ``)
 - Commands: `reset all/inventory`, `add seed/leaf/essence`, `weather set`, `world set`, `stage set`, `plant grow`, `tick set/reset`, `kill`, `godmode`, `minigame start/end`, `plant info`, `help`
 - `DebugConsole.GodMode` skips all damage, maxes stats, only grows
-- Has command history, autocomplete, picker UI
+- Has command history, autocomplete, and picker UI
 
 ## Key Conventions
 
@@ -182,9 +182,9 @@ All balancing constants for temperature thresholds, resource consumption rates, 
 - Do NOT use Raylib directly in GUI code — use Engine wrappers if avaiable
 - Do NOT modify window handles without validation
 - Do NOT skip `GameSave.Save()` on exit
-- Do NOT load assets in render loop
+- Do NOT load assets in the render loop
 - Always `Destroy()` child GameElements before removing parent
-- Inheritance only — no interfaces in this codebase
+- Inheritance only — no interfaces used in this codebase
 - Thread safety: timer callbacks run on thread pool — `GameElement.elementList` access uses `_elementLock`
 - Never compare `SeedRarity` enum values directly for ordering — use `SeedDefinitions.GetRarityRank()`
 
