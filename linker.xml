@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <linker>
-  <assembly fullname="Plants">
-    <!-- Preserve all types in the Plants assembly from trimming -->
-    <!-- This is needed because GameElement.Create<T>() uses reflection -->
-    <type fullname="Plants.*" />
-  </assembly>
+  <assembly fullname="Plants" preserve="all" required="true" />
 </linker>

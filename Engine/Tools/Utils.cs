@@ -14,7 +14,10 @@ internal class Utility
     {
        var asm = Assembly.GetExecutingAssembly();
 
-       using var stream = asm.GetManifestResourceStream("Plants."+path+"."+resourceName);
+       // Normalize path: replace / with . for .NET resource naming convention
+       string normalizedPath = path.Replace("/", ".");
+       string normalizedName = resourceName.Replace("/", ".");
+       using var stream = asm.GetManifestResourceStream("Plants."+normalizedPath+"."+normalizedName);
        if (stream == null)
        {
             return new Icon(resourceName);
@@ -35,10 +38,13 @@ internal class Utility
     {
        var asm = Assembly.GetExecutingAssembly();
 
-       using var stream = asm.GetManifestResourceStream("Plants."+path+"."+resourceName);
+       // Normalize path: replace / with . for .NET resource naming convention
+       string normalizedPath = path.Replace("/", ".");
+       string normalizedName = resourceName.Replace("/", ".");
+       using var stream = asm.GetManifestResourceStream("Plants."+normalizedPath+"."+normalizedName);
        if (stream == null)
        {
-            return RayImg.Image.Load(path+"/"+resourceName);
+            return RayImg.Image.Load(Path.Combine(path, resourceName));
        }
 
         using MemoryStream ms = new();
@@ -52,8 +58,11 @@ internal class Utility
     {
        var asm = Assembly.GetExecutingAssembly();
 
-       using var stream = asm.GetManifestResourceStream("Plants."+path+"."+resourceName);
-      if (stream != null)
+       // Normalize path: replace / with . for .NET resource naming convention
+       string normalizedPath = path.Replace("/", ".");
+       string normalizedName = resourceName.Replace("/", ".");
+       using var stream = asm.GetManifestResourceStream("Plants."+normalizedPath+"."+normalizedName);
+       if (stream != null)
 		{
 			using var reader = new StreamReader(stream);
 			return reader.ReadToEnd();

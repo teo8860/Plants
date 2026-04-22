@@ -72,63 +72,25 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Assets\leaf.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\logo.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\seme1.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\seme2.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\shader\seed.frag">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\shader\base.vert">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\shader\recolor.frag">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\shader\base.frag">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\shine.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\texture\tex_noise1.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\texture\tex_noise2.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\texture\tex_noise3.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\texture\tex_noise4.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\texture\tex_noise5.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\texture\tex_noise6.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="assets\v.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="assets\x.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\watering_off.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\watering_on.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+	  <EmbeddedResource Include="Assets\leaf.png" />
+	  <EmbeddedResource Include="Assets\logo.png" />
+	  <EmbeddedResource Include="Assets\seme1.png" />
+	  <EmbeddedResource Include="Assets\seme2.png" />
+	  <EmbeddedResource Include="Assets\shader\seed.frag" />
+	  <EmbeddedResource Include="Assets\shader\base.vert" />
+	  <EmbeddedResource Include="Assets\shader\recolor.frag" />
+	  <EmbeddedResource Include="Assets\shader\base.frag" />
+	  <EmbeddedResource Include="Assets\shine.png" />
+	  <EmbeddedResource Include="Assets\texture\tex_noise1.png" />
+	  <EmbeddedResource Include="Assets\texture\tex_noise2.png" />
+	  <EmbeddedResource Include="Assets\texture\tex_noise3.png" />
+	  <EmbeddedResource Include="Assets\texture\tex_noise4.png" />
+	  <EmbeddedResource Include="Assets\texture\tex_noise5.png" />
+	  <EmbeddedResource Include="Assets\texture\tex_noise6.png" />
+	  <EmbeddedResource Include="assets\v.png" />
+	  <EmbeddedResource Include="assets\x.png" />
+	  <EmbeddedResource Include="Assets\watering_off.png" />
+	  <EmbeddedResource Include="Assets\watering_on.png" />
 	</ItemGroup>
 
 

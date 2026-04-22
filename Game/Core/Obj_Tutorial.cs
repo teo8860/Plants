@@ -5,6 +5,7 @@ using System.Numerics;
 using Raylib_CSharp;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Rendering;
+using Raylib_CSharp.Fonts;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Transformations;
 
@@ -52,9 +53,19 @@ namespace Plants
         private float animationProgress = 0f;
         private float animationSpeed = 5f;
         private float semeY = 80f;
+        private float semeX = 0f;
         private float semeTargetY = 80f;
+        private float semeStartY = 80f;
         private float semeOscillation = 0f;
+        private float fallSpeed = 0f;
         private bool semeCaduto = false;
+
+        // Seme visuale (sprite reale)
+        private Obj_Seed tutorialSeedVisual = null;
+        private const float TUTORIAL_FALL_SCALE_START = 3.0f;
+        private const float TUTORIAL_FALL_SCALE_END = 1.5f;
+        private const float TUTORIAL_FLOAT_SCALE = 3.0f;
+        private const float TUTORIAL_FALL_GRAVITY = 280f;
         
         // Timing per fasi automatiche
         private float phaseTimer = 0f;
@@ -271,25 +282,35 @@ namespace Plants
         private void UpdateSemeFluttuante(float deltaTime)
         {
             semeOscillation += deltaTime * 2f;
+            int screenW = Rendering.camera.screenWidth;
+            semeX = screenW / 2f;
             semeY = 80f + MathF.Sin(semeOscillation) * 8f;
+            if (tutorialSeedVisual != null)
+            {
+                tutorialSeedVisual.position = new Vector2(semeX, semeY);
+                tutorialSeedVisual.scale = TUTORIAL_FLOAT_SCALE;
+            }
         }
 
         private void CheckSemeClick()
         {
             int screenW = Rendering.camera.screenWidth;
-            int semeX = screenW / 2;
+            int semeCX = screenW / 2;
             int semeSize = 24;
 
             int mx = Input.GetMouseX();
             int my = Input.GetMouseY();
 
-            bool hovered = mx >= semeX - semeSize && mx <= semeX + semeSize &&
+            bool hovered = mx >= semeCX - semeSize && mx <= semeCX + semeSize &&
                           my >= (int)semeY - semeSize && my <= (int)semeY + semeSize;
 
             if (hovered && Input.IsMouseButtonPressed(MouseButton.Left))
             {
                 currentPhase = TutorialPhase.SemeCade;
-                semeTargetY = 350;//GameProperties.groundPosition - 20;
+                semeStartY = semeY;
+                semeTargetY = 350;
+                fallSpeed = 0f;
+                semeOscillation = 0f;
             }
         }
 
@@ -297,21 +318,40 @@ namespace Plants
         {
             if (!semeCaduto)
             {
-                // Caduta fisica graduale
-                float distanceToTarget = semeTargetY - semeY;
-                float velocity = MathF.Min(distanceToTarget * 1.5f, 50f); // Velocità massima limitata
+                int screenW = Rendering.camera.screenWidth;
 
-                semeY += 1f;// velocity * deltaTime;
+                // Wobble orizzontale come Obj_GuiPiantaggio
+                semeOscillation += deltaTime * 6f;
+                float wobble = MathF.Sin(semeOscillation) * 3f;
+                semeX = screenW / 2f + wobble;
 
-                if (semeY >= semeTargetY - 2f) // Tolleranza per evitare oscillazioni
+                // Gravità cumulativa (leggermente piu' veloce del piantaggio)
+                fallSpeed += TUTORIAL_FALL_GRAVITY * deltaTime;
+                semeY += fallSpeed * deltaTime;
+
+                if (tutorialSeedVisual != null)
+                {
+                    float range = semeTargetY - semeStartY;
+                    float progress = range > 0f
+                        ? Math.Clamp((semeY - semeStartY) / range, 0f, 1f)
+                        : 1f;
+                    tutorialSeedVisual.scale = MathHelper.Lerp(TUTORIAL_FALL_SCALE_START, TUTORIAL_FALL_SCALE_END, progress);
+                    tutorialSeedVisual.position = new Vector2(semeX, semeY);
+                }
+
+                if (semeY >= semeTargetY)
                 {
                     semeY = semeTargetY;
                     semeCaduto = true;
                     phaseTimer = 0f;
 
-                    // Effetto particelle all'impatto!
-                    int screenW = Rendering.camera.screenWidth;
-                    SpawnSeedParticles(screenW / 2, semeTargetY);
+                    SpawnSeedParticles(semeX, semeTargetY);
+
+                    if (tutorialSeedVisual != null)
+                    {
+                        tutorialSeedVisual.Destroy();
+                        tutorialSeedVisual = null;
+                    }
 
                     // Togli la pausa - ora la pianta può crescere
                     Game.isPaused = false;
@@ -456,6 +496,12 @@ namespace Plants
             // Salva che il tutorial è stato completato (anche se saltato)
             SaveTutorialCompleted();
 
+            if (tutorialSeedVisual != null)
+            {
+                tutorialSeedVisual.Destroy();
+                tutorialSeedVisual = null;
+            }
+
             // Togli la pausa
             Game.isPaused = false;
 
@@ -523,6 +569,8 @@ namespace Plants
 
                 isTutorialActive = false;
                 currentPhase = TutorialPhase.Fine;
+
+                Game.EntraModalitaPiantaggio();
             }
         }
 
@@ -668,14 +716,14 @@ namespace Plants
             if (animationProgress < 0.5f) return;
 
             // Titolo
-            int titleWidth = title.Length * 8;
+            int titleWidth = TextManager.MeasureText(title, 16);
             Graphics.DrawText(title, panelX + (panelW - titleWidth) / 2, panelY + 15, 16, new Color(150, 255, 150, 255));
 
             // Linee di testo
             int startY = panelY + 45;
             for (int i = 0; i < lines.Length; i++)
             {
-                int lineWidth = lines[i].Length * 6;
+                int lineWidth = TextManager.MeasureText(lines[i], 12);
                 Graphics.DrawText(lines[i], panelX + (panelW - lineWidth) / 2, startY + i * 16, 12, new Color(220, 220, 220, 255));
             }
 
@@ -696,7 +744,7 @@ namespace Plants
                 0.3f, 8, 2, buttonHovered ? Color.White : new Color(120, 220, 120, 255)
             );
 
-            int textWidth = buttonText.Length * 8;
+            int textWidth = TextManager.MeasureText(buttonText, 14);
             Graphics.DrawText(buttonText, bx + (bw - textWidth) / 2, by + 8, 14, Color.White);
 
             // Bottone Salta (solo se richiesto)
@@ -717,7 +765,8 @@ namespace Plants
                     ? new Color(255, 255, 255, 255)
                     : new Color(150, 150, 160, 200);
 
-                Graphics.DrawText("Salta", sx + (sw - 25) / 2, sy + 4, 10, skipTextCol);
+                int saltaW = TextManager.MeasureText("Salta", 10);
+                Graphics.DrawText("Salta", sx + (sw - saltaW) / 2, sy + 4, 10, skipTextCol);
             }
         }
 
@@ -759,8 +808,10 @@ namespace Plants
             Graphics.DrawCircle(iconX + 8, iconY + 5, 5, new Color(100, 200, 100, 255));
 
             // Titolo
-            Graphics.DrawText("TERRA", panelX + (panelW - 36) / 2, panelY + 75, 14, new Color(100, 200, 100, 255));
-            Graphics.DrawText("Primo Mondo", panelX + (panelW - 66) / 2, panelY + 95, 10, new Color(180, 180, 200, 255));
+            int terraW = TextManager.MeasureText("TERRA", 14);
+            Graphics.DrawText("TERRA", panelX + (panelW - terraW) / 2, panelY + 75, 14, new Color(100, 200, 100, 255));
+            int primoW = TextManager.MeasureText("Primo Mondo", 10);
+            Graphics.DrawText("Primo Mondo", panelX + (panelW - primoW) / 2, panelY + 95, 10, new Color(180, 180, 200, 255));
 
             // Descrizione
             string[] desc = new[] {
@@ -774,7 +825,7 @@ namespace Plants
             int startY = panelY + 115;
             for (int i = 0; i < desc.Length; i++)
             {
-                int lineW = desc[i].Length * 5;
+                int lineW = TextManager.MeasureText(desc[i], 9);
                 Color col = i == 4 ? new Color(100, 200, 100, 255) : new Color(200, 200, 200, 255);
                 Graphics.DrawText(desc[i], panelX + (panelW - lineW) / 2, startY + i * 12, 9, col);
             }
@@ -798,13 +849,14 @@ namespace Plants
                 0.3f, 8, 2, buttonHovered ? Color.White : new Color(100, 200, 100, 255)
             );
 
-            Graphics.DrawText("VIAGGIA", bx + (bw - 42) / 2, by + 8, 11, Color.White);
+            int viaggiaW = TextManager.MeasureText("VIAGGIA", 11);
+            Graphics.DrawText("VIAGGIA", bx + (bw - viaggiaW) / 2, by + 8, 11, Color.White);
         }
 
         private void DrawSeme()
         {
             int screenW = Rendering.camera.screenWidth;
-            int semeX = screenW / 2;
+            int semeCX = screenW / 2;
 
             // Ombra dinamica - solo se il seme è abbastanza alto
             if (semeY > 100)
@@ -813,33 +865,30 @@ namespace Plants
                 float shadowScale = MathHelper.Lerp(0.3f, 1.2f, progressToGround);
                 byte shadowAlpha = (byte)MathHelper.Lerp(30, 120, progressToGround);
 
-                Graphics.DrawEllipse(semeX, (int)semeTargetY + 8, (int)(15 * shadowScale), (int)(5 * shadowScale),
+                Graphics.DrawEllipse(semeCX, (int)semeTargetY + 8, (int)(15 * shadowScale), (int)(5 * shadowScale),
                     new Color(0, 0, 0, shadowAlpha));
             }
 
-            // Seme (forma ovale marrone)
-            Color semeColor1 = new Color(139, 90, 43, 255);
-            Color semeColor2 = new Color(101, 67, 33, 255);
-            
-            Graphics.DrawEllipse(semeX, (int)semeY, 10, 14, semeColor1);
-            Graphics.DrawEllipse(semeX - 2, (int)semeY - 2, 6, 8, semeColor2);
-
-            // Brillantino
-            Graphics.DrawCircle(semeX - 3, (int)semeY - 5, 2, new Color(255, 255, 255, 150));
+            // Sprite vero del seme (stesso usato in piantaggio/inventario)
+            if (tutorialSeedVisual != null)
+            {
+                tutorialSeedVisual.DrawNow();
+            }
 
             // Testo "Cliccami!" con animazione
             if (currentPhase == TutorialPhase.SemeFluttuante)
             {
                 float alpha = (MathF.Sin(buttonPulse * 2) + 1f) * 0.5f;
                 Color textCol = new Color(255, 255, 100, (byte)(180 + alpha * 75));
-                Graphics.DrawText("Cliccami!", semeX - 28, (int)semeY - 35, 12, textCol);
+                int clicW = TextManager.MeasureText("Cliccami!", 12);
+                Graphics.DrawText("Cliccami!", semeCX - clicW / 2, (int)semeY - 35, 12, textCol);
 
                 // Freccia che punta al seme
                 float arrowY = semeY - 45 + MathF.Sin(buttonPulse * 3) * 3;
                 Graphics.DrawTriangle(
-                    new Vector2(semeX, arrowY + 8),
-                    new Vector2(semeX - 6, arrowY),
-                    new Vector2(semeX + 6, arrowY),
+                    new Vector2(semeCX, arrowY + 8),
+                    new Vector2(semeCX - 6, arrowY),
+                    new Vector2(semeCX + 6, arrowY),
                     textCol
                 );
             }
@@ -870,14 +919,14 @@ namespace Plants
 
             // Titolo
             Color titleColor = new Color(255, 220, 100, (byte)(255 * messageAlpha));
-            int titleW = title.Length * 6;
+            int titleW = TextManager.MeasureText(title, 11);
             Graphics.DrawText(title, boxX + (boxWidth - titleW) / 2, boxY + 8, 11, titleColor);
 
             // Linee
             Color textColor = new Color(220, 220, 220, (byte)(255 * messageAlpha));
             for (int i = 0; i < lines.Length; i++)
             {
-                int lineW = lines[i].Length * 5;
+                int lineW = TextManager.MeasureText(lines[i], 9);
                 Graphics.DrawText(lines[i], boxX + (boxWidth - lineW) / 2, boxY + 24 + i * 13, 9, textColor);
             }
         }
@@ -888,7 +937,7 @@ namespace Plants
             int screenH = Rendering.camera.screenHeight;
 
             string continueText = "Clicca per continuare";
-            int textWidth = continueText.Length * 7;
+            int textWidth = TextManager.MeasureText(continueText, 12);
             int textX = (screenW - textWidth) / 2;
             int textY = screenH - 50;
 
@@ -1051,8 +1100,28 @@ namespace Plants
             animationProgress = 0f;
             messageAlpha = 0f;
             semeY = 80f;
+            semeStartY = 80f;
+            fallSpeed = 0f;
             semeCaduto = false;
             phaseTimer = 0f;
+
+            // Crea il seme visuale (sprite vero) - stesso oggetto usato ovunque
+            if (tutorialSeedVisual != null)
+            {
+                tutorialSeedVisual.Destroy();
+                tutorialSeedVisual = null;
+            }
+            Seed tutorialSeedData = StarterSeedSystem.CreateStarterSeed();
+            tutorialSeedVisual = new Obj_Seed();
+            tutorialSeedVisual.scale = TUTORIAL_FLOAT_SCALE;
+            tutorialSeedVisual.depth = -1001;
+            tutorialSeedVisual.guiLayer = true;
+            tutorialSeedVisual.persistent = true;
+            tutorialSeedVisual.roomId = uint.MaxValue;
+            tutorialSeedVisual.active = false; // disegnato manualmente in DrawSeme
+            tutorialSeedVisual.dati = tutorialSeedData;
+            tutorialSeedVisual.color = tutorialSeedData.color;
+            tutorialSeedVisual.position = new Vector2(Rendering.camera.screenWidth / 2f, semeY);
             particles.Clear();
             currentGrowthSpeed = GetGrowthSpeed();
             targetGrowthSpeed = GetGrowthSpeed();
