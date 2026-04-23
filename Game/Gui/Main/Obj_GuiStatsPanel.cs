@@ -21,14 +21,18 @@ public class Obj_GuiStatsPanel : GameElement
     private string hoveredStatId = null;
     private int hoveredStatDotY;
 
-    // Layout indicatori
-    private const int DOT_RADIUS = 3;
-    private const int DOT_CX = 3;       // centro X del pallino relativo a x
-    private const int LABEL_X = 11;     // inizio label relativo a x
-    private const int BAR_X = 48;       // inizio barra relativo a x
-    private const int BAR_W = 56;       // larghezza barra
-    private const int VAL_X = 110;      // inizio valore relativo a x
-    private const int PANEL_W = 146;
+    // Layout pannello stile pixel (dark purple)
+    private const int PANEL_W = 180;
+    private const int PAD_H = 5;           // padding orizzontale interno
+    private const int PAD_V_TOP = 4;
+    private const int ROW_H = 15;
+    private const int DOT_R = 3;
+    private const int DOT_CX = 10;         // centro pallino rispetto a x
+    private const int LABEL_X = 17;
+    private const int BAR_X = 60;
+    private const int BAR_W = 82;
+    private const int BAR_H = 7;
+    private const int OUTLINE = 1;
 
     private enum StatSeverity { Good, Warning, Bad, Critical }
 
@@ -59,17 +63,16 @@ public class Obj_GuiStatsPanel : GameElement
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 
-        // Hover sugli indicatori statistiche
-        int yOff = y + 16;
-        int lineH = 15;
+        // Hover sugli indicatori statistiche (layout nuovo)
+        int firstRowY = y + 18;
         string[] statIds = { "salute", "idratazione", "energia", "ossigeno", "temperatura" };
         for (int i = 0; i < statIds.Length; i++)
         {
             int dotCenterX = x + DOT_CX;
-            int dotCenterY = yOff + i * lineH + 5;
+            int dotCenterY = firstRowY + i * ROW_H + ROW_H / 2;
             int dx = mx - dotCenterX;
             int dy = my - dotCenterY;
-            if (dx * dx + dy * dy <= (DOT_RADIUS + 3) * (DOT_RADIUS + 3))
+            if (dx * dx + dy * dy <= (DOT_R + 4) * (DOT_R + 4))
             {
                 hoveredStatId = statIds[i];
                 hoveredStatDotY = dotCenterY;
@@ -80,10 +83,10 @@ public class Obj_GuiStatsPanel : GameElement
         // Hover sugli oggetti equipaggiati
         if (Game.pianta.equippedItemIds == null) return;
 
-        int iconSize = 18;
-        int iconSpacing = 4;
-        int iconsY = y + 100;
-        int iconsX = x + 2;
+        int iconSize = 10;
+        int iconSpacing = 3;
+        int iconsY = firstRowY + 5 * ROW_H + 6;
+        int iconsX = x + PAD_H;
 
         for (int i = 0; i < Game.pianta.equippedItemIds.Count; i++)
         {
@@ -103,91 +106,109 @@ public class Obj_GuiStatsPanel : GameElement
     {
         var stats = Game.pianta.Stats;
 
-        Color bg = Color.Black;
-        bg.A = 180;
-        int panelHeight = expanded ? 130 : 25;
-        Graphics.DrawRectangleRounded(
-            new Rectangle(x - 5, y - 5, PANEL_W, panelHeight),
-            0.2f, 16, bg
-        );
+        int panelH = 110;
 
+        // Background + outline
+        Graphics.DrawRectangle(x, y, PANEL_W, panelH, GuiTheme.PanelBg);
+        Graphics.DrawRectangle(x, y, PANEL_W, OUTLINE, GuiTheme.PanelOutline);
+        Graphics.DrawRectangle(x, y + panelH - OUTLINE, PANEL_W, OUTLINE, GuiTheme.PanelOutline);
+        Graphics.DrawRectangle(x, y, OUTLINE, panelH, GuiTheme.PanelOutline);
+        Graphics.DrawRectangle(x + PANEL_W - OUTLINE, y, OUTLINE, panelH, GuiTheme.PanelOutline);
+
+        // Header: STAGE N + X moltiplicatore
         int stage = WorldManager.GetCurrentStage();
         float diff = WorldManager.GetDifficultyMultiplier(stage);
-        Graphics.DrawText($"Stage {stage} x{diff:F2}", x + 5, y + 2, 9, new Color(192, 192, 192, 255));
+        GuiTheme.DrawText($"STAGE {stage}", x + PAD_H, y + PAD_V_TOP, GuiTheme.PanelText);
+        string xText = $"X{diff:F2}".Replace('.', ',');
+        int xW = GuiTheme.MeasureText(xText);
+        GuiTheme.DrawText(xText, x + PANEL_W - PAD_H - xW, y + PAD_V_TOP, GuiTheme.PanelText);
 
         if (!expanded) return;
 
-        int yOff = y + 16;
-        int lineH = 15;
+        // Divider sopra stats
+        int div1Y = y + 16;
+        Graphics.DrawRectangle(x + PAD_H, div1Y, PANEL_W - PAD_H * 2, 1, GuiTheme.PanelDivider);
 
-        DrawStatBarWithIndicator("salute", "Salute", stats.Salute, Color.Red, ref yOff, lineH);
-        DrawStatBarWithIndicator("idratazione", "Idrat.", stats.Idratazione, Color.Blue, ref yOff, lineH);
-        DrawStatBarWithIndicator("energia", "Energia", stats.Metabolismo, Color.Yellow, ref yOff, lineH);
-        DrawStatBarWithIndicator("ossigeno", "O2", stats.Ossigeno, Color.SkyBlue, ref yOff, lineH);
+        int rowY = y + 18;
+        DrawStatRow("salute", "SALUTE", stats.Salute, GuiTheme.StatSalute, rowY); 
+        rowY += ROW_H;
 
-        Color tempColor = GetTemperatureColor(stats.Temperatura);
-        DrawTemperatureLineWithIndicator(stats.Temperatura, tempColor, ref yOff, lineH);
+        DrawStatRow("idratazione", "IDRAT.", stats.Idratazione, GuiTheme.StatIdratazione, rowY); 
+        rowY += ROW_H;
 
-        // Icone oggetti equipaggiati
+        DrawStatRow("energia", "ENERGIE", stats.Metabolismo, GuiTheme.StatEnergia, rowY); 
+        rowY += ROW_H;
+
+        DrawStatRow("ossigeno", "O2", stats.Ossigeno, GuiTheme.StatOssigeno, rowY); 
+        rowY += ROW_H;
+
+        DrawTempRow(stats.Temperatura, rowY); rowY += ROW_H;
+
+        // Divider sotto stats
+        int div2Y = rowY + 3;
+        Graphics.DrawRectangle(x + PAD_H, div2Y, PANEL_W - PAD_H * 2, 1, GuiTheme.PanelDivider);
+
+        // Oggetti equipaggiati
         DrawEquippedItems();
 
         // Tooltip (disegnati per ultimi, sopra tutto)
         DrawStatTooltip();
         DrawItemTooltip();
-
-        yOff += 5;
     }
 
-    // ─── Statistiche con indicatore ─────────────────────────────
-
-    private void DrawStatBarWithIndicator(string id, string label, float value, Color barColor, ref int y, int h)
+    private void DrawStatRow(string id, string label, float value, Color barColor, int rowY)
     {
-        StatSeverity severity = GetStatSeverity(id, value);
-        Color dotColor = GetSeverityColor(severity);
-
         int cx = x + DOT_CX;
-        int cy = y + 5;
+        int cy = rowY + ROW_H / 2;
 
-        // Alone su hover
+        // Hover halo
         if (hoveredStatId == id)
         {
-            Color halo = dotColor;
-            halo.A = 60;
-            Graphics.DrawCircleV(new Vector2(cx, cy), DOT_RADIUS + 2, halo);
+            Color halo = barColor; halo.A = 80;
+            Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R + 2, halo);
         }
-        Graphics.DrawCircleV(new Vector2(cx, cy), DOT_RADIUS, dotColor);
+        Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R, barColor);
 
-        Graphics.DrawText(label, x + LABEL_X, y, 9, Color.LightGray);
+        int textY = rowY + (ROW_H - GuiTheme.FontSize) / 2;
+        GuiTheme.DrawText(label, x + LABEL_X, textY, GuiTheme.PanelText,8);
 
-        Graphics.DrawRectangle(x + BAR_X, y + 2, BAR_W, 8, Color.DarkGray);
-        Graphics.DrawRectangle(x + BAR_X, y + 2, (int)(BAR_W * Math.Clamp(value, 0f, 1f)), 8, barColor);
+        // Track + fill
+        int barY = rowY + (ROW_H - BAR_H) / 2;
+        Graphics.DrawRectangle(x + BAR_X, barY, BAR_W, BAR_H, GuiTheme.BarTrack);
+        int fillW = (int)(BAR_W * Math.Clamp(value, 0f, 1f));
+        if (fillW > 0)
+            Graphics.DrawRectangle(x + BAR_X, barY, fillW, BAR_H, barColor);
 
-        Graphics.DrawText($"{value:P0}", x + VAL_X, y, 9, Color.White);
-        y += h;
+        // Valore percentuale right-aligned
+        string valText = $"{(int)Math.Round(value * 100f)}%";
+        int valW = GuiTheme.MeasureText(valText);
+        GuiTheme.DrawText(valText, x + PANEL_W - PAD_H - valW, textY, GuiTheme.PanelText);
     }
 
-    private void DrawTemperatureLineWithIndicator(float temp, Color color, ref int y, int h)
+    private void DrawTempRow(float temp, int rowY)
     {
-        StatSeverity severity = GetTemperatureSeverity(temp);
-        Color dotColor = GetSeverityColor(severity);
-
         int cx = x + DOT_CX;
-        int cy = y + 5;
+        int cy = rowY + ROW_H / 2;
 
         if (hoveredStatId == "temperatura")
         {
-            Color halo = dotColor;
-            halo.A = 60;
-            Graphics.DrawCircleV(new Vector2(cx, cy), DOT_RADIUS + 2, halo);
+            Color halo = GuiTheme.StatTemperatura; halo.A = 80;
+            Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R + 2, halo);
         }
-        Graphics.DrawCircleV(new Vector2(cx, cy), DOT_RADIUS, dotColor);
+        Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R, GuiTheme.StatTemperatura);
 
-        Graphics.DrawText("Temp.", x + LABEL_X, y, 9, Color.LightGray);
-        Graphics.DrawText($"{temp:F1}°C", x + BAR_X, y, 9, color);
+        int textY = rowY + (ROW_H - GuiTheme.FontSize) / 2;
+        GuiTheme.DrawText("TEMP.", x + LABEL_X, textY, GuiTheme.PanelText);
 
-        string desc = GetTemperatureDescription(temp);
-        Graphics.DrawText(desc, x + BAR_X + 42, y, 9, color);
-        y += h;
+        string tempText = $"{temp:F1}°C".Replace('.', ',');
+        GuiTheme.DrawText(tempText, x + BAR_X, textY, GuiTheme.StatTemperatura);
+
+        string desc = GetTemperatureDescription(temp).ToUpperInvariant();
+        Color descColor = GetTemperatureSeverity(temp) == StatSeverity.Good
+            ? GuiTheme.StatIdeale
+            : GuiTheme.StatTemperatura;
+        int descW = GuiTheme.MeasureText(desc);
+        GuiTheme.DrawText(desc, x + PANEL_W - PAD_H - descW, textY, descColor);
     }
 
     // ─── Severita' per stat ─────────────────────────────────────
@@ -571,10 +592,11 @@ public class Obj_GuiStatsPanel : GameElement
     {
         if (Game.pianta == null || Game.pianta.equippedItemIds == null) return;
 
-        int iconSize = 18;
-        int iconSpacing = 4;
-        int iconsY = y + 100;
-        int iconsX = x + 2;
+        int firstRowY = y + 18;
+        int iconsY = firstRowY + 5 * ROW_H + 6;
+        int iconsX = x + PAD_H;
+        int iconSize = 10;
+        int iconSpacing = 3;
 
         bool hasAny = false;
         for (int i = 0; i < Game.pianta.equippedItemIds.Count; i++)
@@ -588,27 +610,16 @@ public class Obj_GuiStatsPanel : GameElement
 
             int ix = iconsX + i * (iconSize + iconSpacing);
 
-            Color iconBg = tooltipItemId == id
-                ? new Color(100, 180, 255, 200)
-                : new Color(60, 60, 80, 200);
-            Color iconBorder = tooltipItemId == id
-                ? new Color(140, 200, 255, 255)
-                : new Color(90, 90, 110, 255);
+            Color iconBg = tooltipItemId == id ? GuiTheme.StatIdratazione : GuiTheme.BarTrack;
+            Graphics.DrawRectangle(ix, iconsY, iconSize, iconSize, iconBg);
 
-            Graphics.DrawRectangleRounded(
-                new Rectangle(ix, iconsY, iconSize, iconSize),
-                0.25f, 4, iconBg);
-            Graphics.DrawRectangleRoundedLines(
-                new Rectangle(ix, iconsY, iconSize, iconSize),
-                0.25f, 4, 1, iconBorder);
-
-            string initial = def.Name.Length > 0 ? def.Name.Substring(0, 1) : "?";
-            Graphics.DrawText(initial, ix + iconSize / 2 - 3, iconsY + iconSize / 2 - 5, 10, new Color(240, 240, 255, 255));
+            string initial = (def.Name.Length > 0 ? def.Name.Substring(0, 1) : "?").ToUpperInvariant();
+            GuiTheme.DrawText(initial, ix + 2, iconsY, GuiTheme.PanelText);
         }
 
         if (!hasAny)
         {
-            Graphics.DrawText("No oggetti", iconsX, iconsY + 3, 7, new Color(120, 120, 140, 180));
+            GuiTheme.DrawText("NO OGGETTI", iconsX, iconsY, GuiTheme.PanelText);
         }
     }
 

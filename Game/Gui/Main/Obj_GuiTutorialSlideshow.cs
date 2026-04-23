@@ -4,6 +4,7 @@ using Raylib_CSharp;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Rendering;
+using Raylib_CSharp.Fonts;
 using Raylib_CSharp.Transformations;
 
 namespace Plants
@@ -133,7 +134,7 @@ namespace Plants
 
             // Header
             Graphics.DrawRectangleRounded(new Rectangle(px, py, PanelW, HeaderH), 0.2f, 8, HeaderBg);
-            int titleW = slide.Titolo.Length * 8;
+            int titleW = TextManager.MeasureText(slide.Titolo, 14);
             Graphics.DrawText(slide.Titolo, px + (PanelW - titleW) / 2, py + 7, 14, TextColor);
 
             // Corpo: layout a una o due colonne
@@ -155,7 +156,7 @@ namespace Plants
             {
                 if (riga.Length > 0)
                 {
-                    int rigaW = riga.Length * 7;
+                    int rigaW = TextManager.MeasureText(riga, 11);
                     int clampedX = px + Math.Max(4, (PanelW - rigaW) / 2);
                     Graphics.DrawText(riga, clampedX, textY, 11, SubTextColor);
                 }
@@ -167,15 +168,24 @@ namespace Plants
         private void DrawBodyTwoColumns(TutorialSlide slide, int px, int py)
         {
             int bodyTop  = py + HeaderH + 8;
-            int textColW = PanelW - IconAreaW - 8;
+            int textColW = PanelW - IconAreaW - 12;
             int textX    = px + 8;
 
-            // Testo colonna sinistra
+            // Testo colonna sinistra — riduci font se riga supera la colonna
             int textY = bodyTop;
             foreach (var riga in slide.Righe)
             {
                 if (riga.Length > 0)
-                    Graphics.DrawText(riga, textX, textY, 11, SubTextColor);
+                {
+                    int fs = 11;
+                    int w = TextManager.MeasureText(riga, fs);
+                    while (w > textColW && fs > 8)
+                    {
+                        fs--;
+                        w = TextManager.MeasureText(riga, fs);
+                    }
+                    Graphics.DrawText(riga, textX, textY, fs, SubTextColor);
+                }
                 textY += 15;
             }
 
@@ -230,7 +240,7 @@ namespace Plants
             var rNext = NextBtnRect();
             Color nextCol = hoverNext ? BtnHoverColor : BtnColor;
             Graphics.DrawRectangleRounded(rNext, 0.3f, 8, nextCol);
-            int nextW = nextLabel.Length * 6;
+            int nextW = TextManager.MeasureText(nextLabel, 11);
             Graphics.DrawText(nextLabel,
                 (int)(rNext.X + (rNext.Width - nextW) / 2),
                 (int)(rNext.Y + 5), 11, TextColor);
@@ -242,7 +252,7 @@ namespace Plants
                 Color prevCol = hoverPrev ? BtnHoverColor : BtnDisabled;
                 Graphics.DrawRectangleRounded(rPrev, 0.3f, 8, prevCol);
                 string prevLabel = "< Indietro";
-                int prevW = prevLabel.Length * 6;
+                int prevW = TextManager.MeasureText(prevLabel, 11);
                 Graphics.DrawText(prevLabel,
                     (int)(rPrev.X + (rPrev.Width - prevW) / 2),
                     (int)(rPrev.Y + 5), 11, TextColor);

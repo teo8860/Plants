@@ -244,7 +244,7 @@ public static class Game
 
         GameElement.Create<Obj_GuiScrollbar>(100);
 
-        statsPanel = new Obj_GuiStatsPanel(Rendering.camera.screenWidth - 143, Rendering.camera.screenHeight - 487);
+        statsPanel = new Obj_GuiStatsPanel(Rendering.camera.screenWidth - 180 - 6, Rendering.camera.screenHeight - 487);
 
 
         // Toolbar in basso a destra con innaffiatoio - dropdown verso l'alto, aperta di default

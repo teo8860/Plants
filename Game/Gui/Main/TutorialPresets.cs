@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Raylib_CSharp.Colors;
+using Raylib_CSharp.Fonts;
 using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Transformations;
 
@@ -67,7 +68,7 @@ namespace Plants
 
             // Sinistra (OFF)
             DrawMiniButton(startX, ay + 2, half, BtnOffBg, left);
-            int lW = labelL.Length * 5;
+            int lW = TextManager.MeasureText(labelL, 8);
             Graphics.DrawText(labelL, startX + (half - lW) / 2, ay + half + 6, 8, SubText);
 
             // Freccia
@@ -76,7 +77,7 @@ namespace Plants
             // Destra (ON)
             int rightX = startX + half + gap;
             DrawMiniButton(rightX, ay + 2, half, BtnOnBg, right);
-            int rW = labelR.Length * 5;
+            int rW = TextManager.MeasureText(labelR, 8);
             Graphics.DrawText(labelR, rightX + (half - rW) / 2, ay + half + 6, 8, SubText);
         }
 

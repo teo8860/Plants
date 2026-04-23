@@ -41,22 +41,78 @@ public static class SeedStatsDrawer
         // Scala unificata 0-99 (SeedStatScaling).
         var entries = new StatEntry[]
         {
-            new() { Label = "Vitalità", ShortLabel = "VIT", Value = stats.vitalita, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
-                     BarColor = new Color(220, 60, 60, 255) },
-            new() { Label = "Idratazione", ShortLabel = "IDR", Value = stats.idratazione, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
-                     BarColor = new Color(60, 140, 220, 255) },
-            new() { Label = "Metabolismo", ShortLabel = "MET", Value = stats.metabolismo, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
-                     BarColor = new Color(220, 180, 50, 255) },
-            new() { Label = "Vegetazione", ShortLabel = "VEG", Value = stats.vegetazione, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
-                     BarColor = new Color(60, 200, 80, 255) },
-            new() { Label = "Res. Freddo", ShortLabel = "FRD", Value = stats.resistenzaFreddo, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
-                     BarColor = new Color(120, 200, 255, 255) },
-            new() { Label = "Res. Caldo", ShortLabel = "CLD", Value = stats.resistenzaCaldo, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
-                     BarColor = new Color(255, 130, 50, 255) },
-            new() { Label = "Res. Parassiti", ShortLabel = "PAR", Value = stats.resistenzaParassiti, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
-                     BarColor = new Color(180, 100, 220, 255) },
-            new() { Label = "Res. Vuoto", ShortLabel = "VUO", Value = stats.resistenzaVuoto, MinVal = SeedStatScaling.StatMin, MaxVal = SeedStatScaling.StatMax,
-                     BarColor = new Color(160, 160, 200, 255) },
+            new() 
+            { 
+                Label = "Vitalità", 
+                ShortLabel = "VIT", 
+                Value = stats.vitalita, 
+                MinVal = SeedStatScaling.StatMin, 
+                MaxVal = SeedStatScaling.StatMax,
+                BarColor = new Color(220, 60, 60, 255) 
+            },
+            new() 
+            { 
+                Label = "Idratazione",
+                ShortLabel = "IDR",
+                Value = stats.idratazione,
+                MinVal = SeedStatScaling.StatMin,
+                MaxVal = SeedStatScaling.StatMax,
+                BarColor = new Color(60, 140, 220, 255) 
+             },
+            new() 
+            { 
+                Label = "Metabolismo",
+                ShortLabel = "MET",
+                Value = stats.metabolismo,
+                MinVal = SeedStatScaling.StatMin,
+                MaxVal = SeedStatScaling.StatMax,
+                BarColor = new Color(220, 180, 50, 255)
+            },
+            new() 
+            { 
+                Label = "Vegetazione",
+                ShortLabel = "VEG",
+                Value = stats.vegetazione,
+                MinVal = SeedStatScaling.StatMin,
+                MaxVal = SeedStatScaling.StatMax,
+                BarColor = new Color(60, 200, 80, 255)
+            },
+            new() 
+            { 
+                Label = "Res. Freddo",
+                ShortLabel = "FRD",
+                Value = stats.resistenzaFreddo,
+                MinVal = SeedStatScaling.StatMin,
+                MaxVal = SeedStatScaling.StatMax,
+                BarColor = new Color(120, 200, 255, 255)
+            },
+            new() 
+            { 
+                Label = "Res. Caldo",
+                ShortLabel = "CLD",
+                Value = stats.resistenzaCaldo,
+                MinVal = SeedStatScaling.StatMin,
+                MaxVal = SeedStatScaling.StatMax,
+                BarColor = new Color(255, 130, 50, 255) 
+            },
+            new() 
+            { 
+                Label = "Res. Parassiti",
+                ShortLabel = "PAR",
+                Value = stats.resistenzaParassiti,
+                MinVal = SeedStatScaling.StatMin,
+                MaxVal = SeedStatScaling.StatMax,
+                BarColor = new Color(180, 100, 220, 255) 
+            },
+            new() 
+            { 
+                Label = "Res. Vuoto",
+                ShortLabel = "VUO",
+                Value = stats.resistenzaVuoto,
+                MinVal = SeedStatScaling.StatMin,
+                MaxVal = SeedStatScaling.StatMax,
+                BarColor = new Color(160, 160, 200, 255) 
+            },
         };
 
         if (compact)
