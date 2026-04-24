@@ -22,7 +22,7 @@ dotnet clean
 
 No automated tests. Verify changes by running game manually.
 
-**Trimming**: Project uses `PublishTrimmed` with `partial` trim mode. `linker.xml` preserves all types in `Plants` namespace (needed for `GameElement.Create<T>()` reflection). New assembly with reflection-created types → update `linker.xml`.
+**Trimming**: Toggled via `<PublishTrimmed>` in `Plants.csproj` — user switches between `true` and `false` for testing, so code must work with both. When `true`, `TrimMode=partial` is used and `linker.xml` preserves all types in `Plants` namespace. `GameElement.Create<T>()` uses `new T()` with a `new()` constraint (not reflection), so it is trim-safe without extra annotations. JSON (`System.Text.Json`) still relies on runtime reflection — kept working via `<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>`. If you add types constructed dynamically (e.g. `Activator.CreateInstance(Type)`, JSON polymorphism), verify `linker.xml` still covers them.
 
 **Standalone minigame mode**: `Plants.exe --minigioco <TipoMinigioco>` launches single minigame in separate window.
 
@@ -45,7 +45,7 @@ Window never truly closes — minimize/close hides to system tray (`ConfigFlags.
 
 ### Object System
 - **All game objects** inherit from `GameElement` (in `Engine/GameGeneral/`)
-- Factory: `GameElement.Create<T>(depth, room)` — uses `Activator.CreateInstance` (needs trimmer preservation)
+- Factory: `GameElement.Create<T>(depth, room)` — constructs via `new T()` (requires `where T : GameElement, new()`). Trim-safe, no reflection
 - Constructor auto-registers in static `GameElement.elementList` (thread-safe with `_elementLock`)
 - Call `Destroy()` to remove; finalizer also removes from list
 - `Obj_` prefix for game objects, `Obj_Gui` prefix for UI objects

@@ -41,6 +41,14 @@ internal static class Program
         CrashLogger.SetupGlobalHandlers();
         CrashLogger.LogInfo("Program", $"Plants starting - Version: {typeof(Program).Assembly.GetName().Version}");
         CrashLogger.LogInfo("Program", $"Executable: {exeDir}");
+
+        // Windows Toast Notifications require an AUMID. Set it on the process and
+        // install a per-user Start Menu shortcut so the system can route toast activations
+        // back to this exe. Both steps are no-admin and idempotent.
+        const string AUMID = "Plants.Game";
+        ShortcutInstaller.SetProcessAumid(AUMID);
+        string exePath = Environment.ProcessPath ?? Path.Combine(exeDir, "Plants.exe");
+        ShortcutInstaller.EnsureShortcut(AUMID, "Plants", exePath);
         
         try
         {

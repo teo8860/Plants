@@ -15,11 +15,15 @@
 
 	<PropertyGroup>
 		
-	 <PublishTrimmed>true</PublishTrimmed> 
+	 <PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>partial</TrimMode>
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 		<!-- Embed PDB directly into the single-file exe for crash debugging -->
 		<DebugType>embedded</DebugType>
+		<!-- Keep debug support in Release so crash stack traces include file:line.
+		     JIT inlining still collapses frames; per-method [MethodImpl(MethodImplOptions.NoInlining)]
+		     is the only reliable way to preserve a specific frame. -->
+		<DebuggerSupport>true</DebuggerSupport>
 	</PropertyGroup>
 
 	<PropertyGroup>

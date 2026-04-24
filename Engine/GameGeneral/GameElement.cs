@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -45,9 +44,9 @@ public class GameElement
         }
     }
    
-    public static T Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T >(int depth = 0, Room room = null) where T : GameElement
+    public static T Create<T>(int depth = 0, Room room = null) where T : GameElement, new()
     {
-        T obj = Activator.CreateInstance<T>();
+        T obj = new T();
 
         if(depth != 0)
             obj.depth = depth;

@@ -30,6 +30,7 @@ public class Obj_Radice : GameElement
 {
     private List<SegmentoRadice> segmenti = new();
     private List<Obj_Radice> ramificazioni = new();
+    private readonly object _lock = new();
 
     private Vector2 origine;
     private Vector2 direzioneBase;
@@ -73,9 +74,12 @@ public class Obj_Radice : GameElement
 
     public new void Destroy()
     {
-        foreach (var item in ramificazioni)
-            item.Destroy();
-        ramificazioni.Clear();
+        lock (_lock)
+        {
+            foreach (var item in ramificazioni)
+                item.Destroy();
+            ramificazioni.Clear();
+        }
         base.Destroy();
     }
 
@@ -97,19 +101,22 @@ public class Obj_Radice : GameElement
 
         tempoVita += 0.016f;
 
-        CresciSegmento();
-
-        foreach (var ramo in ramificazioni)
+        lock (_lock)
         {
-            ramo.Cresci();
-        }
+            CresciSegmento();
 
-        if (ramificazioni.Count < maxRamificazioni && segmenti.Count > 3)
-        {
-            TentaRamificazione();
-        }
+            foreach (var ramo in ramificazioni)
+            {
+                ramo.Cresci();
+            }
 
-        UpdateBounds();
+            if (ramificazioni.Count < maxRamificazioni && segmenti.Count > 3)
+            {
+                TentaRamificazione();
+            }
+
+            UpdateBounds();
+        }
     }
 
     private void CresciSegmento()
@@ -240,39 +247,42 @@ public class Obj_Radice : GameElement
 
     public override void Draw()
     {
-        foreach (var ramo in ramificazioni)
+        lock (_lock)
         {
-            ramo.Draw();
-        }
-
-        if (segmenti.Count < 2) return;
-
-        for (int i = 0; i < segmenti.Count - 1; i++)
-        {
-            var seg = segmenti[i];
-            var nextSeg = segmenti[i + 1];
-
-            float profRatio = (float)i / segmenti.Count;
-            Color colore = LerpColor(ColorePrimario, ColoreSecondario, profRatio);
-
-            if (seg.Thickness > 1.5f)
+            foreach (var ramo in ramificazioni)
             {
-                Color ombra = new Color(60, 40, 20, 180);
-                Graphics.DrawLineEx(seg.Start, nextSeg.Start, seg.Thickness + 1f, ombra);
+                ramo.Draw();
             }
 
-            Graphics.DrawLineEx(seg.Start, nextSeg.Start, seg.Thickness, colore);
-        }
+            if (segmenti.Count < 2) return;
 
-        if (segmenti.Count > 1 && !completamenteCresta)
-        {
-            var punta = segmenti[^1];
-            Graphics.DrawCircleV(punta.End, punta.Thickness * 0.7f, ColorePunta);
-        }
+            for (int i = 0; i < segmenti.Count - 1; i++)
+            {
+                var seg = segmenti[i];
+                var nextSeg = segmenti[i + 1];
 
-        if (generazione == 0)
-        {
-            DrawPeliRadicali();
+                float profRatio = (float)i / segmenti.Count;
+                Color colore = LerpColor(ColorePrimario, ColoreSecondario, profRatio);
+
+                if (seg.Thickness > 1.5f)
+                {
+                    Color ombra = new Color(60, 40, 20, 180);
+                    Graphics.DrawLineEx(seg.Start, nextSeg.Start, seg.Thickness + 1f, ombra);
+                }
+
+                Graphics.DrawLineEx(seg.Start, nextSeg.Start, seg.Thickness, colore);
+            }
+
+            if (segmenti.Count > 1 && !completamenteCresta)
+            {
+                var punta = segmenti[^1];
+                Graphics.DrawCircleV(punta.End, punta.Thickness * 0.7f, ColorePunta);
+            }
+
+            if (generazione == 0)
+            {
+                DrawPeliRadicali();
+            }
         }
     }
 
@@ -323,14 +333,17 @@ public class Obj_Radice : GameElement
         var data = new RadiceSaveData();
         data.Generazione = generazione;
 
-        foreach (var seg in segmenti)
+        lock (_lock)
         {
-            data.Start.Add(seg.Start);
-            data.End.Add(seg.End);
-        }
+            foreach (var seg in segmenti)
+            {
+                data.Start.Add(seg.Start);
+                data.End.Add(seg.End);
+            }
 
-        foreach (var ramo in ramificazioni)
-            data.Rami.Add(ramo.ToSaveData());
+            foreach (var ramo in ramificazioni)
+                data.Rami.Add(ramo.ToSaveData());
+        }
 
         return data;
     }

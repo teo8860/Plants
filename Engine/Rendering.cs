@@ -103,7 +103,14 @@ internal class Rendering
 
             foreach (var item in elements)
             {
-                item.Update();
+                try
+                {
+                    item.Update();
+                }
+                catch (Exception ex)
+                {
+                    CrashLogger.LogError($"Update/{item?.GetType().FullName ?? "null"}", ex);
+                }
             }
 
 
@@ -120,7 +127,14 @@ internal class Rendering
             camera.BeginWorldMode();
             foreach (var item in layerBase)
             {
-                item.Draw();
+                try
+                {
+                    item.Draw();
+                }
+                catch (Exception ex)
+                {
+                    CrashLogger.LogError($"Draw/World/{item?.GetType().FullName ?? "null"}", ex);
+                }
             }
             camera.EndWorldMode();
 
@@ -134,7 +148,14 @@ internal class Rendering
             // GUI: coordinate pixel logiche, invariate
             foreach (var item in layerGui)
             {
-                item.Draw();
+                try
+                {
+                    item.Draw();
+                }
+                catch (Exception ex)
+                {
+                    CrashLogger.LogError($"Draw/Gui/{item?.GetType().FullName ?? "null"}", ex);
+                }
             }
 
             // Debug console (update + draw sopra tutto)
