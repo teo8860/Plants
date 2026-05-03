@@ -68,12 +68,16 @@ internal static class Program
             var cfg = GameConfig.get();
             GameProperties.uiScale = cfg.UiScale;
 
+            Raylib_CSharp.Raylib.SetConfigFlags(ConfigFlags.UndecoratedWindow);
             Window.Init(GameProperties.physicalWindowWidth, GameProperties.physicalWindowHeight, "Plants");
             Window.ClearState(ConfigFlags.ResizableWindow);
 
             // Scala input mouse in modo che GetMouseX/Y restituiscano coordinate logiche
             float invMul = 1f / GameProperties.uiScaleMultiplier;
             Input.SetMouseScale(invMul, invMul);
+            // Sposta l'origine del mouse sotto la TopBar: il GUI sotto la barra usa coordinate
+            // logiche y=0..windowHeight. La barra stessa compensa aggiungendo TopBarHeight.
+            Input.SetMouseOffset(0, (int)(-GameProperties.TopBarHeight * GameProperties.uiScaleMultiplier));
 
             // rimuove la possibilità di minimizzare
             IntPtr hwnd = Window.GetHandle();

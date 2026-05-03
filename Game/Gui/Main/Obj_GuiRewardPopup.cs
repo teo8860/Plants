@@ -67,6 +67,7 @@ public class Obj_GuiRewardPopup : GameElement
     public override void Update()
     {
         if (!isVisible) return;
+        InputGate.ConsumeMouse();
 
         (int panelX, int panelY, int panelW, int panelH) = GetPanelRect();
         int btnW = 90;

@@ -52,6 +52,8 @@ public class Obj_GuiUpgradePanel : GameElement
 
     public override void Update()
     {
+        if (InputGate.MouseConsumed) { hoveredButton = -1; return; }
+
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 

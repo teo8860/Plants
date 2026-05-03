@@ -84,6 +84,8 @@ public class Obj_GuiBottomNavigation : GameElement
 
     public override void Update()
     {
+        if (InputGate.MouseConsumed) { hoveredTabIndex = -1; return; }
+
         if (Game.guiMorte != null && Game.guiMorte.active)
             return;
 

@@ -80,14 +80,14 @@ public class PixelCamera
 		Graphics.EndTextureMode();
 	}
 
-	public void DrawWorld()
+	public void DrawWorld(float yOffset = 0)
 	{
 		Graphics.BeginMode2D(screenSpaceCamera);
 
 		Graphics.DrawTexturePro(
 			renderTexture.Texture,
 			new Raylib_CSharp.Transformations.Rectangle(0, 0, renderTexture.Texture.Width, renderTexture.Texture.Height),
-			new Raylib_CSharp.Transformations.Rectangle(-virtualRatio, -virtualRatio,
+			new Raylib_CSharp.Transformations.Rectangle(-virtualRatio, -virtualRatio + yOffset,
 				screenWidth + (virtualRatio * 2),
 				screenHeight + (virtualRatio * 2)
 			),
@@ -95,7 +95,7 @@ public class PixelCamera
 			0.0f,
 			Color.White
 		);
-	
+
 		Graphics.EndMode2D();
 	}
 

@@ -25,7 +25,7 @@ internal class Rendering
     private static void EnsureFinalTexture()
     {
         if (finalTextureReady) return;
-        finalTexture = RenderTexture2D.Load(GameProperties.windowWidth, GameProperties.windowHeight);
+        finalTexture = RenderTexture2D.Load(GameProperties.windowWidth, GameProperties.windowHeight + GameProperties.TopBarHeight);
         finalTexture.Value.Texture.SetFilter(TextureFilter.Point);
         finalTextureReady = true;
     }
@@ -97,11 +97,16 @@ internal class Rendering
             Program.trayIcon?.LoopEventRender();
             
             camera.Update();
+            InputGate.Reset();
             var elements = GameElement.GetList();
             elements = elements.FindAll((o)=> o.active == true);
 
+            // Update in ordine di depth crescente (più "in cima" prima),
+            // così gli overlay possono consumare il click prima dei sottostanti.
+            var updateOrder = new System.Collections.Generic.List<GameElement>(elements);
+            updateOrder.Sort((a, b) => a.depth - b.depth);
 
-            foreach (var item in elements)
+            foreach (var item in updateOrder)
             {
                 try
                 {
@@ -138,16 +143,19 @@ internal class Rendering
             }
             camera.EndWorldMode();
 
-            // Passa a disegnare sulla texture intermedia in coordinate logiche (400x500)
+            // Passa a disegnare sulla texture intermedia in coordinate logiche (400x(500+TopBarHeight))
             Graphics.BeginTextureMode(finalTexture.Value);
             Graphics.ClearBackground(Color.Black);
 
-            // Upscale della texture mondo virtuale sulla texture logica
-            camera.DrawWorld();
+            // Upscale della texture mondo virtuale sulla texture logica, traslato sotto la TopBar
+            camera.DrawWorld(GameProperties.TopBarHeight);
 
-            // GUI: coordinate pixel logiche, invariate
+            // GUI normale: traslata sotto la TopBar via Camera2D
+            var guiCamera = new Camera2D(new Vector2(0, GameProperties.TopBarHeight), Vector2.Zero, 0f, 1f);
+            Graphics.BeginMode2D(guiCamera);
             foreach (var item in layerGui)
             {
+                if (item is Obj_GuiTopBar || item is Obj_GuiTopDrawer) continue; // disegnati dopo, senza translation
                 try
                 {
                     item.Draw();
@@ -157,22 +165,38 @@ internal class Rendering
                     CrashLogger.LogError($"Draw/Gui/{item?.GetType().FullName ?? "null"}", ex);
                 }
             }
+            Graphics.EndMode2D();
+
+            // TopBar + cassetto: coordinate logiche raw, sopra ogni cosa
+            foreach (var item in layerGui)
+            {
+                if (item is not Obj_GuiTopBar) continue;
+                try { item.Draw(); }
+                catch (Exception ex) { CrashLogger.LogError($"Draw/TopBar/{item?.GetType().FullName ?? "null"}", ex); }
+            }
+            foreach (var item in layerGui)
+            {
+                if (item is not Obj_GuiTopDrawer) continue;
+                try { item.Draw(); }
+                catch (Exception ex) { CrashLogger.LogError($"Draw/TopDrawer/{item?.GetType().FullName ?? "null"}", ex); }
+            }
 
             // Debug console (update + draw sopra tutto)
             DebugConsole.Update();
             DebugConsole.Draw();
 
             if (!DebugConsole.IsOpen)
-                GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY()), 0, 1, Color.White, 1);
+                GameFunctions.DrawSprite(AssetLoader.spriteLeaf, new Vector2( Input.GetMouseX(), Input.GetMouseY() + GameProperties.TopBarHeight), 0, 1, Color.White, 1);
 
             Graphics.EndTextureMode();
 
             // Blit finale sulla finestra fisica con upscaling Point (niente blur) in base a uiScale
             int physW = GameProperties.physicalWindowWidth;
             int physH = GameProperties.physicalWindowHeight;
+            int logicalH = GameProperties.windowHeight + GameProperties.TopBarHeight;
             Graphics.DrawTexturePro(
                 finalTexture.Value.Texture,
-                new Raylib_CSharp.Transformations.Rectangle(0, 0, GameProperties.windowWidth, -GameProperties.windowHeight),
+                new Raylib_CSharp.Transformations.Rectangle(0, 0, GameProperties.windowWidth, -logicalH),
                 new Raylib_CSharp.Transformations.Rectangle(0, 0, physW, physH),
                 Vector2.Zero,
                 0f,

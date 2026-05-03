@@ -123,6 +123,7 @@ public class Obj_GuiFusionResultPopup : GameElement
     public override void Update()
     {
         if (!isVisible) return;
+        InputGate.ConsumeMouse();
 
         pulse += Time.GetFrameTime() * 3f;
 

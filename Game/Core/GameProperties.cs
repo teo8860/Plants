@@ -7,6 +7,9 @@ internal static class GameProperties
     public static int windowWidth = 400;
     public static int windowHeight = 500;
 
+    // Altezza barra superiore (currencies + opzioni + chiudi). Aggiunta sopra l'area di gioco logica.
+    public const int TopBarHeight = 22;
+
     // Livello di scala UI 1..4. Livello 4 equivale al vecchio x2 (raddoppio). Livelli 2-3 intermedi.
     // Logica interna e coordinate GUI restano sempre a windowWidth x windowHeight.
     public const int MaxUiScaleLevel = 4;
@@ -25,7 +28,7 @@ internal static class GameProperties
 
     public static float uiScaleMultiplier => GetUiScaleMultiplier(uiScale);
     public static int physicalWindowWidth => (int)(windowWidth * uiScaleMultiplier);
-    public static int physicalWindowHeight => (int)(windowHeight * uiScaleMultiplier);
+    public static int physicalWindowHeight => (int)((windowHeight + TopBarHeight) * uiScaleMultiplier);
 
     public static int viewWidth => windowWidth / 4;
     public static int viewHeight => windowHeight / 4;

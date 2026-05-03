@@ -420,7 +420,7 @@ public class Obj_Plant : GameElement
         }
 
         // Click su foglia dorata → avvia animazione
-        if (Input.IsMouseButtonPressed(Raylib_CSharp.Interact.MouseButton.Left) && !ManagerMinigames.InCorso)
+        if (!InputGate.MouseConsumed && Input.IsMouseButtonPressed(Raylib_CSharp.Interact.MouseButton.Left) && !ManagerMinigames.InCorso)
         {
             ControllaClickFogliaDorata();
         }

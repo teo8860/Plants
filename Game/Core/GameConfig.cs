@@ -75,6 +75,7 @@ public class GameConfig
 
         float inv = 1f / GameProperties.uiScaleMultiplier;
         Input.SetMouseScale(inv, inv);
+        Input.SetMouseOffset(0, (int)(-GameProperties.TopBarHeight * GameProperties.uiScaleMultiplier));
     }
 
     public bool StartHidden

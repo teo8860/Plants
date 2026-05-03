@@ -120,6 +120,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
     public override void Update()
     {
         if (!isVisible) return;
+        InputGate.ConsumeMouse();
 
         float dt = Time.GetFrameTime();
         pulseTime += dt;

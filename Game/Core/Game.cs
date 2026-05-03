@@ -21,6 +21,8 @@ public static class Game
 
     public static Obj_GuiToolbar toolbar;
     public static Obj_GuiToolbar toolbarBottom;
+    public static Obj_GuiTopBar topBar;
+    public static Obj_GuiTopDrawer topDrawer;
 
     public static ObjBackground background;
     public static ObjGround ground;
@@ -247,60 +249,9 @@ public static class Game
         statsPanel = new Obj_GuiStatsPanel(Rendering.camera.screenWidth - 180 - 6, Rendering.camera.screenHeight - 487);
 
 
-        // Toolbar in basso a destra con innaffiatoio - dropdown verso l'alto, aperta di default
-        int bottomToolbarX = Rendering.camera.screenWidth - 46;
-        int bottomToolbarY = Rendering.camera.screenHeight - 90;
-        toolbarBottom = new Obj_GuiToolbar(bottomToolbarX, bottomToolbarY, buttonSize: 36, hasDropdown: true, dropUp: true, startOpen: true);
-        toolbarBottom.depth = -600;
-        toolbarBottom.ButtonFillColor = new Color(140, 140, 160, 255);
-        toolbarBottom.ButtonHoverColor = new Color(170, 170, 190, 255);
-        toolbarBottom.ButtonPressedColor = new Color(120, 120, 140, 255);
-        toolbarBottom.ShowMenuButton = false;
-        toolbarBottom.SetIcons(
-            AssetLoader.spriteArrowDown,
-            AssetLoader.spriteArrowUp,
-            AssetLoader.spriteMenu
-        );
-        toolbarBottom.AddButton(
-            AssetLoader.spriteWateringOff,
-            AssetLoader.spriteWateringOn,
-            "Innaffiatoio",
-            (active) => {
-                controller.annaffiatoioAttivo = active;
-            }
-        );
-
-        toolbarBottom.AddActionButton(
-            AssetLoader.spriteSeed1,
-            "Riprendi Seme",
-            () => {
-                if (!SeedRecoverySystem.IsRecovering && !SeedRecoverySystem.IsConfirming
-                    && !IsModalitaPiantaggio && guiSeedRecovery != null)
-                {
-                    guiSeedRecovery.ShowConfirmation();
-                }
-            }
-        );
-
-        toolbarBottom.AddActionButton(
-            AssetLoader.spriteSeed2,
-            "Posta Giornaliera",
-            () => {
-                if (guiPostaPopup != null && !guiPostaPopup.IsVisible)
-                    guiPostaPopup.Show();
-            }
-        );
-
-        toolbarBottom.AddActionButton(
-            AssetLoader.spriteMenu,
-            "Opzioni",
-            () => {
-                if (guiOpzioniPopup != null && !guiOpzioniPopup.IsVisible)
-                    guiOpzioniPopup.Show();
-            }
-        );
-
         GameElement.Create<Obj_GuiBottomNavigation>(-600);
+        topBar = GameElement.Create<Obj_GuiTopBar>(-700);
+        topDrawer = GameElement.Create<Obj_GuiTopDrawer>(-800);
 
         guiPiantaggio = new Obj_GuiPiantaggio();
         guiMorte = new Obj_GuiMorte();
@@ -308,8 +259,6 @@ public static class Game
         guiOpzioniPopup = GameElement.Create<Obj_GuiOpzioniPopup>(-2000);
         guiPostaPopup = GameElement.Create<Obj_GuiPostaPopup>(-2000);
         guiRewardPopup = GameElement.Create<Obj_GuiRewardPopup>(-3000);
-        guiPostaBadge = GameElement.Create<Obj_GuiPostaBadge>(-650);
-        guiPostaBadge.PostaButtonIndex = 2;
         tutorialSlideshow = GameElement.Create<Obj_GuiTutorialSlideshow>(-5000);
 
         MailSystem.Load();

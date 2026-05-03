@@ -54,6 +54,8 @@ public class Obj_GuiCompostPanel : GameElement
         // Aggiorna il sistema compost
         CompostSystem.Update(Time.GetFrameTime());
 
+        if (InputGate.MouseConsumed) return;
+
         int screenWidth = Rendering.camera.screenWidth;
         int screenHeight = Rendering.camera.screenHeight;
 
@@ -128,18 +130,7 @@ public class Obj_GuiCompostPanel : GameElement
 
     public override void Draw()
     {
-        // Info foglie e slot
         int totalPackages = CompostSystem.GetTotalPackageCount();
-        int maxPackages = UpgradeSystem.GetMaxPackages();
-
-        // Sfondo per leggibilità testo
-        Graphics.DrawRectangleRounded(
-            new Rectangle(5, 5, 130, 42),
-            0.2f, 6, new Color(30, 25, 20, 180)
-        );
-        Graphics.DrawText($"Foglie: {Game.pianta.Stats.FoglieAccumulate}", 12, 10, 16, new Color(140, 220, 140, 255));
-        Graphics.DrawText($"Slot: {totalPackages}/{maxPackages}", 12, 30, 14,
-            totalPackages >= maxPackages ? new Color(255, 120, 120, 255) : new Color(240, 240, 240, 255));
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
@@ -151,7 +142,7 @@ public class Obj_GuiCompostPanel : GameElement
         {
             Graphics.DrawRectangleRoundedLines(binRect, 0.2f, 6, 2, new Color(255, 255, 100, 200));
 
-            string hoverText = totalPackages >= maxPackages ? "Slot pieni!" : "Clicca per creare";
+            string hoverText = totalPackages >= UpgradeSystem.GetMaxPackages() ? "Slot pieni!" : "Clicca per creare";
             Graphics.DrawText(hoverText, (int)binRect.X - 15, (int)binRect.Y - 15, 9, Color.White);
         }
 

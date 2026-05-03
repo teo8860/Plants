@@ -76,8 +76,8 @@ public class Obj_Controller : GameElement
         float deltaTime = Time.GetFrameTime();
         WaterSystem.Update(deltaTime);
 
-        if (Game.toolbarBottom != null)
-            Game.toolbarBottom.GetButton(0).FillLevel = WaterSystem.FillPercent;
+        if (InputGate.MouseConsumed)
+            return;
 
 		if (Input.IsMouseButtonDown(MouseButton.Right))
         {

@@ -223,6 +223,8 @@ public class Obj_GuiInventoryGrid : GameElement
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsInventoryOpen)
             return;
 
+        if (InputGate.MouseConsumed) return;
+
         // Blocca input mentre il popup di fusione e' aperto
         if (Game.guiFusionResultPopup != null && Game.guiFusionResultPopup.IsVisible)
             return;

@@ -90,6 +90,7 @@ public class Obj_GuiPostaPopup : GameElement
     public override void Update()
     {
         if (!isVisible) return;
+        InputGate.ConsumeMouse();
 
         if (Game.guiRewardPopup != null && Game.guiRewardPopup.IsVisible)
             return;

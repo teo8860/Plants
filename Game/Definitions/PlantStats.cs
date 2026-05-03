@@ -43,6 +43,7 @@ public class PlantStats
     public int FoglieBase { get; set; } = 1000;
     public int FoglieAttuali { get; set; } = 0;
     public int FoglieAccumulate { get; set; } = 0;
+    public int FoglieOro { get; set; } = 0;
     public float DropRateFoglie { get; set; } = 0.003f;
     public float Altezza { get; set; } = 0.0f;
     public float AltezzaMassima { get; set; } = 5000.0f;

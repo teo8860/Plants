@@ -109,6 +109,7 @@ public class Obj_GuiOpzioniPopup : GameElement
     public override void Update()
     {
         if (!isVisible) return;
+        InputGate.ConsumeMouse();
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
