@@ -235,7 +235,7 @@ public class Obj_GuiTopDrawer : GameElement
                 Graphics.DrawCircle(bx + badgeSize / 2, by + badgeSize / 2, badgeSize / 2f + 0.8f, new Color(255, 220, 220, alpha));
                 Graphics.DrawCircle(bx + badgeSize / 2, by + badgeSize / 2, badgeSize / 2f, new Color(210, 50, 50, alpha));
                 int textW = text.Length * 5;
-                Graphics.DrawText(text, bx + (badgeSize - textW) / 2 + 1, by + 2, 8, new Color(255, 255, 255, alpha));
+                GuiTheme.DrawText(text, bx + (badgeSize - textW) / 2 + 1, by + 2, 8, new Color(255, 255, 255, alpha));
             }
         }
     }

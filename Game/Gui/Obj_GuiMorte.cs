@@ -95,18 +95,18 @@ public class Obj_GuiMorte : GameElement
         string titolo = "La tua pianta e' morta";
         int titoloW = titolo.Length * 8;
         byte tAlpha = (byte)(255 * textAlpha);
-        Graphics.DrawText(titolo, px + (pw - titoloW) / 2, py + 25, 16,
+        GuiTheme.DrawText(titolo, px + (pw - titoloW) / 2, py + 25, 16,
             new Color(rosso.R, rosso.G, rosso.B, tAlpha));
 
         // Messaggio
         string msg1 = "Dovrai ricominciare";
         int msg1W = msg1.Length * 5;
-        Graphics.DrawText(msg1, px + (pw - msg1W) / 2, py + 60, 10,
+        GuiTheme.DrawText(msg1, px + (pw - msg1W) / 2, py + 60, 10,
             new Color(bianco.R, bianco.G, bianco.B, tAlpha));
 
         string msg2 = "con un nuovo seme.";
         int msg2W = msg2.Length * 5;
-        Graphics.DrawText(msg2, px + (pw - msg2W) / 2, py + 78, 10,
+        GuiTheme.DrawText(msg2, px + (pw - msg2W) / 2, py + 78, 10,
             new Color(bianco.R, bianco.G, bianco.B, tAlpha));
 
         // Hint per continuare
@@ -116,7 +116,7 @@ public class Obj_GuiMorte : GameElement
             byte hintA = (byte)(120 + pulse * 80);
             string hint = "Clicca per continuare";
             int hintW = hint.Length * 5;
-            Graphics.DrawText(hint, px + (pw - hintW) / 2, py + 120, 10,
+            GuiTheme.DrawText(hint, px + (pw - hintW) / 2, py + 120, 10,
                 new Color(grigio.R, grigio.G, grigio.B, hintA));
         }
     }

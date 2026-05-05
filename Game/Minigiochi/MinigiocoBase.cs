@@ -177,22 +177,22 @@ public abstract class MinigiocoBase : GameElement
         {
             string nome = Nome;
             int nomeW = nome.Length * 8;
-            Graphics.DrawText(nome, px + (pw - nomeW) / 2, py + 20, 16, verdeChiaro);
+            GuiTheme.DrawText(nome, px + (pw - nomeW) / 2, py + 20, 16, verdeChiaro);
 
             string desc = Descrizione;
             int descW = desc.Length * 5;
-            Graphics.DrawText(desc, px + (pw - descW) / 2, py + 50, 10, grigioChiaro);
+            GuiTheme.DrawText(desc, px + (pw - descW) / 2, py + 50, 10, grigioChiaro);
 
             string tempo = $"Tempo: {tempoTotale:0}s";
             int tempoW = tempo.Length * 5;
-            Graphics.DrawText(tempo, px + (pw - tempoW) / 2, py + 75, 10, bianco);
+            GuiTheme.DrawText(tempo, px + (pw - tempoW) / 2, py + 75, 10, bianco);
 
             float countdown = INTRO_DURATA - introTimer;
             if (countdown > 0 && countdown < 1.5f)
             {
                 string countText = countdown > 1f ? "2" : countdown > 0.5f ? "1" : "Via!";
                 int countW = countText.Length * 12;
-                Graphics.DrawText(countText, px + (pw - countW) / 2, py + 92, 20, verdeChiaro);
+                GuiTheme.DrawText(countText, px + (pw - countW) / 2, py + 92, 20, verdeChiaro);
             }
         }
     }
@@ -213,11 +213,11 @@ public abstract class MinigiocoBase : GameElement
 
         // Tempo testo
         string tempoStr = $"{tempoRimasto:0.0}s";
-        Graphics.DrawText(tempoStr, barX + barW - 40, barY + 12, 10, bianco);
+        GuiTheme.DrawText(tempoStr, barX + barW - 40, barY + 12, 10, bianco);
 
         // Punteggio
         string punteggioStr = $"{punteggio}/{punteggioMassimo}";
-        Graphics.DrawText(punteggioStr, barX, barY + 12, 10, verdeChiaro);
+        GuiTheme.DrawText(punteggioStr, barX, barY + 12, 10, verdeChiaro);
     }
 
     private void DrawRisultato()
@@ -237,31 +237,31 @@ public abstract class MinigiocoBase : GameElement
         string titolo = vinto ? "Vittoria!" : "Tempo Scaduto!";
         Color titoloCol = vinto ? verdeChiaro : rosso;
         int titoloW = titolo.Length * 9;
-        Graphics.DrawText(titolo, px + (pw - titoloW) / 2, py + 20, 18, titoloCol);
+        GuiTheme.DrawText(titolo, px + (pw - titoloW) / 2, py + 20, 18, titoloCol);
 
         // Punteggio
         string puntStr = $"Punteggio: {punteggio}/{punteggioMassimo}";
         int puntW = puntStr.Length * 6;
-        Graphics.DrawText(puntStr, px + (pw - puntW) / 2, py + 55, 12, bianco);
+        GuiTheme.DrawText(puntStr, px + (pw - puntW) / 2, py + 55, 12, bianco);
 
         // Foglie guadagnate
         int foglie = CalcolaFoglie();
         string foglieStr = $"+{foglie} Foglie";
         int foglieW = foglieStr.Length * 7;
         Color foglieCol = foglie > 0 ? verdeChiaro : grigioChiaro;
-        Graphics.DrawText(foglieStr, px + (pw - foglieW) / 2, py + 85, 14, foglieCol);
+        GuiTheme.DrawText(foglieStr, px + (pw - foglieW) / 2, py + 85, 14, foglieCol);
 
         // Messaggio
         string msg = vinto ? "Complimenti!" : "Ritenta!";
         int msgW = msg.Length * 6;
-        Graphics.DrawText(msg, px + (pw - msgW) / 2, py + 120, 12, grigioChiaro);
+        GuiTheme.DrawText(msg, px + (pw - msgW) / 2, py + 120, 12, grigioChiaro);
 
         // Hint chiudi
         float pulse = (MathF.Sin(outroTimer * 3f) + 1f) * 0.5f;
         byte hintA = (byte)(120 + pulse * 80);
         string hint = "Clicca per continuare";
         int hintW = hint.Length * 5;
-        Graphics.DrawText(hint, px + (pw - hintW) / 2, py + 150, 10, new Color(150, 150, 150, hintA));
+        GuiTheme.DrawText(hint, px + (pw - hintW) / 2, py + 150, 10, new Color(150, 150, 150, hintA));
     }
 
     protected void Termina(bool vinto)

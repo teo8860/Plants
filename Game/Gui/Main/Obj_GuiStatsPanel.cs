@@ -293,7 +293,7 @@ public class Obj_GuiStatsPanel : GameElement
         int ly = ty + pad;
         foreach (var (text, color) in lines)
         {
-            Graphics.DrawText(text, tx + pad, ly, fontSize, color);
+            GuiTheme.DrawText(text, tx + pad, ly, fontSize, color);
             ly += lineH;
         }
     }
@@ -656,7 +656,7 @@ public class Obj_GuiStatsPanel : GameElement
             new Rectangle(tx, ty, tw, th),
             0.1f, 6, tooltipBg);
 
-        Graphics.DrawText(def.Name, tx + 6, ty + 5, 10, textAccent);
+        GuiTheme.DrawText(def.Name, tx + 6, ty + 5, 10, textAccent);
 
         string catLabel = def.Category switch
         {
@@ -664,7 +664,7 @@ public class Obj_GuiStatsPanel : GameElement
             ItemCategory.Consumabile => "Consumabile",
             _ => "Equipaggiabile"
         };
-        Graphics.DrawText(catLabel, tx + 6, ty + 18, 7, textDim);
+        GuiTheme.DrawText(catLabel, tx + 6, ty + 18, 7, textDim);
 
         Graphics.DrawLine(tx + 6, ty + 27, tx + tw - 6, ty + 27, tooltipBorder);
 
@@ -714,7 +714,7 @@ public class Obj_GuiStatsPanel : GameElement
         {
             if ((line + " " + word).Trim().Length > maxChars)
             {
-                Graphics.DrawText(line.Trim(), x, lineY, fontSize, color);
+                GuiTheme.DrawText(line.Trim(), x, lineY, fontSize, color);
                 lineY += fontSize + 3;
                 line = word;
             }
@@ -725,6 +725,6 @@ public class Obj_GuiStatsPanel : GameElement
         }
 
         if (line.Trim().Length > 0)
-            Graphics.DrawText(line.Trim(), x, lineY, fontSize, color);
+            GuiTheme.DrawText(line.Trim(), x, lineY, fontSize, color);
     }
 }

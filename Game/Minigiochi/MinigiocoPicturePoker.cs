@@ -491,22 +491,22 @@ public class MinigiocoPicturePoker : MinigiocoBase
 
         // HUD
         DrawCoin(18, 32);
-        Graphics.DrawText($"{moneteGiocatore}", 30, 33, 10, goldText);
+        GuiTheme.DrawText($"{moneteGiocatore}", 30, 33, 10, goldText);
         string betStr = $"Puntata: {scommessa}";
-        Graphics.DrawText(betStr, sw - 10 - betStr.Length * 5, 33, 8, goldText);
+        GuiTheme.DrawText(betStr, sw - 10 - betStr.Length * 5, 33, 8, goldText);
         string roundStr = $"Round {roundCorrente}/{ROUND_TOTALI}";
         int rw = roundStr.Length * 4;
-        Graphics.DrawText(roundStr, sw / 2 - rw / 2, 32, 8, grigioChiaro);
+        GuiTheme.DrawText(roundStr, sw / 2 - rw / 2, 32, 8, grigioChiaro);
 
         // Label dealer
-        Graphics.DrawText("LUIGI", sw / 2 - 18, 46, 10, luigiGreen);
+        GuiTheme.DrawText("LUIGI", sw / 2 - 18, 46, 10, luigiGreen);
 
         // Carte dealer
         DrawHand(manoDealer, sw / 2, 62, false);
 
         // Separatore
         int sepY = sh / 2 - 5;
-        Graphics.DrawText("VS", sw / 2 - 6, sepY - 4, 10, new Color(200, 180, 100, 120));
+        GuiTheme.DrawText("VS", sw / 2 - 6, sepY - 4, 10, new Color(200, 180, 100, 120));
 
         // Carte giocatore
         DrawHand(manoGiocatore, sw / 2, sh / 2 + 22, true);
@@ -517,7 +517,7 @@ public class MinigiocoPicturePoker : MinigiocoBase
             int selCount = manoGiocatore.Count(c => c.Selezionata);
             string hint = selCount > 0 ? $"Scarti: {selCount} carte" : "Clicca le carte da scartare";
             int hw = hint.Length * 5;
-            Graphics.DrawText(hint, sw / 2 - hw / 2, sh / 2 + 10, 8, grigioChiaro);
+            GuiTheme.DrawText(hint, sw / 2 - hw / 2, sh / 2 + 10, 8, grigioChiaro);
 
             DrawButton(btnConferma, "GIOCA", hoverConferma, btnPurple, btnPurpleHover);
             if (moneteGiocatore >= scommessa * 2)
@@ -532,7 +532,7 @@ public class MinigiocoPicturePoker : MinigiocoBase
         if (fase == FasePoker.Reveal || fase == FasePoker.Risultato)
         {
             int tw = manoTesto.Length * 5;
-            Graphics.DrawText(manoTesto, sw / 2 - tw / 2, sepY + 5, 8, bianco);
+            GuiTheme.DrawText(manoTesto, sw / 2 - tw / 2, sepY + 5, 8, bianco);
         }
 
         // Risultato
@@ -599,7 +599,7 @@ public class MinigiocoPicturePoker : MinigiocoBase
         // Question mark
         int cx = x + w / 2;
         int cy = y + h / 2;
-        Graphics.DrawText("?", cx - 5, cy - 7, 14, new Color(255, 255, 255, 60));
+        GuiTheme.DrawText("?", cx - 5, cy - 7, 14, new Color(255, 255, 255, 60));
     }
 
     private void DrawPicCardFace(PokerCard card, int x, int y, int w, int h)
@@ -612,7 +612,7 @@ public class MinigiocoPicturePoker : MinigiocoBase
 
         // Nome in alto
         if (w >= 30)
-            Graphics.DrawText(name, x + 3, y + 3, 7, col);
+            GuiTheme.DrawText(name, x + 3, y + 3, 7, col);
 
         // Simbolo grande al centro
         int cx = x + w / 2;
@@ -722,12 +722,12 @@ public class MinigiocoPicturePoker : MinigiocoBase
 
         string title = $"Round {roundCorrente}";
         int tw = title.Length * 9;
-        Graphics.DrawText(title, px + (pw - tw) / 2, py + 10, 18,
+        GuiTheme.DrawText(title, px + (pw - tw) / 2, py + 10, 18,
             new Color(255, 220, 80, (byte)(255 * alpha)));
 
         string sub = "Batti Luigi!";
         int sw2 = sub.Length * 5;
-        Graphics.DrawText(sub, px + (pw - sw2) / 2, py + 32, 10,
+        GuiTheme.DrawText(sub, px + (pw - sw2) / 2, py + 32, 10,
             new Color(200, 200, 210, (byte)(200 * alpha)));
     }
 
@@ -750,14 +750,14 @@ public class MinigiocoPicturePoker : MinigiocoBase
             new Color(borderCol.R, borderCol.G, borderCol.B, (byte)(255 * t)));
 
         int tw1 = risultatoTesto.Length * 7;
-        Graphics.DrawText(risultatoTesto, px + (pw - tw1) / 2, py + 10, 14,
+        GuiTheme.DrawText(risultatoTesto, px + (pw - tw1) / 2, py + 10, 14,
             new Color(255, 255, 255, (byte)(255 * t)));
 
         Color monCol = roundVinto
             ? new Color(100, 255, 120, (byte)(255 * t))
             : new Color(255, 120, 100, (byte)(255 * t));
         int tw2 = vincitaTesto.Length * 5;
-        Graphics.DrawText(vincitaTesto, px + (pw - tw2) / 2, py + 32, 10, monCol);
+        GuiTheme.DrawText(vincitaTesto, px + (pw - tw2) / 2, py + 32, 10, monCol);
     }
 
     private void DrawButton(Rectangle rect, string text, bool hover, Color normal, Color hoverCol)
@@ -769,7 +769,7 @@ public class MinigiocoPicturePoker : MinigiocoBase
         int tw = text.Length * 6;
         int tx = (int)rect.X + ((int)rect.Width - tw) / 2;
         int ty = (int)rect.Y + ((int)rect.Height - 12) / 2;
-        Graphics.DrawText(text, tx, ty, 12, bianco);
+        GuiTheme.DrawText(text, tx, ty, 12, bianco);
     }
 
     private float EaseOutBack(float x)

@@ -508,13 +508,13 @@ public class MinigiocoBlackjack : MinigiocoBase
         DrawHUD();
 
         // Label Luigi (dealer)
-        Graphics.DrawText("LUIGI", sw / 2 - 18, 44, 10, luigiGreen);
+        GuiTheme.DrawText("LUIGI", sw / 2 - 18, 44, 10, luigiGreen);
         int dealerPts = CalcolaPunteggio(manoDealer);
         if (fase != FaseBJ.Distribuzione && fase != FaseBJ.RoundIntro)
         {
             bool hasCoperta = manoDealer.Exists(c => c.Coperta);
             string dealerStr = hasCoperta ? "?" : dealerPts.ToString();
-            Graphics.DrawText(dealerStr, sw / 2 + 20, 44, 10, bianco);
+            GuiTheme.DrawText(dealerStr, sw / 2 + 20, 44, 10, bianco);
         }
 
         // Carte dealer
@@ -526,9 +526,9 @@ public class MinigiocoBlackjack : MinigiocoBase
 
         // Label giocatore
         int playerPts = CalcolaPunteggio(manoGiocatore);
-        Graphics.DrawText("TU", sw / 2 - 8, sepY + 8, 10, goldText);
+        GuiTheme.DrawText("TU", sw / 2 - 8, sepY + 8, 10, goldText);
         if (manoGiocatore.Count > 0)
-            Graphics.DrawText(playerPts.ToString(), sw / 2 + 14, sepY + 8, 10, bianco);
+            GuiTheme.DrawText(playerPts.ToString(), sw / 2 + 14, sepY + 8, 10, bianco);
 
         // Carte giocatore
         DrawMano(manoGiocatore, sw / 2, sepY + 24);
@@ -557,16 +557,16 @@ public class MinigiocoBlackjack : MinigiocoBase
     {
         // Monete giocatore (sinistra)
         DrawCoin(20, 32);
-        Graphics.DrawText($"{moneteGiocatore}", 32, 33, 10, goldText);
+        GuiTheme.DrawText($"{moneteGiocatore}", 32, 33, 10, goldText);
 
         // Monete dealer (destra)
         DrawCoin(sw - 55, 32);
-        Graphics.DrawText($"{moneteDealer}", sw - 43, 33, 10, luigiGreen);
+        GuiTheme.DrawText($"{moneteDealer}", sw - 43, 33, 10, luigiGreen);
 
         // Round (centro in alto)
         string roundStr = $"Round {roundCorrente}/{ROUND_TOTALI}";
         int rw = roundStr.Length * 5;
-        Graphics.DrawText(roundStr, sw / 2 - rw / 2, 32, 8, grigioChiaro);
+        GuiTheme.DrawText(roundStr, sw / 2 - rw / 2, 32, 8, grigioChiaro);
     }
 
     private void DrawCoin(int x, int y)
@@ -594,12 +594,12 @@ public class MinigiocoBlackjack : MinigiocoBase
 
         string title = $"Round {roundCorrente}";
         int tw = title.Length * 9;
-        Graphics.DrawText(title, px + (pw - tw) / 2, py + 12, 18,
+        GuiTheme.DrawText(title, px + (pw - tw) / 2, py + 12, 18,
             new Color(255, 220, 80, (byte)(255 * alpha)));
 
         string sub = "Avvicinati a 21!";
         int sw2 = sub.Length * 5;
-        Graphics.DrawText(sub, px + (pw - sw2) / 2, py + 38, 10,
+        GuiTheme.DrawText(sub, px + (pw - sw2) / 2, py + 38, 10,
             new Color(200, 200, 210, (byte)(200 * alpha)));
     }
 
@@ -624,7 +624,7 @@ public class MinigiocoBlackjack : MinigiocoBase
 
         // Testo risultato
         int tw1 = risultatoRoundTesto.Length * 6;
-        Graphics.DrawText(risultatoRoundTesto, px + (pw - tw1) / 2, py + 12, 12,
+        GuiTheme.DrawText(risultatoRoundTesto, px + (pw - tw1) / 2, py + 12, 12,
             new Color(255, 255, 255, (byte)(255 * alpha)));
 
         // Testo monete
@@ -632,7 +632,7 @@ public class MinigiocoBlackjack : MinigiocoBase
             ? new Color(100, 255, 120, (byte)(255 * alpha))
             : new Color(255, 120, 100, (byte)(255 * alpha));
         int tw2 = risultatoMoneteTesto.Length * 6;
-        Graphics.DrawText(risultatoMoneteTesto, px + (pw - tw2) / 2, py + 35, 12, monCol);
+        GuiTheme.DrawText(risultatoMoneteTesto, px + (pw - tw2) / 2, py + 35, 12, monCol);
     }
 
     private void DrawFinePartita()
@@ -655,12 +655,12 @@ public class MinigiocoBlackjack : MinigiocoBase
 
         string title = pareggio ? "Pareggio!" : vinto ? "Hai Vinto!" : "Luigi Vince!";
         int tw = title.Length * 9;
-        Graphics.DrawText(title, px + (pw - tw) / 2, py + 14, 18,
+        GuiTheme.DrawText(title, px + (pw - tw) / 2, py + 14, 18,
             new Color(255, 255, 255, (byte)(255 * t)));
 
         string score = $"Tu: {moneteGiocatore}  -  Luigi: {moneteDealer}";
         int sw2 = score.Length * 5;
-        Graphics.DrawText(score, px + (pw - sw2) / 2, py + 42, 10,
+        GuiTheme.DrawText(score, px + (pw - sw2) / 2, py + 42, 10,
             new Color(200, 200, 210, (byte)(220 * t)));
 
         int foglie = vinto ? 40 + moneteGiocatore : Math.Max(0, moneteGiocatore / 2);
@@ -669,7 +669,7 @@ public class MinigiocoBlackjack : MinigiocoBase
         Color foglieCol = foglie > 0
             ? new Color(100, 255, 120, (byte)(255 * t))
             : new Color(160, 160, 160, (byte)(200 * t));
-        Graphics.DrawText(foglieStr, px + (pw - fw) / 2, py + 65, 12, foglieCol);
+        GuiTheme.DrawText(foglieStr, px + (pw - fw) / 2, py + 65, 12, foglieCol);
     }
 
     private void DrawMano(List<Card> mano, int centerX, int startY)
@@ -744,8 +744,8 @@ public class MinigiocoBlackjack : MinigiocoBase
 
         if (w >= 18)
         {
-            Graphics.DrawText(valStr, x + 3, y + 2, 10, textCol);
-            Graphics.DrawText(semeChar, x + 3, y + 12, 7, textCol);
+            GuiTheme.DrawText(valStr, x + 3, y + 2, 10, textCol);
+            GuiTheme.DrawText(semeChar, x + 3, y + 12, 7, textCol);
         }
 
         int cx = x + w / 2;
@@ -801,7 +801,7 @@ public class MinigiocoBlackjack : MinigiocoBase
         int tw = text.Length * 7;
         int tx = (int)rect.X + ((int)rect.Width - tw) / 2;
         int ty = (int)rect.Y + ((int)rect.Height - 14) / 2;
-        Graphics.DrawText(text, tx, ty, 14, bianco);
+        GuiTheme.DrawText(text, tx, ty, 14, bianco);
     }
 
     private float EaseOutBack(float x)

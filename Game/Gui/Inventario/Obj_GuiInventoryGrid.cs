@@ -435,7 +435,7 @@ public class Obj_GuiInventoryGrid : GameElement
                 {
                     int selectionNum = i == fusionManager.SelectedIndex1 ? 1 : 2;
                     Graphics.DrawCircle(x + cellSize - 10, y + 10, 8, new Color(255, 255, 255, 200));
-                    Graphics.DrawText(selectionNum.ToString(), x + cellSize - 13, y + 4, 12, new Color(0, 0, 0, 255));
+                    GuiTheme.DrawText(selectionNum.ToString(), x + cellSize - 13, y + 4, 12, new Color(0, 0, 0, 255));
                 }
 
                 if (seed.stats.fusionCount > 0)
@@ -508,7 +508,7 @@ public class Obj_GuiInventoryGrid : GameElement
         Graphics.DrawRectangle(barX, barY, fillWidth, barHeight, fillColor);
 
         string fusionText = $"{fusionCount}/{Seed.MAX_FUSIONS}";
-        Graphics.DrawText(fusionText, x + cellSize - 18, y + cellSize - 12, 7, Color.White);
+        GuiTheme.DrawText(fusionText, x + cellSize - 18, y + cellSize - 12, 7, Color.White);
     }
 
     public void ClearSelection()

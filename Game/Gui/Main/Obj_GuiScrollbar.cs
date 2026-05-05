@@ -97,15 +97,15 @@ public class Obj_GuiScrollbar : GameElement
                 Color textColor = new Color(255, 255, 255, 255);
                 if (milestone.name == "Inizio")
                 { 
-                    Graphics.DrawText(WorldDefinitions.GetWorldName(WorldManager.GetCurrentWorld()), x + 2, markerY - 4, 8, textColor);
+                    GuiTheme.DrawText(WorldDefinitions.GetWorldName(WorldManager.GetCurrentWorld()), x + 2, markerY - 4, 8, textColor);
                     continue;
                 }
                 if (milestone.name == "Fine")
                 {
-                    Graphics.DrawText(WorldDefinitions.GetWorldName(WorldDefinitions.GetNextWorld(WorldManager.GetCurrentWorld())), x + 2, markerY - 8, 8, textColor);
+                    GuiTheme.DrawText(WorldDefinitions.GetWorldName(WorldDefinitions.GetNextWorld(WorldManager.GetCurrentWorld())), x + 2, markerY - 8, 8, textColor);
                     continue;
                 }
-                Graphics.DrawText(milestone.name, x + 2, markerY - 4, 8, textColor);
+                GuiTheme.DrawText(milestone.name, x + 2, markerY - 4, 8, textColor);
             }
         }
     }
@@ -159,9 +159,9 @@ public class Obj_GuiScrollbar : GameElement
             0.2f, 4, panelBg
         );
 
-        Graphics.DrawText(heightStr, x + 4, y + 3, 9, Color.White);
-        Graphics.DrawText($"{percent:F0}%", x + 4, y + 14, 9, new Color(255, 150, 150, 255));
-        Graphics.DrawText(currentMilestone, x + 4, y + 25, 7, new Color(180, 180, 200, 255));
+        GuiTheme.DrawText(heightStr, x + 4, y + 3, 9, Color.White);
+        GuiTheme.DrawText($"{percent:F0}%", x + 4, y + 14, 9, new Color(255, 150, 150, 255));
+        GuiTheme.DrawText(currentMilestone, x + 4, y + 25, 7, new Color(180, 180, 200, 255));
     }
 
     private Color LerpColor(Color a, Color b, float t)

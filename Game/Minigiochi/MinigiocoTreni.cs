@@ -295,7 +295,7 @@ public class MinigiocoTreni : MinigiocoBase
         Graphics.DrawRectangleLines(marginX, piattaformaY, sw - marginX * 2, sh - piattaformaY, new Color(130, 120, 110, 255));
         
         // Segnali piattaforma
-        Graphics.DrawText("STAZIONE", marginX + 10, piattaformaY + 15, 12, new Color(200, 180, 150, 200));
+        GuiTheme.DrawText("STAZIONE", marginX + 10, piattaformaY + 15, 12, new Color(200, 180, 150, 200));
         
         // Disegna treno
         float scale = EaseOutBack(animTreno);
@@ -366,7 +366,7 @@ public class MinigiocoTreni : MinigiocoBase
             Color col = fb.positivo ? new Color(100, 255, 100, textA) : new Color(255, 100, 100, textA);
             
             int textW = text.Length * 6;
-            Graphics.DrawText(text, (int)(fb.posizione.X - textW / 2), (int)(fb.posizione.Y - 25 - yOff), 12, col);
+            GuiTheme.DrawText(text, (int)(fb.posizione.X - textW / 2), (int)(fb.posizione.Y - 25 - yOff), 12, col);
         }
         
         // Indicatori passeggeri persi
@@ -387,7 +387,7 @@ public class MinigiocoTreni : MinigiocoBase
             byte hintA = (byte)(150 + pulse * 80);
             string hint = "Clicca i passeggeri per aiutarli a saltare sul treno!";
             int hintW = hint.Length * 5;
-            Graphics.DrawText(hint, (sw - hintW) / 2, sh / 2, 10, new Color(200, 200, 150, hintA));
+            GuiTheme.DrawText(hint, (sw - hintW) / 2, sh / 2, 10, new Color(200, 200, 150, hintA));
         }
         
         // Status treno
@@ -397,7 +397,7 @@ public class MinigiocoTreni : MinigiocoBase
             byte textA = (byte)(150 + pulse * 80);
             string status = "Il treno sta arrivando...";
             int statusW = status.Length * 6;
-            Graphics.DrawText(status, (sw - statusW) / 2, sh / 3, 12, new Color(200, 200, 150, textA));
+            GuiTheme.DrawText(status, (sw - statusW) / 2, sh / 3, 12, new Color(200, 200, 150, textA));
         }
     }
 

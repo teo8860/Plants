@@ -323,9 +323,9 @@ public static class DebugConsole
         Graphics.DrawRectangleLines(panelX, panelY, panelW, panelH, new Color(80, 200, 120, 180));
 
         // Title
-        Graphics.DrawText("DEBUG CONSOLE", panelX + 8, panelY + 6, 12, new Color(80, 200, 120, 255));
+        GuiTheme.DrawText("DEBUG CONSOLE", panelX + 8, panelY + 6, 12, new Color(80, 200, 120, 255));
         string hint = pickerActive ? "[UP/DOWN] select  [ENTER] confirm  [ESC] cancel" : "[TAB] close  [RIGHT] autocomplete  [UP/DOWN] history";
-        Graphics.DrawText(hint, panelX + 130, panelY + 8, 8, new Color(120, 120, 130, 200));
+        GuiTheme.DrawText(hint, panelX + 130, panelY + 8, 8, new Color(120, 120, 130, 200));
 
         // Output lines
         int lineY = panelY + 26;
@@ -343,20 +343,20 @@ public static class DebugConsole
             else if (line.StartsWith(">"))
                 lineColor = new Color(150, 150, 160, 180);
 
-            Graphics.DrawText(line, panelX + 10, lineY, 10, lineColor);
+            GuiTheme.DrawText(line, panelX + 10, lineY, 10, lineColor);
             lineY += lineHeight;
         }
 
         // Input line
         int inputY = panelY + panelH - 24;
         Graphics.DrawRectangle(panelX + 2, inputY - 2, panelW - 4, 20, new Color(20, 20, 25, 240));
-        Graphics.DrawText("> " + inputText, panelX + 8, inputY + 2, 10, new Color(220, 220, 230, 255));
+        GuiTheme.DrawText("> " + inputText, panelX + 8, inputY + 2, 10, new Color(220, 220, 230, 255));
 
         // Cursor (hide during picker)
         if (cursorVisible && !pickerActive)
         {
             int cursorX = panelX + 8 + ("> " + inputText).Length * 6;
-            Graphics.DrawText("_", cursorX, inputY + 2, 10, new Color(80, 200, 120, 255));
+            GuiTheme.DrawText("_", cursorX, inputY + 2, 10, new Color(80, 200, 120, 255));
         }
 
         // Ghost text suggestion (hide during picker)
@@ -364,7 +364,7 @@ public static class DebugConsole
         {
             string ghostPart = currentSuggestion[inputText.Length..];
             int ghostX = panelX + 8 + ("> " + inputText).Length * 6;
-            Graphics.DrawText(ghostPart, ghostX, inputY + 2, 10, new Color(80, 200, 120, 90));
+            GuiTheme.DrawText(ghostPart, ghostX, inputY + 2, 10, new Color(80, 200, 120, 90));
         }
 
         // Picker box (drawn above input line)
@@ -413,24 +413,24 @@ public static class DebugConsole
                 Graphics.DrawRectangle(pickerX + 2, itemY, 3, itemH, new Color(80, 200, 120, 220));
 
                 // Arrow indicator
-                Graphics.DrawText(">", pickerX + 8, itemY + 2, 10, new Color(80, 200, 120, 255));
+                GuiTheme.DrawText(">", pickerX + 8, itemY + 2, 10, new Color(80, 200, 120, 255));
             }
 
             Color textCol = selected
                 ? new Color(255, 255, 255, 255)
                 : new Color(170, 170, 180, 200);
 
-            Graphics.DrawText(pickerOptions[idx], pickerX + 22, itemY + 2, 10, textCol);
+            GuiTheme.DrawText(pickerOptions[idx], pickerX + 22, itemY + 2, 10, textCol);
         }
 
         // Scroll indicators
         if (scrollOffset > 0)
         {
-            Graphics.DrawText("...", pickerX + pickerW - 24, pickerY + 2, 8, new Color(120, 120, 130, 160));
+            GuiTheme.DrawText("...", pickerX + pickerW - 24, pickerY + 2, 8, new Color(120, 120, 130, 160));
         }
         if (scrollOffset + maxVisible < pickerOptions.Count)
         {
-            Graphics.DrawText("...", pickerX + pickerW - 24, pickerY + pickerH - 12, 8, new Color(120, 120, 130, 160));
+            GuiTheme.DrawText("...", pickerX + pickerW - 24, pickerY + pickerH - 12, 8, new Color(120, 120, 130, 160));
         }
     }
 

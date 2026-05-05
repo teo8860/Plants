@@ -503,7 +503,7 @@ public class Obj_GuiPiantaggio : GameElement
         // Titolo
         string titolo = "Scegli un Seme";
         int titoloW = titolo.Length * 9;
-        Graphics.DrawText(titolo, (sw - titoloW) / 2, 15, 18, verdeChiaro);
+        GuiTheme.DrawText(titolo, (sw - titoloW) / 2, 15, 18, verdeChiaro);
 
         // Linea decorativa sotto il titolo
         Graphics.DrawRectangle((sw - lineW) / 2, 36, lineW, 1, new Color(100, 220, 100, 100));
@@ -513,7 +513,7 @@ public class Obj_GuiPiantaggio : GameElement
             ? $"{seeds.Count} semi disponibili"
             : "Nessun seme disponibile!";
         int sottoW = sotto.Length * 5;
-        Graphics.DrawText(sotto, (sw - sottoW) / 2, 42, 10, grigio);
+        GuiTheme.DrawText(sotto, (sw - sottoW) / 2, 42, 10, grigio);
 
         // Linea separatrice
         Graphics.DrawRectangle(20, 58, sw - 40, 1, new Color(80, 80, 60, 120));
@@ -541,7 +541,7 @@ public class Obj_GuiPiantaggio : GameElement
     {
         string hint = "Apri dei pacchetti per ottenere semi";
         int hintW = hint.Length * 5;
-        Graphics.DrawText(hint, (sw - hintW) / 2, sh / 2 - 10, 10, grigio);
+        GuiTheme.DrawText(hint, (sw - hintW) / 2, sh / 2 - 10, 10, grigio);
 
         int cbtnW = 140;
         int cbtnH = 28;
@@ -557,7 +557,7 @@ public class Obj_GuiPiantaggio : GameElement
 
         string cbtnText = "Apri Pacchetti";
         int cbtnTextW = cbtnText.Length * 6;
-        Graphics.DrawText(cbtnText, cbtnX + (cbtnW - cbtnTextW) / 2, cbtnY + 7, 12, bianco);
+        GuiTheme.DrawText(cbtnText, cbtnX + (cbtnW - cbtnTextW) / 2, cbtnY + 7, 12, bianco);
     }
 
     private void DrawGrid()
@@ -674,11 +674,11 @@ public class Obj_GuiPiantaggio : GameElement
         // Nome del seme
         string nome = SeedDefinitions.GetSeedName(sel.type);
         int nomeW = nome.Length * 6;
-        Graphics.DrawText(nome, (sw - nomeW) / 2, panelY + 5, 12, bianco);
+        GuiTheme.DrawText(nome, (sw - nomeW) / 2, panelY + 5, 12, bianco);
 
         // Rarita
         int rarW = rarityName.Length * 4;
-        Graphics.DrawText(rarityName, (sw - rarW) / 2, panelY + 19, 8, rarityColor);
+        GuiTheme.DrawText(rarityName, (sw - rarW) / 2, panelY + 19, 8, rarityColor);
 
         // Separatore
         Graphics.DrawRectangle(panelX + 10, panelY + 30, panelW - 20, 1, new Color(80, 100, 80, 100));
@@ -704,7 +704,7 @@ public class Obj_GuiPiantaggio : GameElement
 
         string btnText = "Pianta!";
         int btnTextW = btnText.Length * 6;
-        Graphics.DrawText(btnText, btnX + (btnW - btnTextW) / 2, btnY + 5, 12, bianco);
+        GuiTheme.DrawText(btnText, btnX + (btnW - btnTextW) / 2, btnY + 5, 12, bianco);
     }
 
     private void DrawFalling()

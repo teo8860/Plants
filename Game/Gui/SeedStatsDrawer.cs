@@ -134,11 +134,11 @@ public static class SeedStatsDrawer
             int rowY = y + i * (rowHeight + barHeight + spacing);
 
             // Label e valore
-            Graphics.DrawText(entry.Label, x, rowY, 9, labelColor);
+            GuiTheme.DrawText(entry.Label, x, rowY, 9, labelColor);
 
             string valText = FormatValue(entry.Value);
             int valW = valText.Length * 5;
-            Graphics.DrawText(valText, x + width - valW, rowY, 9, textColor);
+            GuiTheme.DrawText(valText, x + width - valW, rowY, 9, textColor);
 
             // Barra
             int barY = rowY + 11;
@@ -180,11 +180,11 @@ public static class SeedStatsDrawer
             int cellY = y + row * (rowHeight + barHeight + spacing);
 
             // Short label e valore
-            Graphics.DrawText(entry.ShortLabel, cellX, cellY, 8, labelColor);
+            GuiTheme.DrawText(entry.ShortLabel, cellX, cellY, 8, labelColor);
 
             string valText = FormatValue(entry.Value);
             int valW = valText.Length * 4;
-            Graphics.DrawText(valText, cellX + colWidth - valW, cellY, 8, GetValueColor(entry.Value, entry.MinVal, entry.MaxVal));
+            GuiTheme.DrawText(valText, cellX + colWidth - valW, cellY, 8, GetValueColor(entry.Value, entry.MinVal, entry.MaxVal));
 
             // Barra
             int barY = cellY + 10;

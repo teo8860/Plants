@@ -717,14 +717,14 @@ namespace Plants
 
             // Titolo
             int titleWidth = TextManager.MeasureText(title, 16);
-            Graphics.DrawText(title, panelX + (panelW - titleWidth) / 2, panelY + 15, 16, new Color(150, 255, 150, 255));
+            GuiTheme.DrawText(title, panelX + (panelW - titleWidth) / 2, panelY + 15, 16, new Color(150, 255, 150, 255));
 
             // Linee di testo
             int startY = panelY + 45;
             for (int i = 0; i < lines.Length; i++)
             {
                 int lineWidth = TextManager.MeasureText(lines[i], 12);
-                Graphics.DrawText(lines[i], panelX + (panelW - lineWidth) / 2, startY + i * 16, 12, new Color(220, 220, 220, 255));
+                GuiTheme.DrawText(lines[i], panelX + (panelW - lineWidth) / 2, startY + i * 16, 12, new Color(220, 220, 220, 255));
             }
 
             // Bottone principale
@@ -745,7 +745,7 @@ namespace Plants
             );
 
             int textWidth = TextManager.MeasureText(buttonText, 14);
-            Graphics.DrawText(buttonText, bx + (bw - textWidth) / 2, by + 8, 14, Color.White);
+            GuiTheme.DrawText(buttonText, bx + (bw - textWidth) / 2, by + 8, 14, Color.White);
 
             // Bottone Salta (solo se richiesto)
             if (showSkip)
@@ -766,7 +766,7 @@ namespace Plants
                     : new Color(150, 150, 160, 200);
 
                 int saltaW = TextManager.MeasureText("Salta", 10);
-                Graphics.DrawText("Salta", sx + (sw - saltaW) / 2, sy + 4, 10, skipTextCol);
+                GuiTheme.DrawText("Salta", sx + (sw - saltaW) / 2, sy + 4, 10, skipTextCol);
             }
         }
 
@@ -809,9 +809,9 @@ namespace Plants
 
             // Titolo
             int terraW = TextManager.MeasureText("TERRA", 14);
-            Graphics.DrawText("TERRA", panelX + (panelW - terraW) / 2, panelY + 75, 14, new Color(100, 200, 100, 255));
+            GuiTheme.DrawText("TERRA", panelX + (panelW - terraW) / 2, panelY + 75, 14, new Color(100, 200, 100, 255));
             int primoW = TextManager.MeasureText("Primo Mondo", 10);
-            Graphics.DrawText("Primo Mondo", panelX + (panelW - primoW) / 2, panelY + 95, 10, new Color(180, 180, 200, 255));
+            GuiTheme.DrawText("Primo Mondo", panelX + (panelW - primoW) / 2, panelY + 95, 10, new Color(180, 180, 200, 255));
 
             // Descrizione
             string[] desc = new[] {
@@ -827,7 +827,7 @@ namespace Plants
             {
                 int lineW = TextManager.MeasureText(desc[i], 9);
                 Color col = i == 4 ? new Color(100, 200, 100, 255) : new Color(200, 200, 200, 255);
-                Graphics.DrawText(desc[i], panelX + (panelW - lineW) / 2, startY + i * 12, 9, col);
+                GuiTheme.DrawText(desc[i], panelX + (panelW - lineW) / 2, startY + i * 12, 9, col);
             }
 
             // Bottone
@@ -850,7 +850,7 @@ namespace Plants
             );
 
             int viaggiaW = TextManager.MeasureText("VIAGGIA", 11);
-            Graphics.DrawText("VIAGGIA", bx + (bw - viaggiaW) / 2, by + 8, 11, Color.White);
+            GuiTheme.DrawText("VIAGGIA", bx + (bw - viaggiaW) / 2, by + 8, 11, Color.White);
         }
 
         private void DrawSeme()
@@ -881,7 +881,7 @@ namespace Plants
                 float alpha = (MathF.Sin(buttonPulse * 2) + 1f) * 0.5f;
                 Color textCol = new Color(255, 255, 100, (byte)(180 + alpha * 75));
                 int clicW = TextManager.MeasureText("Cliccami!", 12);
-                Graphics.DrawText("Cliccami!", semeCX - clicW / 2, (int)semeY - 35, 12, textCol);
+                GuiTheme.DrawText("Cliccami!", semeCX - clicW / 2, (int)semeY - 35, 12, textCol);
 
                 // Freccia che punta al seme
                 float arrowY = semeY - 45 + MathF.Sin(buttonPulse * 3) * 3;
@@ -920,14 +920,14 @@ namespace Plants
             // Titolo
             Color titleColor = new Color(255, 220, 100, (byte)(255 * messageAlpha));
             int titleW = TextManager.MeasureText(title, 11);
-            Graphics.DrawText(title, boxX + (boxWidth - titleW) / 2, boxY + 8, 11, titleColor);
+            GuiTheme.DrawText(title, boxX + (boxWidth - titleW) / 2, boxY + 8, 11, titleColor);
 
             // Linee
             Color textColor = new Color(220, 220, 220, (byte)(255 * messageAlpha));
             for (int i = 0; i < lines.Length; i++)
             {
                 int lineW = TextManager.MeasureText(lines[i], 9);
-                Graphics.DrawText(lines[i], boxX + (boxWidth - lineW) / 2, boxY + 24 + i * 13, 9, textColor);
+                GuiTheme.DrawText(lines[i], boxX + (boxWidth - lineW) / 2, boxY + 24 + i * 13, 9, textColor);
             }
         }
 
@@ -947,7 +947,7 @@ namespace Plants
             // Testo lampeggiante
             float alpha = (MathF.Sin(buttonPulse * 2) + 1f) * 0.5f;
             Color textColor = new Color(255, 255, 255, (byte)(200 + alpha * 55));
-            Graphics.DrawText(continueText, textX, textY, 12, textColor);
+            GuiTheme.DrawText(continueText, textX, textY, 12, textColor);
         }
 
         private float EaseOutBack(float x)

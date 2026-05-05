@@ -95,6 +95,17 @@
 	  <EmbeddedResource Include="assets\x.png" />
 	  <EmbeddedResource Include="Assets\watering_off.png" />
 	  <EmbeddedResource Include="Assets\watering_on.png" />
+		<EmbeddedResource Include="Assets\PressStart2P-Regular.ttf" />
+		<EmbeddedResource Include="Assets\editundo.ttf" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="assets\editundo.ttf">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="assets\PressStart2P-Regular.ttf">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 

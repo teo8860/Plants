@@ -304,11 +304,11 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 Color statsBoxBorder = new Color(41, 26, 17, 255);
 
                 string seedName = SeedDefinitions.GetSeedName(seed.type);
-                Graphics.DrawText(seedName, panelX + 18, headerY, 11, textColor);
+                GuiTheme.DrawText(seedName, panelX + 18, headerY, 11, textColor);
 
                 Color rarityColor = SeedDefinitions.GetRarityColor(seed.rarity);
                 string rarityName = SeedDefinitions.GetRarityName(seed.rarity);
-                Graphics.DrawText(rarityName, panelX + 18, headerY + 14, 9, rarityColor);
+                GuiTheme.DrawText(rarityName, panelX + 18, headerY + 14, 9, rarityColor);
 
                 // Descrizione tipo seme
                 string desc = SeedDefinitions.GetSeedDescription(seed.type);
@@ -323,7 +323,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 {
                     if ((line + " " + word).Trim().Length > maxCharsPerLine && line.Length > 0)
                     {
-                        Graphics.DrawText(line, panelX + 18, descY + lineCount * 10, 8, descColor);
+                        GuiTheme.DrawText(line, panelX + 18, descY + lineCount * 10, 8, descColor);
                         line = word;
                         lineCount++;
                     }
@@ -334,7 +334,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 }
                 if (line.Length > 0)
                 {
-                    Graphics.DrawText(line, panelX + 18, descY + lineCount * 10, 8, descColor);
+                    GuiTheme.DrawText(line, panelX + 18, descY + lineCount * 10, 8, descColor);
                     lineCount++;
                 }
 
@@ -358,14 +358,14 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 {
                     string fusionText = $"Fusioni: {seed.stats.fusionCount}/{Seed.MAX_FUSIONS}";
                     Color fusionColor = seed.CanBeFused ? new Color(100, 200, 255, 255) : new Color(200, 80, 80, 255);
-                    Graphics.DrawText(fusionText, panelX + 18, infoY, 9, fusionColor);
+                    GuiTheme.DrawText(fusionText, panelX + 18, infoY, 9, fusionColor);
                     infoY += 14;
                 }
 
                 if (seed.upgradeLevel > 0)
                 {
                     string upgradeText = $"Livello: +{seed.upgradeLevel}";
-                    Graphics.DrawText(upgradeText, panelX + 18, infoY, 9, new Color(255, 200, 50, 255));
+                    GuiTheme.DrawText(upgradeText, panelX + 18, infoY, 9, new Color(255, 200, 50, 255));
                 }
             }
         }
@@ -373,9 +373,9 @@ public class Obj_GuiSeedDetailPanel : GameElement
         {
             // Nessun seme selezionato
             Color hintColor = new Color(160, 150, 130, 180);
-            Graphics.DrawText("Seleziona un", panelX + 18, 40, 10, hintColor);
-            Graphics.DrawText("seme dalla", panelX + 18, 55, 10, hintColor);
-            Graphics.DrawText("griglia", panelX + 18, 70, 10, hintColor);
+            GuiTheme.DrawText("Seleziona un", panelX + 18, 40, 10, hintColor);
+            GuiTheme.DrawText("seme dalla", panelX + 18, 55, 10, hintColor);
+            GuiTheme.DrawText("griglia", panelX + 18, 70, 10, hintColor);
         }
 
         // Info modalità fusione
@@ -401,20 +401,20 @@ public class Obj_GuiSeedDetailPanel : GameElement
             0.1f, 8, infoBoxColor
         );
 
-        Graphics.DrawText("FUSIONE", panelX + 18, startY + 8, 12, new Color(255, 255, 255, 255));
+        GuiTheme.DrawText("FUSIONE", panelX + 18, startY + 8, 12, new Color(255, 255, 255, 255));
 
         if (fusionManager.CanFuse)
         {
-            Graphics.DrawText("Semi selezionati: 2", panelX + 18, startY + 28, 9, textColor);
-            Graphics.DrawText("Premi Unisci per", panelX + 18, startY + 43, 9, textColor);
-            Graphics.DrawText("completare", panelX + 18, startY + 58, 9, textColor);
+            GuiTheme.DrawText("Semi selezionati: 2", panelX + 18, startY + 28, 9, textColor);
+            GuiTheme.DrawText("Premi Unisci per", panelX + 18, startY + 43, 9, textColor);
+            GuiTheme.DrawText("completare", panelX + 18, startY + 58, 9, textColor);
         }
         else
         {
             int count = fusionManager.SelectedSeed1 != null ? 1 : 0;
-            Graphics.DrawText($"Semi selezionati: {count}/2", panelX + 18, startY + 28, 9, textColor);
-            Graphics.DrawText("Seleziona 2 semi", panelX + 18, startY + 43, 9, textColor);
-            Graphics.DrawText("dalla griglia", panelX + 18, startY + 58, 9, textColor);
+            GuiTheme.DrawText($"Semi selezionati: {count}/2", panelX + 18, startY + 28, 9, textColor);
+            GuiTheme.DrawText("Seleziona 2 semi", panelX + 18, startY + 43, 9, textColor);
+            GuiTheme.DrawText("dalla griglia", panelX + 18, startY + 58, 9, textColor);
         }
     }
 
@@ -472,7 +472,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
             if (i == 1)
             {
                 int labelW = label.Length * 6;
-                Graphics.DrawText(label, btnX + (btnWidth - labelW) / 2, btnY + 4, 11, textColor);
+                GuiTheme.DrawText(label, btnX + (btnWidth - labelW) / 2, btnY + 4, 11, textColor);
 
                 Seed sel = selectedSeedIndex >= 0 ? Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) : null;
                 if (sel != null)
@@ -483,7 +483,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
                     int iconSize = 5;
                     int totalW = pvTextW + 4 + iconSize * 2;
                     int startX = btnX + (btnWidth - totalW) / 2;
-                    Graphics.DrawText(previewText, startX, btnY + 20, 9, essenceColor);
+                    GuiTheme.DrawText(previewText, startX, btnY + 20, 9, essenceColor);
                     DrawEssenceIcon(startX + pvTextW + 4 + iconSize, btnY + 25, iconSize);
                 }
             }
@@ -492,7 +492,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 int textWidth = label.Length * 7;
                 int textX = btnX + (btnWidth - textWidth) / 2;
                 int textY = btnY + (buttonHeight - 14) / 2;
-                Graphics.DrawText(label, textX, textY, 14, textColor);
+                GuiTheme.DrawText(label, textX, textY, 14, textColor);
             }
         }
     }

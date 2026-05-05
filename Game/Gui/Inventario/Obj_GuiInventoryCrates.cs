@@ -278,7 +278,7 @@ public class Obj_GuiInventoryCrates : GameElement
             new Color(woodDark.R, woodDark.G, woodDark.B, 255));
 
         int textWidth = name.Length * 5;
-        Graphics.DrawText(name, labelX + labelWidth / 2 - textWidth / 2, labelY + 6, 9, Color.White);
+        GuiTheme.DrawText(name, labelX + labelWidth / 2 - textWidth / 2, labelY + 6, 9, Color.White);
 
         // === HOVER EFFECTS ===
         if (hovered)
@@ -288,7 +288,7 @@ public class Obj_GuiInventoryCrates : GameElement
                 new Color(rarityColor.R, rarityColor.G, rarityColor.B, 200));
 
             // Tooltip
-            Graphics.DrawText("Clicca per aprire", x + width / 2 - 40, y - 15, 9, rarityColor);
+            GuiTheme.DrawText("Clicca per aprire", x + width / 2 - 40, y - 15, 9, rarityColor);
         }
 
         // === EFFETTO BRILLANTEZZA (Epico/Leggendario) ===

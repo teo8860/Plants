@@ -208,7 +208,7 @@ public class Obj_GuiPostaPopup : GameElement
 
         string title = $"POSTA ({MailSystem.UnreadCount})";
         int titleW = title.Length * 7;
-        Graphics.DrawText(title, panelX + (panelW - titleW) / 2, panelY + 6, 14, textColor);
+        GuiTheme.DrawText(title, panelX + (panelW - titleW) / 2, panelY + 6, 14, textColor);
 
         DrawList();
         DrawBottomButtons();
@@ -223,7 +223,7 @@ public class Obj_GuiPostaPopup : GameElement
         {
             string empty = "Nessuna posta.";
             int ew = empty.Length * 5;
-            Graphics.DrawText(empty, listX + (listW - ew) / 2, listY + listH / 2 - 5, 10, mutedTextColor);
+            GuiTheme.DrawText(empty, listX + (listW - ew) / 2, listY + listH / 2 - 5, 10, mutedTextColor);
             return;
         }
 
@@ -269,19 +269,19 @@ public class Obj_GuiPostaPopup : GameElement
         Color titleColor = mail.claimed ? mutedTextColor : textColor;
         Color descColor = mail.claimed ? mutedTextColor : subTextColor;
 
-        Graphics.DrawText(mail.title, textX, y + 4, 11, titleColor);
+        GuiTheme.DrawText(mail.title, textX, y + 4, 11, titleColor);
 
         string meta = $"{mail.senderName}  -  {FormatDate(mail.receivedAt)}";
-        Graphics.DrawText(meta, textX, y + 16, 8, descColor);
+        GuiTheme.DrawText(meta, textX, y + 16, 8, descColor);
 
         string desc = mail.description;
         if (desc.Length > 42) desc = desc.Substring(0, 40) + "...";
-        Graphics.DrawText(desc, textX, y + 26, 8, descColor);
+        GuiTheme.DrawText(desc, textX, y + 26, 8, descColor);
 
         string statusText = mail.claimed ? "Riscattato" : "Nuovo";
         Color statusColor = mail.claimed ? statusClaimedColor : statusNewColor;
         int statusW = statusText.Length * 5;
-        Graphics.DrawText(statusText, x + w - statusW - 8, y + 4, 9, statusColor);
+        GuiTheme.DrawText(statusText, x + w - statusW - 8, y + 4, 9, statusColor);
     }
 
     private void DrawBottomButtons()
@@ -324,7 +324,7 @@ public class Obj_GuiPostaPopup : GameElement
 
         int textW = label.Length * 5;
         Color lc = enabled ? textColor : mutedTextColor;
-        Graphics.DrawText(label, x + (w - textW) / 2, y + 6, 10, lc);
+        GuiTheme.DrawText(label, x + (w - textW) / 2, y + 6, 10, lc);
     }
 
     private static string FormatDate(DateTime dt)

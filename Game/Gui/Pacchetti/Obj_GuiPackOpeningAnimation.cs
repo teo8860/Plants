@@ -1002,7 +1002,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
             {
                 string rarityText = resultSeed.rarity.ToString();
                 int textWidth = rarityText.Length * 7;
-                Graphics.DrawText(
+                GuiTheme.DrawText(
                     rarityText,
                     (int)(center.X - textWidth / 2),
                     (int)(center.Y - cardHeight / 2 + 18),
@@ -1024,7 +1024,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         {
             string seedName = SeedDefinitions.GetSeedName(resultSeed.type);
             int nameWidth = seedName.Length * 8;
-            Graphics.DrawText(
+            GuiTheme.DrawText(
                 seedName,
                 (int)(center.X - nameWidth / 2),
                 (int)(center.Y + 100),
@@ -1137,7 +1137,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
             0.3f, 6, bgColor
         );
 
-        Graphics.DrawText(text, x + 10, y + 6, 10, textColor);
+        GuiTheme.DrawText(text, x + 10, y + 6, 10, textColor);
     }
 
     private void DrawClickPrompt()
@@ -1151,7 +1151,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         string text = "Click to continue";
         int textWidth = text.Length * 7;
 
-        Graphics.DrawText(text, screenW / 2 - textWidth / 2, screenH - 60, 14, new Color(255, 255, 255, alpha));
+        GuiTheme.DrawText(text, screenW / 2 - textWidth / 2, screenH - 60, 14, new Color(255, 255, 255, alpha));
     }
 
     private float EaseOutCubic(float x)

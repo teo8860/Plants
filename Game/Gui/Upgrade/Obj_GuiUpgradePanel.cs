@@ -87,12 +87,12 @@ public class Obj_GuiUpgradePanel : GameElement
         DrawBackground(screenW, screenH);
 
         // Titolo foglie
-        Graphics.DrawText($"Foglie: {Game.pianta.Stats.FoglieAccumulate}", 10, 10, 16, leafColor);
+        GuiTheme.DrawText($"Foglie: {Game.pianta.Stats.FoglieAccumulate}", 10, 10, 16, leafColor);
 
         // Titolo
         string title = "Upgrade";
         int titleW = title.Length * 8;
-        Graphics.DrawText(title, screenW / 2 - titleW / 2, 40, 18, textWhite);
+        GuiTheme.DrawText(title, screenW / 2 - titleW / 2, 40, 18, textWhite);
 
         // Pannello upgrade
         int panelX = 20;
@@ -130,7 +130,7 @@ public class Obj_GuiUpgradePanel : GameElement
         bool canBuy = UpgradeSystem.CanUpgrade(type);
 
         // Nome upgrade
-        Graphics.DrawText(UpgradeSystem.GetName(type), x + 5, y + 5, 12, textWhite);
+        GuiTheme.DrawText(UpgradeSystem.GetName(type), x + 5, y + 5, 12, textWhite);
 
         // Descrizione
         string desc = descriptions[index];
@@ -141,7 +141,7 @@ public class Obj_GuiUpgradePanel : GameElement
             UpgradeType.SpazioPacchetti => $"{UpgradeSystem.GetMaxPackages()}",
             _ => ""
         };
-        Graphics.DrawText($"{desc}: {valueText}", x + 5, y + 20, 9, textGray);
+        GuiTheme.DrawText($"{desc}: {valueText}", x + 5, y + 20, 9, textGray);
 
         // Tacche livello
         int tickStartX = x + 5;
@@ -181,7 +181,7 @@ public class Obj_GuiUpgradePanel : GameElement
                 new Rectangle(btnX, btnY, btnW, btnH),
                 0.3f, 6, btnDisabled);
             string maxText = "MAX";
-            Graphics.DrawText(maxText, btnX + btnW / 2 - 12, btnY + 8, 11, textGray);
+            GuiTheme.DrawText(maxText, btnX + btnW / 2 - 12, btnY + 8, 11, textGray);
         }
         else
         {
@@ -203,7 +203,7 @@ public class Obj_GuiUpgradePanel : GameElement
 
             string btnText = $"+ {cost}";
             int textW = btnText.Length * 5;
-            Graphics.DrawText(btnText, btnX + btnW / 2 - textW / 2, btnY + 5, 10,
+            GuiTheme.DrawText(btnText, btnX + btnW / 2 - textW / 2, btnY + 5, 10,
                 canBuy ? textWhite : textGray);
 
             // Icona foglia piccola

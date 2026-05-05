@@ -281,11 +281,11 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         string title = currentResult.TriggerReason == "Pianta morta"
             ? "Raccolta d'Emergenza"
             : "Raccolta Foglie";
-        Graphics.DrawText(title, px + 55, py + 18, 15, new Color(200, 255, 200, 255));
+        GuiTheme.DrawText(title, px + 55, py + 18, 15, new Color(200, 255, 200, 255));
 
         // Sottotitolo (motivo)
         string sub = currentResult.TriggerReason;
-        Graphics.DrawText(sub, px + 55, py + 37, 9, new Color(150, 200, 150, 255));
+        GuiTheme.DrawText(sub, px + 55, py + 37, 9, new Color(150, 200, 150, 255));
     }
 
     private void DrawSummary(int px, int py, int pw)
@@ -321,7 +321,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         byte leafAlpha = (byte)(200 + pulse * 55);
 
         Color leafGlow = new Color(100, 220, 100, leafAlpha);
-        Graphics.DrawText(leavesStr, leavesX + 5, leavesY, 12, leafGlow);
+        GuiTheme.DrawText(leavesStr, leavesX + 5, leavesY, 12, leafGlow);
 
         // Piccola icona foglia
         DrawLeafIcon(leavesX + leavesW - 8, leavesY + 6, 5);
@@ -330,10 +330,10 @@ public class Obj_GuiLeafHarvestPopup : GameElement
     private void DrawStatBox(int x, int y, int w, string label, string value, Color valueColor)
     {
         int textW = label.Length * 5;
-        Graphics.DrawText(label, x + (w - textW) / 2, y + 2, 8, new Color(160, 160, 160, 255));
+        GuiTheme.DrawText(label, x + (w - textW) / 2, y + 2, 8, new Color(160, 160, 160, 255));
 
         int valW = value.Length * 8;
-        Graphics.DrawText(value, x + (w - valW) / 2, y + 14, 14, valueColor);
+        GuiTheme.DrawText(value, x + (w - valW) / 2, y + 14, 14, valueColor);
     }
 
     private void DrawLeafList(int px, int py, int pw, int maxH)
@@ -341,7 +341,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         if (currentResult.TotalLeaves == 0) return;
 
         // Titolo lista
-        Graphics.DrawText("Dettaglio foglie:", px + 12, py, 9, new Color(150, 180, 150, 255));
+        GuiTheme.DrawText("Dettaglio foglie:", px + 12, py, 9, new Color(150, 180, 150, 255));
 
         int listY = py + 14;
         int listH = maxH - 14;
@@ -369,7 +369,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
             Graphics.DrawCircle(px + 20, rowY + rowH / 2, 4, dotColor);
 
             // Numero foglia
-            Graphics.DrawText($"#{i + 1}", px + 30, rowY + 5, 9, new Color(150, 150, 150, 255));
+            GuiTheme.DrawText($"#{i + 1}", px + 30, rowY + 5, 9, new Color(150, 150, 150, 255));
 
             if (leaf.IsIntact)
             {
@@ -389,15 +389,15 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
                 Graphics.DrawRectangle(barX, barY, (int)(barW * leaf.Quality), barH, barColor);
 
-                Graphics.DrawText("integra", px + pw - 55, rowY + 5, 8, intactColor);
+                GuiTheme.DrawText("integra", px + pw - 55, rowY + 5, 8, intactColor);
             }
             else
             {
                 // Motivo del danno
                 string reason = leaf.DamageReason;
-                Graphics.DrawText(reason, px + 58, rowY + 5, 8, new Color(160, 100, 100, 255));
+                GuiTheme.DrawText(reason, px + 58, rowY + 5, 8, new Color(160, 100, 100, 255));
 
-                Graphics.DrawText("rotta", px + pw - 45, rowY + 5, 8, brokenColor);
+                GuiTheme.DrawText("rotta", px + pw - 45, rowY + 5, 8, brokenColor);
             }
         }
 
@@ -406,7 +406,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         {
             string scrollText = $"{scrollOffset + 1}-{endIdx} / {currentResult.TotalLeaves}  (scroll)";
             int scrollTextW = scrollText.Length * 5;
-            Graphics.DrawText(scrollText, px + (pw - scrollTextW) / 2, listY + listH - 11, 8,
+            GuiTheme.DrawText(scrollText, px + (pw - scrollTextW) / 2, listY + listH - 11, 8,
                 new Color(120, 120, 120, 255));
         }
     }
@@ -434,7 +434,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
         string label = "Continua";
         int lw = label.Length * 7;
-        Graphics.DrawText(label, btnX + (btnW - lw) / 2, py + 8, 13, Color.White);
+        GuiTheme.DrawText(label, btnX + (btnW - lw) / 2, py + 8, 13, Color.White);
     }
 
     private void DrawLeafIcon(int x, int y, int size)

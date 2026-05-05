@@ -53,8 +53,8 @@ public class Obj_EssenceGainFx : GameElement
         Color shadowC = new Color((byte)0, (byte)0, (byte)0, alpha);
 
         // Ombra poi testo
-        Graphics.DrawText(txt, x + 1, y + 1, 11, shadowC);
-        Graphics.DrawText(txt, x, y, 11, textC);
+        GuiTheme.DrawText(txt, x + 1, y + 1, 11, shadowC);
+        GuiTheme.DrawText(txt, x, y, 11, textC);
 
         // Icona cristallo a destra del testo
         int size = 5;

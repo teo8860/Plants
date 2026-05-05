@@ -169,20 +169,20 @@ public class Obj_GuiSeedRecovery : GameElement
             new Rectangle(px + 6, py + 6, pw - 12, 35), 0.12f, 6, headerBg);
         Graphics.DrawCircle(px + 22, py + 23, 7, new Color(180, 140, 60, 255));
         Graphics.DrawCircle(px + 22, py + 20, 5, new Color(200, 170, 80, 255));
-        Graphics.DrawText("Recupero Seme", px + 38, py + 14, 13, new Color(220, 240, 200, 255));
+        GuiTheme.DrawText("Recupero Seme", px + 38, py + 14, 13, new Color(220, 240, 200, 255));
 
         // Testo
         string msg1 = "Vuoi recuperare il seme?";
         int msg1W = msg1.Length * 5;
-        Graphics.DrawText(msg1, px + (pw - msg1W) / 2, py + 50, 10, new Color(220, 220, 220, 255));
+        GuiTheme.DrawText(msg1, px + (pw - msg1W) / 2, py + 50, 10, new Color(220, 220, 220, 255));
 
         string msg2 = "Tieni viva la pianta per il tempo";
         int msg2W = msg2.Length * 4;
-        Graphics.DrawText(msg2, px + (pw - msg2W) / 2, py + 65, 8, new Color(160, 200, 160, 255));
+        GuiTheme.DrawText(msg2, px + (pw - msg2W) / 2, py + 65, 8, new Color(160, 200, 160, 255));
 
         string msg3 = "indicato per recuperare il seme.";
         int msg3W = msg3.Length * 4;
-        Graphics.DrawText(msg3, px + (pw - msg3W) / 2, py + 77, 8, new Color(160, 200, 160, 255));
+        GuiTheme.DrawText(msg3, px + (pw - msg3W) / 2, py + 77, 8, new Color(160, 200, 160, 255));
 
         // Durata
         SeedRarity rarity = Seed.GetRarityFromType(Game.pianta.TipoSeme);
@@ -191,7 +191,7 @@ public class Obj_GuiSeedRecovery : GameElement
         int secs = (int)(duration % 60);
         string durText = $"Sopravvivi: {mins}:{secs:D2}";
         int durW = durText.Length * 5;
-        Graphics.DrawText(durText, px + (pw - durW) / 2, py + 95, 10, new Color(255, 220, 100, 255));
+        GuiTheme.DrawText(durText, px + (pw - durW) / 2, py + 95, 10, new Color(255, 220, 100, 255));
 
         // Pulsanti
         int btnW = 90;
@@ -205,14 +205,14 @@ public class Obj_GuiSeedRecovery : GameElement
             new Rectangle(confirmX, btnY, btnW, btnH), 0.25f, 6, confirmBg);
         string confLabel = "Conferma";
         int confW = confLabel.Length * 6;
-        Graphics.DrawText(confLabel, confirmX + (btnW - confW) / 2, btnY + 7, 11, Color.White);
+        GuiTheme.DrawText(confLabel, confirmX + (btnW - confW) / 2, btnY + 7, 11, Color.White);
 
         Color cancelBg = cancelHovered ? redBtnHover : redBtn;
         Graphics.DrawRectangleRounded(
             new Rectangle(cancelX, btnY, btnW, btnH), 0.25f, 6, cancelBg);
         string cancLabel = "Annulla";
         int cancW = cancLabel.Length * 6;
-        Graphics.DrawText(cancLabel, cancelX + (btnW - cancW) / 2, btnY + 7, 11, Color.White);
+        GuiTheme.DrawText(cancLabel, cancelX + (btnW - cancW) / 2, btnY + 7, 11, Color.White);
     }
 
     // ========== COUNTDOWN DI SOPRAVVIVENZA ==========
@@ -251,11 +251,11 @@ public class Obj_GuiSeedRecovery : GameElement
         int secs = (int)(remaining % 60);
         string timeText = $"{mins}:{secs:D2}";
         int timeW = timeText.Length * 7;
-        Graphics.DrawText(timeText, barX + (barW - timeW) / 2, barY + 4, 12, Color.White);
+        GuiTheme.DrawText(timeText, barX + (barW - timeW) / 2, barY + 4, 12, Color.White);
 
         // Label
         string label = "Sopravvivi!";
-        Graphics.DrawText(label, barX + 8, barY + 8, 9, new Color(255, 220, 100, 255));
+        GuiTheme.DrawText(label, barX + 8, barY + 8, 9, new Color(255, 220, 100, 255));
 
         // Pulsante annulla (piccolo, a destra)
         int btnW = 60;
@@ -270,7 +270,7 @@ public class Obj_GuiSeedRecovery : GameElement
             new Rectangle(btnX, btnBY, btnW, btnH), 0.3f, 4, btnBg);
         string cancText = "Annulla";
         int cancW = cancText.Length * 5;
-        Graphics.DrawText(cancText, btnX + (btnW - cancW) / 2, btnBY + 3, 8, new Color(220, 200, 200, 255));
+        GuiTheme.DrawText(cancText, btnX + (btnW - cancW) / 2, btnBY + 3, 8, new Color(220, 200, 200, 255));
 
         // Pulsa il bordo se il tempo sta scadendo (ultimi 30 secondi)
         if (remaining < 30f)
@@ -315,18 +315,18 @@ public class Obj_GuiSeedRecovery : GameElement
 
         // Testo
         string label = "Recupero in corso...";
-        Graphics.DrawText(label, barX + 8, barY + 8, 9, new Color(220, 240, 200, 255));
+        GuiTheme.DrawText(label, barX + 8, barY + 8, 9, new Color(220, 240, 200, 255));
 
         string pctText = $"{(int)(progress * 100)}%";
         int pctW = pctText.Length * 7;
-        Graphics.DrawText(pctText, barX + barW - pctW - 8, barY + 8, 9, new Color(200, 200, 200, 255));
+        GuiTheme.DrawText(pctText, barX + barW - pctW - 8, barY + 8, 9, new Color(200, 200, 200, 255));
 
         // Hint input bloccato
         float pulse2 = (MathF.Sin(pulseTime * 2f) + 1f) * 0.5f;
         byte hintA = (byte)(100 + pulse2 * 80);
         string hint = "Input bloccato";
         int hintW = hint.Length * 4;
-        Graphics.DrawText(hint, (sw - hintW) / 2, barY + barH + 4, 7, new Color(180, 150, 100, hintA));
+        GuiTheme.DrawText(hint, (sw - hintW) / 2, barY + barH + 4, 7, new Color(180, 150, 100, hintA));
     }
 
     private float EaseOutBack(float x)

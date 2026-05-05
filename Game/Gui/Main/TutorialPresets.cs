@@ -69,16 +69,16 @@ namespace Plants
             // Sinistra (OFF)
             DrawMiniButton(startX, ay + 2, half, BtnOffBg, left);
             int lW = TextManager.MeasureText(labelL, 8);
-            Graphics.DrawText(labelL, startX + (half - lW) / 2, ay + half + 6, 8, SubText);
+            GuiTheme.DrawText(labelL, startX + (half - lW) / 2, ay + half + 6, 8, SubText);
 
             // Freccia
-            Graphics.DrawText(">", startX + half + 1, ay + half / 2, 9, TextColor);
+            GuiTheme.DrawText(">", startX + half + 1, ay + half / 2, 9, TextColor);
 
             // Destra (ON)
             int rightX = startX + half + gap;
             DrawMiniButton(rightX, ay + 2, half, BtnOnBg, right);
             int rW = TextManager.MeasureText(labelR, 8);
-            Graphics.DrawText(labelR, rightX + (half - rW) / 2, ay + half + 6, 8, SubText);
+            GuiTheme.DrawText(labelR, rightX + (half - rW) / 2, ay + half + 6, 8, SubText);
         }
 
         private static void DrawMiniButton(int x, int y, int size, Color bg, Sprite sprite)

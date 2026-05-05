@@ -71,4 +71,22 @@ internal class Utility
 		// Se non esiste come risorsa incorporata, prova a leggere dal filesystem
 		return File.ReadAllText(Path.Combine(path, resourceName));
     }
+
+    public static ReadOnlySpan<byte> LoadBytesFromEmbedded(string resourceName, string path = "")
+    {
+        var asm = Assembly.GetExecutingAssembly();
+        string normalizedPath = path.Replace("/", ".");
+        string normalizedName = resourceName.Replace("/", ".");
+
+        using var stream = asm.GetManifestResourceStream("Plants." + normalizedPath + "." + normalizedName);
+        if (stream != null)
+        {
+            var buffer = new byte[stream.Length];
+            stream.ReadExactly(buffer);
+            return new ReadOnlySpan<byte>(buffer);
+        }
+
+        // Fallback: leggi dal filesystem
+        return File.ReadAllBytes(Path.Combine(path, resourceName));
+    }
 }

@@ -44,6 +44,6 @@ public class Obj_GuiPostaBadge : GameElement
         Graphics.DrawCircle(bx + badgeSize / 2, by + badgeSize / 2, badgeSize / 2f, badgeBg);
 
         int textW = text.Length * 5;
-        Graphics.DrawText(text, bx + (badgeSize - textW) / 2 + 1, by + 2, 8, badgeText);
+        GuiTheme.DrawText(text, bx + (badgeSize - textW) / 2 + 1, by + 2, 8, badgeText);
     }
 }

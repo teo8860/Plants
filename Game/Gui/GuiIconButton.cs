@@ -216,7 +216,7 @@ public class GuiIconButton
             Color textColor = new Color(255, 255, 255, alpha);
             int textX = X + Size + 8;
             int textY = drawY + (Size - 12) / 2;
-            Graphics.DrawText(Text, textX, textY, 12, textColor);
+            GuiTheme.DrawText(Text, textX, textY, 12, textColor);
         }
     }
 }

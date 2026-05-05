@@ -135,7 +135,7 @@ namespace Plants
             // Header
             Graphics.DrawRectangleRounded(new Rectangle(px, py, PanelW, HeaderH), 0.2f, 8, HeaderBg);
             int titleW = TextManager.MeasureText(slide.Titolo, 14);
-            Graphics.DrawText(slide.Titolo, px + (PanelW - titleW) / 2, py + 7, 14, TextColor);
+            GuiTheme.DrawText(slide.Titolo, px + (PanelW - titleW) / 2, py + 7, 14, TextColor);
 
             // Corpo: layout a una o due colonne
             bool hasVisual = slide.Icon != null || slide.DrawExtra != null;
@@ -158,7 +158,7 @@ namespace Plants
                 {
                     int rigaW = TextManager.MeasureText(riga, 11);
                     int clampedX = px + Math.Max(4, (PanelW - rigaW) / 2);
-                    Graphics.DrawText(riga, clampedX, textY, 11, SubTextColor);
+                    GuiTheme.DrawText(riga, clampedX, textY, 11, SubTextColor);
                 }
                 textY += 15;
             }
@@ -184,7 +184,7 @@ namespace Plants
                         fs--;
                         w = TextManager.MeasureText(riga, fs);
                     }
-                    Graphics.DrawText(riga, textX, textY, fs, SubTextColor);
+                    GuiTheme.DrawText(riga, textX, textY, fs, SubTextColor);
                 }
                 textY += 15;
             }
@@ -241,7 +241,7 @@ namespace Plants
             Color nextCol = hoverNext ? BtnHoverColor : BtnColor;
             Graphics.DrawRectangleRounded(rNext, 0.3f, 8, nextCol);
             int nextW = TextManager.MeasureText(nextLabel, 11);
-            Graphics.DrawText(nextLabel,
+            GuiTheme.DrawText(nextLabel,
                 (int)(rNext.X + (rNext.Width - nextW) / 2),
                 (int)(rNext.Y + 5), 11, TextColor);
 
@@ -253,7 +253,7 @@ namespace Plants
                 Graphics.DrawRectangleRounded(rPrev, 0.3f, 8, prevCol);
                 string prevLabel = "< Indietro";
                 int prevW = TextManager.MeasureText(prevLabel, 11);
-                Graphics.DrawText(prevLabel,
+                GuiTheme.DrawText(prevLabel,
                     (int)(rPrev.X + (rPrev.Width - prevW) / 2),
                     (int)(rPrev.Y + 5), 11, TextColor);
             }

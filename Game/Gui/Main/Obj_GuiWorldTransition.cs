@@ -174,9 +174,9 @@ public class Obj_GuiWorldTransition : GameElement
         string title = GetWorldName(nextWorld);
         Color titleColor = GetWorldColor(nextWorld);
         int titleWidth = title.Length * 7;
-        Graphics.DrawText(title, panelX + (panelW - titleWidth) / 2, panelY + 12, 12, titleColor);
+        GuiTheme.DrawText(title, panelX + (panelW - titleWidth) / 2, panelY + 12, 12, titleColor);
 
-        Graphics.DrawText("Nuovo Mondo", panelX + (panelW - 65) / 2, panelY + 28, 8, new Color(150, 150, 180, 255));
+        GuiTheme.DrawText("Nuovo Mondo", panelX + (panelW - 65) / 2, panelY + 28, 8, new Color(150, 150, 180, 255));
 
         int statsY = panelY + 48;
         int statsX = panelX + 15;
@@ -210,17 +210,17 @@ public class Obj_GuiWorldTransition : GameElement
             0.3f, 8, 2, buttonBorder
         );
 
-        Graphics.DrawText("VIAGGIA", buttonX + 28, buttonY + 6, 11, Color.White);
+        GuiTheme.DrawText("VIAGGIA", buttonX + 28, buttonY + 6, 11, Color.White);
     }
 
     private void DrawStat(string name, float value, int x, int y, int width)
     {
-        Graphics.DrawText(name, x, y, 8, new Color(180, 180, 200, 255));
+        GuiTheme.DrawText(name, x, y, 8, new Color(180, 180, 200, 255));
 
         bool isGood = value >= 0.5f;
         Color indicatorColor = isGood ? new Color(100, 200, 100, 255) : new Color(255, 150, 50, 255);
 
-        Graphics.DrawText(value.ToString("F1"), x + width - 12, y, 8, indicatorColor);
+        GuiTheme.DrawText(value.ToString("F1"), x + width - 12, y, 8, indicatorColor);
     }
 
     private float NormalizeTemp(float temp)

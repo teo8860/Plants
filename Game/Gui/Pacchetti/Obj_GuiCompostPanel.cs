@@ -143,7 +143,7 @@ public class Obj_GuiCompostPanel : GameElement
             Graphics.DrawRectangleRoundedLines(binRect, 0.2f, 6, 2, new Color(255, 255, 100, 200));
 
             string hoverText = totalPackages >= UpgradeSystem.GetMaxPackages() ? "Slot pieni!" : "Clicca per creare";
-            Graphics.DrawText(hoverText, (int)binRect.X - 15, (int)binRect.Y - 15, 9, Color.White);
+            GuiTheme.DrawText(hoverText, (int)binRect.X - 15, (int)binRect.Y - 15, 9, Color.White);
         }
 
         DrawPackagesOnTable();
@@ -206,14 +206,14 @@ public class Obj_GuiCompostPanel : GameElement
             Color textColor = canCreate ? Color.White : new Color(120, 100, 80, 255);
             Color costColor = canCreate ? rarityColors[rarities[i]] : new Color(100, 80, 60, 255);
 
-            Graphics.DrawText(itemText, menuX + 15, itemY + 4, 10, textColor);
-            Graphics.DrawText(costText, menuX + 15, itemY + 16, 8, costColor);
-            Graphics.DrawText(timeText, menuX + 15, itemY + 26, 7, new Color(200, 180, 160, 255));
+            GuiTheme.DrawText(itemText, menuX + 15, itemY + 4, 10, textColor);
+            GuiTheme.DrawText(costText, menuX + 15, itemY + 16, 8, costColor);
+            GuiTheme.DrawText(timeText, menuX + 15, itemY + 26, 7, new Color(200, 180, 160, 255));
 
             if (!canCreate)
             {
                 string blockReason = CompostSystem.GetTotalPackageCount() >= UpgradeSystem.GetMaxPackages() ? "PIENO" : "X";
-                Graphics.DrawText(blockReason, menuX + menuWidth - 35, itemY + 12, 10, new Color(200, 80, 80, 255));
+                GuiTheme.DrawText(blockReason, menuX + menuWidth - 35, itemY + 12, 10, new Color(200, 80, 80, 255));
             }
         }
     }
@@ -324,7 +324,7 @@ public class Obj_GuiCompostPanel : GameElement
         // Tempo rimanente
         float timeLeft = package.TimeRequired - package.TimeElapsed;
         string timeText = $"{(int)timeLeft}s";
-        Graphics.DrawText(timeText, x + width / 2 - 6, y + height / 2 - 4, 8, Color.White);
+        GuiTheme.DrawText(timeText, x + width / 2 - 6, y + height / 2 - 4, 8, Color.White);
     }
 
     private void DrawPackage(int x, int y, int width, int height, SeedPackageRarity rarity, bool hovered)
@@ -373,7 +373,7 @@ public class Obj_GuiCompostPanel : GameElement
         if (hovered)
         {
             string tooltip = $"Clicca per aprire";
-            Graphics.DrawText(tooltip, x - 15, y - 15, 8, Color.White);
+            GuiTheme.DrawText(tooltip, x - 15, y - 15, 8, Color.White);
         }
     }
 }

@@ -185,12 +185,12 @@ public class Obj_GuiOpzioniPopup : GameElement
 
         string title = "OPZIONI";
         int titleW = title.Length * 8;
-        Graphics.DrawText(title, panelX + (PanelW - titleW) / 2, panelY + 7, 16, textColor);
+        GuiTheme.DrawText(title, panelX + (PanelW - titleW) / 2, panelY + 7, 16, textColor);
 
         // --- Scala ---
         string scaleLabel = "Scala finestra";
         int scaleLabelW = scaleLabel.Length * 7;
-        Graphics.DrawText(scaleLabel, panelX + (PanelW - scaleLabelW) / 2, panelY + 58, 12, textColor);
+        GuiTheme.DrawText(scaleLabel, panelX + (PanelW - scaleLabelW) / 2, panelY + 58, 12, textColor);
 
         for (int i = 0; i < GameProperties.MaxUiScaleLevel; i++)
         {
@@ -202,25 +202,25 @@ public class Obj_GuiOpzioniPopup : GameElement
         Graphics.DrawRectangle(panelX + 12, panelY + 122, PanelW - 24, 1, panelBorder);
 
         // --- Avvio nascosto ---
-        Graphics.DrawText("Avvio nascosto", panelX + 12, panelY + 140, 12, textColor);
+        GuiTheme.DrawText("Avvio nascosto", panelX + 12, panelY + 140, 12, textColor);
         DrawToggle(StartHiddenToggleRect(), cfg.StartHidden, hoverStartHidden);
 
         string hint = cfg.StartHidden
             ? "Il gioco partira' nella tray."
             : "Il gioco partira' visibile.";
-        Graphics.DrawText(hint, panelX + 12, panelY + 164, 9, subTextColor);
+        GuiTheme.DrawText(hint, panelX + 12, panelY + 164, 9, subTextColor);
 
         // Separatore
         Graphics.DrawRectangle(panelX + 12, panelY + 186, PanelW - 24, 1, panelBorder);
 
         // --- Azione su X finestra ---
-        Graphics.DrawText("Chiudi con X", panelX + 12, panelY + 204, 12, textColor);
+        GuiTheme.DrawText("Chiudi con X", panelX + 12, panelY + 204, 12, textColor);
         DrawToggle(CloseOnXToggleRect(), cfg.CloseOnX, hoverCloseOnX);
 
         string hintX = cfg.CloseOnX
             ? "La X chiudera' il gioco."
             : "La X nascondera' il gioco nella tray.";
-        Graphics.DrawText(hintX, panelX + 12, panelY + 228, 9, subTextColor);
+        GuiTheme.DrawText(hintX, panelX + 12, panelY + 228, 9, subTextColor);
 
         // --- Bottone chiudi ---
         var rClose = CloseButtonRect();
@@ -229,7 +229,7 @@ public class Obj_GuiOpzioniPopup : GameElement
 
         string btnText = "Chiudi";
         int btnTextW = btnText.Length * 6;
-        Graphics.DrawText(btnText, (int)(rClose.X + (rClose.Width - btnTextW) / 2), (int)(rClose.Y + 7), 12, textColor);
+        GuiTheme.DrawText(btnText, (int)(rClose.X + (rClose.Width - btnTextW) / 2), (int)(rClose.Y + 7), 12, textColor);
     }
 
     private void DrawScaleButton(Rectangle r, string label, bool active, bool hover)
@@ -242,7 +242,7 @@ public class Obj_GuiOpzioniPopup : GameElement
 
         Graphics.DrawRectangleRounded(r, 0.3f, 8, bg);
         int tW = label.Length * 7;
-        Graphics.DrawText(label, (int)(r.X + (r.Width - tW) / 2), (int)(r.Y + 8), 12, textColor);
+        GuiTheme.DrawText(label, (int)(r.X + (r.Width - tW) / 2), (int)(r.Y + 8), 12, textColor);
     }
 
     private void DrawToggle(Rectangle r, bool on, bool hover)

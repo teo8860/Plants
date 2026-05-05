@@ -84,7 +84,7 @@ public class PixelCamera
 	{
 		Graphics.BeginMode2D(screenSpaceCamera);
 
-		Graphics.DrawTexturePro(
+        Graphics.DrawTexturePro(
 			renderTexture.Texture,
 			new Raylib_CSharp.Transformations.Rectangle(0, 0, renderTexture.Texture.Width, renderTexture.Texture.Height),
 			new Raylib_CSharp.Transformations.Rectangle(-virtualRatio, -virtualRatio + yOffset,

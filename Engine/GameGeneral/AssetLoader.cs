@@ -1,9 +1,13 @@
+using Raylib_CSharp;
 using Raylib_CSharp.Colors;
+using Raylib_CSharp.Fonts;
 using Raylib_CSharp.Images;
 using Raylib_CSharp.Shaders;
 using Raylib_CSharp.Textures;
 using System;
+using System.IO;
 using System.Numerics;
+using System.Reflection;
 
 namespace Plants;
 
@@ -46,6 +50,8 @@ public static class AssetLoader
     public static Shader shaderRecolor;
     public static Shader shaderSeed;
 
+    public static Font mainFont;
+
     public static void LoadAll()
     {
 
@@ -85,6 +91,10 @@ public static class AssetLoader
         spriteWeatherOff = CreateColoredPlaceholder(new Color(150, 150, 180, 255));
         spriteWeatherOn = CreateColoredPlaceholder(new Color(200, 220, 255, 255));
         spriteWorldIcon = CreateColoredPlaceholder(new Color(100, 200, 100, 255));
+ 
+        ReadOnlySpan<int> ranges = stackalloc int[] { 32, 126, 0 };
+        mainFont = Font.LoadFromMemory(".ttf",Utility.LoadBytesFromEmbedded("PressStart2P-Regular.ttf", "Assets"), 64, null);
+       
     }
     
     private static Sprite CreateColoredPlaceholder(Color color)
@@ -98,6 +108,7 @@ public static class AssetLoader
 
     private static Shader LoadShader(string name)
     {
+
         return Shader.LoadFromMemory(Utility.LoadTextFromEmbedded("base.vert", "Assets/shader"), Utility.LoadTextFromEmbedded(name+".frag", "Assets/shader"));
     }
 }

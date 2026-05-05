@@ -263,7 +263,7 @@ public class MinigiocoSemi : MinigiocoBase
             float yOff = (1f - alpha) * 25f;
             byte textA = (byte)(255 * alpha);
             
-            Graphics.DrawText("+1",
+            GuiTheme.DrawText("+1",
                 (int)(fb.posizione.X - 8),
                 (int)(fb.posizione.Y - 15 - yOff),
                 14, new Color(255, 220, 100, textA));
@@ -276,7 +276,7 @@ public class MinigiocoSemi : MinigiocoBase
             byte hintA = (byte)(150 + pulse * 80);
             string hint = "Muovi il mouse per raccogliere!";
             int hintW = hint.Length * 5;
-            Graphics.DrawText(hint, (sw - hintW) / 2, sh / 2, 10, new Color(200, 200, 150, hintA));
+            GuiTheme.DrawText(hint, (sw - hintW) / 2, sh / 2, 10, new Color(200, 200, 150, hintA));
         }
         
         // Indicatore difficoltà
@@ -292,7 +292,7 @@ public class MinigiocoSemi : MinigiocoBase
         Graphics.DrawRectangleRounded(new Rectangle(barX, barY, (int)(barW * diff), barH), 0.3f, 2, diffCol);
         
         string diffLabel = "Difficoltà";
-        Graphics.DrawText(diffLabel, barX, barY + 10, 8, grigioChiaro);
+        GuiTheme.DrawText(diffLabel, barX, barY + 10, 8, grigioChiaro);
     }
 
     private float EaseOutBack(float x)

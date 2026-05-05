@@ -32,8 +32,8 @@ public class OxygenSystem : GameElement
     {
         if (WorldManager.GetCurrentModifiers().OxygenLevel <= 0)
         {
-            Graphics.DrawText($"Tank O2: {oxygenTankLevel:P0}", 10, 200, 12, Color.SkyBlue);
-            Graphics.DrawText("[O] Fornisci ossigeno", 10, 215, 10, Color.Gray);
+            GuiTheme.DrawText($"Tank O2: {oxygenTankLevel:P0}", 10, 200, 12, Color.SkyBlue);
+            GuiTheme.DrawText("[O] Fornisci ossigeno", 10, 215, 10, Color.Gray);
         }
     }
 }

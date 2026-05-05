@@ -211,7 +211,7 @@ public class Obj_GuiItemBoard : GameElement
 
             string label = tabs[i].label;
             int labelW = label.Length * 5;
-            Graphics.DrawText(label, tx + (tabW - 2 - labelW) / 2, ty + (th - 9) / 2, 9, text);
+            GuiTheme.DrawText(label, tx + (tabW - 2 - labelW) / 2, ty + (th - 9) / 2, 9, text);
 
             if (isActive)
             {
@@ -268,11 +268,11 @@ public class Obj_GuiItemBoard : GameElement
 
             // Iniziale
             string initial = def.Name.Length > 0 ? def.Name.Substring(0, 1) : "?";
-            Graphics.DrawText(initial, cx + cellSize / 2 - 5, cy + cellSize / 2 - 8, 14, textWhite);
+            GuiTheme.DrawText(initial, cx + cellSize / 2 - 5, cy + cellSize / 2 - 8, 14, textWhite);
 
             // Nome corto sotto
             string sn = def.Name.Length > 5 ? def.Name.Substring(0, 4) + ".." : def.Name;
-            Graphics.DrawText(sn, cx + 2, cy + cellSize - 9, 6, textDim);
+            GuiTheme.DrawText(sn, cx + 2, cy + cellSize - 9, 6, textDim);
         }
 
         if (filteredItemIds.Count == 0)
@@ -283,7 +283,7 @@ public class Obj_GuiItemBoard : GameElement
                 ItemCategory.Consumabile => "Nessun consumabile",
                 _ => "Nessun equipaggiamento"
             };
-            Graphics.DrawText(empty, gridX + 6, GridY + 14, 9, textDim);
+            GuiTheme.DrawText(empty, gridX + 6, GridY + 14, 9, textDim);
         }
 
         Graphics.EndScissorMode();
@@ -311,7 +311,7 @@ public class Obj_GuiItemBoard : GameElement
             if (def != null)
             {
                 // Nome
-                Graphics.DrawText(def.Name, panelX + 6, panelY + 6, 10, textAccent);
+                GuiTheme.DrawText(def.Name, panelX + 6, panelY + 6, 10, textAccent);
 
                 // Categoria badge
                 string catLabel = def.Category switch
@@ -320,7 +320,7 @@ public class Obj_GuiItemBoard : GameElement
                     ItemCategory.Consumabile => "Consumabile",
                     _ => "Equipaggiabile"
                 };
-                Graphics.DrawText(catLabel, panelX + 6, panelY + 20, 7, textDim);
+                GuiTheme.DrawText(catLabel, panelX + 6, panelY + 20, 7, textDim);
 
                 // Linea
                 Graphics.DrawLine(panelX + 6, panelY + 30, panelX + detailW - 6, panelY + 30, tabBorder);
@@ -331,8 +331,8 @@ public class Obj_GuiItemBoard : GameElement
         }
         else
         {
-            Graphics.DrawText("Seleziona", panelX + 6, panelY + 12, 9, textDim);
-            Graphics.DrawText("un oggetto", panelX + 6, panelY + 25, 9, textDim);
+            GuiTheme.DrawText("Seleziona", panelX + 6, panelY + 12, 9, textDim);
+            GuiTheme.DrawText("un oggetto", panelX + 6, panelY + 25, 9, textDim);
         }
     }
 
@@ -348,7 +348,7 @@ public class Obj_GuiItemBoard : GameElement
         {
             if ((line + " " + word).Trim().Length > maxChars)
             {
-                Graphics.DrawText(line.Trim(), x, lineY, fontSize, color);
+                GuiTheme.DrawText(line.Trim(), x, lineY, fontSize, color);
                 lineY += fontSize + 3;
                 line = word;
             }
@@ -359,6 +359,6 @@ public class Obj_GuiItemBoard : GameElement
         }
 
         if (line.Trim().Length > 0)
-            Graphics.DrawText(line.Trim(), x, lineY, fontSize, color);
+            GuiTheme.DrawText(line.Trim(), x, lineY, fontSize, color);
     }
 }

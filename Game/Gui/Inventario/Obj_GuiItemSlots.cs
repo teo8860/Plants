@@ -215,7 +215,7 @@ public class Obj_GuiItemSlots : GameElement
         int slotsStartY = 175;
 
         // Label
-        Graphics.DrawText("OGGETTI", panelX + 18, slotsStartY - 15, 10, textDim);
+        GuiTheme.DrawText("OGGETTI", panelX + 18, slotsStartY - 15, 10, textDim);
 
         // Disegna i 3 slot
         for (int i = 0; i < Seed.MAX_ITEM_SLOTS; i++)
@@ -247,12 +247,12 @@ public class Obj_GuiItemSlots : GameElement
                 if (def != null)
                 {
                     string initial = def.Name.Length > 0 ? def.Name.Substring(0, 1) : "?";
-                    Graphics.DrawText(initial, sx + slotSize / 2 - 5, sy + slotSize / 2 - 7, 14, textColor);
+                    GuiTheme.DrawText(initial, sx + slotSize / 2 - 5, sy + slotSize / 2 - 7, 14, textColor);
                 }
             }
             else
             {
-                Graphics.DrawText("+", sx + slotSize / 2 - 3, sy + slotSize / 2 - 6, 12, textDim);
+                GuiTheme.DrawText("+", sx + slotSize / 2 - 3, sy + slotSize / 2 - 6, 12, textDim);
             }
         }
 
@@ -296,7 +296,7 @@ public class Obj_GuiItemSlots : GameElement
                 Graphics.DrawRectangleRounded(
                     new Rectangle(pickerX + 2, iy, pickerW - 4, itemH),
                     0.15f, 4, bg);
-                Graphics.DrawText("Rimuovi", pickerX + 8, iy + 8, 10, textColor);
+                GuiTheme.DrawText("Rimuovi", pickerX + 8, iy + 8, 10, textColor);
             }
             entryIndex++;
         }
@@ -320,14 +320,14 @@ public class Obj_GuiItemSlots : GameElement
                 0.15f, 4, bg);
 
             string name = def.Name.Length > 16 ? def.Name.Substring(0, 14) + ".." : def.Name;
-            Graphics.DrawText(name, pickerX + 8, iy + 8, 9, textColor);
+            GuiTheme.DrawText(name, pickerX + 8, iy + 8, 9, textColor);
 
             entryIndex++;
         }
 
         if (items.Count == 0 && !hasItem)
         {
-            Graphics.DrawText("Nessun oggetto", pickerX + 8, pickerY + 10, 9, textDim);
+            GuiTheme.DrawText("Nessun oggetto", pickerX + 8, pickerY + 10, 9, textDim);
         }
     }
 
@@ -354,7 +354,7 @@ public class Obj_GuiItemSlots : GameElement
             0.08f, 6, tooltipBg);
 
         // Nome
-        Graphics.DrawText(def.Name, tooltipX + 6, tooltipY + 6, 10, textColor);
+        GuiTheme.DrawText(def.Name, tooltipX + 6, tooltipY + 6, 10, textColor);
 
         // Linea separatrice
         Graphics.DrawLine(tooltipX + 6, tooltipY + 20, tooltipX + tooltipW - 6, tooltipY + 20, tooltipBorder);
@@ -375,7 +375,7 @@ public class Obj_GuiItemSlots : GameElement
         {
             if ((line + " " + word).Trim().Length > maxChars)
             {
-                Graphics.DrawText(line.Trim(), x, lineY, fontSize, color);
+                GuiTheme.DrawText(line.Trim(), x, lineY, fontSize, color);
                 lineY += fontSize + 3;
                 line = word;
             }
@@ -386,6 +386,6 @@ public class Obj_GuiItemSlots : GameElement
         }
 
         if (line.Trim().Length > 0)
-            Graphics.DrawText(line.Trim(), x, lineY, fontSize, color);
+            GuiTheme.DrawText(line.Trim(), x, lineY, fontSize, color);
     }
 }

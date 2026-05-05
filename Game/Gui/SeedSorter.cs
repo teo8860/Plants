@@ -214,6 +214,6 @@ public class SeedSorter
         int textW = text.Length * (fontSize / 2 + 1);
         int tx = (int)(r.X + (r.Width - textW) / 2);
         int ty = (int)(r.Y + (r.Height - fontSize) / 2);
-        Graphics.DrawText(text, tx, ty, fontSize, color);
+        GuiTheme.DrawText(text, tx, ty, fontSize, color);
     }
 }

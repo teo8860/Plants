@@ -47,6 +47,16 @@ public static class GuiTheme
     public const int FontSize = 10;
     public const int FontSpacing = 2;
 
+    public static void DrawText(string text, int x, int y, int fontSize, Color color)
+    {
+        DrawText(text, x, y, color, fontSize);
+    }
+    public static void DrawText(string text, int x, int y, int fontSize)
+    {
+        DrawText(text, x, y, fontSize);
+    }
+
+
     // Disegna testo pixel (default font) con faux bold via double-draw offset 1px.
     public static void DrawText(string text, int x, int y, Color color)
     {
@@ -54,13 +64,13 @@ public static class GuiTheme
 	}
      public static void DrawText(string text, int x, int y, Color color, int fontsize)
     {
-        var f = Font.GetDefault();
-        Graphics.DrawTextEx(f, text, new Vector2(x, y), fontsize, FontSpacing, color);
-        Graphics.DrawTextEx(f, text, new Vector2(x + 1, y), fontsize, FontSpacing, color);
+        var f = AssetLoader.mainFont;// Font.GetDefault();
+        Graphics.DrawTextEx(f, text, new Vector2(x, y), fontsize-2, FontSpacing, color);
+        Graphics.DrawTextEx(f, text, new Vector2(x + 1, y), fontsize-2, FontSpacing, color);
     }
 
     public static int MeasureText(string text)
     {
-        return (int)TextManager.MeasureTextEx(Font.GetDefault(), text, FontSize, FontSpacing).X + 1;
+        return (int)TextManager.MeasureTextEx(AssetLoader.mainFont, text, FontSize, FontSpacing).X + 1;
     }
 }

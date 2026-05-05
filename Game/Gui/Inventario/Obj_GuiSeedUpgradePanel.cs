@@ -260,12 +260,12 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         );
 
         string title = "MIGLIORA SEME";
-        Graphics.DrawText(title, panelX + panelWidth / 2 - 60, panelY + 20, 14, Color.White);
+        GuiTheme.DrawText(title, panelX + panelWidth / 2 - 60, panelY + 20, 14, Color.White);
 
         // Rarità
         Color rarityColor = SeedDefinitions.GetRarityColor(currentSeed.rarity);
         string rarityText = SeedDefinitions.GetRarityName(currentSeed.rarity);
-        Graphics.DrawText(rarityText, panelX + panelWidth / 2 - rarityText.Length * 3, panelY + 40, 10, rarityColor);
+        GuiTheme.DrawText(rarityText, panelX + panelWidth / 2 - rarityText.Length * 3, panelY + 40, 10, rarityColor);
     }
 
     private void DrawEssenceDisplay(int panelX, int y)
@@ -277,8 +277,8 @@ public class Obj_GuiSeedUpgradePanel : GameElement
             0.2f, 6, new Color(30, 25, 40, 255)
         );
 
-        Graphics.DrawText("ESSENZA:", panelX + 25, y + 8, 11, new Color(200, 200, 220, 255));
-        Graphics.DrawText(essence.ToString(), panelX + 100, y + 8, 14, essenceColor);
+        GuiTheme.DrawText("ESSENZA:", panelX + 25, y + 8, 11, new Color(200, 200, 220, 255));
+        GuiTheme.DrawText(essence.ToString(), panelX + 100, y + 8, 14, essenceColor);
 
         // Icona essenza (cristallo)
         int iconX = panelX + panelWidth - 45;
@@ -327,18 +327,18 @@ public class Obj_GuiSeedUpgradePanel : GameElement
             );
 
             // Nome stat
-            Graphics.DrawText(StatNames[i], statX + 8, statY + 6, 10, Color.White);
+            GuiTheme.DrawText(StatNames[i], statX + 8, statY + 6, 10, Color.White);
 
             // Livello
             string levelText = isMaxLevel ? "MAX" : $"{currentLevel}/{maxLevel}";
             Color levelColor = isMaxLevel ? maxLevelColor : new Color(150, 200, 255, 255);
-            Graphics.DrawText(levelText, statX + 8, statY + 21, 9, levelColor);
+            GuiTheme.DrawText(levelText, statX + 8, statY + 21, 9, levelColor);
 
             // Costo
             if (!isMaxLevel)
             {
                 Color costColor = canUpgrade ? essenceColor : new Color(100, 100, 120, 255);
-                Graphics.DrawText($"{cost}", statX + statW - 60, statY + 21, 9, costColor);
+                GuiTheme.DrawText($"{cost}", statX + statW - 60, statY + 21, 9, costColor);
                 DrawEssenceIcon(statX + statW - 15, statY + 26, 8);
             }
 
@@ -378,11 +378,11 @@ public class Obj_GuiSeedUpgradePanel : GameElement
             0.25f, 6, sacrificeBg
         );
 
-        Graphics.DrawText("Sacrifica", sacrificeX + 12, buttonY + 4, 10, Color.White);
+        GuiTheme.DrawText("Sacrifica", sacrificeX + 12, buttonY + 4, 10, Color.White);
 
         // Mostra valore essenza
         string valueText = $"+{sacrificeValue}";
-        Graphics.DrawText(valueText, sacrificeX + 15, buttonY + 17, 9, essenceColor);
+        GuiTheme.DrawText(valueText, sacrificeX + 15, buttonY + 17, 9, essenceColor);
         DrawEssenceIcon(sacrificeX + 15 + valueText.Length * 5, buttonY + 22, 6);
 
         // Pulsante Chiudi
@@ -395,7 +395,7 @@ public class Obj_GuiSeedUpgradePanel : GameElement
             0.25f, 6, closeBg
         );
 
-        Graphics.DrawText("Chiudi", closeX + 38, buttonY + 9, 11, Color.White);
+        GuiTheme.DrawText("Chiudi", closeX + 38, buttonY + 9, 11, Color.White);
     }
 
     private void DrawEssenceIcon(int x, int y, int size)

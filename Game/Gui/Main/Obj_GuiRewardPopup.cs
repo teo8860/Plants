@@ -117,7 +117,7 @@ public class Obj_GuiRewardPopup : GameElement
 
         string title = "RICOMPENSE";
         int titleW = title.Length * 7;
-        Graphics.DrawText(title, panelX + (panelW - titleW) / 2, panelY + 6, 14, textColor);
+        GuiTheme.DrawText(title, panelX + (panelW - titleW) / 2, panelY + 6, 14, textColor);
 
         int rowH = 24;
         int rowY = panelY + 32;
@@ -132,7 +132,7 @@ public class Obj_GuiRewardPopup : GameElement
                 new Rectangle(rowX, rowY, rowW, rowH), 0.3f, 6, 1, rewardBorder);
 
             string label = MailSystem.FormatReward(reward);
-            Graphics.DrawText(label, rowX + 10, rowY + 7, 11, rewardTextColor);
+            GuiTheme.DrawText(label, rowX + 10, rowY + 7, 11, rewardTextColor);
 
             rowY += rowH + 4;
         }
@@ -146,6 +146,6 @@ public class Obj_GuiRewardPopup : GameElement
         Graphics.DrawRectangleRounded(new Rectangle(btnX, btnY, btnW, btnH), 0.3f, 8, bc);
         string btnText = "Ottimo!";
         int btnTextW = btnText.Length * 6;
-        Graphics.DrawText(btnText, btnX + (btnW - btnTextW) / 2, btnY + 6, 12, textColor);
+        GuiTheme.DrawText(btnText, btnX + (btnW - btnTextW) / 2, btnY + 6, 12, textColor);
     }
 }

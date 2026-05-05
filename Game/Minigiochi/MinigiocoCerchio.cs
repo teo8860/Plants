@@ -134,7 +134,7 @@ public class MinigiocoCerchio : MinigiocoBase
             float a = hitAnimTimer / 0.5f;
             float yOff = (1f - a) * 20f;
             byte textA = (byte)(255 * a);
-            Graphics.DrawText(hitText,
+            GuiTheme.DrawText(hitText,
                 (int)lastHitPos.X - 8,
                 (int)(lastHitPos.Y - 20 - yOff),
                 14, new Color(100, 255, 100, textA));

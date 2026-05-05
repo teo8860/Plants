@@ -72,7 +72,7 @@ public class Obj_GuiInventoryBackground : GameElement
         // === TITOLO (solo nella vista casse/griglia semi) ===
         if (Game.inventoryCrates != null && Game.inventoryCrates.IsInventoryOpen)
         {
-            Graphics.DrawText("MAGAZZINO SEMI", screenWidth / 2 - 70, 20, 18, woodDark);
+            GuiTheme.DrawText("MAGAZZINO SEMI", screenWidth / 2 - 70, 20, 18, woodDark);
         }
         // Quando le casse non sono aperte, lo schermo digitale gestisce il suo titolo
 
