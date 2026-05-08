@@ -68,12 +68,12 @@ public class GameElement
     {
         try
         {
-            if (_elementLock == null || elementList == null)
+            if (GameElement._elementLock == null || GameElement.elementList == null)
                 return new List<GameElement>();
                 
-            lock (_elementLock)
+            lock (GameElement._elementLock)
             {
-                return new List<GameElement>(elementList);
+                return new List<GameElement>(GameElement.elementList);
             }
         }
         catch

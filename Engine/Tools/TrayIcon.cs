@@ -24,6 +24,7 @@ public class NativeTrayIcon : IDisposable
     private int _iconId = 1;
     private IntPtr _hIcon;
     private IntPtr _hMenu;
+    private Icon _icon; // root GC: senza questo, Icon viene collezionato e DestroyIcon invalida _hIcon -> crash random in shell repaint
 
     public event Action OnClickLeft;
     public event Action OnExit;
@@ -31,8 +32,11 @@ public class NativeTrayIcon : IDisposable
 
     public NativeTrayIcon(Icon hIcon, string tip)
     {
-        _hIcon = hIcon.Handle;
+        _icon = hIcon ?? throw new ArgumentNullException(nameof(hIcon));
+        _hIcon = _icon.Handle;
         _hWnd = CreateMessageWindow();
+        if (_hWnd == IntPtr.Zero)
+            throw new InvalidOperationException($"CreateWindowEx failed, error={Marshal.GetLastWin32Error()}");
 
         // Aggiungo l'icona
         var nid = new NOTIFYICONDATA();
@@ -57,15 +61,18 @@ public class NativeTrayIcon : IDisposable
     private IntPtr CreateMessageWindow()
     {
         this._wndProcDelegate = WindowProc;
+        IntPtr hInstance = GetModuleHandle(null);
         var wc = new WNDCLASS();
         wc.lpszClassName = "NativeTrayIconWndClass";
         wc.lpfnWndProc = _wndProcDelegate;
+        wc.hInstance = hInstance;
+        // RegisterClass puo' tornare 0 se classe gia' registrata (ERROR_CLASS_ALREADY_EXISTS=1410): non fatale
         RegisterClass(ref wc);
 
         IntPtr hwnd = CreateWindowEx(
             0, wc.lpszClassName, "TrayWindow",
             0, 0, 0, 0, 0,
-            IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero
+            IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero
         );
         return hwnd;
     }
@@ -115,12 +122,27 @@ public class NativeTrayIcon : IDisposable
 
     public void Dispose()
     {
-        var nid = new NOTIFYICONDATA();
-        nid.cbSize = (uint)Marshal.SizeOf(nid);
-        nid.hWnd = _hWnd;
-        nid.uID = (uint)_iconId;
-        Shell_NotifyIcon(NIM_DELETE, ref nid);
-        DestroyWindow(_hWnd);
+        if (_hWnd != IntPtr.Zero)
+        {
+            var nid = new NOTIFYICONDATA();
+            nid.cbSize = (uint)Marshal.SizeOf(nid);
+            nid.hWnd = _hWnd;
+            nid.uID = (uint)_iconId;
+            Shell_NotifyIcon(NIM_DELETE, ref nid);
+            DestroyWindow(_hWnd);
+            _hWnd = IntPtr.Zero;
+        }
+        if (_hMenu != IntPtr.Zero)
+        {
+            DestroyMenu(_hMenu);
+            _hMenu = IntPtr.Zero;
+        }
+        if (_icon != null)
+        {
+            _icon.Dispose();
+            _icon = null;
+            _hIcon = IntPtr.Zero;
+        }
     }
 
     /// <summary> 
@@ -139,8 +161,11 @@ public class NativeTrayIcon : IDisposable
     
     public void LoopEventRender()
     {
+        // IMPORTANTE: filtrare per _hWnd. Con hWnd=NULL PeekMessage drena anche i messaggi
+        // del window raylib/GLFW (stessa thread queue) -> stato GLFW corrotto -> crash random.
+        if (_hWnd == IntPtr.Zero) return;
         MSG msg;
-        while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1))
+        while (PeekMessage(out msg, _hWnd, 0, 0, 1))
         {
             TranslateMessage(ref msg);
             DispatchMessage(ref msg);
@@ -190,8 +215,13 @@ public class NativeTrayIcon : IDisposable
     [DllImport("user32.dll")]
     private static extern bool TrackPopupMenu(IntPtr hMenu, uint uFlags, int x, int y, int nReserved, IntPtr hWnd, IntPtr prcRect);
 
+    [DllImport("user32.dll")]
+    private static extern bool DestroyMenu(IntPtr hMenu);
+
     // Struct e delegati
 
+    // Struct completa NOTIFYICONDATAW (Vista+). cbSize parziale puo' causare comportamenti
+    // imprevedibili nella shell.
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct NOTIFYICONDATA
     {
@@ -203,7 +233,16 @@ public class NativeTrayIcon : IDisposable
         public IntPtr hIcon;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
         public string szTip;
-        // campi extra se servono
+        public uint dwState;
+        public uint dwStateMask;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string szInfo;
+        public uint uTimeoutOrVersion;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string szInfoTitle;
+        public uint dwInfoFlags;
+        public Guid guidItem;
+        public IntPtr hBalloonIcon;
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -231,8 +270,11 @@ public class NativeTrayIcon : IDisposable
     }
 
     
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr GetModuleHandle(string lpModuleName);
+
     [DllImport("user32.dll")]
-    private static extern bool PeekMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax, uint asdasd );
+    private static extern bool PeekMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax, uint wRemoveMsg);
     
     [DllImport("user32.dll")]
     private static extern bool GetMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);

@@ -35,6 +35,7 @@ internal static class Program
 
     public static void Main(string[] args)
     {
+        
         // Initialize crash logging FIRST before anything else
         string exeDir = AppContext.BaseDirectory;
         CrashLogger.Init(exeDir);
@@ -52,6 +53,7 @@ internal static class Program
         
         try
         {
+            
             // Controlla se avviato in modalità minigioco standalone
             if (args.Length >= 2 && args[0] == "--minigioco")
             {
@@ -63,7 +65,7 @@ internal static class Program
                     return;
                 }
             }
-
+            
             // Carica config prima di creare la finestra per applicare la scala
             var cfg = GameConfig.get();
             GameProperties.uiScale = cfg.UiScale;

@@ -94,6 +94,7 @@ public static class AssetLoader
  
         ReadOnlySpan<int> ranges = stackalloc int[] { 32, 126, 0 };
         mainFont = Font.LoadFromMemory(".ttf",Utility.LoadBytesFromEmbedded("PressStart2P-Regular.ttf", "Assets"), 64, null);
+        mainFont = Font.LoadFromMemory(".ttf",Utility.LoadBytesFromEmbedded("editundo.ttf", "Assets"), 12, null);
        
     }
     
