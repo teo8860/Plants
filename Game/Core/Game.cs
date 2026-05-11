@@ -425,6 +425,8 @@ public static class Game
         pendingDeathHarvest = null;
 
         WorldManager.SetCurrentWorld(WorldType.Terra);
+        WorldManager.SetCurrentStage(1);
+        GameSave.get().Save();
         if (pianta != null) pianta.SetNaturalColors(WorldType.Terra);
         Rendering.camera.position.Y = 0;
         if (controller != null) controller.targetScrollY = 0;

@@ -38,6 +38,9 @@ public static class ManagerMinigames
 
         var picturePoker = GameElement.Create<MinigiocoPicturePoker>(0, room_minigioco);
         minigiochi[TipoMinigioco.PicturePoker] = picturePoker;
+
+        var breakout = GameElement.Create<MinigiocoBreakout>(0, room_minigioco);
+        minigiochi[TipoMinigioco.Breakout] = breakout;
     }
 
     /// <summary>
@@ -56,6 +59,7 @@ public static class ManagerMinigames
             TipoMinigioco.Treni => GameElement.Create<MinigiocoTreni>(0, room_minigioco),
             TipoMinigioco.Blackjack => GameElement.Create<MinigiocoBlackjack>(0, room_minigioco),
             TipoMinigioco.PicturePoker => GameElement.Create<MinigiocoPicturePoker>(0, room_minigioco),
+            TipoMinigioco.Breakout => GameElement.Create<MinigiocoBreakout>(0, room_minigioco),
             _ => throw new ArgumentException($"Tipo minigioco sconosciuto: {tipo}")
         };
 
