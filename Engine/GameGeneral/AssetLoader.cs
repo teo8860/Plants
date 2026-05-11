@@ -92,9 +92,11 @@ public static class AssetLoader
         spriteWeatherOn = CreateColoredPlaceholder(new Color(200, 220, 255, 255));
         spriteWorldIcon = CreateColoredPlaceholder(new Color(100, 200, 100, 255));
  
-        ReadOnlySpan<int> ranges = stackalloc int[] { 32, 126, 0 };
-        mainFont = Font.LoadFromMemory(".ttf",Utility.LoadBytesFromEmbedded("PressStart2P-Regular.ttf", "Assets"), 64, null);
-        mainFont = Font.LoadFromMemory(".ttf",Utility.LoadBytesFromEmbedded("editundo.ttf", "Assets"), 64, null);
+        // Font caricato a dimensione alta per buona rasterizzazione glyph,
+        // poi Point filter su atlas → scaling nearest-neighbor = pixel croccanti.
+        // null = set ASCII default (95 codepoints, 32-126).
+        mainFont = Font.LoadFromMemory(".ttf", Utility.LoadBytesFromEmbedded("editundo.ttf", "Assets"), 32, null);
+        mainFont.Texture.SetFilter(TextureFilter.Point);
        
     }
     

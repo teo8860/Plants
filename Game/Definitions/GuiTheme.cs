@@ -64,13 +64,12 @@ public static class GuiTheme
 	}
      public static void DrawText(string text, int x, int y, Color color, int fontsize)
     {
-        var f = AssetLoader.mainFont;// Font.GetDefault();
-        Graphics.DrawTextEx(f, text, new Vector2(x, y), fontsize-2, FontSpacing, color);
-        Graphics.DrawTextEx(f, text, new Vector2(x + 1, y), fontsize-2, FontSpacing, color);
+        var f = AssetLoader.mainFont;
+        Graphics.DrawTextEx(f, text, new Vector2(x, y), fontsize, FontSpacing, color);
     }
 
     public static int MeasureText(string text)
     {
-        return (int)TextManager.MeasureTextEx(AssetLoader.mainFont, text, FontSize, FontSpacing).X + 1;
+        return (int)TextManager.MeasureTextEx(AssetLoader.mainFont, text, FontSize, FontSpacing).X;
     }
 }

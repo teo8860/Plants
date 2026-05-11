@@ -19,7 +19,10 @@
       "Bash(pip install *)",
       "mcp__plugin_claude-mem_mcp-search__get_observations",
       "Read(//c/Users/Stage/.claude/plugins/cache/caveman/caveman/84cc3c14fa1e/skills/compress/**)",
-      "Bash(python3 -m scripts \"C:\\\\Dev\\\\Plants\\\\CLAUDE.md\")"
+      "Bash(python3 -m scripts \"C:\\\\Dev\\\\Plants\\\\CLAUDE.md\")",
+      "Bash(dotnet tool:*)",
+      "Bash(ls ~/.nuget/packages/raylib-csharp/)",
+      "Bash(dotnet script --eval ':*)"
     ]
   }
 }
