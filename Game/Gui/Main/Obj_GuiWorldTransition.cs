@@ -173,7 +173,7 @@ public class Obj_GuiWorldTransition : GameElement
 
         string title = GetWorldName(nextWorld);
         Color titleColor = GetWorldColor(nextWorld);
-        int titleWidth = title.Length * 7;
+        int titleWidth = GuiTheme.MeasureText(title, 12);
         GuiTheme.DrawText(title, panelX + (panelW - titleWidth) / 2, panelY + 12, 12, titleColor);
 
         GuiTheme.DrawText("Nuovo Mondo", panelX + (panelW - 65) / 2, panelY + 28, 8, new Color(150, 150, 180, 255));

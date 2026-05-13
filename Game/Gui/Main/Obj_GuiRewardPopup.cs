@@ -116,7 +116,7 @@ public class Obj_GuiRewardPopup : GameElement
             new Rectangle(panelX, panelY, panelW, 22), 0.25f, 8, headerBg);
 
         string title = "RICOMPENSE";
-        int titleW = title.Length * 7;
+        int titleW = GuiTheme.MeasureText(title, 14);
         GuiTheme.DrawText(title, panelX + (panelW - titleW) / 2, panelY + 6, 14, textColor);
 
         int rowH = 24;
@@ -145,7 +145,7 @@ public class Obj_GuiRewardPopup : GameElement
         Color bc = closeHovered ? buttonHoverColor : buttonColor;
         Graphics.DrawRectangleRounded(new Rectangle(btnX, btnY, btnW, btnH), 0.3f, 8, bc);
         string btnText = "Ottimo!";
-        int btnTextW = btnText.Length * 6;
+        int btnTextW = GuiTheme.MeasureText(btnText, 12);
         GuiTheme.DrawText(btnText, btnX + (btnW - btnTextW) / 2, btnY + 6, 12, textColor);
     }
 }

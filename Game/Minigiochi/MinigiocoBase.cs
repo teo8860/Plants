@@ -177,22 +177,22 @@ public abstract class MinigiocoBase : GameElement
         if (pw > 100)
         {
             string nome = Nome;
-            int nomeW = nome.Length * 8;
+            int nomeW = GuiTheme.MeasureText(nome, 16);
             GuiTheme.DrawText(nome, px + (pw - nomeW) / 2, py + 20, 16, verdeChiaro);
 
             string desc = Descrizione;
-            int descW = desc.Length * 5;
+            int descW = GuiTheme.MeasureText(desc);
             GuiTheme.DrawText(desc, px + (pw - descW) / 2, py + 50, 10, grigioChiaro);
 
             string tempo = $"Tempo: {tempoTotale:0}s";
-            int tempoW = tempo.Length * 5;
+            int tempoW = GuiTheme.MeasureText(tempo);
             GuiTheme.DrawText(tempo, px + (pw - tempoW) / 2, py + 75, 10, bianco);
 
             float countdown = INTRO_DURATA - introTimer;
             if (countdown > 0 && countdown < 1.5f)
             {
                 string countText = countdown > 1f ? "2" : countdown > 0.5f ? "1" : "Via!";
-                int countW = countText.Length * 12;
+                int countW = GuiTheme.MeasureText(countText, 20);
                 GuiTheme.DrawText(countText, px + (pw - countW) / 2, py + 92, 20, verdeChiaro);
             }
         }
@@ -237,31 +237,31 @@ public abstract class MinigiocoBase : GameElement
         // Titolo
         string titolo = vinto ? "Vittoria!" : "Tempo Scaduto!";
         Color titoloCol = vinto ? verdeChiaro : rosso;
-        int titoloW = titolo.Length * 9;
+        int titoloW = GuiTheme.MeasureText(titolo, 18);
         GuiTheme.DrawText(titolo, px + (pw - titoloW) / 2, py + 20, 18, titoloCol);
 
         // Punteggio
         string puntStr = $"Punteggio: {punteggio}/{punteggioMassimo}";
-        int puntW = puntStr.Length * 6;
+        int puntW = GuiTheme.MeasureText(puntStr, 12);
         GuiTheme.DrawText(puntStr, px + (pw - puntW) / 2, py + 55, 12, bianco);
 
         // Foglie guadagnate
         int foglie = CalcolaFoglie();
         string foglieStr = $"+{foglie} Foglie";
-        int foglieW = foglieStr.Length * 7;
+        int foglieW = GuiTheme.MeasureText(foglieStr, 14);
         Color foglieCol = foglie > 0 ? verdeChiaro : grigioChiaro;
         GuiTheme.DrawText(foglieStr, px + (pw - foglieW) / 2, py + 85, 14, foglieCol);
 
         // Messaggio
         string msg = vinto ? "Complimenti!" : "Ritenta!";
-        int msgW = msg.Length * 6;
+        int msgW = GuiTheme.MeasureText(msg, 12);
         GuiTheme.DrawText(msg, px + (pw - msgW) / 2, py + 120, 12, grigioChiaro);
 
         // Hint chiudi
         float pulse = (MathF.Sin(outroTimer * 3f) + 1f) * 0.5f;
         byte hintA = (byte)(120 + pulse * 80);
         string hint = "Clicca per continuare";
-        int hintW = hint.Length * 5;
+        int hintW = GuiTheme.MeasureText(hint);
         GuiTheme.DrawText(hint, px + (pw - hintW) / 2, py + 150, 10, new Color(150, 150, 150, hintA));
     }
 

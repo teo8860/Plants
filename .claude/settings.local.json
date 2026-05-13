@@ -22,7 +22,18 @@
       "Bash(python3 -m scripts \"C:\\\\Dev\\\\Plants\\\\CLAUDE.md\")",
       "Bash(dotnet tool:*)",
       "Bash(ls ~/.nuget/packages/raylib-csharp/)",
-      "Bash(dotnet script --eval ':*)"
+      "Bash(dotnet script --eval ':*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -L -o /tmp/tiny5.zip \"https://fonts.google.com/download?family=Tiny5\")",
+      "Bash(unzip -l /tmp/tiny5.zip)",
+      "Bash(curl -L -o /tmp/Tiny5-Regular.ttf \"https://github.com/Gissio/font_Tiny5/raw/main/fonts/ttf/Tiny5-Regular.ttf\")",
+      "Bash(curl -L -o /tmp/m3x6.zip \"https://managore.itch.io/m3x6\")",
+      "Bash(curl -L -o /tmp/m3x6.ttf \"https://github.com/managore/m3x6/raw/main/m3x6.ttf\")",
+      "Bash(curl -sL \"https://api.github.com/search/repositories?q=m3x6+font\")",
+      "Bash(curl -L -o /tmp/m3x6.ttf \"https://raw.githubusercontent.com/managore/m3x6/master/m3x6.ttf\")",
+      "Bash(file /tmp/m3x6.ttf curl -L -o /tmp/m5x7.ttf \"https://raw.githubusercontent.com/managore/m5x7/master/m5x7.ttf\")",
+      "Bash(taskkill //F //IM Plants.exe)"
     ]
   }
 }

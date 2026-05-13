@@ -313,7 +313,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         // Foglie guadagnate (sotto)
         int leavesY = py + 38;
         string leavesStr = $"+{(int)animatedLeaves} Foglie";
-        int leavesW = leavesStr.Length * 7 + 10;
+        int leavesW = GuiTheme.MeasureText(leavesStr, 12) + 10;
         int leavesX = px + (pw - leavesW) / 2;
 
         // Pulsa
@@ -329,10 +329,10 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
     private void DrawStatBox(int x, int y, int w, string label, string value, Color valueColor)
     {
-        int textW = label.Length * 5;
+        int textW = GuiTheme.MeasureText(label, 8);
         GuiTheme.DrawText(label, x + (w - textW) / 2, y + 2, 8, new Color(160, 160, 160, 255));
 
-        int valW = value.Length * 8;
+        int valW = GuiTheme.MeasureText(value, 14);
         GuiTheme.DrawText(value, x + (w - valW) / 2, y + 14, 14, valueColor);
     }
 
@@ -405,7 +405,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         if (currentResult.TotalLeaves > LEAVES_PER_PAGE)
         {
             string scrollText = $"{scrollOffset + 1}-{endIdx} / {currentResult.TotalLeaves}  (scroll)";
-            int scrollTextW = scrollText.Length * 5;
+            int scrollTextW = GuiTheme.MeasureText(scrollText, 8);
             GuiTheme.DrawText(scrollText, px + (pw - scrollTextW) / 2, listY + listH - 11, 8,
                 new Color(120, 120, 120, 255));
         }
@@ -433,7 +433,7 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         );
 
         string label = "Continua";
-        int lw = label.Length * 7;
+        int lw = GuiTheme.MeasureText(label, 13);
         GuiTheme.DrawText(label, btnX + (btnW - lw) / 2, py + 8, 13, Color.White);
     }
 

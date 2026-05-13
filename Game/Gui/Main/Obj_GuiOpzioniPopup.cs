@@ -184,12 +184,12 @@ public class Obj_GuiOpzioniPopup : GameElement
             new Rectangle(panelX, panelY, PanelW, 26), 0.2f, 8, headerBg);
 
         string title = "OPZIONI";
-        int titleW = title.Length * 8;
+        int titleW = GuiTheme.MeasureText(title, 16);
         GuiTheme.DrawText(title, panelX + (PanelW - titleW) / 2, panelY + 7, 16, textColor);
 
         // --- Scala ---
         string scaleLabel = "Scala finestra";
-        int scaleLabelW = scaleLabel.Length * 7;
+        int scaleLabelW = GuiTheme.MeasureText(scaleLabel, 12);
         GuiTheme.DrawText(scaleLabel, panelX + (PanelW - scaleLabelW) / 2, panelY + 58, 12, textColor);
 
         for (int i = 0; i < GameProperties.MaxUiScaleLevel; i++)
@@ -228,7 +228,7 @@ public class Obj_GuiOpzioniPopup : GameElement
         Graphics.DrawRectangleRounded(rClose, 0.3f, 8, bc);
 
         string btnText = "Chiudi";
-        int btnTextW = btnText.Length * 6;
+        int btnTextW = GuiTheme.MeasureText(btnText, 12);
         GuiTheme.DrawText(btnText, (int)(rClose.X + (rClose.Width - btnTextW) / 2), (int)(rClose.Y + 7), 12, textColor);
     }
 
@@ -241,7 +241,7 @@ public class Obj_GuiOpzioniPopup : GameElement
             bg = hover ? buttonHoverColor : buttonColor;
 
         Graphics.DrawRectangleRounded(r, 0.3f, 8, bg);
-        int tW = label.Length * 7;
+        int tW = GuiTheme.MeasureText(label, 12);
         GuiTheme.DrawText(label, (int)(r.X + (r.Width - tW) / 2), (int)(r.Y + 8), 12, textColor);
     }
 

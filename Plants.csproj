@@ -9,6 +9,7 @@
 	  <EnableWindowsTargeting>true</EnableWindowsTargeting>
 
 
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  <PublishSingleFile>true</PublishSingleFile>
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	  <SelfContained>true</SelfContained>
@@ -98,6 +99,7 @@
 	  <EmbeddedResource Include="Assets\watering_on.png" />
 		<EmbeddedResource Include="Assets\PressStart2P-Regular.ttf" />
 		<EmbeddedResource Include="Assets\editundo.ttf" />
+		<EmbeddedResource Include="Assets\Tiny5-Regular.ttf" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -105,6 +107,9 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="assets\PressStart2P-Regular.ttf">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="assets\Tiny5-Regular.ttf">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

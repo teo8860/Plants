@@ -207,7 +207,7 @@ public class Obj_GuiPostaPopup : GameElement
             new Rectangle(panelX, panelY, panelW, HEADER_H), 0.25f, 8, headerBg);
 
         string title = $"POSTA ({MailSystem.UnreadCount})";
-        int titleW = title.Length * 7;
+        int titleW = GuiTheme.MeasureText(title, 14);
         GuiTheme.DrawText(title, panelX + (panelW - titleW) / 2, panelY + 6, 14, textColor);
 
         DrawList();
@@ -222,7 +222,7 @@ public class Obj_GuiPostaPopup : GameElement
         if (inbox.Count == 0)
         {
             string empty = "Nessuna posta.";
-            int ew = empty.Length * 5;
+            int ew = GuiTheme.MeasureText(empty);
             GuiTheme.DrawText(empty, listX + (listW - ew) / 2, listY + listH / 2 - 5, 10, mutedTextColor);
             return;
         }
@@ -280,7 +280,7 @@ public class Obj_GuiPostaPopup : GameElement
 
         string statusText = mail.claimed ? "Riscattato" : "Nuovo";
         Color statusColor = mail.claimed ? statusClaimedColor : statusNewColor;
-        int statusW = statusText.Length * 5;
+        int statusW = GuiTheme.MeasureText(statusText, 9);
         GuiTheme.DrawText(statusText, x + w - statusW - 8, y + 4, 9, statusColor);
     }
 
@@ -322,7 +322,7 @@ public class Obj_GuiPostaPopup : GameElement
         Color bg = !enabled ? buttonDisabledColor : (hovered ? hoverColor : baseColor);
         Graphics.DrawRectangleRounded(new Rectangle(x, y, w, h), 0.3f, 8, bg);
 
-        int textW = label.Length * 5;
+        int textW = GuiTheme.MeasureText(label);
         Color lc = enabled ? textColor : mutedTextColor;
         GuiTheme.DrawText(label, x + (w - textW) / 2, y + 6, 10, lc);
     }

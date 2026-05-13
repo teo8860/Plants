@@ -92,10 +92,10 @@ public static class AssetLoader
         spriteWeatherOn = CreateColoredPlaceholder(new Color(200, 220, 255, 255));
         spriteWorldIcon = CreateColoredPlaceholder(new Color(100, 200, 100, 255));
  
-        // Font caricato a dimensione alta per buona rasterizzazione glyph,
-        // poi Point filter su atlas → scaling nearest-neighbor = pixel croccanti.
-        // null = set ASCII default (95 codepoints, 32-126).
-        mainFont = Font.LoadFromMemory(".ttf", Utility.LoadBytesFromEmbedded("editundo.ttf", "Assets"), 32, null);
+        // PressStart2P: pixel font 8x8. Binarizzazione rimuove AA, Point filter = crisp.
+        mainFont = Font.LoadFromMemory(".ttf", Utility.LoadBytesFromEmbedded("PressStart2P-Regular.ttf", "Assets"), 8, null);
+        BinarizeFontAtlas(ref mainFont);
+        mainFont.GlyphPadding = 0;
         mainFont.Texture.SetFilter(TextureFilter.Point);
        
     }
@@ -109,9 +109,30 @@ public static class AssetLoader
         return new Sprite(texture, new Vector2(size / 2f, size / 2f));
     }
 
+    /// <summary>
+    /// Rimuove anti-aliasing dall'atlas font: alpha > 128 → 255, altrimenti → 0.
+    /// Accesso diretto ai pixel via pointer — DrawPixel usa alpha blending e non funziona.
+    /// </summary>
+    private static unsafe void BinarizeFontAtlas(ref Font font)
+    {
+        var img = Image.LoadFromTexture(font.Texture);
+        // Converti a RGBA per accesso uniforme (atlas font può essere GRAY_ALPHA)
+        img.FromFormat(Raylib_CSharp.Images.PixelFormat.UncompressedR8G8B8A8);
+        byte* data = (byte*)img.Data;
+        int count = img.Width * img.Height;
+        for (int i = 0; i < count; i++)
+        {
+            int offset = i * 4 + 3; // byte alpha in RGBA
+            data[offset] = data[offset] > 128 ? (byte)255 : (byte)0;
+        }
+        var newTex = Texture2D.LoadFromImage(img);
+        font.Texture.Unload();
+        font.Texture = newTex;
+        img.Unload();
+    }
+
     private static Shader LoadShader(string name)
     {
-
         return Shader.LoadFromMemory(Utility.LoadTextFromEmbedded("base.vert", "Assets/shader"), Utility.LoadTextFromEmbedded(name+".frag", "Assets/shader"));
     }
 }

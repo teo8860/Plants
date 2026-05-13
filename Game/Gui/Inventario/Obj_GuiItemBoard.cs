@@ -210,7 +210,7 @@ public class Obj_GuiItemBoard : GameElement
                 new Rectangle(tx, ty, tabW - 2, th), 0.2f, 6, bg);
 
             string label = tabs[i].label;
-            int labelW = label.Length * 5;
+            int labelW = GuiTheme.MeasureText(label, 9);
             GuiTheme.DrawText(label, tx + (tabW - 2 - labelW) / 2, ty + (th - 9) / 2, 9, text);
 
             if (isActive)

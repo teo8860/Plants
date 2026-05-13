@@ -86,12 +86,9 @@ public class Obj_GuiUpgradePanel : GameElement
 
         DrawBackground(screenW, screenH);
 
-        // Titolo foglie
-        GuiTheme.DrawText($"Foglie: {Game.pianta.Stats.FoglieAccumulate}", 10, 10, 16, leafColor);
-
         // Titolo
         string title = "Upgrade";
-        int titleW = title.Length * 8;
+        int titleW = GuiTheme.MeasureText(title, 18);
         GuiTheme.DrawText(title, screenW / 2 - titleW / 2, 40, 18, textWhite);
 
         // Pannello upgrade
@@ -202,7 +199,7 @@ public class Obj_GuiUpgradePanel : GameElement
             }
 
             string btnText = $"+ {cost}";
-            int textW = btnText.Length * 5;
+            int textW = GuiTheme.MeasureText(btnText);
             GuiTheme.DrawText(btnText, btnX + btnW / 2 - textW / 2, btnY + 5, 10,
                 canBuy ? textWhite : textGray);
 

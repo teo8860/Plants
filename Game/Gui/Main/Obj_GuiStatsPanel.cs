@@ -22,7 +22,7 @@ public class Obj_GuiStatsPanel : GameElement
     private int hoveredStatDotY;
 
     // Layout pannello stile pixel (dark purple)
-    private const int PANEL_W = 180;
+    public const int PANEL_W = 180;
     private const int PAD_H = 5;           // padding orizzontale interno
     private const int PAD_V_TOP = 4;
     private const int ROW_H = 15;
@@ -170,7 +170,7 @@ public class Obj_GuiStatsPanel : GameElement
         Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R, barColor);
 
         int textY = rowY + (ROW_H - GuiTheme.FontSize) / 2;
-        GuiTheme.DrawText(label, x + LABEL_X, textY, GuiTheme.PanelText,8);
+        GuiTheme.DrawText(label, x + LABEL_X, textY, GuiTheme.PanelText, 8);
 
         // Track + fill
         int barY = rowY + (ROW_H - BAR_H) / 2;

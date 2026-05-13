@@ -16,7 +16,6 @@ public class Obj_GuiTopBar : GameElement
     private const int ButtonSize = 16;
     private const int ButtonGap = 3;
 
-    private bool wasPressed = false;
     private int hoveredButton = -1; // 0 = X, 1 = Opzioni
 
     public Obj_GuiTopBar()
@@ -41,9 +40,14 @@ public class Obj_GuiTopBar : GameElement
 
         hoveredButton = -1;
 
+        // Se un elemento a priorità più alta ha già consumato il mouse, non processare click
+        bool alreadyConsumed = InputGate.MouseConsumed;
+
         // Consuma input quando il mouse è sopra la barra (y < TopBarHeight in coord raw)
         if (my >= 0 && my < BarHeight)
             InputGate.ConsumeMouse();
+
+        if (alreadyConsumed) return;
 
         // X (estrema destra)
         int xBtnX = sw - PadH - ButtonSize;
@@ -56,8 +60,7 @@ public class Obj_GuiTopBar : GameElement
         if (mx >= optBtnX && mx < optBtnX + ButtonSize && my >= btnY && my < btnY + ButtonSize)
             hoveredButton = 1;
 
-        bool isPressed = Input.IsMouseButtonDown(MouseButton.Left);
-        if (hoveredButton != -1 && wasPressed && !isPressed)
+        if (hoveredButton != -1 && Input.IsMouseButtonPressed(MouseButton.Left))
         {
             if (hoveredButton == 0)
             {
@@ -69,11 +72,15 @@ public class Obj_GuiTopBar : GameElement
             }
             else if (hoveredButton == 1)
             {
-                if (Game.guiOpzioniPopup != null && !Game.guiOpzioniPopup.IsVisible)
-                    Game.guiOpzioniPopup.Show();
+                if (Game.guiOpzioniPopup != null)
+                {
+                    if (Game.guiOpzioniPopup.IsVisible)
+                        Game.guiOpzioniPopup.Hide();
+                    else
+                        Game.guiOpzioniPopup.Show();
+                }
             }
         }
-        wasPressed = isPressed && hoveredButton != -1;
     }
 
     public override void Draw()

@@ -265,7 +265,7 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         // Rarità
         Color rarityColor = SeedDefinitions.GetRarityColor(currentSeed.rarity);
         string rarityText = SeedDefinitions.GetRarityName(currentSeed.rarity);
-        GuiTheme.DrawText(rarityText, panelX + panelWidth / 2 - rarityText.Length * 3, panelY + 40, 10, rarityColor);
+        GuiTheme.DrawText(rarityText, panelX + panelWidth / 2 - GuiTheme.MeasureText(rarityText) / 2, panelY + 40, 10, rarityColor);
     }
 
     private void DrawEssenceDisplay(int panelX, int y)
@@ -383,7 +383,7 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         // Mostra valore essenza
         string valueText = $"+{sacrificeValue}";
         GuiTheme.DrawText(valueText, sacrificeX + 15, buttonY + 17, 9, essenceColor);
-        DrawEssenceIcon(sacrificeX + 15 + valueText.Length * 5, buttonY + 22, 6);
+        DrawEssenceIcon(sacrificeX + 15 + GuiTheme.MeasureText(valueText, 9), buttonY + 22, 6);
 
         // Pulsante Chiudi
         int closeX = panelX + panelWidth - 15 - buttonW;

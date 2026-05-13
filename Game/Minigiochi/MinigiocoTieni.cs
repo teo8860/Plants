@@ -168,7 +168,7 @@ public class MinigiocoTieni : MinigiocoBase
 
         // Testo al centro
         string pctText = $"{(int)(fillPct * 100)}%";
-        int pctW = pctText.Length * 6;
+        int pctW = GuiTheme.MeasureText(pctText, 12);
         GuiTheme.DrawText(pctText, (int)drawPos.X - pctW / 2, (int)drawPos.Y - 5, 12, bianco);
 
         // Barra di progresso in basso
@@ -182,7 +182,7 @@ public class MinigiocoTieni : MinigiocoBase
         Graphics.DrawRectangleRoundedLines(new Rectangle(barX, barY, barW, barH), 0.5f, 4, 1, new Color(80, 160, 80, 150));
 
         string barLabel = $"Tenuto: {tempoTenuto:0.1}s / {tempoRichiesto:0.0}s";
-        int labelW = barLabel.Length * 5;
+        int labelW = GuiTheme.MeasureText(barLabel);
         GuiTheme.DrawText(barLabel, barX + (barW - labelW) / 2, barY - 14, 10, grigioChiaro);
 
         // Hint spostamento
@@ -191,7 +191,7 @@ public class MinigiocoTieni : MinigiocoBase
             float pulse = (MathF.Sin(pulseTime * 6f) + 1f) * 0.5f;
             byte warnA = (byte)(150 + pulse * 105);
             string warn = "Si sposta tra poco!";
-            int warnW = warn.Length * 5;
+            int warnW = GuiTheme.MeasureText(warn);
             GuiTheme.DrawText(warn, (sw - warnW) / 2, 30, 10, new Color(220, 180, 50, warnA));
         }
     }

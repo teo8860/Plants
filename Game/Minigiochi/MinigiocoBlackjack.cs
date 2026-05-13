@@ -565,7 +565,7 @@ public class MinigiocoBlackjack : MinigiocoBase
 
         // Round (centro in alto)
         string roundStr = $"Round {roundCorrente}/{ROUND_TOTALI}";
-        int rw = roundStr.Length * 5;
+        int rw = GuiTheme.MeasureText(roundStr, 8);
         GuiTheme.DrawText(roundStr, sw / 2 - rw / 2, 32, 8, grigioChiaro);
     }
 
@@ -593,12 +593,12 @@ public class MinigiocoBlackjack : MinigiocoBase
             new Color(255, 220, 80, (byte)(255 * alpha)));
 
         string title = $"Round {roundCorrente}";
-        int tw = title.Length * 9;
+        int tw = GuiTheme.MeasureText(title, 18);
         GuiTheme.DrawText(title, px + (pw - tw) / 2, py + 12, 18,
             new Color(255, 220, 80, (byte)(255 * alpha)));
 
         string sub = "Avvicinati a 21!";
-        int sw2 = sub.Length * 5;
+        int sw2 = GuiTheme.MeasureText(sub);
         GuiTheme.DrawText(sub, px + (pw - sw2) / 2, py + 38, 10,
             new Color(200, 200, 210, (byte)(200 * alpha)));
     }

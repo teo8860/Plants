@@ -471,7 +471,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
             // Bottone Scarta: mostra label sopra e preview essenza + icona sotto.
             if (i == 1)
             {
-                int labelW = label.Length * 6;
+                int labelW = GuiTheme.MeasureText(label, 11);
                 GuiTheme.DrawText(label, btnX + (btnWidth - labelW) / 2, btnY + 4, 11, textColor);
 
                 Seed sel = selectedSeedIndex >= 0 ? Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) : null;
@@ -479,7 +479,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 {
                     int preview = SeedUpgradeSystem.PreviewSacrificeValue(sel);
                     string previewText = $"+{preview}";
-                    int pvTextW = previewText.Length * 5;
+                    int pvTextW = GuiTheme.MeasureText(previewText, 9);
                     int iconSize = 5;
                     int totalW = pvTextW + 4 + iconSize * 2;
                     int startX = btnX + (btnWidth - totalW) / 2;
@@ -489,7 +489,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
             }
             else
             {
-                int textWidth = label.Length * 7;
+                int textWidth = GuiTheme.MeasureText(label, 14);
                 int textX = btnX + (btnWidth - textWidth) / 2;
                 int textY = btnY + (buttonHeight - 14) / 2;
                 GuiTheme.DrawText(label, textX, textY, 14, textColor);

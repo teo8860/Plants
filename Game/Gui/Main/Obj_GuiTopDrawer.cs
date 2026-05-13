@@ -110,8 +110,10 @@ public class Obj_GuiTopDrawer : GameElement
         int mx = RawMouseX;
         int my = RawMouseY;
 
-        // Apre anche con mouse sulla TopBar (y >= 0)
-        bool hoverArea = !blocked && mx >= 0 && mx < sw && my >= 0 && my <= currentBottom + 4;
+        // Hover solo dentro la larghezza del pannello cassetto
+        int panelW = Math.Min(sw - 20, 280);
+        int panelX = (sw - panelW) / 2;
+        bool hoverArea = !blocked && mx >= panelX && mx < panelX + panelW && my >= 0 && my <= currentBottom + 4;
         float target = hoverArea ? 1f : 0f;
         openProgress += (target - openProgress) * Time.GetFrameTime() * AnimSpeed;
         openProgress = Math.Clamp(openProgress, 0f, 1f);
@@ -180,22 +182,24 @@ public class Obj_GuiTopDrawer : GameElement
         int panelX = (sw - panelW) / 2;
 
         Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelTop - 4, panelW, panelH + 4),
+            new Rectangle(panelX, panelTop + 2, panelW, panelH),
             0.25f, 8, bg
         );
         Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX, panelTop - 4, panelW, panelH + 4),
+            new Rectangle(panelX, panelTop + 2, panelW, panelH),
             0.25f, 8, 1, border
         );
 
-        // Bottoni quando il cassetto è almeno parzialmente aperto
-        if (openProgress > 0.05f)
+        // Bottoni solo quando visibili sotto la navbar
+        if (openProgress > 0.3f)
         {
             var (positions, btnY) = LayoutButtons(sw);
-            byte alpha = (byte)(255 * Math.Clamp(openProgress * 1.4f, 0f, 1f));
+            float fadeIn = Math.Clamp((openProgress - 0.3f) / 0.3f, 0f, 1f);
+            byte alpha = (byte)(255 * fadeIn);
             for (int i = 0; i < currentButtons.Count; i++)
             {
-                DrawButton(currentButtons[i], positions[i], btnY, hoveredButtonIdx == i, alpha);
+                if (btnY >= panelTop + 2)
+                    DrawButton(currentButtons[i], positions[i], btnY, hoveredButtonIdx == i, alpha);
             }
         }
 
@@ -234,7 +238,7 @@ public class Obj_GuiTopDrawer : GameElement
                 int by = y - 2;
                 Graphics.DrawCircle(bx + badgeSize / 2, by + badgeSize / 2, badgeSize / 2f + 0.8f, new Color(255, 220, 220, alpha));
                 Graphics.DrawCircle(bx + badgeSize / 2, by + badgeSize / 2, badgeSize / 2f, new Color(210, 50, 50, alpha));
-                int textW = text.Length * 5;
+                int textW = GuiTheme.MeasureText(text, 8);
                 GuiTheme.DrawText(text, bx + (badgeSize - textW) / 2 + 1, by + 2, 8, new Color(255, 255, 255, alpha));
             }
         }

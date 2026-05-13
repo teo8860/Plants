@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Fonts;
@@ -56,20 +57,23 @@ public static class GuiTheme
         DrawText(text, x, y, fontSize);
     }
 
-
-    // Disegna testo pixel (default font) con faux bold via double-draw offset 1px.
     public static void DrawText(string text, int x, int y, Color color)
     {
         DrawText(text, x, y, color, FontSize);
-	}
-     public static void DrawText(string text, int x, int y, Color color, int fontsize)
+    }
+    public static void DrawText(string text, int x, int y, Color color, int fontsize)
     {
         var f = AssetLoader.mainFont;
-        Graphics.DrawTextEx(f, text, new Vector2(x, y), fontsize, FontSpacing, color);
+        Graphics.DrawTextEx(f, text, new Vector2(x, y), fontsize - 2, FontSpacing, color);
     }
 
     public static int MeasureText(string text)
     {
-        return (int)TextManager.MeasureTextEx(AssetLoader.mainFont, text, FontSize, FontSpacing).X;
+        return (int)TextManager.MeasureTextEx(AssetLoader.mainFont, text, FontSize - 2, FontSpacing).X;
+    }
+
+    public static int MeasureText(string text, int fontsize)
+    {
+        return (int)TextManager.MeasureTextEx(AssetLoader.mainFont, text, fontsize - 2, FontSpacing).X;
     }
 }

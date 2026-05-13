@@ -493,9 +493,9 @@ public class MinigiocoPicturePoker : MinigiocoBase
         DrawCoin(18, 32);
         GuiTheme.DrawText($"{moneteGiocatore}", 30, 33, 10, goldText);
         string betStr = $"Puntata: {scommessa}";
-        GuiTheme.DrawText(betStr, sw - 10 - betStr.Length * 5, 33, 8, goldText);
+        GuiTheme.DrawText(betStr, sw - 10 - GuiTheme.MeasureText(betStr, 8), 33, 8, goldText);
         string roundStr = $"Round {roundCorrente}/{ROUND_TOTALI}";
-        int rw = roundStr.Length * 4;
+        int rw = GuiTheme.MeasureText(roundStr, 8);
         GuiTheme.DrawText(roundStr, sw / 2 - rw / 2, 32, 8, grigioChiaro);
 
         // Label dealer
@@ -516,7 +516,7 @@ public class MinigiocoPicturePoker : MinigiocoBase
         {
             int selCount = manoGiocatore.Count(c => c.Selezionata);
             string hint = selCount > 0 ? $"Scarti: {selCount} carte" : "Clicca le carte da scartare";
-            int hw = hint.Length * 5;
+            int hw = GuiTheme.MeasureText(hint, 8);
             GuiTheme.DrawText(hint, sw / 2 - hw / 2, sh / 2 + 10, 8, grigioChiaro);
 
             DrawButton(btnConferma, "GIOCA", hoverConferma, btnPurple, btnPurpleHover);
@@ -531,7 +531,7 @@ public class MinigiocoPicturePoker : MinigiocoBase
         // Reveal: mostra nomi mani
         if (fase == FasePoker.Reveal || fase == FasePoker.Risultato)
         {
-            int tw = manoTesto.Length * 5;
+            int tw = GuiTheme.MeasureText(manoTesto, 8);
             GuiTheme.DrawText(manoTesto, sw / 2 - tw / 2, sepY + 5, 8, bianco);
         }
 
@@ -721,12 +721,12 @@ public class MinigiocoPicturePoker : MinigiocoBase
             new Color(255, 220, 80, (byte)(255 * alpha)));
 
         string title = $"Round {roundCorrente}";
-        int tw = title.Length * 9;
+        int tw = GuiTheme.MeasureText(title, 18);
         GuiTheme.DrawText(title, px + (pw - tw) / 2, py + 10, 18,
             new Color(255, 220, 80, (byte)(255 * alpha)));
 
         string sub = "Batti Luigi!";
-        int sw2 = sub.Length * 5;
+        int sw2 = GuiTheme.MeasureText(sub);
         GuiTheme.DrawText(sub, px + (pw - sw2) / 2, py + 32, 10,
             new Color(200, 200, 210, (byte)(200 * alpha)));
     }
@@ -749,14 +749,14 @@ public class MinigiocoPicturePoker : MinigiocoBase
         Graphics.DrawRectangleRoundedLines(new Rectangle(px, py, pw, ph), 0.12f, 6, 2,
             new Color(borderCol.R, borderCol.G, borderCol.B, (byte)(255 * t)));
 
-        int tw1 = risultatoTesto.Length * 7;
+        int tw1 = GuiTheme.MeasureText(risultatoTesto, 14);
         GuiTheme.DrawText(risultatoTesto, px + (pw - tw1) / 2, py + 10, 14,
             new Color(255, 255, 255, (byte)(255 * t)));
 
         Color monCol = roundVinto
             ? new Color(100, 255, 120, (byte)(255 * t))
             : new Color(255, 120, 100, (byte)(255 * t));
-        int tw2 = vincitaTesto.Length * 5;
+        int tw2 = GuiTheme.MeasureText(vincitaTesto);
         GuiTheme.DrawText(vincitaTesto, px + (pw - tw2) / 2, py + 32, 10, monCol);
     }
 
@@ -766,7 +766,7 @@ public class MinigiocoPicturePoker : MinigiocoBase
         Graphics.DrawRectangleRounded(rect, 0.3f, 6, bg);
         Graphics.DrawRectangleRoundedLines(rect, 0.3f, 6, 1, new Color(255, 255, 255, hover ? (byte)80 : (byte)40));
 
-        int tw = text.Length * 6;
+        int tw = GuiTheme.MeasureText(text, 12);
         int tx = (int)rect.X + ((int)rect.Width - tw) / 2;
         int ty = (int)rect.Y + ((int)rect.Height - 12) / 2;
         GuiTheme.DrawText(text, tx, ty, 12, bianco);

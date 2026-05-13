@@ -179,7 +179,7 @@ public class Obj_GuiFusionResultPopup : GameElement
         // Header
         Graphics.DrawRectangleRounded(new Rectangle(px, py, PANEL_W, 24), 0.25f, 8, headerBg);
         string title = "FUSIONE COMPLETATA!";
-        int titleW = title.Length * 7;
+        int titleW = GuiTheme.MeasureText(title, 14);
         GuiTheme.DrawText(title, px + (PANEL_W - titleW) / 2, py + 6, 14, headerText);
 
         // === Nuovo seme ===
@@ -205,12 +205,12 @@ public class Obj_GuiFusionResultPopup : GameElement
 
         // Nome
         string name = SeedDefinitions.GetSeedName(fused.type);
-        int nameW = name.Length * 6;
+        int nameW = GuiTheme.MeasureText(name, 12);
         GuiTheme.DrawText(name, px + (PANEL_W - nameW) / 2, py + 100, 12, textColor);
 
         // Rarita
         string rar = SeedDefinitions.GetRarityName(fused.rarity);
-        int rarW = rar.Length * 5;
+        int rarW = GuiTheme.MeasureText(rar);
         GuiTheme.DrawText(rar, px + (PANEL_W - rarW) / 2, py + 116, 10, rarityColor);
 
         // Separatore
@@ -237,7 +237,7 @@ public class Obj_GuiFusionResultPopup : GameElement
         Graphics.DrawRectangleRoundedLines(btn, 0.3f, 8, 2, panelBorder);
 
         string btnText = "Fantastico!";
-        int btnTextW = btnText.Length * 6;
+        int btnTextW = GuiTheme.MeasureText(btnText, 12);
         GuiTheme.DrawText(btnText, (int)btn.X + ((int)btn.Width - btnTextW) / 2,
             (int)btn.Y + 7, 12, textColor);
     }
@@ -306,7 +306,7 @@ public class Obj_GuiFusionResultPopup : GameElement
             // p1 allineato a destra verso il separatore, p2 a sinistra del separatore.
             string p1 = ((int)Math.Round(s.P1)).ToString();
             string p2 = ((int)Math.Round(s.P2)).ToString();
-            int p1W = p1.Length * 5;
+            int p1W = GuiTheme.MeasureText(p1, 8);
             int sepX = x + labelW + 28;
             GuiTheme.DrawText(p1, sepX - 4 - p1W, ry + 3, 8, dimText);
             GuiTheme.DrawText("|", sepX, ry + 3, 8, dimText);

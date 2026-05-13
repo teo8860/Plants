@@ -231,7 +231,7 @@ public class MinigiocoBreakout : MinigiocoBase
         if (!ballLaunched && launchTimer >= LAUNCH_COOLDOWN)
         {
             string hint = "CLICCA PER LANCIARE";
-            int hintW = hint.Length * 8;
+            int hintW = GuiTheme.MeasureText(hint, 12);
             GuiTheme.DrawText(hint, (sw - hintW) / 2, sh - 30, 12, atariDim);
         }
     }

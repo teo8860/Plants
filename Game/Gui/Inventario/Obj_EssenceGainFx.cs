@@ -58,7 +58,7 @@ public class Obj_EssenceGainFx : GameElement
 
         // Icona cristallo a destra del testo
         int size = 5;
-        int iconX = x + txt.Length * 6 + 4;
+        int iconX = x + GuiTheme.MeasureText(txt, 11) + 4;
         int iconY = y + 5;
 
         Graphics.DrawTriangle(

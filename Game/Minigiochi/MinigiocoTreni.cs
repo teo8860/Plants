@@ -365,7 +365,7 @@ public class MinigiocoTreni : MinigiocoBase
             string text = fb.positivo ? "OK!" : "Mancato!";
             Color col = fb.positivo ? new Color(100, 255, 100, textA) : new Color(255, 100, 100, textA);
             
-            int textW = text.Length * 6;
+            int textW = GuiTheme.MeasureText(text, 12);
             GuiTheme.DrawText(text, (int)(fb.posizione.X - textW / 2), (int)(fb.posizione.Y - 25 - yOff), 12, col);
         }
         
@@ -386,7 +386,7 @@ public class MinigiocoTreni : MinigiocoBase
             float pulse = (MathF.Sin(pulseTime * 4f) + 1f) * 0.5f;
             byte hintA = (byte)(150 + pulse * 80);
             string hint = "Clicca i passeggeri per aiutarli a saltare sul treno!";
-            int hintW = hint.Length * 5;
+            int hintW = GuiTheme.MeasureText(hint);
             GuiTheme.DrawText(hint, (sw - hintW) / 2, sh / 2, 10, new Color(200, 200, 150, hintA));
         }
         
@@ -396,7 +396,7 @@ public class MinigiocoTreni : MinigiocoBase
             float pulse = (MathF.Sin(pulseTime * 3f) + 1f) * 0.5f;
             byte textA = (byte)(150 + pulse * 80);
             string status = "Il treno sta arrivando...";
-            int statusW = status.Length * 6;
+            int statusW = GuiTheme.MeasureText(status, 12);
             GuiTheme.DrawText(status, (sw - statusW) / 2, sh / 3, 12, new Color(200, 200, 150, textA));
         }
     }

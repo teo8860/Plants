@@ -93,19 +93,19 @@ public class Obj_GuiMorte : GameElement
 
         // Titolo
         string titolo = "La tua pianta e' morta";
-        int titoloW = titolo.Length * 8;
+        int titoloW = GuiTheme.MeasureText(titolo, 16);
         byte tAlpha = (byte)(255 * textAlpha);
         GuiTheme.DrawText(titolo, px + (pw - titoloW) / 2, py + 25, 16,
             new Color(rosso.R, rosso.G, rosso.B, tAlpha));
 
         // Messaggio
         string msg1 = "Dovrai ricominciare";
-        int msg1W = msg1.Length * 5;
+        int msg1W = GuiTheme.MeasureText(msg1);
         GuiTheme.DrawText(msg1, px + (pw - msg1W) / 2, py + 60, 10,
             new Color(bianco.R, bianco.G, bianco.B, tAlpha));
 
         string msg2 = "con un nuovo seme.";
-        int msg2W = msg2.Length * 5;
+        int msg2W = GuiTheme.MeasureText(msg2);
         GuiTheme.DrawText(msg2, px + (pw - msg2W) / 2, py + 78, 10,
             new Color(bianco.R, bianco.G, bianco.B, tAlpha));
 
@@ -115,7 +115,7 @@ public class Obj_GuiMorte : GameElement
             float pulse = (MathF.Sin(timer * 3f) + 1f) * 0.5f;
             byte hintA = (byte)(120 + pulse * 80);
             string hint = "Clicca per continuare";
-            int hintW = hint.Length * 5;
+            int hintW = GuiTheme.MeasureText(hint);
             GuiTheme.DrawText(hint, px + (pw - hintW) / 2, py + 120, 10,
                 new Color(grigio.R, grigio.G, grigio.B, hintA));
         }

@@ -137,7 +137,7 @@ public static class SeedStatsDrawer
             GuiTheme.DrawText(entry.Label, x, rowY, 9, labelColor);
 
             string valText = FormatValue(entry.Value);
-            int valW = valText.Length * 5;
+            int valW = GuiTheme.MeasureText(valText, 9);
             GuiTheme.DrawText(valText, x + width - valW, rowY, 9, textColor);
 
             // Barra
@@ -183,7 +183,7 @@ public static class SeedStatsDrawer
             GuiTheme.DrawText(entry.ShortLabel, cellX, cellY, 8, labelColor);
 
             string valText = FormatValue(entry.Value);
-            int valW = valText.Length * 4;
+            int valW = GuiTheme.MeasureText(valText, 8);
             GuiTheme.DrawText(valText, cellX + colWidth - valW, cellY, 8, GetValueColor(entry.Value, entry.MinVal, entry.MaxVal));
 
             // Barra

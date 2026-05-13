@@ -277,7 +277,7 @@ public class Obj_GuiInventoryCrates : GameElement
         Graphics.DrawRectangleLines(labelX, labelY, labelWidth, labelHeight,
             new Color(woodDark.R, woodDark.G, woodDark.B, 255));
 
-        int textWidth = name.Length * 5;
+        int textWidth = GuiTheme.MeasureText(name, 9);
         GuiTheme.DrawText(name, labelX + labelWidth / 2 - textWidth / 2, labelY + 6, 9, Color.White);
 
         // === HOVER EFFECTS ===

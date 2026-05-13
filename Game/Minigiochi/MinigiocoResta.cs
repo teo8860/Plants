@@ -157,7 +157,7 @@ public class MinigiocoResta : MinigiocoBase
         }
 
         string pctText = $"{(int)percentuale}%";
-        int pctW = pctText.Length * 7;
+        int pctW = GuiTheme.MeasureText(pctText, 14);
         Color textCol = mouseDentro ? bianco : new Color(255, 220, 220, 255);
         GuiTheme.DrawText(pctText, (int)cerchioPos.X - pctW / 2, (int)cerchioPos.Y - 8, 14, textCol);
 
@@ -166,7 +166,7 @@ public class MinigiocoResta : MinigiocoBase
             float warnPulse = (MathF.Sin(pulseTime * 8f) + 1f) * 0.5f;
             byte warnA = (byte)(150 + warnPulse * 100);
             string warn = "Resta dentro!";
-            int warnW = warn.Length * 5;
+            int warnW = GuiTheme.MeasureText(warn);
             GuiTheme.DrawText(warn, (int)cerchioPos.X - warnW / 2, (int)(cerchioPos.Y - r - 15), 10, new Color(255, 150, 150, warnA));
         }
 
@@ -182,7 +182,7 @@ public class MinigiocoResta : MinigiocoBase
         Graphics.DrawRectangleRoundedLines(new Rectangle(barX, barY, barW, barH), 0.5f, 4, 1, new Color(80, 160, 80, 150));
 
         string barLabel = $"Percentuale: {percentuale:0.0}%";
-        int labelW = barLabel.Length * 5;
+        int labelW = GuiTheme.MeasureText(barLabel);
         GuiTheme.DrawText(barLabel, barX + (barW - labelW) / 2, barY - 14, 10, grigioChiaro);
     }
 

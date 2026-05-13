@@ -1001,7 +1001,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
             if (revealScale > 0.5f)
             {
                 string rarityText = resultSeed.rarity.ToString();
-                int textWidth = rarityText.Length * 7;
+                int textWidth = GuiTheme.MeasureText(rarityText, 14);
                 GuiTheme.DrawText(
                     rarityText,
                     (int)(center.X - textWidth / 2),
@@ -1023,7 +1023,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         if (revealScale > 0.7f)
         {
             string seedName = SeedDefinitions.GetSeedName(resultSeed.type);
-            int nameWidth = seedName.Length * 8;
+            int nameWidth = GuiTheme.MeasureText(seedName, 16);
             GuiTheme.DrawText(
                 seedName,
                 (int)(center.X - nameWidth / 2),
@@ -1128,7 +1128,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         Color textColor = new Color(255, 255, 255, alpha);
 
         string text = "SPACE to skip";
-        int textWidth = text.Length * 6;
+        int textWidth = GuiTheme.MeasureText(text);
         int x = screenW / 2 - textWidth / 2 - 10;
         int y = 20;
 
@@ -1149,7 +1149,7 @@ public class Obj_GuiPackOpeningAnimation : GameElement
         byte alpha = (byte)(200 + pulse * 55);
 
         string text = "Click to continue";
-        int textWidth = text.Length * 7;
+        int textWidth = GuiTheme.MeasureText(text, 14);
 
         GuiTheme.DrawText(text, screenW / 2 - textWidth / 2, screenH - 60, 14, new Color(255, 255, 255, alpha));
     }

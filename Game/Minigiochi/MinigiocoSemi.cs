@@ -275,7 +275,7 @@ public class MinigiocoSemi : MinigiocoBase
             float pulse = (MathF.Sin(pulseTime * 4f) + 1f) * 0.5f;
             byte hintA = (byte)(150 + pulse * 80);
             string hint = "Muovi il mouse per raccogliere!";
-            int hintW = hint.Length * 5;
+            int hintW = GuiTheme.MeasureText(hint);
             GuiTheme.DrawText(hint, (sw - hintW) / 2, sh / 2, 10, new Color(200, 200, 150, hintA));
         }
         
