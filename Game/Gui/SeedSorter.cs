@@ -124,6 +124,7 @@ public class SeedSorter
         nextHover = HitRect(nextBtnRect, mx, my);
         dirHover  = HitRect(dirBtnRect, mx, my);
 
+        if (InputGate.MouseConsumed) return false;
         if (!Input.IsMouseButtonPressed(MouseButton.Left)) return false;
 
         var avail = GetAvailable();

@@ -198,6 +198,8 @@ public class Obj_GuiPiantaggio : GameElement
 
         if (!active) return;
 
+        InputGate.ConsumeMouse();
+
         float deltaTime = Time.GetFrameTime();
         pulse += deltaTime * 3f;
 

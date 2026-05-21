@@ -90,6 +90,13 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
+
+        if (InputGate.MouseConsumed) { hoveredButton = -1; return; }
+
+        // Consuma mouse se sopra il pannello
+        if (mx >= panelX && mx <= panelX + panelWidth)
+            InputGate.ConsumeMouse();
+
         bool clicked = Input.IsMouseButtonPressed(MouseButton.Left)
             && (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked);
 
@@ -110,8 +117,13 @@ public class Obj_GuiSeedDetailPanel : GameElement
         int navBarHeight = 45; // Spazio per la barra di navigazione (35px + padding)
         int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - navBarHeight;
 
+        bool hasSeed = selectedSeedIndex >= 0 && Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) != null;
+
         for (int i = 0; i < buttonLabels.Length; i++)
         {
+            // Scarta (1) e Migliora (2) disabilitati senza seme selezionato
+            if (!hasSeed && i >= 1) continue;
+
             int btnX = panelX + buttonMargin;
             int btnY = buttonsStartY + i * (buttonHeight + buttonSpacing);
             int btnWidth = panelWidth - buttonMargin * 2;
@@ -421,13 +433,18 @@ public class Obj_GuiSeedDetailPanel : GameElement
     private void DrawButtons(int panelX, int screenHeight)
     {
         var fusionManager = SeedFusionManager.Get();
+        bool hasSeed = selectedSeedIndex >= 0 && Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) != null;
 
         int buttonHeight = 36;
         int buttonSpacing = 16;
         int buttonMargin = 12;
         int totalButtonsHeight = buttonLabels.Length * buttonHeight + (buttonLabels.Length - 1) * buttonSpacing;
-        int navBarHeight = 45; // Spazio per la barra di navigazione (35px + padding)
+        int navBarHeight = 45;
         int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - navBarHeight;
+
+        Color disabledBg = new Color(50, 40, 35, 200);
+        Color disabledBorder = new Color(45, 33, 22, 200);
+        Color disabledText = new Color(140, 130, 120, 150);
 
         for (int i = 0; i < buttonLabels.Length; i++)
         {
@@ -435,15 +452,25 @@ public class Obj_GuiSeedDetailPanel : GameElement
             int btnY = buttonsStartY + i * (buttonHeight + buttonSpacing);
             int btnWidth = panelWidth - buttonMargin * 2;
 
-            // Colore bottone speciale per "Unisci" in modalità fusione
-            Color bg = buttonColor;
-            if (i == 0 && fusionManager.IsFusionMode) // Bottone "Unisci"
+            bool disabled = !hasSeed && i >= 1;
+
+            // Colore bottone
+            Color bg;
+            if (disabled)
+            {
+                bg = disabledBg;
+            }
+            else if (i == 0 && fusionManager.IsFusionMode)
             {
                 bg = buttonActiveColor;
             }
             else if (i == hoveredButton)
             {
                 bg = buttonHoverColor;
+            }
+            else
+            {
+                bg = buttonColor;
             }
 
             Graphics.DrawRectangleRounded(
@@ -458,8 +485,10 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 0.22f,
                 8,
                 3,
-                buttonBorder
+                disabled ? disabledBorder : buttonBorder
             );
+
+            Color txtColor = disabled ? disabledText : textColor;
 
             // Testo del bottone
             string label = buttonLabels[i];
@@ -472,19 +501,22 @@ public class Obj_GuiSeedDetailPanel : GameElement
             if (i == 1)
             {
                 int labelW = GuiTheme.MeasureText(label, 11);
-                GuiTheme.DrawText(label, btnX + (btnWidth - labelW) / 2, btnY + 4, 11, textColor);
+                GuiTheme.DrawText(label, btnX + (btnWidth - labelW) / 2, btnY + 4, 11, txtColor);
 
-                Seed sel = selectedSeedIndex >= 0 ? Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) : null;
-                if (sel != null)
+                if (!disabled)
                 {
-                    int preview = SeedUpgradeSystem.PreviewSacrificeValue(sel);
-                    string previewText = $"+{preview}";
-                    int pvTextW = GuiTheme.MeasureText(previewText, 9);
-                    int iconSize = 5;
-                    int totalW = pvTextW + 4 + iconSize * 2;
-                    int startX = btnX + (btnWidth - totalW) / 2;
-                    GuiTheme.DrawText(previewText, startX, btnY + 20, 9, essenceColor);
-                    DrawEssenceIcon(startX + pvTextW + 4 + iconSize, btnY + 25, iconSize);
+                    Seed sel = selectedSeedIndex >= 0 ? Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) : null;
+                    if (sel != null)
+                    {
+                        int preview = SeedUpgradeSystem.PreviewSacrificeValue(sel);
+                        string previewText = $"+{preview}";
+                        int pvTextW = GuiTheme.MeasureText(previewText, 9);
+                        int iconSize = 5;
+                        int totalW = pvTextW + 4 + iconSize * 2;
+                        int startX = btnX + (btnWidth - totalW) / 2;
+                        GuiTheme.DrawText(previewText, startX, btnY + 20, 9, essenceColor);
+                        DrawEssenceIcon(startX + pvTextW + 4 + iconSize, btnY + 25, iconSize);
+                    }
                 }
             }
             else
@@ -492,7 +524,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
                 int textWidth = GuiTheme.MeasureText(label, 14);
                 int textX = btnX + (btnWidth - textWidth) / 2;
                 int textY = btnY + (buttonHeight - 14) / 2;
-                GuiTheme.DrawText(label, textX, textY, 14, textColor);
+                GuiTheme.DrawText(label, textX, textY, 14, txtColor);
             }
         }
     }

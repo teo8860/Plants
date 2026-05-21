@@ -94,6 +94,8 @@ namespace Plants
         {
             if (!isVisible || slides.Length == 0) return;
 
+            InputGate.ConsumeMouse();
+
             int mx = Input.GetMouseX();
             int my = Input.GetMouseY();
 

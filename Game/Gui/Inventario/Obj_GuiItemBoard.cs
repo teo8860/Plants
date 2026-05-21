@@ -110,6 +110,9 @@ public class Obj_GuiItemBoard : GameElement
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
+
+        if (InputGate.MouseConsumed) return;
+
         bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
 
         // --- Tab handling ---

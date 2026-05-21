@@ -61,6 +61,8 @@ public class Obj_GuiWorldTransition : GameElement
         int buttonX = panelX + (panelW - buttonW) / 2;
         int buttonY = panelY + panelH - 35;
 
+        InputGate.ConsumeMouse();
+
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 
