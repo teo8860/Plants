@@ -79,6 +79,8 @@ public class Obj_GuiSeedRecovery : GameElement
 
     private void HandleConfirmationInput()
     {
+        InputGate.ConsumeMouse();
+
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 

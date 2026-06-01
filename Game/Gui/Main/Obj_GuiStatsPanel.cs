@@ -22,15 +22,15 @@ public class Obj_GuiStatsPanel : GameElement
     private int hoveredStatDotY;
 
     // Layout pannello stile pixel (dark purple)
-    public const int PANEL_W = 180;
+    public const int PANEL_W = 130;
     private const int PAD_H = 5;           // padding orizzontale interno
     private const int PAD_V_TOP = 4;
     private const int ROW_H = 15;
     private const int DOT_R = 3;
     private const int DOT_CX = 10;         // centro pallino rispetto a x
-    private const int LABEL_X = 17;
-    private const int BAR_X = 60;
-    private const int BAR_W = 82;
+    private const int ICON_X = 18;
+    private const int BAR_X = 30;
+    private const int BAR_W = 50;
     private const int BAR_H = 7;
     private const int OUTLINE = 1;
 
@@ -161,28 +161,31 @@ public class Obj_GuiStatsPanel : GameElement
         int cx = x + DOT_CX;
         int cy = rowY + ROW_H / 2;
 
-        // Hover halo
+        var severity = GetStatSeverity(id, value);
+        Color dotColor = GetSeverityColor(severity);
+
         if (hoveredStatId == id)
         {
-            Color halo = barColor; halo.A = 80;
+            Color halo = dotColor; halo.A = 80;
             Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R + 2, halo);
         }
-        Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R, barColor);
+        Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R, dotColor);
 
-        int textY = rowY + (ROW_H - GuiTheme.FontSize) / 2;
-        GuiTheme.DrawText(label, x + LABEL_X, textY, GuiTheme.PanelText, 8);
+        DrawStatIcon(id, x + ICON_X, cy);
 
-        // Track + fill
         int barY = rowY + (ROW_H - BAR_H) / 2;
+
+        // Outline + track + fill (fixed width)
+        Graphics.DrawRectangle(x + BAR_X - 1, barY - 1, BAR_W + 2, BAR_H + 2, GuiTheme.PanelOutline);
         Graphics.DrawRectangle(x + BAR_X, barY, BAR_W, BAR_H, GuiTheme.BarTrack);
         int fillW = (int)(BAR_W * Math.Clamp(value, 0f, 1f));
         if (fillW > 0)
             Graphics.DrawRectangle(x + BAR_X, barY, fillW, BAR_H, barColor);
 
-        // Valore percentuale right-aligned
+        // Percentuale right-aligned a fine pannello
         string valText = $"{(int)Math.Round(value * 100f)}%";
         int valW = GuiTheme.MeasureText(valText);
-        GuiTheme.DrawText(valText, x + PANEL_W - PAD_H - valW, textY, GuiTheme.PanelText);
+        GuiTheme.DrawText(valText, x + PANEL_W - PAD_H - valW, barY - 1, GuiTheme.PanelText);
     }
 
     private void DrawTempRow(float temp, int rowY)
@@ -190,25 +193,69 @@ public class Obj_GuiStatsPanel : GameElement
         int cx = x + DOT_CX;
         int cy = rowY + ROW_H / 2;
 
+        var severity = GetTemperatureSeverity(temp);
+        Color dotColor = GetSeverityColor(severity);
+
         if (hoveredStatId == "temperatura")
         {
-            Color halo = GuiTheme.StatTemperatura; halo.A = 80;
+            Color halo = dotColor; halo.A = 80;
             Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R + 2, halo);
         }
-        Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R, GuiTheme.StatTemperatura);
+        Graphics.DrawCircleV(new Vector2(cx, cy), DOT_R, dotColor);
 
-        int textY = rowY + (ROW_H - GuiTheme.FontSize) / 2;
-        GuiTheme.DrawText("TEMP.", x + LABEL_X, textY, GuiTheme.PanelText);
+        DrawStatIcon("temperatura", x + ICON_X, cy);
+
+        int barY = rowY + (ROW_H - BAR_H) / 2;
 
         string tempText = $"{temp:F1}°C".Replace('.', ',');
-        GuiTheme.DrawText(tempText, x + BAR_X, textY, GuiTheme.StatTemperatura);
+        int tempW = GuiTheme.MeasureText(tempText);
+        GuiTheme.DrawText(tempText, x + BAR_X, barY - 1, GuiTheme.StatTemperatura);
+    }
 
-        string desc = GetTemperatureDescription(temp).ToUpperInvariant();
-        Color descColor = GetTemperatureSeverity(temp) == StatSeverity.Good
-            ? GuiTheme.StatIdeale
-            : GuiTheme.StatTemperatura;
-        int descW = GuiTheme.MeasureText(desc);
-        GuiTheme.DrawText(desc, x + PANEL_W - PAD_H - descW, textY, descColor);
+    // ─── Icone stat (pixel art) ────────────────────────────────
+
+    private void DrawStatIcon(string id, int ix, int cy)
+    {
+        Color c = new Color(200, 200, 210, 255);
+        switch (id)
+        {
+            case "salute": // croce (health cross)
+                Graphics.DrawRectangle(ix, cy - 3, 6, 1, c);
+                Graphics.DrawRectangle(ix, cy - 2, 6, 1, c);
+                Graphics.DrawRectangle(ix + 2, cy - 5, 2, 1, c);
+                Graphics.DrawRectangle(ix + 2, cy - 4, 2, 1, c);
+                Graphics.DrawRectangle(ix + 2, cy, 2, 1, c);
+                Graphics.DrawRectangle(ix + 2, cy + 1, 2, 1, c);
+                break;
+            case "idratazione": // goccia
+                Graphics.DrawRectangle(ix + 2, cy - 4, 2, 1, c);
+                Graphics.DrawRectangle(ix + 1, cy - 3, 4, 1, c);
+                Graphics.DrawRectangle(ix, cy - 2, 6, 1, c);
+                Graphics.DrawRectangle(ix, cy - 1, 6, 1, c);
+                Graphics.DrawRectangle(ix + 1, cy, 4, 1, c);
+                Graphics.DrawRectangle(ix + 2, cy + 1, 2, 1, c);
+                break;
+            case "energia": // fulmine
+                Graphics.DrawRectangle(ix + 3, cy - 4, 2, 1, c);
+                Graphics.DrawRectangle(ix + 2, cy - 3, 2, 1, c);
+                Graphics.DrawRectangle(ix + 1, cy - 2, 4, 1, c);
+                Graphics.DrawRectangle(ix, cy - 1, 4, 1, c);
+                Graphics.DrawRectangle(ix + 2, cy, 2, 1, c);
+                Graphics.DrawRectangle(ix + 1, cy + 1, 2, 1, c);
+                break;
+            case "ossigeno": // bolla (cerchietto)
+                Graphics.DrawRectangle(ix + 1, cy - 3, 4, 1, c);
+                Graphics.DrawRectangle(ix, cy - 2, 1, 4, c);
+                Graphics.DrawRectangle(ix + 5, cy - 2, 1, 4, c);
+                Graphics.DrawRectangle(ix + 1, cy + 2, 4, 1, c);
+                break;
+            case "temperatura": // termometro
+                Graphics.DrawRectangle(ix + 2, cy - 5, 2, 7, c);
+                Graphics.DrawRectangle(ix + 1, cy + 2, 4, 1, c);
+                Graphics.DrawRectangle(ix + 1, cy + 3, 4, 1, c);
+                Graphics.DrawRectangle(ix + 2, cy + 4, 2, 1, c);
+                break;
+        }
     }
 
     // ─── Severita' per stat ─────────────────────────────────────
@@ -265,11 +312,19 @@ public class Obj_GuiStatsPanel : GameElement
         var lines = BuildEffectLines(hoveredStatId);
         if (lines.Count == 0) return;
 
-        int fontSize = 7;
-        int lineH = fontSize + 4;
-        int pad = 6;
-        int tw = 155;
-        int th = pad * 2 + lines.Count * lineH - 2;
+        int fontSize = 10;
+        int lineH = fontSize + 3;
+        int pad = 8;
+
+        // Calcola larghezza necessaria dal testo piu lungo
+        int maxTextW = 0;
+        foreach (var (text, _) in lines)
+        {
+            int w = GuiTheme.MeasureText(text, fontSize);
+            if (w > maxTextW) maxTextW = w;
+        }
+        int tw = maxTextW + pad * 2;
+        int th = pad * 2 + lines.Count * lineH;
 
         // Posizione: a sinistra del pannello
         int tx = x - 5 - tw - 4;
@@ -280,8 +335,8 @@ public class Obj_GuiStatsPanel : GameElement
         if (ty + th > Rendering.camera.screenHeight - 2)
             ty = Rendering.camera.screenHeight - th - 2;
 
-        Color tooltipBg = new Color(20, 20, 32, 240);
-        Color border = new Color(70, 70, 100, 255);
+        Color tooltipBg = new Color(15, 15, 25, 245);
+        Color border = new Color(80, 80, 120, 255);
 
         Graphics.DrawRectangleRounded(
             new Rectangle(tx - 2, ty - 2, tw + 4, th + 4),
@@ -304,11 +359,11 @@ public class Obj_GuiStatsPanel : GameElement
         var stats = Game.pianta.Stats;
         var logic = Game.pianta.proprieta;
 
-        Color white = new Color(200, 200, 210, 255);
-        Color good  = new Color(80, 200, 80, 255);
-        Color warn  = new Color(220, 200, 50, 255);
-        Color bad   = new Color(230, 150, 50, 255);
-        Color crit  = new Color(220, 80, 80, 255);
+        Color white = new Color(220, 220, 230, 255);
+        Color good  = new Color(100, 240, 100, 255);
+        Color warn  = new Color(255, 235, 80, 255);
+        Color bad   = new Color(255, 180, 70, 255);
+        Color crit  = new Color(255, 100, 100, 255);
 
         switch (statId)
         {

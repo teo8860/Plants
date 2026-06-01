@@ -51,6 +51,8 @@ public class Obj_GuiMorte : GameElement
     {
         if (!active) return;
 
+        InputGate.ConsumeMouse();
+
         float dt = Time.GetFrameTime();
         timer += dt;
         fadeProgress = Math.Min(1f, timer / 1.0f);

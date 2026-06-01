@@ -23,14 +23,14 @@ public class Obj_GuiSeedUpgradePanel : GameElement
     private Color buttonColor = new Color(60, 100, 160, 255);
     private Color buttonHoverColor = new Color(80, 130, 200, 255);
     private Color buttonDisabledColor = new Color(40, 40, 50, 200);
-    private Color essenceColor = new Color(180, 100, 255, 255);
+    private Color essenceColor = new Color(210, 150, 255, 255);
     private Color statBarBg = new Color(30, 30, 40, 255);
     private Color statBarFill = new Color(100, 180, 255, 255);
     private Color maxLevelColor = new Color(255, 200, 50, 255);
 
     // Layout
     private int panelWidth = 350;
-    private int panelHeight = 480;
+    private int panelHeight = 400;
     private const int NAV_BAR_HEIGHT = 45;
 
     // Interazione
@@ -89,6 +89,8 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         if (!isOpen || currentSeed == null)
             return;
 
+        InputGate.ConsumeMouse();
+
         if (Input.IsKeyPressed(KeyboardKey.Escape))
         {
             Close();
@@ -114,9 +116,9 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         hoveredActionButton = -1;
 
         // Check hover sulle statistiche
-        int statsY = panelY + 120;
-        int statHeight = 40;
-        int statSpacing = 4;
+        int statsY = panelY + 100;
+        int statHeight = 36;
+        int statSpacing = 3;
 
         for (int i = 0; i < StatTypes.Length; i++)
         {
@@ -138,11 +140,9 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         }
 
         // Check hover sui pulsanti azione
-        int buttonY = panelY + panelHeight - 50;
         int buttonW = 120;
         int buttonH = 32;
-
-        // Pulsante Sacrifica
+        int buttonY = panelY + panelHeight - 45;
         int sacrificeX = panelX + 15;
         if (mx >= sacrificeX && mx <= sacrificeX + buttonW &&
             my >= buttonY && my <= buttonY + buttonH)
@@ -242,13 +242,13 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         DrawHeader(panelX, panelY);
 
         // Essenza
-        DrawEssenceDisplay(panelX, panelY + 70);
+        DrawEssenceDisplay(panelX, panelY + 65);
 
         // Statistiche
-        DrawStats(panelX, panelY + 120);
+        DrawStats(panelX, panelY + 100);
 
         // Pulsanti azione
-        DrawActionButtons(panelX, panelY + currentPanelH - 50);
+        DrawActionButtons(panelX, panelY + currentPanelH - 45);
     }
 
     private void DrawHeader(int panelX, int panelY)
@@ -260,12 +260,14 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         );
 
         string title = "MIGLIORA SEME";
-        GuiTheme.DrawText(title, panelX + panelWidth / 2 - 60, panelY + 20, 14, Color.White);
+        int titleW = GuiTheme.MeasureText(title, 12);
+        GuiTheme.DrawText(title, panelX + (panelWidth - titleW) / 2, panelY + 18, 12, Color.White);
 
         // Rarità
         Color rarityColor = SeedDefinitions.GetRarityColor(currentSeed.rarity);
         string rarityText = SeedDefinitions.GetRarityName(currentSeed.rarity);
-        GuiTheme.DrawText(rarityText, panelX + panelWidth / 2 - GuiTheme.MeasureText(rarityText) / 2, panelY + 40, 10, rarityColor);
+        int rarityW = GuiTheme.MeasureText(rarityText, 10);
+        GuiTheme.DrawText(rarityText, panelX + (panelWidth - rarityW) / 2, panelY + 38, 10, rarityColor);
     }
 
     private void DrawEssenceDisplay(int panelX, int y)
@@ -277,8 +279,10 @@ public class Obj_GuiSeedUpgradePanel : GameElement
             0.2f, 6, new Color(30, 25, 40, 255)
         );
 
-        GuiTheme.DrawText("ESSENZA:", panelX + 25, y + 8, 11, new Color(200, 200, 220, 255));
-        GuiTheme.DrawText(essence.ToString(), panelX + 100, y + 8, 14, essenceColor);
+        string label = "ESSENZA:";
+        GuiTheme.DrawText(label, panelX + 25, y + 10, 10, new Color(200, 200, 220, 255));
+        int labelW = GuiTheme.MeasureText(label, 10);
+        GuiTheme.DrawText(essence.ToString(), panelX + 25 + labelW + 8, y + 10, 12, essenceColor);
 
         // Icona essenza (cristallo)
         int iconX = panelX + panelWidth - 45;
@@ -290,8 +294,8 @@ public class Obj_GuiSeedUpgradePanel : GameElement
     {
         int maxLevel = SeedUpgradeSystem.GetMaxUpgradeLevel(currentSeed);
 
-        int statHeight = 40;
-        int statSpacing = 4;
+        int statHeight = 36;
+        int statSpacing = 3;
 
         for (int i = 0; i < StatTypes.Length; i++)
         {
@@ -326,29 +330,32 @@ public class Obj_GuiSeedUpgradePanel : GameElement
                 0.15f, 6, 2, borderColor
             );
 
-            // Nome stat
-            GuiTheme.DrawText(StatNames[i], statX + 8, statY + 6, 10, Color.White);
+            // Nome stat (top-left)
+            GuiTheme.DrawText(StatNames[i], statX + 8, statY + 5, 10, Color.White);
 
-            // Livello
-            string levelText = isMaxLevel ? "MAX" : $"{currentLevel}/{maxLevel}";
+            // Livello (bottom-left)
+            string levelText = isMaxLevel ? "MAX" : $"Lv {currentLevel}/{maxLevel}";
             Color levelColor = isMaxLevel ? maxLevelColor : new Color(150, 200, 255, 255);
-            GuiTheme.DrawText(levelText, statX + 8, statY + 21, 9, levelColor);
+            GuiTheme.DrawText(levelText, statX + 8, statY + 19, 10, levelColor);
 
-            // Costo
+            // Costo (bottom-right, right-aligned)
             if (!isMaxLevel)
             {
                 Color costColor = canUpgrade ? essenceColor : new Color(100, 100, 120, 255);
-                GuiTheme.DrawText($"{cost}", statX + statW - 60, statY + 21, 9, costColor);
-                DrawEssenceIcon(statX + statW - 15, statY + 26, 8);
+                string costText = $"{cost}";
+                int costTW = GuiTheme.MeasureText(costText, 10);
+                int iconSpace = 18;
+                GuiTheme.DrawText(costText, statX + statW - 10 - iconSpace - costTW, statY + 19, 10, costColor);
+                DrawEssenceIcon(statX + statW - 16, statY + 25, 7);
             }
 
             // Barra di progresso
             if (maxLevel > 0)
             {
                 int barW = statW - 16;
-                int barH = 4;
+                int barH = 3;
                 int barX = statX + 8;
-                int barY = statY + statHeight - 8;
+                int barY = statY + statHeight - 6;
 
                 Graphics.DrawRectangle(barX, barY, barW, barH, new Color(20, 20, 30, 255));
 
@@ -382,8 +389,9 @@ public class Obj_GuiSeedUpgradePanel : GameElement
 
         // Mostra valore essenza
         string valueText = $"+{sacrificeValue}";
-        GuiTheme.DrawText(valueText, sacrificeX + 15, buttonY + 17, 9, essenceColor);
-        DrawEssenceIcon(sacrificeX + 15 + GuiTheme.MeasureText(valueText, 9), buttonY + 22, 6);
+        int valW = GuiTheme.MeasureText(valueText, 10);
+        GuiTheme.DrawText(valueText, sacrificeX + 15, buttonY + 18, 10, essenceColor);
+        DrawEssenceIcon(sacrificeX + 15 + valW + 8, buttonY + 23, 5);
 
         // Pulsante Chiudi
         int closeX = panelX + panelWidth - 15 - buttonW;
@@ -395,7 +403,9 @@ public class Obj_GuiSeedUpgradePanel : GameElement
             0.25f, 6, closeBg
         );
 
-        GuiTheme.DrawText("Chiudi", closeX + 38, buttonY + 9, 11, Color.White);
+        string chiudiText = "Chiudi";
+        int chiudiW = GuiTheme.MeasureText(chiudiText, 10);
+        GuiTheme.DrawText(chiudiText, closeX + (buttonW - chiudiW) / 2, buttonY + 10, 10, Color.White);
     }
 
     private void DrawEssenceIcon(int x, int y, int size)

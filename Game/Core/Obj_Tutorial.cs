@@ -162,6 +162,8 @@ namespace Plants
         {
             if (!isTutorialActive) return;
 
+            InputGate.ConsumeMouse();
+
             float deltaTime = Time.GetFrameTime();
             buttonPulse += deltaTime * 3f;
             

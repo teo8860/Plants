@@ -246,7 +246,7 @@ public static class Game
 
         GameElement.Create<Obj_GuiScrollbar>(100);
 
-        statsPanel = new Obj_GuiStatsPanel(Rendering.camera.screenWidth - 180 - 6, Rendering.camera.screenHeight - 487);
+        statsPanel = new Obj_GuiStatsPanel(Rendering.camera.screenWidth - Obj_GuiStatsPanel.PANEL_W - 6, Rendering.camera.screenHeight - 487);
 
 
         GameElement.Create<Obj_GuiBottomNavigation>(-600);

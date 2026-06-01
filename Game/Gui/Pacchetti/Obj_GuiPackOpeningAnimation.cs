@@ -216,6 +216,8 @@ public class Obj_GuiPackOpeningAnimation : GameElement
     {
         if (currentPhase == PackOpeningPhase.Idle) return;
 
+        InputGate.ConsumeMouse();
+
         float deltaTime = Time.GetFrameTime();
         phaseTimer += deltaTime;
         clickPromptPulse += deltaTime;

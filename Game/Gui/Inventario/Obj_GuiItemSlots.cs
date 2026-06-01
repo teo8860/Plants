@@ -83,6 +83,9 @@ public class Obj_GuiItemSlots : GameElement
 
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
+
+        if (InputGate.MouseConsumed) return;
+
         bool clicked = Input.IsMouseButtonPressed(MouseButton.Left);
 
         int panelX = Rendering.camera.screenWidth - (int)(Game.seedDetailPanel.PanelWidth * Game.seedDetailPanel.SlideProgress);
@@ -92,6 +95,7 @@ public class Obj_GuiItemSlots : GameElement
         // Se picker e' aperto, gestisci click sul picker
         if (pickerOpen)
         {
+            InputGate.ConsumeMouse();
             UpdatePicker(mx, my, clicked, seed, panelX);
             return;
         }
