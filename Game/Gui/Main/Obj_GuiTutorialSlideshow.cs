@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Raylib_CSharp;
 using Raylib_CSharp.Colors;
@@ -23,14 +24,17 @@ namespace Plants
     public class Obj_GuiTutorialSlideshow : GameElement
     {
         // Layout
-        private const int PanelW       = 240;
-        private const int PanelH       = 165;
+        private const int PanelW       = 260;
+        private const int MinPanelH    = 165;
         private const int HeaderH      = 26;
         private const int FooterH      = 32;
         private const int BtnW         = 76;
         private const int BtnH         = 22;
-        private const int IconAreaW    = 60;  // larghezza colonna icona (layout a due colonne)
-        private const int IconSize     = 44;  // px di display per l'icona
+        private const int IconAreaW    = 60;
+        private const int IconSize     = 44;
+        private const int LineH        = 15;
+        private const int BodyFontSize = 11;
+        private const int BodyPadding  = 10;
 
         // Colori
         private static readonly Color OverlayColor  = new Color(0,   0,   0,   140);
@@ -52,16 +56,19 @@ namespace Plants
         private TutorialSlide[] slides = Array.Empty<TutorialSlide>();
         private int currentIndex = 0;
         private Action? onComplete;
+        private Action? onSkip;
 
         // Hover
         private bool hoverNext = false;
         private bool hoverPrev = false;
+        private bool hoverSkip = false;
 
         // Screen helpers
         private int sw => Rendering.camera.screenWidth;
         private int sh => Rendering.camera.screenHeight;
         private int panelX => (sw - PanelW) / 2;
-        private int panelY => (sh - PanelH) / 2;
+        private int currentPanelH = MinPanelH;
+        private int panelY => (sh - currentPanelH) / 2;
 
         public Obj_GuiTutorialSlideshow()
         {
@@ -73,11 +80,12 @@ namespace Plants
         // ── API pubblica ────────────────────────────────────────────
 
         /// <summary>Mostra le slide. onDone viene chiamato quando il player clicca "Capito!" sull'ultima.</summary>
-        public void Show(TutorialSlide[] slideList, Action? onDone = null)
+        public void Show(TutorialSlide[] slideList, Action? onDone = null, Action? onSkipTutorial = null)
         {
             slides = slideList;
             currentIndex = 0;
             onComplete = onDone;
+            onSkip = onSkipTutorial;
             isVisible = true;
         }
 
@@ -94,15 +102,23 @@ namespace Plants
         {
             if (!isVisible || slides.Length == 0) return;
 
+            currentPanelH = ComputePanelH(slides[currentIndex]);
+
             int mx = Input.GetMouseX();
             int my = Input.GetMouseY();
 
             hoverNext = Contains(NextBtnRect(), mx, my);
             hoverPrev = currentIndex > 0 && Contains(PrevBtnRect(), mx, my);
+            hoverSkip = onSkip != null && Contains(SkipBtnRect(), mx, my);
 
             if (Input.IsMouseButtonPressed(MouseButton.Left))
             {
-                if (hoverNext)
+                if (hoverSkip)
+                {
+                    isVisible = false;
+                    onSkip?.Invoke();
+                }
+                else if (hoverNext)
                 {
                     if (currentIndex < slides.Length - 1)
                         currentIndex++;
@@ -123,18 +139,19 @@ namespace Plants
             if (!isVisible || slides.Length == 0) return;
 
             var slide = slides[currentIndex];
+            currentPanelH = ComputePanelH(slide);
             int px = panelX;
             int py = panelY;
 
             Graphics.DrawRectangle(0, 0, sw, sh, OverlayColor);
 
             // Pannello
-            Graphics.DrawRectangleRounded(new Rectangle(px, py, PanelW, PanelH), 0.08f, 8, PanelBg);
-            Graphics.DrawRectangleRoundedLines(new Rectangle(px, py, PanelW, PanelH), 0.08f, 8, 2, PanelBorder);
+            Graphics.DrawRectangleRounded(new Rectangle(px, py, PanelW, currentPanelH), 0.08f, 8, PanelBg);
+            Graphics.DrawRectangleRoundedLines(new Rectangle(px, py, PanelW, currentPanelH), 0.08f, 8, 2, PanelBorder);
 
             // Header
             Graphics.DrawRectangleRounded(new Rectangle(px, py, PanelW, HeaderH), 0.2f, 8, HeaderBg);
-            int titleW = TextManager.MeasureText(slide.Titolo, 14);
+            int titleW = GuiTheme.MeasureText(slide.Titolo, 14);
             GuiTheme.DrawText(slide.Titolo, px + (PanelW - titleW) / 2, py + 7, 14, TextColor);
 
             // Corpo: layout a una o due colonne
@@ -146,52 +163,91 @@ namespace Plants
 
             DrawDots(px, py);
             DrawButtons(px, py, slide);
+            if (onSkip != null) DrawSkipButton();
+        }
+
+        private static List<string> WrapLines(string[] lines, int maxWidth, int fontSize)
+        {
+            var result = new List<string>();
+            foreach (var line in lines)
+            {
+                if (line.Length == 0)
+                {
+                    result.Add("");
+                    continue;
+                }
+                int w = GuiTheme.MeasureText(line, fontSize);
+                if (w <= maxWidth)
+                {
+                    result.Add(line);
+                    continue;
+                }
+                var words = line.Split(' ');
+                string current = "";
+                foreach (var word in words)
+                {
+                    string test = current.Length == 0 ? word : current + " " + word;
+                    if (GuiTheme.MeasureText(test, fontSize) > maxWidth && current.Length > 0)
+                    {
+                        result.Add(current);
+                        current = word;
+                    }
+                    else
+                    {
+                        current = test;
+                    }
+                }
+                if (current.Length > 0)
+                    result.Add(current);
+            }
+            return result;
+        }
+
+        private int ComputePanelH(TutorialSlide slide)
+        {
+            bool hasVisual = slide.Icon != null || slide.DrawExtra != null;
+            int maxW = hasVisual ? PanelW - IconAreaW - 20 : PanelW - 16;
+            var wrapped = WrapLines(slide.Righe, maxW, BodyFontSize);
+            int bodyH = wrapped.Count * LineH + BodyPadding * 2;
+            return Math.Max(MinPanelH, HeaderH + bodyH + FooterH);
         }
 
         // Testo centrato — nessuna icona
         private void DrawBodyText(TutorialSlide slide, int px, int py)
         {
-            int textY = py + HeaderH + 10;
-            foreach (var riga in slide.Righe)
+            int maxW = PanelW - 16;
+            var wrapped = WrapLines(slide.Righe, maxW, BodyFontSize);
+            int textY = py + HeaderH + BodyPadding;
+            foreach (var riga in wrapped)
             {
                 if (riga.Length > 0)
                 {
-                    int rigaW = TextManager.MeasureText(riga, 11);
+                    int rigaW = GuiTheme.MeasureText(riga, BodyFontSize);
                     int clampedX = px + Math.Max(4, (PanelW - rigaW) / 2);
-                    GuiTheme.DrawText(riga, clampedX, textY, 11, SubTextColor);
+                    GuiTheme.DrawText(riga, clampedX, textY, BodyFontSize, SubTextColor);
                 }
-                textY += 15;
+                textY += LineH;
             }
         }
 
         // Testo a sinistra + icona/custom a destra
         private void DrawBodyTwoColumns(TutorialSlide slide, int px, int py)
         {
-            int bodyTop  = py + HeaderH + 8;
-            int textColW = PanelW - IconAreaW - 12;
+            int bodyTop  = py + HeaderH + BodyPadding;
+            int textColW = PanelW - IconAreaW - 20;
             int textX    = px + 8;
 
-            // Testo colonna sinistra — riduci font se riga supera la colonna
+            var wrapped = WrapLines(slide.Righe, textColW, BodyFontSize);
             int textY = bodyTop;
-            foreach (var riga in slide.Righe)
+            foreach (var riga in wrapped)
             {
                 if (riga.Length > 0)
-                {
-                    int fs = 11;
-                    int w = TextManager.MeasureText(riga, fs);
-                    while (w > textColW && fs > 8)
-                    {
-                        fs--;
-                        w = TextManager.MeasureText(riga, fs);
-                    }
-                    GuiTheme.DrawText(riga, textX, textY, fs, SubTextColor);
-                }
-                textY += 15;
+                    GuiTheme.DrawText(riga, textX, textY, BodyFontSize, SubTextColor);
+                textY += LineH;
             }
 
-            // Colonna destra: area icona
             int iconColX  = px + PanelW - IconAreaW - 4;
-            int iconBodyH = PanelH - HeaderH - FooterH;
+            int iconBodyH = currentPanelH - HeaderH - FooterH;
             int iconAreaY = py + HeaderH + (iconBodyH - IconSize) / 2;
 
             // Sfondo icona
@@ -220,7 +276,7 @@ namespace Plants
             const int dotGap  = 4;
             int totalW     = slides.Length * dotSize + (slides.Length - 1) * dotGap;
             int dotStartX  = px + (PanelW - totalW) / 2;
-            int dotY       = py + PanelH - FooterH + 5;
+            int dotY       = py + currentPanelH - FooterH + 5;
 
             for (int i = 0; i < slides.Length; i++)
             {
@@ -240,7 +296,7 @@ namespace Plants
             var rNext = NextBtnRect();
             Color nextCol = hoverNext ? BtnHoverColor : BtnColor;
             Graphics.DrawRectangleRounded(rNext, 0.3f, 8, nextCol);
-            int nextW = TextManager.MeasureText(nextLabel, 11);
+            int nextW = GuiTheme.MeasureText(nextLabel, 11);
             GuiTheme.DrawText(nextLabel,
                 (int)(rNext.X + (rNext.Width - nextW) / 2),
                 (int)(rNext.Y + 5), 11, TextColor);
@@ -252,7 +308,7 @@ namespace Plants
                 Color prevCol = hoverPrev ? BtnHoverColor : BtnDisabled;
                 Graphics.DrawRectangleRounded(rPrev, 0.3f, 8, prevCol);
                 string prevLabel = "< Indietro";
-                int prevW = TextManager.MeasureText(prevLabel, 11);
+                int prevW = GuiTheme.MeasureText(prevLabel, 11);
                 GuiTheme.DrawText(prevLabel,
                     (int)(rPrev.X + (rPrev.Width - prevW) / 2),
                     (int)(rPrev.Y + 5), 11, TextColor);
@@ -262,10 +318,31 @@ namespace Plants
         // ── Rects ──────────────────────────────────────────────────
 
         private Rectangle NextBtnRect() =>
-            new Rectangle(panelX + PanelW - BtnW - 10, panelY + PanelH - BtnH - 6, BtnW, BtnH);
+            new Rectangle(panelX + PanelW - BtnW - 10, panelY + currentPanelH - BtnH - 6, BtnW, BtnH);
 
-        private Rectangle PrevBtnRect() =>
-            new Rectangle(panelX + 10, panelY + PanelH - BtnH - 6, BtnW, BtnH);
+        private Rectangle PrevBtnRect()
+        {
+            if (onSkip != null)
+                return new Rectangle(panelX + (PanelW - BtnW) / 2, panelY + currentPanelH - BtnH - 6, BtnW, BtnH);
+            return new Rectangle(panelX + 10, panelY + currentPanelH - BtnH - 6, BtnW, BtnH);
+        }
+
+        private static readonly Color SkipBtnColor      = new Color(140, 60, 50, 255);
+        private static readonly Color SkipBtnHoverColor = new Color(180, 75, 60, 255);
+
+        private Rectangle SkipBtnRect() =>
+            new Rectangle(panelX + 10, panelY + currentPanelH - BtnH - 6, BtnW, BtnH);
+
+        private void DrawSkipButton()
+        {
+            var r = SkipBtnRect();
+            Color bg = hoverSkip ? SkipBtnHoverColor : SkipBtnColor;
+            Graphics.DrawRectangleRounded(r, 0.3f, 8, bg);
+
+            string label = "Salta >>";
+            int lw = GuiTheme.MeasureText(label, 11);
+            GuiTheme.DrawText(label, (int)(r.X + (r.Width - lw) / 2), (int)(r.Y + 5), 11, TextColor);
+        }
 
         private static bool Contains(Rectangle r, int mx, int my) =>
             mx >= r.X && mx <= r.X + r.Width && my >= r.Y && my <= r.Y + r.Height;

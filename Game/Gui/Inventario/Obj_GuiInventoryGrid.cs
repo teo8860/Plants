@@ -35,6 +35,8 @@ public class Obj_GuiInventoryGrid : GameElement
     public Obj_GuiSeedDetailPanel detailPanel;
 
     private SeedRarity? rarityFilter = null;
+    private bool showAllRarities = false;
+    private bool showAllHovered = false;
     private List<Seed> filteredSeeds = new();
     private List<Obj_Seed> visualSeedList = new();
 
@@ -237,6 +239,38 @@ public class Obj_GuiInventoryGrid : GameElement
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked)
             sortConsumed = sorter.HandleInput();
 
+        var fusionManager = SeedFusionManager.Get();
+        bool inFusionMode = fusionManager.IsFusionMode;
+
+        int maxX = GetGridMaxX();
+        int sortX = startX;
+        int sortW = Math.Max(120, maxX - startX - 10);
+        if (sortW > 260) sortW = 260;
+
+        if (inFusionMode)
+        {
+            int btnX = sortX + sortW + 10;
+            int btnY = 44;
+            int btnW = 60;
+            int btnH = 18;
+
+            showAllHovered = mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH;
+
+            if (Input.IsMouseButtonPressed(MouseButton.Left) && showAllHovered)
+            {
+                showAllRarities = !showAllRarities;
+                if (showAllRarities)
+                    ClearRarityFilter();
+                else if (Game.inventoryCrates != null && Game.inventoryCrates.SelectedRarity.HasValue)
+                    SetRarityFilter(Game.inventoryCrates.SelectedRarity.Value);
+            }
+        }
+        else
+        {
+            showAllHovered = false;
+            showAllRarities = false;
+        }
+
         // === Scrollbar drag ===
         var track = GetScrollbarTrackRect();
         var thumb = GetScrollbarThumbRect();
@@ -312,7 +346,6 @@ public class Obj_GuiInventoryGrid : GameElement
         int columnsCurrent = GetCurrentColumns();
         int gridTop = startY;
         int gridBottom = startY + visibleHeight;
-        var fusionManager = SeedFusionManager.Get();
 
         for (int i = 0; i < visualSeedList.Count; i++)
         {
@@ -364,6 +397,24 @@ public class Obj_GuiInventoryGrid : GameElement
         if (sortW > 260) sortW = 260;
         sorter.Draw(sortX, 44, sortW);
 
+        var fusionManager = SeedFusionManager.Get();
+        bool inFusionMode = fusionManager.IsFusionMode;
+        if (inFusionMode)
+        {
+            int btnX = sortX + sortW + 10;
+            int btnY = 44;
+            int btnW = 60;
+            int btnH = 18;
+
+            Color btnBg = showAllHovered ? new Color(120, 90, 55, 255) : new Color(101, 67, 43, 255);
+            Color btnBorder = showAllRarities ? new Color(100, 200, 100, 255) : new Color(62, 39, 25, 255);
+            Color btnText = new Color(245, 235, 220, 255);
+
+            Graphics.DrawRectangle(btnX, btnY, btnW, btnH, btnBg);
+            Graphics.DrawRectangleLines(btnX, btnY, btnW, btnH, btnBorder);
+            GuiTheme.DrawText(showAllRarities ? "Mostra uno" : "Mostra tutto", btnX + 5, btnY + 5, 10, btnText);
+        }
+
         // Riserva spazio per la scrollbar se c'è overflow
         int contentHeight = GetContentHeight();
         bool hasOverflow = contentHeight > visibleHeight;
@@ -375,7 +426,6 @@ public class Obj_GuiInventoryGrid : GameElement
         Graphics.BeginScissorMode(scissorX, startY, scissorW, visibleHeight);
 
         int rows = (int)Math.Ceiling((float)filteredSeeds.Count / columns);
-        var fusionManager = SeedFusionManager.Get();
 
         for (int row = 0; row < rows; row++)
         {

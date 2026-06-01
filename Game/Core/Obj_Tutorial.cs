@@ -185,8 +185,6 @@ namespace Plants
             switch (currentPhase)
             {
                 case TutorialPhase.Intro:
-                    if (!Game.tutorialSlideshow.IsVisible)
-                        CheckSkipButton();
                     break;
 
                 case TutorialPhase.SemeFluttuante:
@@ -1065,7 +1063,7 @@ namespace Plants
                 ? () => { currentPhase = TutorialPhase.MostraPopupTerra; animationProgress = 0f; }
                 : ResumeGrowth;
 
-            Game.tutorialSlideshow.Show(slides, onDone);
+            Game.tutorialSlideshow.Show(slides, onDone, onSkipTutorial: SkipTutorial);
         }
 
         public float GetGrowthSpeed()
@@ -1149,7 +1147,7 @@ namespace Plants
             {
                 currentPhase = TutorialPhase.SemeFluttuante;
                 animationProgress = 0f;
-            });
+            }, onSkipTutorial: SkipTutorial);
         }
     }
 
