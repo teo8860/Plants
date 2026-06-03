@@ -1,14 +1,11 @@
-﻿﻿using NotificationIconSharp;
+﻿using NotificationIconSharp;
 using Plants;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Windowing;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 namespace Plants;
 
 
@@ -43,13 +40,13 @@ internal static class Program
         CrashLogger.LogInfo("Program", $"Plants starting - Version: {typeof(Program).Assembly.GetName().Version}");
         CrashLogger.LogInfo("Program", $"Executable: {exeDir}");
 
-        // Windows Toast Notifications require an AUMID. Set it on the process and
-        // install a per-user Start Menu shortcut so the system can route toast activations
-        // back to this exe. Both steps are no-admin and idempotent.
-        const string AUMID = "Plants.Game";
-        ShortcutInstaller.SetProcessAumid(AUMID);
-        string exePath = Environment.ProcessPath ?? Path.Combine(exeDir, "Plants.exe");
-        ShortcutInstaller.EnsureShortcut(AUMID, "Plants", exePath);
+        if (OperatingSystem.IsWindows())
+        {
+            const string AUMID = "Plants.Game";
+            ShortcutInstaller.SetProcessAumid(AUMID);
+            string exePath = Environment.ProcessPath ?? Path.Combine(exeDir, "Plants.exe");
+            ShortcutInstaller.EnsureShortcut(AUMID, "Plants", exePath);
+        }
         
         try
         {
@@ -81,12 +78,13 @@ internal static class Program
             // logiche y=0..windowHeight. La barra stessa compensa aggiungendo TopBarHeight.
             Input.SetMouseOffset(0, (int)(-GameProperties.TopBarHeight * GameProperties.uiScaleMultiplier));
 
-            // rimuove la possibilità di minimizzare
-            IntPtr hwnd = Window.GetHandle();
-            uint style = GetWindowLong(hwnd, GWL_STYLE);
-            style &= ~WS_MINIMIZEBOX;
-            SetWindowLong(hwnd, GWL_STYLE, style);
-
+            if (OperatingSystem.IsWindows())
+            {
+                IntPtr hwnd = Window.GetHandle();
+                uint style = GetWindowLong(hwnd, GWL_STYLE);
+                style &= ~WS_MINIMIZEBOX;
+                SetWindowLong(hwnd, GWL_STYLE, style);
+            }
 
             SetupIcon();
             Window.SetPosition(Window.GetMonitorWidth(0) - GameProperties.physicalWindowWidth - 20, Window.GetMonitorHeight(0) - GameProperties.physicalWindowHeight - 50);
@@ -115,10 +113,13 @@ internal static class Program
         Window.Init(GameProperties.windowWidth, miniHeight, $"Plants - Minigioco");
         Window.ClearState(ConfigFlags.ResizableWindow);
 
-        IntPtr hwnd = Window.GetHandle();
-        uint style = GetWindowLong(hwnd, GWL_STYLE);
-        style &= ~WS_MINIMIZEBOX;
-        SetWindowLong(hwnd, GWL_STYLE, style);
+        if (OperatingSystem.IsWindows())
+        {
+            IntPtr hwnd = Window.GetHandle();
+            uint style = GetWindowLong(hwnd, GWL_STYLE);
+            style &= ~WS_MINIMIZEBOX;
+            SetWindowLong(hwnd, GWL_STYLE, style);
+        }
 
         // Centra la finestra
         int monW = Window.GetMonitorWidth(0);
@@ -149,7 +150,8 @@ internal static class Program
 
     private static void SetupIcon()
     {
-        // Carica icona nella barra delle applicazioni
+        if (!OperatingSystem.IsWindows()) return;
+
         Icon icon = Utility.LoadIconFromEmbedded("icon.ico", "Assets");
         trayIcon = new NativeTrayIcon(icon, "Plants");
         

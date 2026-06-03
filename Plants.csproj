@@ -16,9 +16,8 @@
   </PropertyGroup>
 
 	<PropertyGroup>
-		
-	 <PublishTrimmed>true</PublishTrimmed>
-		<TrimMode>partial</TrimMode>
+		<!-- PublishTrimmed and TrimMode are set via build.bat / build commands.
+		     Kept here as defaults only for publish profiles. -->
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 		<!-- Embed PDB directly into the single-file exe for crash debugging -->
 		<DebugType>embedded</DebugType>

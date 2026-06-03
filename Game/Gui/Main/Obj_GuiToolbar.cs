@@ -31,8 +31,8 @@ public class Obj_GuiToolbar : GameElement
     private Sprite arrowUpIcon;
     private Sprite menuIcon;
 
-    private Color panelColor = new Color(40, 40, 50, 220);
-    private Color panelBorder = new Color(80, 80, 100, 255);
+    private Color panelColor = new Color(62, 39, 25, 220);
+    private Color panelBorder = new Color(82, 54, 35, 255);
 
     private int menuWidth = 180;
 
@@ -41,9 +41,9 @@ public class Obj_GuiToolbar : GameElement
 
     private float menuButtonAlpha = 255f;
 
-    public Color ButtonFillColor = new Color(50, 50, 65, 255);
-    public Color ButtonHoverColor = new Color(70, 70, 90, 255);
-    public Color ButtonPressedColor = new Color(60, 60, 75, 255);
+    public Color ButtonFillColor = new Color(72, 48, 30, 255);
+    public Color ButtonHoverColor = new Color(110, 75, 48, 255);
+    public Color ButtonPressedColor = new Color(55, 35, 20, 255);
     public bool ShowMenuButton = true;
 
     public Obj_GuiToolbar(int x, int y, int buttonSize = 40, int spacing = 5, bool hasDropdown = true, bool dropUp = false, bool startOpen = false) : base()
@@ -126,8 +126,8 @@ public class Obj_GuiToolbar : GameElement
             button.CurrentAlpha = 255;
         }
 
-        button.BorderInactive = new Color(100, 100, 120, 255);
-        button.BorderActive = new Color(100, 100, 120, 255);
+    button.BorderInactive = new Color(62, 39, 25, 255);
+    button.BorderActive = new Color(62, 39, 25, 255);
 
         toolButtons.Add(button);
         UpdateButtonPositions();
@@ -312,7 +312,7 @@ public class Obj_GuiToolbar : GameElement
                        (hovered ? new Color(ButtonHoverColor.R, ButtonHoverColor.G, ButtonHoverColor.B, alpha) :
                                   new Color(ButtonFillColor.R, ButtonFillColor.G, ButtonFillColor.B, alpha));
 
-        Color borderColor = isActive ? new Color(100, 180, 255, alpha) : new Color(100, 100, 120, alpha);
+        Color borderColor = isActive ? new Color(200, 150, 80, alpha) : new Color(90, 60, 40, alpha);
 
         Graphics.DrawRectangleRounded(
             new Rectangle(x, y, buttonSize, buttonSize),

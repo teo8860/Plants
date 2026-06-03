@@ -25,16 +25,16 @@ public class Obj_GuiFusionResultPopup : GameElement
 
     // Colori
     private readonly Color overlay = new Color(0, 0, 0, 200);
-    private readonly Color panelBg = new Color(30, 35, 45, 250);
-    private readonly Color panelBorder = new Color(150, 150, 255, 255);
-    private readonly Color headerBg = new Color(60, 70, 100, 255);
+    private readonly Color panelBg = new Color(82, 54, 35, 250);
+    private readonly Color panelBorder = new Color(62, 39, 25, 255);
+    private readonly Color headerBg = new Color(62, 39, 25, 255);
     private readonly Color headerText = new Color(255, 230, 150, 255);
     private readonly Color textColor = new Color(240, 240, 240, 255);
     private readonly Color dimText = new Color(170, 170, 185, 255);
-    private readonly Color sectionDivider = new Color(80, 80, 120, 180);
-    private readonly Color barBg = new Color(20, 25, 20, 220);
-    private readonly Color buttonColor = new Color(90, 130, 200, 255);
-    private readonly Color buttonHover = new Color(120, 170, 240, 255);
+    private readonly Color sectionDivider = new Color(62, 39, 25, 180);
+    private readonly Color barBg = new Color(41, 26, 17, 220);
+    private readonly Color buttonColor = new Color(101, 67, 43, 255);
+    private readonly Color buttonHover = new Color(139, 90, 55, 255);
     private readonly Color betterColor = new Color(100, 220, 100, 255);
     private readonly Color midColor = new Color(230, 200, 90, 255);
     private readonly Color worseColor = new Color(220, 100, 100, 255);

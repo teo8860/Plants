@@ -10,13 +10,7 @@ namespace Plants;
 public static class WindowStateHelper
 {
     [DllImport("user32.dll")]
-    private static extern IntPtr GetForegroundWindow();
-
-    [DllImport("user32.dll")]
     private static extern IntPtr GetActiveWindow();
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
     /// <summary>
     /// Verifica se la finestra del gioco è in primo piano
@@ -25,26 +19,7 @@ public static class WindowStateHelper
     {
         try
         {
-            return !Window.IsHidden();
-            return  Window.IsFocused() &&  !Window.IsHidden();
-
-			/**
-             * 
-            bool foregroundWindow = GetForegroundWindow();
-            bool activeWindow = GetActiveWindow();
-			if (foregroundWindow == IntPtr.Zero || activeWindow == IntPtr.Zero)
-                return false;
-
-            // Ottieni il process ID della finestra in primo piano
-            GetWindowThreadProcessId(foregroundWindow, out uint foregroundProcessId);
-
-            // Ottieni il process ID corrente
-            uint currentProcessId = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
-
-            // Se il processo in primo piano è il nostro, siamo focati
-            return foregroundProcessId == currentProcessId;
-            * 
-             */
+            return Window.IsFocused() && !Window.IsHidden();
 		}
 		catch (Exception ex)
         {

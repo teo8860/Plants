@@ -54,7 +54,7 @@ public static class GuiTheme
     }
     public static void DrawText(string text, int x, int y, int fontSize)
     {
-        DrawText(text, x, y, fontSize);
+        DrawText(text, x, y, PanelText, fontSize);
     }
 
     public static void DrawText(string text, int x, int y, Color color)

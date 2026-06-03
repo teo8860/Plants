@@ -13,6 +13,7 @@ public class SeedFusionManager
     public int SelectedIndex2 { get; private set; } = -1;
 
     public bool IsFusionMode { get; private set; } = false;
+    public bool IsPanelOpen { get; private set; } = false;
     public bool CanFuse => SelectedSeed1 != null && SelectedSeed2 != null &&
                           SelectedSeed1.CanBeFused && SelectedSeed2.CanBeFused;
 
@@ -47,6 +48,16 @@ public class SeedFusionManager
     {
         IsFusionMode = false;
         ClearSelection();
+    }
+
+    public void OpenPanel()
+    {
+        IsPanelOpen = true;
+    }
+
+    public void ClosePanel()
+    {
+        IsPanelOpen = false;
     }
 
     public void ToggleSeedSelection(Seed seed, int index)

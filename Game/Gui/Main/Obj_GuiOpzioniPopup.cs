@@ -13,19 +13,19 @@ public class Obj_GuiOpzioniPopup : GameElement
     private bool closeHovered = false;
 
     private readonly Color overlayColor = new Color(0, 0, 0, 160);
-    private readonly Color panelBg = new Color(30, 32, 45, 245);
-    private readonly Color panelBorder = new Color(120, 130, 160, 255);
-    private readonly Color headerBg = new Color(55, 60, 85, 255);
+    private readonly Color panelBg = new Color(82, 54, 35, 245);
+    private readonly Color panelBorder = new Color(62, 39, 25, 255);
+    private readonly Color headerBg = new Color(62, 39, 25, 255);
     private readonly Color textColor = new Color(230, 230, 235, 255);
     private readonly Color subTextColor = new Color(160, 165, 180, 255);
-    private readonly Color buttonColor = new Color(80, 90, 120, 255);
-    private readonly Color buttonHoverColor = new Color(110, 120, 155, 255);
+    private readonly Color buttonColor = new Color(101, 67, 43, 255);
+    private readonly Color buttonHoverColor = new Color(139, 90, 55, 255);
     private readonly Color buttonActiveColor = new Color(90, 160, 110, 255);
     private readonly Color buttonActiveHoverColor = new Color(120, 190, 140, 255);
-    private readonly Color toggleOffColor = new Color(70, 75, 95, 255);
+    private readonly Color toggleOffColor = new Color(70, 48, 32, 255);
     private readonly Color toggleOnColor = new Color(90, 160, 110, 255);
     private readonly Color toggleKnobColor = new Color(230, 230, 235, 255);
-    private readonly Color noteColor = new Color(200, 170, 90, 255);
+    private readonly Color noteColor = new Color(200, 150, 80, 255);
 
     private int sw => Rendering.camera.screenWidth;
     private int sh => Rendering.camera.screenHeight;

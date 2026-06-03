@@ -18,14 +18,14 @@ public class Obj_GuiSeedUpgradePanel : GameElement
     private float animationSpeed = 8f;
 
     // Colori
-    private Color panelColor = new Color(35, 40, 50, 245);
-    private Color panelBorder = new Color(80, 120, 180, 255);
-    private Color buttonColor = new Color(60, 100, 160, 255);
-    private Color buttonHoverColor = new Color(80, 130, 200, 255);
-    private Color buttonDisabledColor = new Color(40, 40, 50, 200);
+    private Color panelColor = new Color(82, 54, 35, 245);
+    private Color panelBorder = new Color(62, 39, 25, 255);
+    private Color buttonColor = new Color(101, 67, 43, 255);
+    private Color buttonHoverColor = new Color(139, 90, 55, 255);
+    private Color buttonDisabledColor = new Color(60, 45, 30, 200);
     private Color essenceColor = new Color(210, 150, 255, 255);
-    private Color statBarBg = new Color(30, 30, 40, 255);
-    private Color statBarFill = new Color(100, 180, 255, 255);
+    private Color statBarBg = new Color(41, 26, 17, 255);
+    private Color statBarFill = new Color(200, 150, 80, 255);
     private Color maxLevelColor = new Color(255, 200, 50, 255);
 
     // Layout
@@ -280,7 +280,7 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         );
 
         string label = "ESSENZA:";
-        GuiTheme.DrawText(label, panelX + 25, y + 10, 10, new Color(200, 200, 220, 255));
+        GuiTheme.DrawText(label, panelX + 25, y + 10, 10, new Color(220, 210, 195, 255));
         int labelW = GuiTheme.MeasureText(label, 10);
         GuiTheme.DrawText(essence.ToString(), panelX + 25 + labelW + 8, y + 10, 12, essenceColor);
 
@@ -322,8 +322,8 @@ public class Obj_GuiSeedUpgradePanel : GameElement
 
             // Bordo
             Color borderColor = isMaxLevel ? maxLevelColor :
-                               canUpgrade ? (isHovered ? Color.White : new Color(100, 150, 200, 255)) :
-                               new Color(60, 60, 80, 255);
+                               canUpgrade ? (isHovered ? Color.White : new Color(180, 120, 70, 255)) :
+                                new Color(60, 45, 30, 255);
 
             Graphics.DrawRectangleRoundedLines(
                 new Rectangle(statX, statY, statW, statHeight),
@@ -335,7 +335,7 @@ public class Obj_GuiSeedUpgradePanel : GameElement
 
             // Livello (bottom-left)
             string levelText = isMaxLevel ? "MAX" : $"Lv {currentLevel}/{maxLevel}";
-            Color levelColor = isMaxLevel ? maxLevelColor : new Color(150, 200, 255, 255);
+            Color levelColor = isMaxLevel ? maxLevelColor : new Color(200, 150, 80, 255);
             GuiTheme.DrawText(levelText, statX + 8, statY + 19, 10, levelColor);
 
             // Costo (bottom-right, right-aligned)
@@ -397,7 +397,7 @@ public class Obj_GuiSeedUpgradePanel : GameElement
         int closeX = panelX + panelWidth - 15 - buttonW;
         bool closeHovered = hoveredActionButton == 1;
 
-        Color closeBg = closeHovered ? new Color(100, 100, 120, 255) : new Color(70, 70, 90, 255);
+        Color closeBg = closeHovered ? new Color(180, 120, 70, 255) : new Color(120, 80, 45, 255);
         Graphics.DrawRectangleRounded(
             new Rectangle(closeX, buttonY, buttonW, buttonH),
             0.25f, 6, closeBg

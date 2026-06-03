@@ -211,10 +211,10 @@ public class Obj_GuiTopDrawer : GameElement
     {
         bool active = b.IsToggle && (b.GetActive?.Invoke() ?? false);
 
-        Color fill = hovered ? new Color(110, 80, 140, alpha)
-                   : (active ? new Color(90, 160, 110, alpha)
-                             : new Color(60, 40, 80, alpha));
-        Color brd = active ? new Color(141, 232, 91, alpha) : new Color(20, 12, 28, alpha);
+        Color fill = hovered ? new Color(139, 90, 55, alpha)
+                   : (active ? new Color(120, 160, 80, alpha)
+                             : new Color(82, 54, 35, alpha));
+        Color brd = active ? new Color(200, 150, 80, alpha) : new Color(62, 39, 25, alpha);
 
         Graphics.DrawRectangleRounded(new Rectangle(x, y, ButtonSize, ButtonSize), 0.25f, 6, fill);
         Graphics.DrawRectangleRoundedLines(new Rectangle(x, y, ButtonSize, ButtonSize), 0.25f, 6, 1, brd);
@@ -246,7 +246,7 @@ public class Obj_GuiTopDrawer : GameElement
 
     private void DrawArrow(int cx, int cy, float progress)
     {
-        Color c = new Color(220, 210, 230, 255);
+        Color c = new Color(220, 210, 195, 255);
         // Mix tra ▼ (chiuso) e ▲ (aperto): rovescia in base a progress
         int dir = progress > 0.5f ? -1 : 1;
         int half = 3;

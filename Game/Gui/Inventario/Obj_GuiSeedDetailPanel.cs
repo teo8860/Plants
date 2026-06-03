@@ -19,10 +19,10 @@ public class Obj_GuiSeedDetailPanel : GameElement
     // Colori stile legno
     private Color panelColor = new Color(82, 54, 35, 245);
     private Color panelBorder = new Color(62, 39, 25, 255);
-    private Color buttonColor = new Color(101, 67, 43, 255);
-    private Color buttonHoverColor = new Color(139, 90, 55, 255);
-    private Color buttonActiveColor = new Color(100, 180, 255, 255);
-    private Color buttonBorder = new Color(62, 39, 25, 255);
+    private Color buttonColor = new Color(160, 105, 60, 255);
+    private Color buttonHoverColor = new Color(200, 140, 80, 255);
+    private Color buttonActiveColor = new Color(220, 170, 90, 255);
+    private Color buttonBorder = new Color(110, 70, 40, 255);
     private Color textColor = new Color(245, 235, 220, 255);
     private Color essenceColor = new Color(180, 100, 255, 255);
 
@@ -110,6 +110,10 @@ public class Obj_GuiSeedDetailPanel : GameElement
         if (Game.guiFusionResultPopup != null && Game.guiFusionResultPopup.IsVisible)
             return;
 
+        // Blocca interazione bottoni se il pannello fusione e' aperto
+        if (Game.fusionPanel != null && Game.fusionPanel.IsOpen)
+            return;
+
         int buttonHeight = 36;
         int buttonSpacing = 16;
         int buttonMargin = 12;
@@ -163,60 +167,21 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
     private void HandleFusion()
     {
-        var fusionManager = SeedFusionManager.Get();
+        if (Game.fusionPanel != null && Game.fusionPanel.IsOpen)
+            return;
 
-        if (fusionManager.IsFusionMode)
+        Seed preSelected = null;
+        int preSelectedIndex = -1;
+
+        if (Game.inventoryGrid != null)
         {
-            // Se siamo già in modalità fusione e abbiamo 2 semi selezionati, esegui la fusione
-            if (fusionManager.CanFuse)
-            {
-                // Cattura i riferimenti ai genitori PRIMA della fusione
-                // (PerformFusion() svuota la selezione del manager).
-                Seed parent1 = fusionManager.SelectedSeed1;
-                Seed parent2 = fusionManager.SelectedSeed2;
-
-                Seed fusedSeed = fusionManager.PerformFusion();
-
-                if (fusedSeed != null && Game.inventoryGrid != null)
-                {
-                    // Ripopola la griglia
-                    Game.inventoryGrid.Populate();
-
-                    // Mostra il popup con il risultato della fusione
-                    Game.guiFusionResultPopup?.Show(parent1, parent2, fusedSeed);
-
-                    // Mostra animazione o notifica (opzionale)
-                    Console.WriteLine($"Fusione completata! Nuovo seme: {fusedSeed.name} [{fusedSeed.rarity}]");
-                }
-            }
-            else
-            {
-                // Cancella la modalità fusione
-                fusionManager.StopFusionMode();
-            }
+            preSelectedIndex = Game.inventoryGrid.GetSelectedIndex();
+            preSelected = Game.inventoryGrid.GetSeedAtIndex(preSelectedIndex);
         }
-        else
+
+        if (Game.fusionPanel != null)
         {
-            // Entra in modalità fusione: se c'e' un seme selezionato, diventa
-            // automaticamente il primo seme della fusione. In ogni caso la
-            // selezione "base" viene rimossa per evitare confusione visiva
-            // (bordo arancione vs bordo blu di fusione).
-            Seed preSelected = null;
-            int preSelectedIndex = -1;
-
-            if (Game.inventoryGrid != null)
-            {
-                preSelectedIndex = Game.inventoryGrid.GetSelectedIndex();
-                preSelected = Game.inventoryGrid.GetSeedAtIndex(preSelectedIndex);
-            }
-
-            if (preSelected != null && preSelected.CanBeFused)
-                fusionManager.StartFusionMode(preSelected, preSelectedIndex);
-            else
-                fusionManager.StartFusionMode();
-
-            Game.inventoryGrid?.ClearSelection();
-            ClearSeed();
+            Game.fusionPanel.Open(preSelected, preSelectedIndex);
         }
     }
 

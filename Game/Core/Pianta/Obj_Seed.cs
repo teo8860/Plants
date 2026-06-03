@@ -3,10 +3,7 @@ using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Shaders;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Plants;
 

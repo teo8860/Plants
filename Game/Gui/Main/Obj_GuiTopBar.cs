@@ -130,15 +130,15 @@ public class Obj_GuiTopBar : GameElement
         int boxH = BarHeight - 6;
         int boxY = (BarHeight - boxH) / 2;
 
-        Color boxBg = new Color(20, 12, 28, 255);
-        Color boxBorder = new Color(0, 0, 0, 200);
+    Color boxBg = new Color(41, 26, 17, 255);
+    Color boxBorder = new Color(62, 39, 25, 200);
         Graphics.DrawRectangleRounded(new Rectangle(x, boxY, boxW, boxH), 0.45f, 6, boxBg);
         Graphics.DrawRectangleRoundedLines(new Rectangle(x, boxY, boxW, boxH), 0.45f, 6, 1, boxBorder);
 
         int cx = x + innerPadL + iconR;
         int cy = BarHeight / 2;
         Graphics.DrawCircleV(new Vector2(cx, cy), iconR, iconColor);
-        GuiTheme.DrawText(letter, cx - 2, cy - GuiTheme.FontSize / 2, new Color(20, 12, 28, 255), 8);
+        GuiTheme.DrawText(letter, cx - 2, cy - GuiTheme.FontSize / 2, new Color(41, 26, 17, 255), 8);
 
         int textX = cx + iconR + innerGap;
         GuiTheme.DrawText(txt, textX, y, GuiTheme.PanelText);

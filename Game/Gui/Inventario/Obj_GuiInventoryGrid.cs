@@ -35,19 +35,15 @@ public class Obj_GuiInventoryGrid : GameElement
     public Obj_GuiSeedDetailPanel detailPanel;
 
     private SeedRarity? rarityFilter = null;
-    private bool showAllRarities = false;
-    private bool showAllHovered = false;
     private List<Seed> filteredSeeds = new();
     private List<Obj_Seed> visualSeedList = new();
 
     private Color cellColor = new Color(101, 67, 43, 250);
     private Color cellHoverColor = new Color(139, 90, 55, 250);
     private Color cellSelectedColor = new Color(166, 118, 76, 250);
-    private Color cellFusionSelectedColor = new Color(100, 180, 255, 250);
     private Color cellMaxFusionColor = new Color(150, 50, 50, 250);
     private Color borderColor = new Color(62, 39, 25, 255);
     private Color borderSelectedColor = new Color(200, 150, 80, 255);
-    private Color borderFusionColor = new Color(100, 200, 255, 255);
     private Color borderMaxFusionColor = new Color(200, 50, 50, 255);
     private Color innerShadow = new Color(41, 26, 17, 180);
 
@@ -239,39 +235,11 @@ public class Obj_GuiInventoryGrid : GameElement
         if (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked)
             sortConsumed = sorter.HandleInput();
 
-        var fusionManager = SeedFusionManager.Get();
-        bool inFusionMode = fusionManager.IsFusionMode;
-
         int maxX = GetGridMaxX();
         int sortX = startX;
         int sortW = Math.Max(120, maxX - startX - 10);
         if (sortW > 260) sortW = 260;
 
-        if (inFusionMode)
-        {
-            int btnX = sortX + sortW + 10;
-            int btnY = 44;
-            int btnW = 60;
-            int btnH = 18;
-
-            showAllHovered = mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH;
-
-            if (Input.IsMouseButtonPressed(MouseButton.Left) && showAllHovered)
-            {
-                showAllRarities = !showAllRarities;
-                if (showAllRarities)
-                    ClearRarityFilter();
-                else if (Game.inventoryCrates != null && Game.inventoryCrates.SelectedRarity.HasValue)
-                    SetRarityFilter(Game.inventoryCrates.SelectedRarity.Value);
-            }
-        }
-        else
-        {
-            showAllHovered = false;
-            showAllRarities = false;
-        }
-
-        // === Scrollbar drag ===
         var track = GetScrollbarTrackRect();
         var thumb = GetScrollbarThumbRect();
         int contentHeight = GetContentHeight();
@@ -366,15 +334,10 @@ public class Obj_GuiInventoryGrid : GameElement
 
                 if (clicked)
                 {
-                    if (fusionManager.IsFusionMode)
-                        fusionManager.ToggleSeedSelection(filteredSeeds[i], i);
-                    else
-                    {
-                        selectedIndex = i;
-                        selectedSeedRef = filteredSeeds[i];
-                        detailPanel?.Open(i);
-                        OnSeedSelected?.Invoke(i);
-                    }
+                    selectedIndex = i;
+                    selectedSeedRef = filteredSeeds[i];
+                    detailPanel?.Open(i);
+                    OnSeedSelected?.Invoke(i);
                 }
 
                 break;
@@ -397,25 +360,6 @@ public class Obj_GuiInventoryGrid : GameElement
         if (sortW > 260) sortW = 260;
         sorter.Draw(sortX, 44, sortW);
 
-        var fusionManager = SeedFusionManager.Get();
-        bool inFusionMode = fusionManager.IsFusionMode;
-        if (inFusionMode)
-        {
-            int btnX = sortX + sortW + 10;
-            int btnY = 44;
-            int btnW = 60;
-            int btnH = 18;
-
-            Color btnBg = showAllHovered ? new Color(120, 90, 55, 255) : new Color(101, 67, 43, 255);
-            Color btnBorder = showAllRarities ? new Color(100, 200, 100, 255) : new Color(62, 39, 25, 255);
-            Color btnText = new Color(245, 235, 220, 255);
-
-            Graphics.DrawRectangle(btnX, btnY, btnW, btnH, btnBg);
-            Graphics.DrawRectangleLines(btnX, btnY, btnW, btnH, btnBorder);
-            GuiTheme.DrawText(showAllRarities ? "Mostra uno" : "Mostra tutto", btnX + 5, btnY + 5, 10, btnText);
-        }
-
-        // Riserva spazio per la scrollbar se c'è overflow
         int contentHeight = GetContentHeight();
         bool hasOverflow = contentHeight > visibleHeight;
         int gridRight = hasOverflow ? maxX - scrollbarWidth - scrollbarPadding * 2 : maxX;
@@ -456,11 +400,6 @@ public class Obj_GuiInventoryGrid : GameElement
                     bg = cellMaxFusionColor;
                     border = borderMaxFusionColor;
                 }
-                else if (fusionManager.IsFusionMode && fusionManager.IsSeedSelected(i))
-                {
-                    bg = cellFusionSelectedColor;
-                    border = borderFusionColor;
-                }
                 else if (i == selectedIndex)
                 {
                     bg = cellSelectedColor;
@@ -480,13 +419,6 @@ public class Obj_GuiInventoryGrid : GameElement
                 Graphics.DrawRectangleRoundedLines(
                     new Rectangle(x, y, cellSize, cellSize),
                     0.18f, 8, 3, border);
-
-                if (fusionManager.IsFusionMode && fusionManager.IsSeedSelected(i))
-                {
-                    int selectionNum = i == fusionManager.SelectedIndex1 ? 1 : 2;
-                    Graphics.DrawCircle(x + cellSize - 10, y + 10, 8, new Color(255, 255, 255, 200));
-                    GuiTheme.DrawText(selectionNum.ToString(), x + cellSize - 13, y + 4, 12, new Color(0, 0, 0, 255));
-                }
 
                 if (seed.stats.fusionCount > 0)
                     DrawFusionBar(x, y, seed.stats.fusionCount);

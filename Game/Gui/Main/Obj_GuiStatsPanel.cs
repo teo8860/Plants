@@ -335,8 +335,8 @@ public class Obj_GuiStatsPanel : GameElement
         if (ty + th > Rendering.camera.screenHeight - 2)
             ty = Rendering.camera.screenHeight - th - 2;
 
-        Color tooltipBg = new Color(15, 15, 25, 245);
-        Color border = new Color(80, 80, 120, 255);
+        Color tooltipBg = new Color(30, 18, 10, 245);
+        Color border = new Color(62, 39, 25, 255);
 
         Graphics.DrawRectangleRounded(
             new Rectangle(tx - 2, ty - 2, tw + 4, th + 4),
@@ -699,10 +699,10 @@ public class Obj_GuiStatsPanel : GameElement
         if (ty + th > Rendering.camera.screenHeight - 2)
             ty = Rendering.camera.screenHeight - th - 2;
 
-        Color tooltipBg = new Color(25, 25, 38, 245);
-        Color tooltipBorder = new Color(80, 80, 110, 255);
-        Color textAccent = new Color(100, 180, 255, 255);
-        Color textDim = new Color(170, 170, 195, 255);
+        Color tooltipBg = new Color(45, 30, 18, 245);
+        Color tooltipBorder = new Color(62, 39, 25, 255);
+        Color textAccent = new Color(200, 150, 80, 255);
+        Color textDim = new Color(170, 155, 135, 255);
 
         Graphics.DrawRectangleRounded(
             new Rectangle(tx - 2, ty - 2, tw + 4, th + 4),

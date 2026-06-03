@@ -57,7 +57,7 @@ public static class SeedStatsDrawer
                 Value = stats.idratazione,
                 MinVal = SeedStatScaling.StatMin,
                 MaxVal = SeedStatScaling.StatMax,
-                BarColor = new Color(60, 140, 220, 255) 
+                BarColor = new Color(139, 90, 55, 255) 
              },
             new() 
             { 
@@ -84,7 +84,7 @@ public static class SeedStatsDrawer
                 Value = stats.resistenzaFreddo,
                 MinVal = SeedStatScaling.StatMin,
                 MaxVal = SeedStatScaling.StatMax,
-                BarColor = new Color(120, 200, 255, 255)
+                BarColor = new Color(200, 150, 80, 255)
             },
             new() 
             { 

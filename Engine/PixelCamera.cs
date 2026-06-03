@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-using Raylib_CSharp.Camera.Cam2D;
+﻿using Raylib_CSharp.Camera.Cam2D;
 using Raylib_CSharp.Colors;
 using Raylib_CSharp.Interact;
 using Raylib_CSharp.Rendering;

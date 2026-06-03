@@ -8,9 +8,7 @@ using Raylib_CSharp.Transformations;
 using Raylib_CSharp.Windowing;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Numerics;
-using System.Xml.Linq;
 
 namespace Plants;
 
@@ -89,7 +87,8 @@ internal class Rendering
                 Window.SetState(ConfigFlags.HiddenWindow);
             }
 
-            Program.trayIcon?.LoopEventRender();
+            if (OperatingSystem.IsWindows())
+                Program.trayIcon?.LoopEventRender();
 
             // Window hidden/minimized: niente simulazione/draw pesante.
             // Manteniamo solo un BeginDrawing/EndDrawing vuoto a bassa frequenza per tenere

@@ -52,10 +52,12 @@ namespace Plants
         private TutorialSlide[] slides = Array.Empty<TutorialSlide>();
         private int currentIndex = 0;
         private Action? onComplete;
+        private Action? onSkipTutorial;
 
         // Hover
         private bool hoverNext = false;
         private bool hoverPrev = false;
+        private bool hoverSkip = false;
 
         // Screen helpers
         private int sw => Rendering.camera.screenWidth;
@@ -73,11 +75,12 @@ namespace Plants
         // ── API pubblica ────────────────────────────────────────────
 
         /// <summary>Mostra le slide. onDone viene chiamato quando il player clicca "Capito!" sull'ultima.</summary>
-        public void Show(TutorialSlide[] slideList, Action? onDone = null)
+        public void Show(TutorialSlide[] slideList, Action? onDone = null, Action? onSkipTutorial = null)
         {
             slides = slideList;
             currentIndex = 0;
             onComplete = onDone;
+            this.onSkipTutorial = onSkipTutorial;
             isVisible = true;
         }
 
@@ -101,6 +104,7 @@ namespace Plants
 
             hoverNext = Contains(NextBtnRect(), mx, my);
             hoverPrev = currentIndex > 0 && Contains(PrevBtnRect(), mx, my);
+            hoverSkip = onSkipTutorial != null && Contains(SkipBtnRect(), mx, my);
 
             if (Input.IsMouseButtonPressed(MouseButton.Left))
             {
@@ -111,9 +115,13 @@ namespace Plants
                     else
                         Complete();
                 }
-                else if (hoverPrev)
+                else if (hoverPrev && currentIndex > 0)
                 {
                     currentIndex--;
+                }
+                else if (hoverSkip)
+                {
+                    Skip();
                 }
             }
         }
@@ -259,6 +267,19 @@ namespace Plants
                     (int)(rPrev.X + (rPrev.Width - prevW) / 2),
                     (int)(rPrev.Y + 5), 11, TextColor);
             }
+
+            // Bottone Salta Tutorial
+            if (onSkipTutorial != null)
+            {
+                var rSkip = SkipBtnRect();
+                Color skipCol = hoverSkip ? BtnHoverColor : BtnDisabled;
+                Graphics.DrawRectangleRounded(rSkip, 0.3f, 6, skipCol);
+                string skipLabel = "Salta";
+                int skipW = TextManager.MeasureText(skipLabel, 9);
+                GuiTheme.DrawText(skipLabel,
+                    (int)(rSkip.X + (rSkip.Width - skipW) / 2),
+                    (int)(rSkip.Y + 3), 9, TextColor);
+            }
         }
 
         // ── Rects ──────────────────────────────────────────────────
@@ -269,6 +290,9 @@ namespace Plants
         private Rectangle PrevBtnRect() =>
             new Rectangle(panelX + 10, panelY + PanelH - BtnH - 6, BtnW, BtnH);
 
+        private Rectangle SkipBtnRect() =>
+            new Rectangle(panelX + (PanelW - 50) / 2, panelY + 4, 50, 16);
+
         private static bool Contains(Rectangle r, int mx, int my) =>
             mx >= r.X && mx <= r.X + r.Width && my >= r.Y && my <= r.Y + r.Height;
 
@@ -276,6 +300,12 @@ namespace Plants
         {
             isVisible = false;
             onComplete?.Invoke();
+        }
+
+        private void Skip()
+        {
+            isVisible = false;
+            onSkipTutorial?.Invoke();
         }
     }
 }
