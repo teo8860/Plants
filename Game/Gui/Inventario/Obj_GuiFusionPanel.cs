@@ -61,15 +61,15 @@ public class Obj_GuiFusionPanel : GameElement
     private Color separatorColor = new Color(82, 54, 35, 120);
 
     // Layout
-    private int panelWidth = 420;
-    private int panelHeight = 540;
+    private int panelWidth = 380;
+    private int panelHeight = 435;
     private const int NAV_BAR_HEIGHT = 45;
 
     // Browser state
     private List<Seed> browserSeeds = new();
     private int browserScrollY = 0;
-    private int browserCellSize = 40;
-    private int browserSpacing = 5;
+    private int browserCellSize = 38;
+    private int browserSpacing = 4;
     private int hoveredBrowserIndex = -1;
     private int browserColumns = 8;
     private bool isDraggingBrowserScroll = false;
@@ -362,13 +362,13 @@ public class Obj_GuiFusionPanel : GameElement
         hoveredBrowserIndex = -1;
         hoveredFilterIndex = -1;
 
-        int contentX = panelX + 15;
-        int contentW = panelWidth - 30;
+        int contentX = panelX + 12;
+        int contentW = panelWidth - 24;
 
-        int slotSize = 60;
-        int slot1X = contentX + 20;
-        int slot2X = contentX + contentW - 20 - slotSize;
-        int slotY = panelY + 70;
+        int slotSize = 48;
+        int slot1X = contentX + 45;
+        int slot2X = contentX + contentW - 45 - slotSize;
+        int slotY = panelY + 44;
 
         if (mx >= slot1X && mx <= slot1X + slotSize && my >= slotY && my <= slotY + slotSize)
         {
@@ -398,8 +398,8 @@ public class Obj_GuiFusionPanel : GameElement
 
         if (seed1 != null && seed2 != null)
         {
-            int statsY = panelY + 165;
-            int statH = 16;
+            int statsY = panelY + 116;
+            int statH = 14;
             for (int i = 0; i < statPreviews.Length; i++)
             {
                 int sy = statsY + i * statH;
@@ -411,18 +411,18 @@ public class Obj_GuiFusionPanel : GameElement
             }
         }
 
-        int filterBarY = panelY + 310;
+        int filterBarY = panelY + 243;
         UpdateFilterSortInput(mx, my, clicked, contentX, contentW, filterBarY);
 
-        int browserY = panelY + 335;
-        int browserH = 150;
+        int browserY = panelY + 266;
+        int browserH = 130;
         UpdateBrowserInput(mx, my, clicked, rightClicked, contentX, contentW, browserY, browserH);
 
-        int btnY = panelY + panelHeight - 45;
-        int btnW = 140;
-        int btnH = 32;
-        int fuseBtnX = contentX + (contentW / 2) - btnW - 10;
-        int closeBtnX = contentX + (contentW / 2) + 10;
+        int btnY = panelY + panelHeight - 35;
+        int btnW = 130;
+        int btnH = 28;
+        int fuseBtnX = contentX + (contentW / 2) - btnW - 8;
+        int closeBtnX = contentX + (contentW / 2) + 8;
 
         bool canFuse = seed1 != null && seed2 != null && seed1.CanBeFused && seed2.CanBeFused;
 
@@ -447,8 +447,7 @@ public class Obj_GuiFusionPanel : GameElement
 
     private void UpdateFilterSortInput(int mx, int my, bool clicked, int contentX, int contentW, int filterBarY)
     {
-        // Filter button
-        int filterBtnW = 90;
+        int filterBtnW = 85;
         int filterBtnH = 20;
         int filterBtnX = contentX;
 
@@ -482,7 +481,7 @@ public class Obj_GuiFusionPanel : GameElement
         }
 
         int sortBtnX = contentX + filterBtnW + 10;
-        int sortBtnW = 90;
+        int sortBtnW = 85;
         if (mx >= sortBtnX && mx <= sortBtnX + sortBtnW && my >= filterBarY && my <= filterBarY + filterBtnH)
         {
             hoveredFilterIndex = 1;
@@ -634,8 +633,8 @@ public class Obj_GuiFusionPanel : GameElement
         if (slideProgress < 0.5f)
             return;
 
-        int contentX = panelX + 15;
-        int contentW = panelWidth - 30;
+        int contentX = panelX + 12;
+        int contentW = panelWidth - 24;
 
         DrawHeader(panelX, panelY);
         DrawParentSlots(panelX, panelY, contentX, contentW);
@@ -643,7 +642,7 @@ public class Obj_GuiFusionPanel : GameElement
         if (seed1 != null && seed2 != null)
             DrawStatPreview(panelX, panelY, contentX, contentW);
 
-        int separatorY = panelY + 305;
+        int separatorY = panelY + 240;
         Graphics.DrawLine(contentX, separatorY, contentX + contentW, separatorY, separatorColor);
 
         DrawFilterSortBar(panelX, panelY, contentX, contentW);
@@ -654,26 +653,26 @@ public class Obj_GuiFusionPanel : GameElement
     private void DrawHeader(int panelX, int panelY)
     {
         Graphics.DrawRectangleRounded(
-            new Rectangle(panelX + 10, panelY + 10, panelWidth - 20, 40),
+            new Rectangle(panelX + 8, panelY + 8, panelWidth - 16, 30),
             0.15f, 6, headerBg
         );
 
         string title = "FUSIONE SEMI";
         int titleW = GuiTheme.MeasureText(title, 13);
-        GuiTheme.DrawText(title, panelX + (panelWidth - titleW) / 2, panelY + 20, 13, textColor);
+        GuiTheme.DrawText(title, panelX + (panelWidth - titleW) / 2, panelY + 16, 13, textColor);
     }
 
     private void DrawParentSlots(int panelX, int panelY, int contentX, int contentW)
     {
-        int slotSize = 60;
-        int slot1X = contentX + 20;
-        int slot2X = contentX + contentW - 20 - slotSize;
-        int slotY = panelY + 70;
+        int slotSize = 48;
+        int slot1X = contentX + 45;
+        int slot2X = contentX + contentW - 45 - slotSize;
+        int slotY = panelY + 44;
 
         DrawSeedSlot(slot1X, slotY, slotSize, seed1, hoveredSlot == 0, "S1");
         DrawSeedSlot(slot2X, slotY, slotSize, seed2, hoveredSlot == 1, "S2");
 
-        int centerY = slotY + slotSize + 30;
+        int centerY = slotY + slotSize + 20;
         int centerX = contentX + contentW / 2;
 
         int s1CenterX = slot1X + slotSize / 2;
@@ -685,17 +684,17 @@ public class Obj_GuiFusionPanel : GameElement
 
         if (seed1 != null && seed2 != null)
         {
-            Graphics.DrawCircle(centerX, centerY, 6, new Color(200, 150, 80, 230));
+            Graphics.DrawCircle(centerX, centerY, 5, new Color(200, 150, 80, 230));
             Graphics.DrawTriangle(
-                new Vector2(centerX - 5, centerY + 6),
-                new Vector2(centerX + 5, centerY + 6),
-                new Vector2(centerX, centerY + 14),
+                new Vector2(centerX - 4, centerY + 5),
+                new Vector2(centerX + 4, centerY + 5),
+                new Vector2(centerX, centerY + 12),
                 new Color(200, 150, 80, 230)
             );
         }
         else
         {
-            Graphics.DrawCircle(centerX, centerY, 4, new Color(82, 54, 35, 180));
+            Graphics.DrawCircle(centerX, centerY, 3, new Color(82, 54, 35, 180));
         }
     }
 
@@ -719,8 +718,8 @@ public class Obj_GuiFusionPanel : GameElement
             }
 
             string name = SeedDefinitions.GetSeedName(seed.type);
-            int nameW = GuiTheme.MeasureText(name, 9);
-            GuiTheme.DrawText(name, x + (size - nameW) / 2, y + size + 2, 9, textColor);
+            int nameW = GuiTheme.MeasureText(name, 10);
+            GuiTheme.DrawText(name, x + (size - nameW) / 2, y + size + 5, 10, textColor);
 
             Color rarityCol = SeedDefinitions.GetRarityColor(seed.rarity);
             Graphics.DrawCircle(x + size - 6, y + 6, 4, rarityCol);
@@ -728,29 +727,29 @@ public class Obj_GuiFusionPanel : GameElement
             if (isHovered)
             {
                 string hint = "Rimuovi";
-                int hintW = GuiTheme.MeasureText(hint, 8);
-                GuiTheme.DrawText(hint, x + (size - hintW) / 2, y - 10, 8, new Color(200, 150, 120, 230));
+                int hintW = GuiTheme.MeasureText(hint, 10);
+                GuiTheme.DrawText(hint, x + (size - hintW) / 2, y - 12, 10, new Color(200, 150, 120, 230));
             }
         }
         else
         {
-            int labelW = GuiTheme.MeasureText(label, 12);
-            GuiTheme.DrawText(label, x + (size - labelW) / 2, y + (size - 12) / 2, 12, new Color(170, 150, 130, 230));
+            int labelW = GuiTheme.MeasureText(label, 11);
+            GuiTheme.DrawText(label, x + (size - labelW) / 2, y + (size - 11) / 2, 11, new Color(170, 150, 130, 230));
 
             if (isHovered)
             {
                 string hint = "Seleziona";
-                int hintW = GuiTheme.MeasureText(hint, 8);
-                GuiTheme.DrawText(hint, x + (size - hintW) / 2, y + size + 2, 8, new Color(180, 160, 130, 230));
+                int hintW = GuiTheme.MeasureText(hint, 10);
+                GuiTheme.DrawText(hint, x + (size - hintW) / 2, y + size + 2, 10, new Color(180, 160, 130, 230));
             }
         }
     }
 
     private void DrawStatPreview(int panelX, int panelY, int contentX, int contentW)
     {
-        int statsY = panelY + 165;
+        int statsY = panelY + 116;
 
-        int previewH = statPreviews.Length * 16 + 10;
+        int previewH = statPreviews.Length * 14 + 8;
         Graphics.DrawRectangleRounded(
             new Rectangle(contentX - 2, statsY - 4, contentW + 4, previewH),
             0.1f, 6, previewBg
@@ -758,23 +757,28 @@ public class Obj_GuiFusionPanel : GameElement
 
         if (compatibilityBonus > 0)
         {
-            string bonusText = $"Bonus compatibilità: +{compatibilityBonus:F1}";
-            GuiTheme.DrawText(bonusText, contentX + contentW - GuiTheme.MeasureText(bonusText, 8) - 2, statsY - 2, 8, new Color(150, 200, 120, 230));
+            string bonusText = $"Compatibilità: +{compatibilityBonus:F1}";
+            int bonusW = GuiTheme.MeasureText(bonusText, 10);
+            GuiTheme.DrawText(bonusText, contentX + (contentW - bonusW) / 2, statsY - 14, 10, new Color(150, 200, 120, 230));
         }
 
         for (int i = 0; i < statPreviews.Length; i++)
         {
             var sp = statPreviews[i];
-            int sy = statsY + i * 16;
+            int sy = statsY + i * 14;
             bool isHovered = hoveredStat == i;
 
             Color nameColor = isHovered ? Color.White : textDimColor;
-            GuiTheme.DrawText(sp.name, contentX, sy + 3, 9, nameColor);
+            GuiTheme.DrawText(sp.name, contentX, sy + 2, 10, nameColor);
 
-            int barX = contentX + 85;
-            int barW = contentW - 180;
-            int barH = 8;
-            int barY = sy + 4;
+            string rangeText = $"{sp.min:F0}-{sp.max:F0}";
+            int rangeTextW = GuiTheme.MeasureText(rangeText, 10);
+            int rangeTextX = contentX + contentW - rangeTextW;
+
+            int barW = 150;
+            int barH = 7;
+            int barX = rangeTextX - 5 - barW;
+            int barY = sy + 3;
             Graphics.DrawRectangle(barX, barY, barW, barH, statBarBg);
 
             float minRatio = sp.min / SeedStatScaling.StatMax;
@@ -783,23 +787,22 @@ public class Obj_GuiFusionPanel : GameElement
             int rangeW = Math.Max(3, (int)(barW * (maxRatio - minRatio)));
             Graphics.DrawRectangle(rangeX, barY, rangeW, barH, statBarFill);
 
-            string rangeText = $"{sp.min:F0}-{sp.max:F0}";
-            GuiTheme.DrawText(rangeText, contentX + contentW - 85, sy + 3, 9, textDimColor);
+            GuiTheme.DrawText(rangeText, rangeTextX, sy + 2, 10, textDimColor);
         }
     }
 
     private void DrawFilterSortBar(int panelX, int panelY, int contentX, int contentW)
     {
-        int filterBarY = panelY + 310;
+        int filterBarY = panelY + 243;
 
-        int filterBtnW = 90;
+        int filterBtnW = 85;
         int filterBtnH = 20;
         int filterBtnX = contentX;
         string filterLabel = filterRarity.HasValue ? SeedDefinitions.GetRarityName(filterRarity.Value) : "Tutti";
         Color filterBg = hoveredFilterIndex == 0 ? filterActiveColor : filterInactiveColor;
         Graphics.DrawRectangleRounded(new Rectangle(filterBtnX, filterBarY, filterBtnW, filterBtnH), 0.2f, 4, filterBg);
         string filterText = $"Filtro: {filterLabel}";
-        GuiTheme.DrawText(filterText, filterBtnX + 5, filterBarY + 5, 9, textColor);
+        GuiTheme.DrawText(filterText, filterBtnX + 5, filterBarY + 5, 10, textColor);
 
         if (filterDropdownOpen)
         {
@@ -815,17 +818,17 @@ public class Obj_GuiFusionPanel : GameElement
                 int itemY = ddY + i * 18;
                 Color itemBg = filterRarity == rarities[i].val ? filterActiveColor : new Color(62, 42, 28, 255);
                 Graphics.DrawRectangle(filterBtnX, itemY, filterBtnW, 18, itemBg);
-                GuiTheme.DrawText(rarities[i].label, filterBtnX + 5, itemY + 4, 9, textColor);
+                GuiTheme.DrawText(rarities[i].label, filterBtnX + 5, itemY + 4, 10, textColor);
             }
         }
 
         int sortBtnX = contentX + filterBtnW + 10;
-        int sortBtnW = 90;
+        int sortBtnW = 85;
         string sortLabel = sortMode switch { SortMode.Nome => "Nome", SortMode.Rarita => "Rarità", SortMode.Stat => "Stat", _ => "Nome" };
         Color sortBg = hoveredFilterIndex == 1 ? filterActiveColor : filterInactiveColor;
         Graphics.DrawRectangleRounded(new Rectangle(sortBtnX, filterBarY, sortBtnW, filterBtnH), 0.2f, 4, sortBg);
         string sortText = $"Ordina: {sortLabel}";
-        GuiTheme.DrawText(sortText, sortBtnX + 5, filterBarY + 5, 9, textColor);
+        GuiTheme.DrawText(sortText, sortBtnX + 5, filterBarY + 5, 10, textColor);
 
         if (sortDropdownOpen)
         {
@@ -838,26 +841,26 @@ public class Obj_GuiFusionPanel : GameElement
                 Color itemBg = sortMode == modes[i] ? filterActiveColor : new Color(62, 42, 28, 255);
                 Graphics.DrawRectangle(sortBtnX, itemY, sortBtnW, 18, itemBg);
                 string modeName = modes[i] switch { SortMode.Nome => "Nome", SortMode.Rarita => "Rarità", SortMode.Stat => "Stat", _ => "?" };
-                GuiTheme.DrawText(modeName, sortBtnX + 5, itemY + 4, 9, textColor);
+                GuiTheme.DrawText(modeName, sortBtnX + 5, itemY + 4, 10, textColor);
             }
         }
 
         string countText = $"{browserSeeds.Count} semi";
-        int countW = GuiTheme.MeasureText(countText, 9);
-        GuiTheme.DrawText(countText, contentX + contentW - countW, filterBarY + 6, 9, textMutedColor);
+        int countW = GuiTheme.MeasureText(countText, 10);
+        GuiTheme.DrawText(countText, contentX + contentW - countW, filterBarY + 5, 10, textMutedColor);
     }
 
     private void DrawBrowser(int panelX, int panelY, int contentX, int contentW)
     {
-        int browserY = panelY + 335;
-        int browserH = 150;
+        int browserY = panelY + 266;
+        int browserH = 130;
 
         Graphics.DrawRectangleRounded(
             new Rectangle(contentX - 2, browserY - 2, contentW + 4, browserH + 4),
             0.08f, 6, browserBg
         );
 
-        Graphics.BeginScissorMode(contentX, browserY, contentW, browserH);
+        Graphics.BeginScissorMode(contentX, browserY + GameProperties.TopBarHeight, contentW, browserH);
 
         for (int i = 0; i < browserSeeds.Count; i++)
         {
@@ -927,11 +930,11 @@ public class Obj_GuiFusionPanel : GameElement
 
     private void DrawActionButtons(int panelX, int panelY, int contentX, int contentW)
     {
-        int btnY = panelY + panelHeight - 45;
-        int btnW = 140;
-        int btnH = 32;
-        int fuseBtnX = contentX + (contentW / 2) - btnW - 10;
-        int closeBtnX = contentX + (contentW / 2) + 10;
+        int btnY = panelY + panelHeight - 35;
+        int btnW = 130;
+        int btnH = 28;
+        int fuseBtnX = contentX + (contentW / 2) - btnW - 8;
+        int closeBtnX = contentX + (contentW / 2) + 8;
 
         bool canFuse = seed1 != null && seed2 != null && seed1.CanBeFused && seed2.CanBeFused;
 
@@ -939,13 +942,13 @@ public class Obj_GuiFusionPanel : GameElement
         Graphics.DrawRectangleRounded(new Rectangle(fuseBtnX, btnY, btnW, btnH), 0.25f, 6, fuseBg);
         string fuseText = "Fondi";
         int fuseW = GuiTheme.MeasureText(fuseText, 12);
-        GuiTheme.DrawText(fuseText, fuseBtnX + (btnW - fuseW) / 2, btnY + 8, 12, canFuse ? textColor : new Color(130, 120, 100, 200));
+        GuiTheme.DrawText(fuseText, fuseBtnX + (btnW - fuseW) / 2, btnY + 6, 12, canFuse ? textColor : new Color(130, 120, 100, 200));
 
         Color closeBg = hoveredButton == 1 ? closeButtonHoverColor : closeButtonColor;
         Graphics.DrawRectangleRounded(new Rectangle(closeBtnX, btnY, btnW, btnH), 0.25f, 6, closeBg);
         string closeText = "Chiudi";
         int closeW = GuiTheme.MeasureText(closeText, 12);
-        GuiTheme.DrawText(closeText, closeBtnX + (btnW - closeW) / 2, btnY + 8, 12, textColor);
+        GuiTheme.DrawText(closeText, closeBtnX + (btnW - closeW) / 2, btnY + 6, 12, textColor);
     }
 
     private float EaseOutBack(float x)

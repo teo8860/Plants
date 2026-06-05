@@ -217,7 +217,7 @@ public class Obj_GuiFusionResultPopup : GameElement
         Graphics.DrawRectangle(px + 20, py + 136, PANEL_W - 40, 1, sectionDivider);
 
         // === Genitori ===
-        GuiTheme.DrawText("Fusione di:", px + 20, py + 142, 9, dimText);
+        GuiTheme.DrawText("Fusione di:", px + 20, py + 142, 10, dimText);
 
         int parentColW = (PANEL_W - 40) / 2;
         DrawParentCell(px + 20,                    py + 156, parentColW, parent1, visualP1);
@@ -227,7 +227,7 @@ public class Obj_GuiFusionResultPopup : GameElement
         Graphics.DrawRectangle(px + 20, py + 190, PANEL_W - 40, 1, sectionDivider);
 
         // === Statistiche confronto ===
-        GuiTheme.DrawText("Statistiche:", px + 20, py + 196, 9, dimText);
+        GuiTheme.DrawText("Statistiche:", px + 20, py + 196, 10, dimText);
         DrawStatsComparison(px + 20, py + 210, PANEL_W - 40);
 
         // === Bottone ===
@@ -256,12 +256,12 @@ public class Obj_GuiFusionResultPopup : GameElement
         int textX = x + 28;
         string name = SeedDefinitions.GetSeedName(seed.type);
         // Tronca il nome se troppo lungo per la colonna
-        int maxChars = Math.Max(5, (width - 30) / 5);
+        int maxChars = Math.Max(5, (width - 30) / 6);
         if (name.Length > maxChars) name = name.Substring(0, maxChars - 1) + ".";
-        GuiTheme.DrawText(name, textX, y + 2, 9, textColor);
+        GuiTheme.DrawText(name, textX, y + 2, 10, textColor);
 
         string rar = SeedDefinitions.GetRarityName(seed.rarity);
-        GuiTheme.DrawText(rar, textX, y + 14, 8, SeedDefinitions.GetRarityColor(seed.rarity));
+        GuiTheme.DrawText(rar, textX, y + 14, 10, SeedDefinitions.GetRarityColor(seed.rarity));
     }
 
     private struct StatInfo
@@ -286,10 +286,10 @@ public class Obj_GuiFusionResultPopup : GameElement
         };
 
         int rowH = 14;
-        int labelW = 22;
-        int parentBlockW = 78;   // "1.23 | 1.45"
-        int arrowW = 12;
-        int newValW = 34;
+        int labelW = 26;
+        int parentBlockW = 82;
+        int arrowW = 14;
+        int newValW = 36;
         int barX = x + labelW + parentBlockW + arrowW + newValW;
         int barW = width - (labelW + parentBlockW + arrowW + newValW);
         int barH = 6;
@@ -299,27 +299,18 @@ public class Obj_GuiFusionResultPopup : GameElement
             var s = stats[i];
             int ry = y + i * rowH;
 
-            // Label
-            GuiTheme.DrawText(s.Label, x, ry + 2, 9, dimText);
+            GuiTheme.DrawText(s.Label, x, ry + 2, 10, dimText);
 
-            // Genitori (piccoli, grigi) — scala 0-99 intera.
-            // p1 allineato a destra verso il separatore, p2 a sinistra del separatore.
             string p1 = ((int)Math.Round(s.P1)).ToString();
             string p2 = ((int)Math.Round(s.P2)).ToString();
-            int p1W = GuiTheme.MeasureText(p1, 8);
-            int sepX = x + labelW + 28;
-            GuiTheme.DrawText(p1, sepX - 4 - p1W, ry + 3, 8, dimText);
-            GuiTheme.DrawText("|", sepX, ry + 3, 8, dimText);
-            GuiTheme.DrawText(p2, sepX + 8, ry + 3, 8, dimText);
+            int p1W = GuiTheme.MeasureText(p1, 10);
+            int sepX = x + labelW + 30;
+            GuiTheme.DrawText(p1, sepX - 4 - p1W, ry + 2, 10, dimText);
+            GuiTheme.DrawText("|", sepX, ry + 2, 10, dimText);
+            GuiTheme.DrawText(p2, sepX + 8, ry + 2, 10, dimText);
 
-            // Freccia
-            GuiTheme.DrawText("->", x + labelW + parentBlockW, ry + 3, 8, dimText);
+            GuiTheme.DrawText("->", x + labelW + parentBlockW, ry + 2, 10, dimText);
 
-            // Valore nuovo (colorato):
-            //   verde  = sopra max genitori
-            //   bianco = ≈ max genitori
-            //   giallo = tra min e max
-            //   rosso  = sotto min genitori
             float maxP = Math.Max(s.P1, s.P2);
             float minP = Math.Min(s.P1, s.P2);
             Color newColor;
@@ -329,7 +320,7 @@ public class Obj_GuiFusionResultPopup : GameElement
             else                           newColor = worseColor;
 
             string newStr = ((int)Math.Round(s.New)).ToString();
-            GuiTheme.DrawText(newStr, x + labelW + parentBlockW + arrowW, ry + 2, 9, newColor);
+            GuiTheme.DrawText(newStr, x + labelW + parentBlockW + arrowW, ry + 2, 10, newColor);
 
             // Barra con marker dei genitori sovrapposti
             int bY = ry + 3;
