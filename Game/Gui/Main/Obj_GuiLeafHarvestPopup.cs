@@ -34,8 +34,6 @@ public class Obj_GuiLeafHarvestPopup : GameElement
     private List<HarvestParticle> particles = new();
     private float particleTimer = 0f;
 
-    // Hover pulsante
-    private bool confirmHovered = false;
     private float pulseTime = 0f;
 
     // Colori
@@ -192,19 +190,6 @@ public class Obj_GuiLeafHarvestPopup : GameElement
             );
         }
 
-        // Pulsante conferma
-        int btnW = 120;
-        int btnH = 30;
-        int btnX = px + (pw - btnW) / 2;
-        int btnY = py + ph - 45;
-
-        confirmHovered = mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH;
-
-        if (confirmHovered && Input.IsMouseButtonPressed(MouseButton.Left))
-        {
-            Hide();
-        }
-
         // ESC per chiudere
         if (Input.IsKeyPressed(KeyboardKey.Escape) || Input.IsKeyPressed(KeyboardKey.Enter))
         {
@@ -226,9 +211,8 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         int sw = Rendering.camera.screenWidth;
         int sh = Rendering.camera.screenHeight;
 
-        // Overlay scuro
         byte overlayA = (byte)(160 * animProgress);
-        Graphics.DrawRectangle(0, 0, sw, sh, new Color(0, 0, 0, overlayA));
+        Hud.Overlay(new Color(0, 0, 0, overlayA));
 
         // Pannello
         float eased = EaseOutBack(animProgress);
@@ -239,15 +223,10 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
         if (pw < 60) return;
 
-        // Sfondo pannello
-        Graphics.DrawRectangleRounded(
-            new Rectangle(px, py, pw, ph),
-            0.08f, 8, panelBg
-        );
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(px, py, pw, ph),
-            0.08f, 8, 3, panelBorder
-        );
+        Hud.Panel(px, py, pw, ph, new Hud.PanelOptions
+        {
+            Bg = panelBg, Border = panelBorder, Roundness = 0.08f, BorderThickness = 3
+        });
 
         if (animProgress < 0.5f) return;
 
@@ -267,11 +246,10 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
     private void DrawHeader(int px, int py, int pw)
     {
-        // Header verde
-        Graphics.DrawRectangleRounded(
-            new Rectangle(px + 8, py + 8, pw - 16, 50),
-            0.15f, 6, headerBg
-        );
+        Hud.Panel(px + 8, py + 8, pw - 16, 50, new Hud.PanelOptions
+        {
+            Bg = headerBg, Roundness = 0.15f, BorderThickness = 0
+        });
 
         // Icona foglia (emoji-like semplice)
         Graphics.DrawCircle(px + 28, py + 33, 10, new Color(60, 180, 60, 255));
@@ -290,11 +268,10 @@ public class Obj_GuiLeafHarvestPopup : GameElement
 
     private void DrawSummary(int px, int py, int pw)
     {
-        // Box riepilogo con 3 colonne
-        Graphics.DrawRectangleRounded(
-            new Rectangle(px + 8, py, pw - 16, 52),
-            0.12f, 6, new Color(30, 40, 25, 220)
-        );
+        Hud.Panel(px + 8, py, pw - 16, 52, new Hud.PanelOptions
+        {
+            Bg = new Color(30, 40, 25, 220), Roundness = 0.12f, BorderThickness = 0
+        });
 
         int colW = (pw - 16) / 3;
 
@@ -418,23 +395,17 @@ public class Obj_GuiLeafHarvestPopup : GameElement
         int btnX = px + (pw - btnW) / 2;
 
         float pulse = (MathF.Sin(pulseTime * 3f) + 1f) * 0.5f;
-        Color bg = confirmHovered
-            ? new Color(80, 180, 80, 255)
-            : new Color((byte)(55 + pulse * 15), (byte)(130 + pulse * 20), 55, 255);
+        Color pulseBg = new Color((byte)(55 + pulse * 15), (byte)(130 + pulse * 20), 55, 255);
 
-        Graphics.DrawRectangleRounded(
-            new Rectangle(btnX, py, btnW, btnH),
-            0.3f, 8, bg
-        );
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(btnX, py, btnW, btnH),
-            0.3f, 8, 2,
-            confirmHovered ? Color.White : new Color(120, 220, 120, 255)
-        );
-
-        string label = "Continua";
-        int lw = GuiTheme.MeasureText(label, 13);
-        GuiTheme.DrawText(label, btnX + (btnW - lw) / 2, py + 8, 13, Color.White);
+        Hud.Button(btnX, py, btnW, btnH, "Continua", () => Hide(), new Hud.ButtonOptions
+        {
+            Bg = pulseBg,
+            HoverBg = new Color(80, 180, 80, 255),
+            Border = new Color(120, 220, 120, 255),
+            HoverBorder = Color.White,
+            TextColor = Color.White,
+            FontSize = 13, Roundness = 0.3f, BorderThickness = 2
+        });
     }
 
     private void DrawLeafIcon(int x, int y, int size)

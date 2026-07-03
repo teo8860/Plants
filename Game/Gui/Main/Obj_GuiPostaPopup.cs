@@ -13,9 +13,6 @@ public class Obj_GuiPostaPopup : GameElement
     private bool isVisible = false;
     private int scrollY = 0;
     private int hoveredRow = -1;
-    private bool claimAllHovered = false;
-    private bool clearHovered = false;
-    private bool closeHovered = false;
 
     private const int PANEL_W = 280;
     private const int PANEL_H = 230;
@@ -63,11 +60,7 @@ public class Obj_GuiPostaPopup : GameElement
         scrollY = 0;
     }
 
-    public void Hide()
-    {
-        isVisible = false;
-    }
-
+    public void Hide() { isVisible = false; }
     public bool IsVisible => isVisible;
 
     private (int x, int y, int w, int h) GetPanelRect()
@@ -95,9 +88,7 @@ public class Obj_GuiPostaPopup : GameElement
         if (Game.guiRewardPopup != null && Game.guiRewardPopup.IsVisible)
             return;
 
-        var (panelX, panelY, panelW, panelH) = GetPanelRect();
         var (listX, listY, listW, listH) = GetListRect();
-
         int mx = Input.GetMouseX();
         int my = Input.GetMouseY();
 
@@ -129,49 +120,8 @@ public class Obj_GuiPostaPopup : GameElement
             }
         }
 
-        // Bottoni in basso
-        int btnY = panelY + panelH - 30;
-        int btnH = 22;
-        int totalW = panelW - 16;
-        int btnW = (totalW - 8) / 3;
-
-        int claimAllX = panelX + 8;
-        int clearX = claimAllX + btnW + 4;
-        int closeX = clearX + btnW + 4;
-
-        bool hasUnclaimed = false;
-        bool hasClaimed = false;
-        foreach (MailMessage m in inbox)
-        {
-            if (m.claimed) hasClaimed = true;
-            else hasUnclaimed = true;
-        }
-
-        claimAllHovered = hasUnclaimed && mx >= claimAllX && mx <= claimAllX + btnW && my >= btnY && my <= btnY + btnH;
-        clearHovered = hasClaimed && mx >= clearX && mx <= clearX + btnW && my >= btnY && my <= btnY + btnH;
-        closeHovered = mx >= closeX && mx <= closeX + btnW && my >= btnY && my <= btnY + btnH;
-
         if (Input.IsMouseButtonPressed(MouseButton.Left))
         {
-            if (closeHovered) { Hide(); return; }
-
-            if (claimAllHovered)
-            {
-                List<MailReward> all = MailSystem.ClaimAll();
-                if (all.Count > 0 && Game.guiRewardPopup != null)
-                    Game.guiRewardPopup.Show(all);
-                return;
-            }
-
-            if (clearHovered)
-            {
-                MailSystem.ClearClaimed();
-                int contentH = MailSystem.Inbox.Count * (ROW_H + ROW_SPACING);
-                int maxScroll = Math.Max(0, contentH - listH);
-                scrollY = Math.Clamp(scrollY, 0, maxScroll);
-                return;
-            }
-
             if (hoveredRow >= 0 && hoveredRow < inbox.Count)
             {
                 MailMessage mail = inbox[hoveredRow];
@@ -184,6 +134,7 @@ public class Obj_GuiPostaPopup : GameElement
                 return;
             }
 
+            var (panelX, panelY, panelW, panelH) = GetPanelRect();
             bool insidePanel = mx >= panelX && mx <= panelX + panelW &&
                                my >= panelY && my <= panelY + panelH;
             if (!insidePanel) Hide();
@@ -194,21 +145,25 @@ public class Obj_GuiPostaPopup : GameElement
     {
         if (!isVisible) return;
 
-        Graphics.DrawRectangle(0, 0, sw, sh, overlayColor);
+        Hud.Overlay(overlayColor);
 
         var (panelX, panelY, panelW, panelH) = GetPanelRect();
 
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, panelW, panelH), 0.1f, 8, panelBg);
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX, panelY, panelW, panelH), 0.1f, 8, 2, panelBorder);
+        Hud.Panel(panelX, panelY, panelW, panelH, new Hud.PanelOptions
+        {
+            Bg = panelBg, Border = panelBorder, Roundness = 0.1f
+        });
 
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, panelW, HEADER_H), 0.25f, 8, headerBg);
+        Hud.Panel(panelX, panelY, panelW, HEADER_H, new Hud.PanelOptions
+        {
+            Bg = headerBg, Roundness = 0.25f, BorderThickness = 0
+        });
 
         string title = $"POSTA ({MailSystem.UnreadCount})";
-        int titleW = GuiTheme.MeasureText(title, 14);
-        GuiTheme.DrawText(title, panelX + (panelW - titleW) / 2, panelY + 6, 14, textColor);
+        Hud.Label(panelX, panelY + 6, panelW, title, new Hud.LabelOptions
+        {
+            FontSize = 14, Color = textColor, Align = TextAlign.Center
+        });
 
         DrawList();
         DrawBottomButtons();
@@ -240,7 +195,6 @@ public class Obj_GuiPostaPopup : GameElement
 
         Graphics.EndScissorMode();
 
-        // Scrollbar
         int contentH = inbox.Count * (ROW_H + ROW_SPACING);
         if (contentH > listH)
         {
@@ -287,6 +241,7 @@ public class Obj_GuiPostaPopup : GameElement
     private void DrawBottomButtons()
     {
         var (panelX, panelY, panelW, panelH) = GetPanelRect();
+        var (_, _, _, listH) = GetListRect();
 
         int btnY = panelY + panelH - 30;
         int btnH = 22;
@@ -306,25 +261,36 @@ public class Obj_GuiPostaPopup : GameElement
             else hasUnclaimed = true;
         }
 
-        DrawBottomButton(claimAllX, btnY, btnW, btnH, "Riscatta tutto",
-            hasUnclaimed, claimAllHovered, claimAllColor, claimAllHoverColor);
+        Hud.Button(claimAllX, btnY, btnW, btnH, "Riscatta tutto", () => {
+            List<MailReward> all = MailSystem.ClaimAll();
+            if (all.Count > 0 && Game.guiRewardPopup != null)
+                Game.guiRewardPopup.Show(all);
+        }, new Hud.ButtonOptions {
+            Bg = claimAllColor, HoverBg = claimAllHoverColor,
+            Disabled = !hasUnclaimed, DisabledBg = buttonDisabledColor,
+            DisabledTextColor = mutedTextColor,
+            TextColor = textColor, FontSize = 10, Roundness = 0.3f,
+            BorderThickness = 0
+        });
 
-        DrawBottomButton(clearX, btnY, btnW, btnH, "Elimina letti",
-            hasClaimed, clearHovered, clearColor, clearHoverColor);
+        Hud.Button(clearX, btnY, btnW, btnH, "Elimina letti", () => {
+            MailSystem.ClearClaimed();
+            int contentH = MailSystem.Inbox.Count * (ROW_H + ROW_SPACING);
+            int maxScroll = Math.Max(0, contentH - listH);
+            scrollY = Math.Clamp(scrollY, 0, maxScroll);
+        }, new Hud.ButtonOptions {
+            Bg = clearColor, HoverBg = clearHoverColor,
+            Disabled = !hasClaimed, DisabledBg = buttonDisabledColor,
+            DisabledTextColor = mutedTextColor,
+            TextColor = textColor, FontSize = 10, Roundness = 0.3f,
+            BorderThickness = 0
+        });
 
-        DrawBottomButton(closeX, btnY, btnW, btnH, "Chiudi",
-            true, closeHovered, closeColor, closeHoverColor);
-    }
-
-    private void DrawBottomButton(int x, int y, int w, int h, string label,
-        bool enabled, bool hovered, Color baseColor, Color hoverColor)
-    {
-        Color bg = !enabled ? buttonDisabledColor : (hovered ? hoverColor : baseColor);
-        Graphics.DrawRectangleRounded(new Rectangle(x, y, w, h), 0.3f, 8, bg);
-
-        int textW = GuiTheme.MeasureText(label);
-        Color lc = enabled ? textColor : mutedTextColor;
-        GuiTheme.DrawText(label, x + (w - textW) / 2, y + 6, 10, lc);
+        Hud.Button(closeX, btnY, btnW, btnH, "Chiudi", () => Hide(), new Hud.ButtonOptions {
+            Bg = closeColor, HoverBg = closeHoverColor,
+            TextColor = textColor, FontSize = 10, Roundness = 0.3f,
+            BorderThickness = 0
+        });
     }
 
     private static string FormatDate(DateTime dt)

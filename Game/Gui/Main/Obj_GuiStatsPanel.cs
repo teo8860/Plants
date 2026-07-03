@@ -125,9 +125,8 @@ public class Obj_GuiStatsPanel : GameElement
 
         if (!expanded) return;
 
-        // Divider sopra stats
         int div1Y = y + 16;
-        Graphics.DrawRectangle(x + PAD_H, div1Y, PANEL_W - PAD_H * 2, 1, GuiTheme.PanelDivider);
+        Hud.Divider(x + PAD_H, div1Y, PANEL_W - PAD_H * 2);
 
         int rowY = y + 18;
         DrawStatRow("salute", "SALUTE", stats.Salute, GuiTheme.StatSalute, rowY); 
@@ -144,9 +143,8 @@ public class Obj_GuiStatsPanel : GameElement
 
         DrawTempRow(stats.Temperatura, rowY); rowY += ROW_H;
 
-        // Divider sotto stats
         int div2Y = rowY + 3;
-        Graphics.DrawRectangle(x + PAD_H, div2Y, PANEL_W - PAD_H * 2, 1, GuiTheme.PanelDivider);
+        Hud.Divider(x + PAD_H, div2Y, PANEL_W - PAD_H * 2);
 
         // Oggetti equipaggiati
         DrawEquippedItems();
@@ -175,12 +173,11 @@ public class Obj_GuiStatsPanel : GameElement
 
         int barY = rowY + (ROW_H - BAR_H) / 2;
 
-        // Outline + track + fill (fixed width)
-        Graphics.DrawRectangle(x + BAR_X - 1, barY - 1, BAR_W + 2, BAR_H + 2, GuiTheme.PanelOutline);
-        Graphics.DrawRectangle(x + BAR_X, barY, BAR_W, BAR_H, GuiTheme.BarTrack);
-        int fillW = (int)(BAR_W * Math.Clamp(value, 0f, 1f));
-        if (fillW > 0)
-            Graphics.DrawRectangle(x + BAR_X, barY, fillW, BAR_H, barColor);
+        Hud.Bar(x + BAR_X, barY, BAR_W, BAR_H, value, new Hud.BarOptions
+        {
+            FillColor = barColor, TrackColor = GuiTheme.BarTrack,
+            BorderColor = GuiTheme.PanelOutline, BorderThickness = 1, Roundness = 0f
+        });
 
         // Percentuale right-aligned a fine pannello
         string valText = $"{(int)Math.Round(value * 100f)}%";
@@ -313,10 +310,9 @@ public class Obj_GuiStatsPanel : GameElement
         if (lines.Count == 0) return;
 
         int fontSize = 10;
-        int lineH = fontSize + 3;
         int pad = 8;
+        int lineH = fontSize + 3;
 
-        // Calcola larghezza necessaria dal testo piu lungo
         int maxTextW = 0;
         foreach (var (text, _) in lines)
         {
@@ -326,31 +322,10 @@ public class Obj_GuiStatsPanel : GameElement
         int tw = maxTextW + pad * 2;
         int th = pad * 2 + lines.Count * lineH;
 
-        // Posizione: a sinistra del pannello
         int tx = x - 5 - tw - 4;
         int ty = hoveredStatDotY - th / 2;
 
-        if (tx < 2) tx = 2;
-        if (ty < 2) ty = 2;
-        if (ty + th > Rendering.camera.screenHeight - 2)
-            ty = Rendering.camera.screenHeight - th - 2;
-
-        Color tooltipBg = new Color(30, 18, 10, 245);
-        Color border = new Color(62, 39, 25, 255);
-
-        Graphics.DrawRectangleRounded(
-            new Rectangle(tx - 2, ty - 2, tw + 4, th + 4),
-            0.15f, 6, border);
-        Graphics.DrawRectangleRounded(
-            new Rectangle(tx, ty, tw, th),
-            0.15f, 6, tooltipBg);
-
-        int ly = ty + pad;
-        foreach (var (text, color) in lines)
-        {
-            GuiTheme.DrawText(text, tx + pad, ly, fontSize, color);
-            ly += lineH;
-        }
+        Hud.Tooltip(tx, ty, lines);
     }
 
     private List<(string text, Color color)> BuildEffectLines(string statId)
@@ -721,9 +696,12 @@ public class Obj_GuiStatsPanel : GameElement
         };
         GuiTheme.DrawText(catLabel, tx + 6, ty + 18, 7, textDim);
 
-        Graphics.DrawLine(tx + 6, ty + 27, tx + tw - 6, ty + 27, tooltipBorder);
+        Hud.Divider(tx + 6, ty + 27, tw - 12, tooltipBorder);
 
-        DrawWrappedText(def.Description, tx + 6, ty + 31, tw - 12, 7, textDim);
+        Hud.LabelWrapped(tx + 6, ty + 31, tw - 12, def.Description, new Hud.LabelOptions
+        {
+            FontSize = 7, Color = textDim
+        });
     }
 
     // ─── Helpers ─────────────────────────────────────────────────
@@ -757,29 +735,4 @@ public class Obj_GuiStatsPanel : GameElement
         return "Estremo";
     }
 
-    private void DrawWrappedText(string text, int x, int y, int maxWidth, int fontSize, Color color)
-    {
-        int charWidth = Math.Max(1, fontSize - 2);
-        int maxChars = Math.Max(1, maxWidth / charWidth);
-        string[] words = text.Split(' ');
-        string line = "";
-        int lineY = y;
-
-        foreach (var word in words)
-        {
-            if ((line + " " + word).Trim().Length > maxChars)
-            {
-                GuiTheme.DrawText(line.Trim(), x, lineY, fontSize, color);
-                lineY += fontSize + 3;
-                line = word;
-            }
-            else
-            {
-                line = line.Length > 0 ? line + " " + word : word;
-            }
-        }
-
-        if (line.Trim().Length > 0)
-            GuiTheme.DrawText(line.Trim(), x, lineY, fontSize, color);
-    }
 }

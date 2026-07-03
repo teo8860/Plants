@@ -1,7 +1,5 @@
 using Raylib_CSharp;
 using Raylib_CSharp.Colors;
-using Raylib_CSharp.Interact;
-using Raylib_CSharp.Rendering;
 using Raylib_CSharp.Transformations;
 using System;
 
@@ -12,7 +10,6 @@ public class Obj_GuiWorldTransition : GameElement
     private bool isVisible = false;
     private float animationProgress = 0f;
     private float animationSpeed = 5f;
-    private bool buttonHovered = false;
     private float buttonPulse = 0f;
     private bool hasTriggered = false;
 
@@ -48,31 +45,7 @@ public class Obj_GuiWorldTransition : GameElement
 
     private void CheckButtonClick()
     {
-        int screenW = Rendering.camera.screenWidth;
-        int screenH = Rendering.camera.screenHeight;
-
-        int panelW = 160;
-        int panelH = 220;
-        int panelX = (screenW - panelW) / 2;
-        int panelY = (screenH - panelH) / 2;
-
-        int buttonW = 100;
-        int buttonH = 24;
-        int buttonX = panelX + (panelW - buttonW) / 2;
-        int buttonY = panelY + panelH - 35;
-
         InputGate.ConsumeMouse();
-
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-
-        buttonHovered = mx >= buttonX && mx <= buttonX + buttonW &&
-                       my >= buttonY && my <= buttonY + buttonH;
-
-        if (buttonHovered && Input.IsMouseButtonPressed(MouseButton.Left))
-        {
-            OnTravelClick();
-        }
     }
 
     private void OnTravelClick()
@@ -146,7 +119,7 @@ public class Obj_GuiWorldTransition : GameElement
         int screenH = Rendering.camera.screenHeight;
 
         byte overlayAlpha = (byte)(120 * animationProgress);
-        Graphics.DrawRectangle(0, 0, screenW, screenH, new Color(0, 0, 0, overlayAlpha));
+        Hud.Overlay(new Color(0, 0, 0, overlayAlpha));
 
         float eased = EaseOutBack(animationProgress);
         int panelW = (int)(160 * eased);
@@ -156,29 +129,19 @@ public class Obj_GuiWorldTransition : GameElement
 
         if (panelW < 40) return;
 
-        Color panelBg = new Color(30, 30, 45, 230);
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, panelW, panelH),
-            0.1f, 8, panelBg
-        );
-
-        Color borderColor = new Color(100, 100, 150, 255);
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX, panelY, panelW, panelH),
-            0.1f, 8, 2, borderColor
-        );
+        Hud.Panel(panelX, panelY, panelW, panelH, new Hud.PanelOptions
+        {
+            Bg = new Color(30, 30, 45, 230),
+            Border = new Color(100, 100, 150, 255)
+        });
 
         if (animationProgress < 0.5f) return;
 
         WorldType nextWorld = WorldDefinitions.GetNextWorld(WorldManager.GetCurrentWorld());
         WorldModifier nextMod = WorldManager.GetModifiers(nextWorld);
 
-        string title = GetWorldName(nextWorld);
-        Color titleColor = GetWorldColor(nextWorld);
-        int titleWidth = GuiTheme.MeasureText(title, 12);
-        GuiTheme.DrawText(title, panelX + (panelW - titleWidth) / 2, panelY + 12, 12, titleColor);
-
-        GuiTheme.DrawText("Nuovo Mondo", panelX + (panelW - 65) / 2, panelY + 28, 8, new Color(150, 150, 180, 255));
+        Hud.Label(panelX, panelY + 12, panelW, GetWorldName(nextWorld), new Hud.LabelOptions { Color = GetWorldColor(nextWorld), FontSize = 12, Align = TextAlign.Center });
+        Hud.Label(panelX, panelY + 28, panelW, "Nuovo Mondo", new Hud.LabelOptions { Color = new Color(150, 150, 180, 255), FontSize = 8, Align = TextAlign.Center });
 
         int statsY = panelY + 48;
         int statsX = panelX + 15;
@@ -195,34 +158,23 @@ public class Obj_GuiWorldTransition : GameElement
         int buttonH = 24;
         int buttonX = panelX + (panelW - buttonW) / 2;
         int buttonY = panelY + panelH - 35;
-
+        
         float pulse = (MathF.Sin(buttonPulse) + 1f) * 0.5f;
-        Color buttonBg = buttonHovered
-            ? new Color(80, 150, 80, 255)
-            : new Color((byte)(50 + pulse * 15), (byte)(120 + pulse * 25), (byte)(50 + pulse * 15), 255);
-
-        Graphics.DrawRectangleRounded(
-            new Rectangle(buttonX, buttonY, buttonW, buttonH),
-            0.3f, 8, buttonBg
-        );
-
-        Color buttonBorder = buttonHovered ? Color.White : new Color(100, 200, 100, 255);
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(buttonX, buttonY, buttonW, buttonH),
-            0.3f, 8, 2, buttonBorder
-        );
-
-        GuiTheme.DrawText("VIAGGIA", buttonX + 28, buttonY + 6, 11, Color.White);
+        Hud.Button(buttonX, buttonY, buttonW, buttonH, "VIAGGIA", OnTravelClick, new Hud.ButtonOptions
+        {
+            Bg = new Color((byte)(50 + pulse * 15), (byte)(120 + pulse * 25), (byte)(50 + pulse * 15), 255),
+            HoverBg = new Color(80, 150, 80, 255),
+            Border = new Color(100, 200, 100, 255),
+            HoverBorder = Color.White
+        });
+ 
     }
 
     private void DrawStat(string name, float value, int x, int y, int width)
     {
-        GuiTheme.DrawText(name, x, y, 8, new Color(180, 180, 200, 255));
-
-        bool isGood = value >= 0.5f;
-        Color indicatorColor = isGood ? new Color(100, 200, 100, 255) : new Color(255, 150, 50, 255);
-
-        GuiTheme.DrawText(value.ToString("F1"), x + width - 12, y, 8, indicatorColor);
+        Hud.Label(x, y, name, new Hud.LabelOptions { Color = new Color(180, 180, 200, 255), FontSize = 8 });
+        Color valColor = value >= 0.5f ? new Color(100, 200, 100, 255) : new Color(255, 150, 50, 255);
+        Hud.Label(x, y, width, value.ToString("F1"), new Hud.LabelOptions { Color = valColor, FontSize = 8, Align = TextAlign.Right });
     }
 
     private float NormalizeTemp(float temp)

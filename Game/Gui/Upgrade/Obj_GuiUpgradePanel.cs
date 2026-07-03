@@ -40,8 +40,7 @@ public class Obj_GuiUpgradePanel : GameElement
         "Slot pacchetti"
     };
 
-    private Rectangle[] buyButtons = new Rectangle[3];
-    private int hoveredButton = -1;
+    private bool _canClick;
 
     public Obj_GuiUpgradePanel() : base()
     {
@@ -52,31 +51,7 @@ public class Obj_GuiUpgradePanel : GameElement
 
     public override void Update()
     {
-        if (InputGate.MouseConsumed) { hoveredButton = -1; return; }
-
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-
-        hoveredButton = -1;
-        for (int i = 0; i < buyButtons.Length; i++)
-        {
-            var b = buyButtons[i];
-            if (b.Width > 0 && mx >= b.X && mx <= b.X + b.Width &&
-                my >= b.Y && my <= b.Y + b.Height)
-            {
-                hoveredButton = i;
-                break;
-            }
-        }
-
-        if (Input.IsMouseButtonPressed(MouseButton.Left) && hoveredButton != -1)
-        {
-            var type = upgradeTypes[hoveredButton];
-            if (UpgradeSystem.TryUpgrade(type))
-            {
-                Console.WriteLine($"Upgrade {UpgradeSystem.GetName(type)} -> Livello {UpgradeSystem.GetLevel(type)}");
-            }
-        }
+        _canClick = !InputGate.MouseConsumed;
     }
 
     public override void Draw()
@@ -98,12 +73,10 @@ public class Obj_GuiUpgradePanel : GameElement
         int rowHeight = 70;
         int panelH = upgradeTypes.Length * rowHeight + 20;
 
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, panelW, panelH),
-            0.08f, 8, panelBg);
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX, panelY, panelW, panelH),
-            0.08f, 8, 2, panelBorder);
+        Hud.Panel(panelX, panelY, panelW, panelH, new Hud.PanelOptions
+        {
+            Bg = panelBg, Border = panelBorder, Roundness = 0.08f
+        });
 
         for (int i = 0; i < upgradeTypes.Length; i++)
         {
@@ -112,8 +85,7 @@ public class Obj_GuiUpgradePanel : GameElement
             if (i < upgradeTypes.Length - 1)
             {
                 int lineY = panelY + 10 + (i + 1) * rowHeight - 5;
-                Graphics.DrawLine(panelX + 15, lineY, panelX + panelW - 15, lineY,
-                    new Color(80, 70, 60, 150));
+                Hud.Divider(panelX + 15, lineY, panelW - 30, new Color(80, 70, 60, 150));
             }
         }
     }
@@ -164,47 +136,34 @@ public class Obj_GuiUpgradePanel : GameElement
             }
         }
 
-        // Bottone acquisto
         int btnW = 70;
         int btnH = 28;
         int btnX = x + width - btnW - 5;
         int btnY = y + (height - btnH) / 2;
 
-        buyButtons[index] = new Rectangle(btnX, btnY, btnW, btnH);
+        bool disabled = maxed || !canBuy;
+        var capturedType = type;
+        Action buyClick = !disabled && _canClick ? () => {
+            if (UpgradeSystem.TryUpgrade(capturedType))
+                Console.WriteLine($"Upgrade {UpgradeSystem.GetName(capturedType)} -> Livello {UpgradeSystem.GetLevel(capturedType)}");
+        } : null;
 
-        if (maxed)
+        Hud.Button(btnX, btnY, btnW, btnH, maxed ? "MAX" : $"+ {cost}", buyClick, new Hud.ButtonOptions
         {
-            Graphics.DrawRectangleRounded(
-                new Rectangle(btnX, btnY, btnW, btnH),
-                0.3f, 6, btnDisabled);
-            string maxText = "MAX";
-            GuiTheme.DrawText(maxText, btnX + btnW / 2 - 12, btnY + 8, 11, textGray);
-        }
-        else
+            Bg = disabled ? btnDisabled : btnGreen,
+            HoverBg = disabled ? btnDisabled : btnGreenHover,
+            Border = !disabled ? new Color(130, 220, 130, 255) : (Color?)null,
+            TextColor = disabled ? textGray : textWhite,
+            FontSize = maxed ? 11 : 10,
+            Roundness = 0.3f,
+            BorderThickness = !disabled ? 2 : 0
+        });
+
+        if (!maxed && canBuy)
         {
-            bool hovered = hoveredButton == index;
-            Color btnColor = canBuy
-                ? (hovered ? btnGreenHover : btnGreen)
-                : btnDisabled;
-
-            Graphics.DrawRectangleRounded(
-                new Rectangle(btnX, btnY, btnW, btnH),
-                0.3f, 6, btnColor);
-
-            if (canBuy)
-            {
-                Graphics.DrawRectangleRoundedLines(
-                    new Rectangle(btnX, btnY, btnW, btnH),
-                    0.3f, 6, 2, new Color(130, 220, 130, 255));
-            }
-
-            string btnText = $"+ {cost}";
-            int textW = GuiTheme.MeasureText(btnText);
-            GuiTheme.DrawText(btnText, btnX + btnW / 2 - textW / 2, btnY + 5, 10,
-                canBuy ? textWhite : textGray);
-
-            // Icona foglia piccola
-            Graphics.DrawCircle(btnX + btnW / 2 + textW / 2 + 5, btnY + 19, 3, leafColor);
+            string costLabel = $"+ {cost}";
+            int costLabelW = GuiTheme.MeasureText(costLabel);
+            Graphics.DrawCircle(btnX + btnW / 2 + costLabelW / 2 + 5, btnY + 19, 3, leafColor);
         }
     }
 

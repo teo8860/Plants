@@ -83,7 +83,6 @@ public class Obj_GuiFusionPanel : GameElement
     private bool sortDropdownOpen = false;
 
     private int hoveredSlot = -1;
-    private int hoveredButton = -1;
     private int hoveredStat = -1;
 
     private struct StatPreview
@@ -357,7 +356,6 @@ public class Obj_GuiFusionPanel : GameElement
         bool rightClicked = Input.IsMouseButtonPressed(MouseButton.Right);
 
         hoveredSlot = -1;
-        hoveredButton = -1;
         hoveredStat = -1;
         hoveredBrowserIndex = -1;
         hoveredFilterIndex = -1;
@@ -426,23 +424,6 @@ public class Obj_GuiFusionPanel : GameElement
 
         bool canFuse = seed1 != null && seed2 != null && seed1.CanBeFused && seed2.CanBeFused;
 
-        if (mx >= fuseBtnX && mx <= fuseBtnX + btnW && my >= btnY && my <= btnY + btnH)
-        {
-            hoveredButton = 0;
-            if (clicked && canFuse)
-            {
-                PerformFusion();
-            }
-        }
-
-        if (mx >= closeBtnX && mx <= closeBtnX + btnW && my >= btnY && my <= btnY + btnH)
-        {
-            hoveredButton = 1;
-            if (clicked)
-            {
-                Close();
-            }
-        }
     }
 
     private void UpdateFilterSortInput(int mx, int my, bool clicked, int contentX, int contentW, int filterBarY)
@@ -610,7 +591,7 @@ public class Obj_GuiFusionPanel : GameElement
         int screenH = Rendering.camera.screenHeight;
 
         byte overlayAlpha = (byte)(150 * slideProgress);
-        Graphics.DrawRectangle(0, 0, screenW, screenH, new Color(0, 0, 0, overlayAlpha));
+        Hud.Overlay(new Color(0, 0, 0, overlayAlpha));
 
         float eased = EaseOutBack(slideProgress);
         int currentPanelH = (int)(panelHeight * eased);
@@ -620,15 +601,10 @@ public class Obj_GuiFusionPanel : GameElement
         if (currentPanelH < 50)
             return;
 
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, panelWidth, currentPanelH),
-            0.08f, 8, panelColor
-        );
-
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX, panelY, panelWidth, currentPanelH),
-            0.08f, 8, 3, panelBorder
-        );
+        Hud.Panel(panelX, panelY, panelWidth, currentPanelH, new Hud.PanelOptions
+        {
+            Bg = panelColor, Border = panelBorder, Roundness = 0.08f, BorderThickness = 3
+        });
 
         if (slideProgress < 0.5f)
             return;
@@ -643,7 +619,7 @@ public class Obj_GuiFusionPanel : GameElement
             DrawStatPreview(panelX, panelY, contentX, contentW);
 
         int separatorY = panelY + 240;
-        Graphics.DrawLine(contentX, separatorY, contentX + contentW, separatorY, separatorColor);
+        Hud.Divider(contentX, separatorY, contentW, separatorColor);
 
         DrawFilterSortBar(panelX, panelY, contentX, contentW);
         DrawBrowser(panelX, panelY, contentX, contentW);
@@ -652,14 +628,15 @@ public class Obj_GuiFusionPanel : GameElement
 
     private void DrawHeader(int panelX, int panelY)
     {
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX + 8, panelY + 8, panelWidth - 16, 30),
-            0.15f, 6, headerBg
-        );
+        Hud.Panel(panelX + 8, panelY + 8, panelWidth - 16, 30, new Hud.PanelOptions
+        {
+            Bg = headerBg, Roundness = 0.15f, BorderThickness = 0
+        });
 
-        string title = "FUSIONE SEMI";
-        int titleW = GuiTheme.MeasureText(title, 13);
-        GuiTheme.DrawText(title, panelX + (panelWidth - titleW) / 2, panelY + 16, 13, textColor);
+        Hud.Label(panelX, panelY + 16, panelWidth, "FUSIONE SEMI", new Hud.LabelOptions
+        {
+            FontSize = 13, Color = textColor, Align = TextAlign.Center
+        });
     }
 
     private void DrawParentSlots(int panelX, int panelY, int contentX, int contentW)
@@ -938,17 +915,21 @@ public class Obj_GuiFusionPanel : GameElement
 
         bool canFuse = seed1 != null && seed2 != null && seed1.CanBeFused && seed2.CanBeFused;
 
-        Color fuseBg = !canFuse ? fuseButtonDisabledColor : (hoveredButton == 0 ? fuseButtonHoverColor : fuseButtonColor);
-        Graphics.DrawRectangleRounded(new Rectangle(fuseBtnX, btnY, btnW, btnH), 0.25f, 6, fuseBg);
-        string fuseText = "Fondi";
-        int fuseW = GuiTheme.MeasureText(fuseText, 12);
-        GuiTheme.DrawText(fuseText, fuseBtnX + (btnW - fuseW) / 2, btnY + 6, 12, canFuse ? textColor : new Color(130, 120, 100, 200));
+        Hud.Button(fuseBtnX, btnY, btnW, btnH, "Fondi", canFuse ? () => PerformFusion() : null, new Hud.ButtonOptions
+        {
+            Disabled = !canFuse,
+            Bg = fuseButtonColor, HoverBg = fuseButtonHoverColor,
+            DisabledBg = fuseButtonDisabledColor,
+            TextColor = textColor, DisabledTextColor = new Color(130, 120, 100, 200),
+            FontSize = 12, Roundness = 0.25f, BorderThickness = 0
+        });
 
-        Color closeBg = hoveredButton == 1 ? closeButtonHoverColor : closeButtonColor;
-        Graphics.DrawRectangleRounded(new Rectangle(closeBtnX, btnY, btnW, btnH), 0.25f, 6, closeBg);
-        string closeText = "Chiudi";
-        int closeW = GuiTheme.MeasureText(closeText, 12);
-        GuiTheme.DrawText(closeText, closeBtnX + (btnW - closeW) / 2, btnY + 6, 12, textColor);
+        Hud.Button(closeBtnX, btnY, btnW, btnH, "Chiudi", () => Close(), new Hud.ButtonOptions
+        {
+            Bg = closeButtonColor, HoverBg = closeButtonHoverColor,
+            TextColor = textColor,
+            FontSize = 12, Roundness = 0.25f, BorderThickness = 0
+        });
     }
 
     private float EaseOutBack(float x)

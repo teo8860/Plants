@@ -27,7 +27,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
     private Color essenceColor = new Color(180, 100, 255, 255);
 
     private string[] buttonLabels = { "Unisci", "Scarta", "Migliora" };
-    private int hoveredButton = -1;
+    private bool _canInteract;
 
     public Action<int, string> OnButtonClicked;
 
@@ -80,69 +80,23 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
         if (slideProgress < 0.01f)
         {
-            hoveredButton = -1;
+            _canInteract = false;
             return;
         }
 
         int screenWidth = Rendering.camera.screenWidth;
-        int screenHeight = Rendering.camera.screenHeight;
         int panelX = screenWidth - (int)(panelWidth * slideProgress);
-
         int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
 
-        if (InputGate.MouseConsumed) { hoveredButton = -1; return; }
+        if (InputGate.MouseConsumed) { _canInteract = false; return; }
 
-        // Consuma mouse se sopra il pannello
         if (mx >= panelX && mx <= panelX + panelWidth)
             InputGate.ConsumeMouse();
 
-        bool clicked = Input.IsMouseButtonPressed(MouseButton.Left)
+        _canInteract = !(Game.itemSlots != null && Game.itemSlots.IsPickerOpen)
+            && !(Game.guiFusionResultPopup != null && Game.guiFusionResultPopup.IsVisible)
+            && !(Game.fusionPanel != null && Game.fusionPanel.IsOpen)
             && (Game.inventoryCrates == null || !Game.inventoryCrates.IsClickBlocked);
-
-        hoveredButton = -1;
-
-        // Blocca interazione bottoni se il picker oggetti e' aperto
-        if (Game.itemSlots != null && Game.itemSlots.IsPickerOpen)
-            return;
-
-        // Blocca interazione bottoni se il popup di fusione e' aperto
-        if (Game.guiFusionResultPopup != null && Game.guiFusionResultPopup.IsVisible)
-            return;
-
-        // Blocca interazione bottoni se il pannello fusione e' aperto
-        if (Game.fusionPanel != null && Game.fusionPanel.IsOpen)
-            return;
-
-        int buttonHeight = 36;
-        int buttonSpacing = 16;
-        int buttonMargin = 12;
-        int totalButtonsHeight = buttonLabels.Length * buttonHeight + (buttonLabels.Length - 1) * buttonSpacing;
-        int navBarHeight = 45; // Spazio per la barra di navigazione (35px + padding)
-        int buttonsStartY = screenHeight - totalButtonsHeight - buttonMargin - navBarHeight;
-
-        bool hasSeed = selectedSeedIndex >= 0 && Game.inventoryGrid?.GetSeedAtIndex(selectedSeedIndex) != null;
-
-        for (int i = 0; i < buttonLabels.Length; i++)
-        {
-            // Scarta (1) e Migliora (2) disabilitati senza seme selezionato
-            if (!hasSeed && i >= 1) continue;
-
-            int btnX = panelX + buttonMargin;
-            int btnY = buttonsStartY + i * (buttonHeight + buttonSpacing);
-            int btnWidth = panelWidth - buttonMargin * 2;
-
-            if (mx >= btnX && mx <= btnX + btnWidth && my >= btnY && my <= btnY + buttonHeight)
-            {
-                hoveredButton = i;
-
-                if (clicked)
-                {
-                    HandleButtonClick(i);
-                }
-                break;
-            }
-        }
     }
 
     private void HandleButtonClick(int buttonIndex)
@@ -317,7 +271,7 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
                 // Separatore
                 int sepY = descY + lineCount * 10 + 4;
-                Graphics.DrawRectangle(panelX + 15, sepY, panelWidth - 30, 1, new Color(100, 80, 60, 120));
+                Hud.Divider(panelX + 15, sepY, panelWidth - 30, new Color(100, 80, 60, 120));
 
                 // Box statistiche (compact per stare sopra gli item slots a Y=160)
                 int statsStartY = sepY + 4;
@@ -419,52 +373,27 @@ public class Obj_GuiSeedDetailPanel : GameElement
 
             bool disabled = !hasSeed && i >= 1;
 
-            // Colore bottone
-            Color bg;
-            if (disabled)
-            {
-                bg = disabledBg;
-            }
-            else if (i == 0 && fusionManager.IsFusionMode)
-            {
-                bg = buttonActiveColor;
-            }
-            else if (i == hoveredButton)
-            {
-                bg = buttonHoverColor;
-            }
-            else
-            {
-                bg = buttonColor;
-            }
-
-            Graphics.DrawRectangleRounded(
-                new Rectangle(btnX, btnY, btnWidth, buttonHeight),
-                0.22f,
-                8,
-                bg
-            );
-
-            Graphics.DrawRectangleRoundedLines(
-                new Rectangle(btnX, btnY, btnWidth, buttonHeight),
-                0.22f,
-                8,
-                3,
-                disabled ? disabledBorder : buttonBorder
-            );
-
-            Color txtColor = disabled ? disabledText : textColor;
-
-            // Testo del bottone
             string label = buttonLabels[i];
             if (i == 0 && fusionManager.IsFusionMode && fusionManager.CanFuse)
-            {
                 label = "FONDI!";
-            }
 
-            // Bottone Scarta: mostra label sopra e preview essenza + icona sotto.
+            Color bg = (i == 0 && fusionManager.IsFusionMode) ? buttonActiveColor : buttonColor;
+
+            int capturedI = i;
+            Action onClick = disabled || !_canInteract ? null : () => HandleButtonClick(capturedI);
+
             if (i == 1)
             {
+                Hud.Button(btnX, btnY, btnWidth, buttonHeight, "", onClick, new Hud.ButtonOptions
+                {
+                    Disabled = disabled,
+                    Bg = bg, HoverBg = buttonHoverColor,
+                    DisabledBg = disabledBg,
+                    Border = disabled ? disabledBorder : buttonBorder,
+                    Roundness = 0.22f, BorderThickness = 3
+                });
+
+                Color txtColor = disabled ? disabledText : textColor;
                 int labelW = GuiTheme.MeasureText(label, 11);
                 GuiTheme.DrawText(label, btnX + (btnWidth - labelW) / 2, btnY + 4, 11, txtColor);
 
@@ -486,10 +415,15 @@ public class Obj_GuiSeedDetailPanel : GameElement
             }
             else
             {
-                int textWidth = GuiTheme.MeasureText(label, 14);
-                int textX = btnX + (btnWidth - textWidth) / 2;
-                int textY = btnY + (buttonHeight - 14) / 2;
-                GuiTheme.DrawText(label, textX, textY, 14, txtColor);
+                Hud.Button(btnX, btnY, btnWidth, buttonHeight, label, onClick, new Hud.ButtonOptions
+                {
+                    Disabled = disabled,
+                    Bg = bg, HoverBg = buttonHoverColor,
+                    DisabledBg = disabledBg, DisabledTextColor = disabledText,
+                    Border = disabled ? disabledBorder : buttonBorder,
+                    TextColor = textColor,
+                    FontSize = 14, Roundness = 0.22f, BorderThickness = 3
+                });
             }
         }
     }

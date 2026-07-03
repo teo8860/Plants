@@ -136,6 +136,7 @@ internal class Rendering
     {
         camera.Update();
         InputGate.Reset();
+        Hud.BeginFrame();
 
         // Update in ordine di depth crescente (più "in cima" prima),
         // così gli overlay possono consumare il click prima dei sottostanti.

@@ -10,7 +10,6 @@ namespace Plants;
 public class Obj_GuiOpzioniPopup : GameElement
 {
     private bool isVisible = false;
-    private bool closeHovered = false;
 
     private readonly Color overlayColor = new Color(0, 0, 0, 160);
     private readonly Color panelBg = new Color(82, 54, 35, 245);
@@ -25,12 +24,10 @@ public class Obj_GuiOpzioniPopup : GameElement
     private readonly Color toggleOffColor = new Color(70, 48, 32, 255);
     private readonly Color toggleOnColor = new Color(90, 160, 110, 255);
     private readonly Color toggleKnobColor = new Color(230, 230, 235, 255);
-    private readonly Color noteColor = new Color(200, 150, 80, 255);
 
     private int sw => Rendering.camera.screenWidth;
     private int sh => Rendering.camera.screenHeight;
 
-    // Layout dinamico
     private const int PanelW = 300;
     private const int PanelH = 320;
     private const int ScaleBtnW = 48;
@@ -40,11 +37,6 @@ public class Obj_GuiOpzioniPopup : GameElement
     private int panelX => (sw - PanelW) / 2;
     private int panelY => (sh - PanelH) / 2;
 
-    // Hover state per i controlli
-    private bool[] hoverScale = new bool[GameProperties.MaxUiScaleLevel];
-    private bool hoverStartHidden = false;
-    private bool hoverCloseOnX = false;
-
     public Obj_GuiOpzioniPopup()
     {
         this.guiLayer = true;
@@ -52,19 +44,10 @@ public class Obj_GuiOpzioniPopup : GameElement
         this.persistent = true;
     }
 
-    public void Show()
-    {
-        isVisible = true;
-    }
-
-    public void Hide()
-    {
-        isVisible = false;
-    }
-
+    public void Show() { isVisible = true; }
+    public void Hide() { isVisible = false; }
     public bool IsVisible => isVisible;
 
-    // Indice 0..MaxUiScaleLevel-1 (livelli 1..MaxUiScaleLevel)
     private Rectangle ScaleBtnRect(int index)
     {
         int y = panelY + 78;
@@ -74,90 +57,15 @@ public class Obj_GuiOpzioniPopup : GameElement
         return new Rectangle(x, y, ScaleBtnW, ScaleBtnH);
     }
 
-    private Rectangle StartHiddenToggleRect()
-    {
-        int tW = 44;
-        int tH = 22;
-        int y = panelY + 136;
-        int x = panelX + PanelW - 10 - tW;
-        return new Rectangle(x, y, tW, tH);
-    }
-
-    private Rectangle CloseOnXToggleRect()
-    {
-        int tW = 44;
-        int tH = 22;
-        int y = panelY + 200;
-        int x = panelX + PanelW - 10 - tW;
-        return new Rectangle(x, y, tW, tH);
-    }
-
-    private Rectangle CloseButtonRect()
-    {
-        int btnW = 90;
-        int btnH = 26;
-        int x = panelX + (PanelW - btnW) / 2;
-        int y = panelY + PanelH - btnH - 12;
-        return new Rectangle(x, y, btnW, btnH);
-    }
-
-    private static bool Inside(Rectangle r, int mx, int my)
-    {
-        return mx >= r.X && mx <= r.X + r.Width && my >= r.Y && my <= r.Y + r.Height;
-    }
-
     public override void Update()
     {
         if (!isVisible) return;
         InputGate.ConsumeMouse();
 
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-
-        var rHidden = StartHiddenToggleRect();
-        var rCloseOnX = CloseOnXToggleRect();
-        var rClose = CloseButtonRect();
-
-        for (int i = 0; i < GameProperties.MaxUiScaleLevel; i++)
-            hoverScale[i] = Inside(ScaleBtnRect(i), mx, my);
-
-        hoverStartHidden = Inside(rHidden, mx, my);
-        hoverCloseOnX = Inside(rCloseOnX, mx, my);
-        closeHovered = Inside(rClose, mx, my);
-
         if (Input.IsMouseButtonPressed(MouseButton.Left))
         {
-            var cfg = GameConfig.get();
-
-            for (int i = 0; i < GameProperties.MaxUiScaleLevel; i++)
-            {
-                if (hoverScale[i])
-                {
-                    int lvl = i + 1;
-                    if (cfg.UiScale != lvl)
-                        cfg.UiScale = lvl; // setter applica anche a runtime
-                    return;
-                }
-            }
-
-            if (hoverStartHidden)
-            {
-                cfg.StartHidden = !cfg.StartHidden;
-                return;
-            }
-
-            if (hoverCloseOnX)
-            {
-                cfg.CloseOnX = !cfg.CloseOnX;
-                return;
-            }
-
-            if (closeHovered)
-            {
-                Hide();
-                return;
-            }
-
+            int mx = Input.GetMouseX();
+            int my = Input.GetMouseY();
             bool insidePanel = mx >= panelX && mx <= panelX + PanelW &&
                                my >= panelY && my <= panelY + PanelH;
             if (!insidePanel)
@@ -171,91 +79,102 @@ public class Obj_GuiOpzioniPopup : GameElement
 
         var cfg = GameConfig.get();
 
-        Graphics.DrawRectangle(0, 0, sw, sh, overlayColor);
+        Hud.Overlay(overlayColor);
 
-        // Pannello
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, PanelW, PanelH), 0.08f, 8, panelBg);
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX, panelY, PanelW, PanelH), 0.08f, 8, 2, panelBorder);
+        Hud.Panel(panelX, panelY, PanelW, PanelH, new Hud.PanelOptions
+        {
+            Bg = panelBg, Border = panelBorder, Roundness = 0.08f
+        });
 
-        // Header
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, PanelW, 26), 0.2f, 8, headerBg);
+        Hud.Panel(panelX, panelY, PanelW, 26, new Hud.PanelOptions
+        {
+            Bg = headerBg, Roundness = 0.2f, BorderThickness = 0
+        });
 
-        string title = "OPZIONI";
-        int titleW = GuiTheme.MeasureText(title, 16);
-        GuiTheme.DrawText(title, panelX + (PanelW - titleW) / 2, panelY + 7, 16, textColor);
+        Hud.Label(panelX, panelY + 7, PanelW, "OPZIONI", new Hud.LabelOptions
+        {
+            FontSize = 16, Color = textColor, Align = TextAlign.Center
+        });
 
-        // --- Scala ---
-        string scaleLabel = "Scala finestra";
-        int scaleLabelW = GuiTheme.MeasureText(scaleLabel, 12);
-        GuiTheme.DrawText(scaleLabel, panelX + (PanelW - scaleLabelW) / 2, panelY + 58, 12, textColor);
+        Hud.Label(panelX, panelY + 58, PanelW, "Scala finestra", new Hud.LabelOptions
+        {
+            FontSize = 12, Color = textColor, Align = TextAlign.Center
+        });
 
         for (int i = 0; i < GameProperties.MaxUiScaleLevel; i++)
         {
             int lvl = i + 1;
-            DrawScaleButton(ScaleBtnRect(i), "x" + lvl, cfg.UiScale == lvl, hoverScale[i]);
+            bool active = cfg.UiScale == lvl;
+            var r = ScaleBtnRect(i);
+            int capturedLvl = lvl;
+
+            Hud.Button((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height, "x" + lvl,
+                () => { if (cfg.UiScale != capturedLvl) cfg.UiScale = capturedLvl; },
+                new Hud.ButtonOptions
+                {
+                    Bg = active ? buttonActiveColor : buttonColor,
+                    HoverBg = active ? buttonActiveHoverColor : buttonHoverColor,
+                    TextColor = textColor, FontSize = 12, Roundness = 0.3f,
+                    BorderThickness = 0
+                });
         }
 
-        // Separatore
-        Graphics.DrawRectangle(panelX + 12, panelY + 122, PanelW - 24, 1, panelBorder);
+        Hud.Divider(panelX + 12, panelY + 122, PanelW - 24, panelBorder);
 
-        // --- Avvio nascosto ---
-        GuiTheme.DrawText("Avvio nascosto", panelX + 12, panelY + 140, 12, textColor);
-        DrawToggle(StartHiddenToggleRect(), cfg.StartHidden, hoverStartHidden);
+        Hud.Label(panelX + 12, panelY + 140, "Avvio nascosto", new Hud.LabelOptions
+        {
+            FontSize = 12, Color = textColor
+        });
+
+        int tW = 44, tH = 22;
+        int toggleX = panelX + PanelW - 10 - tW;
+
+        Hud.Toggle(toggleX, panelY + 136, tW, tH, cfg.StartHidden,
+            () => { cfg.StartHidden = !cfg.StartHidden; },
+            new Hud.ToggleOptions
+            {
+                OnColor = toggleOnColor, OffColor = toggleOffColor, KnobColor = toggleKnobColor
+            });
 
         string hint = cfg.StartHidden
             ? "Il gioco partira' nella tray."
             : "Il gioco partira' visibile.";
-        GuiTheme.DrawText(hint, panelX + 12, panelY + 164, 9, subTextColor);
+        Hud.Label(panelX + 12, panelY + 164, hint, new Hud.LabelOptions
+        {
+            FontSize = 9, Color = subTextColor
+        });
 
-        // Separatore
-        Graphics.DrawRectangle(panelX + 12, panelY + 186, PanelW - 24, 1, panelBorder);
+        Hud.Divider(panelX + 12, panelY + 186, PanelW - 24, panelBorder);
 
-        // --- Azione su X finestra ---
-        GuiTheme.DrawText("Chiudi con X", panelX + 12, panelY + 204, 12, textColor);
-        DrawToggle(CloseOnXToggleRect(), cfg.CloseOnX, hoverCloseOnX);
+        Hud.Label(panelX + 12, panelY + 204, "Chiudi con X", new Hud.LabelOptions
+        {
+            FontSize = 12, Color = textColor
+        });
+
+        Hud.Toggle(toggleX, panelY + 200, tW, tH, cfg.CloseOnX,
+            () => { cfg.CloseOnX = !cfg.CloseOnX; },
+            new Hud.ToggleOptions
+            {
+                OnColor = toggleOnColor, OffColor = toggleOffColor, KnobColor = toggleKnobColor
+            });
 
         string hintX = cfg.CloseOnX
             ? "La X chiudera' il gioco."
             : "La X nascondera' il gioco nella tray.";
-        GuiTheme.DrawText(hintX, panelX + 12, panelY + 228, 9, subTextColor);
+        Hud.Label(panelX + 12, panelY + 228, hintX, new Hud.LabelOptions
+        {
+            FontSize = 9, Color = subTextColor
+        });
 
-        // --- Bottone chiudi ---
-        var rClose = CloseButtonRect();
-        Color bc = closeHovered ? buttonHoverColor : buttonColor;
-        Graphics.DrawRectangleRounded(rClose, 0.3f, 8, bc);
+        int btnW = 90, btnH = 26;
+        int btnX = panelX + (PanelW - btnW) / 2;
+        int btnY = panelY + PanelH - btnH - 12;
 
-        string btnText = "Chiudi";
-        int btnTextW = GuiTheme.MeasureText(btnText, 12);
-        GuiTheme.DrawText(btnText, (int)(rClose.X + (rClose.Width - btnTextW) / 2), (int)(rClose.Y + 7), 12, textColor);
-    }
-
-    private void DrawScaleButton(Rectangle r, string label, bool active, bool hover)
-    {
-        Color bg;
-        if (active)
-            bg = hover ? buttonActiveHoverColor : buttonActiveColor;
-        else
-            bg = hover ? buttonHoverColor : buttonColor;
-
-        Graphics.DrawRectangleRounded(r, 0.3f, 8, bg);
-        int tW = GuiTheme.MeasureText(label, 12);
-        GuiTheme.DrawText(label, (int)(r.X + (r.Width - tW) / 2), (int)(r.Y + 8), 12, textColor);
-    }
-
-    private void DrawToggle(Rectangle r, bool on, bool hover)
-    {
-        Color bg = on ? toggleOnColor : toggleOffColor;
-        if (hover)
-            bg = new Color((byte)Math.Min(255, bg.R + 25), (byte)Math.Min(255, bg.G + 25), (byte)Math.Min(255, bg.B + 25), bg.A);
-
-        Graphics.DrawRectangleRounded(r, 1f, 8, bg);
-
-        int knobSize = (int)r.Height - 4;
-        int knobX = on ? (int)(r.X + r.Width - knobSize - 2) : (int)(r.X + 2);
-        int knobY = (int)(r.Y + 2);
-        Graphics.DrawRectangleRounded(new Rectangle(knobX, knobY, knobSize, knobSize), 1f, 8, toggleKnobColor);
+        Hud.Button(btnX, btnY, btnW, btnH, "Chiudi", () => Hide(), new Hud.ButtonOptions
+        {
+            Bg = buttonColor, HoverBg = buttonHoverColor,
+            TextColor = textColor, FontSize = 12, Roundness = 0.3f,
+            BorderThickness = 0
+        });
     }
 }

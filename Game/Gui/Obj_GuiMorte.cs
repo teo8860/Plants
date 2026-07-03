@@ -73,7 +73,7 @@ public class Obj_GuiMorte : GameElement
         if (!active) return;
 
         byte alpha = (byte)(220 * fadeProgress);
-        Graphics.DrawRectangle(0, 0, sw, sh, new Color(0, 0, 0, alpha));
+        Hud.Overlay(new Color(0, 0, 0, alpha));
 
         if (fadeProgress < 0.3f) return;
 
@@ -86,12 +86,12 @@ public class Obj_GuiMorte : GameElement
         int py = (sh - ph) / 2;
 
         byte panelAlpha = (byte)(245 * textAlpha);
-        Graphics.DrawRectangleRounded(
-            new Rectangle(px, py, pw, ph), 0.1f, 8,
-            new Color(panelBg.R, panelBg.G, panelBg.B, panelAlpha));
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(px, py, pw, ph), 0.1f, 8, 2,
-            new Color(rosso.R, rosso.G, rosso.B, panelAlpha));
+        Hud.Panel(px, py, pw, ph, new Hud.PanelOptions
+        {
+            Bg = new Color(panelBg.R, panelBg.G, panelBg.B, panelAlpha),
+            Border = new Color(rosso.R, rosso.G, rosso.B, panelAlpha),
+            Roundness = 0.1f
+        });
 
         // Titolo
         string titolo = "La tua pianta e' morta";

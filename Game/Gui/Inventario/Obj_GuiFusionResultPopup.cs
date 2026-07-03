@@ -8,19 +8,12 @@ using System.Numerics;
 
 namespace Plants;
 
-/// <summary>
-/// Popup mostrato dopo una fusione riuscita. Mostra il nuovo seme ottenuto
-/// con icona, nome, rarita' e una tabella di statistiche che confronta i due
-/// semi genitori con il risultato (tick sui valori genitori sovrapposti alla
-/// barra del nuovo valore).
-/// </summary>
 public class Obj_GuiFusionResultPopup : GameElement
 {
     private bool isVisible = false;
     private Seed parent1, parent2, fused;
     private Obj_Seed visualNew, visualP1, visualP2;
 
-    private bool buttonHovered = false;
     private float pulse = 0f;
 
     // Colori
@@ -51,7 +44,7 @@ public class Obj_GuiFusionResultPopup : GameElement
     public Obj_GuiFusionResultPopup()
     {
         this.guiLayer = true;
-        this.depth = -3500; // sopra a tutti gli altri popup
+        this.depth = -3500;
         this.persistent = true;
     }
 
@@ -63,7 +56,6 @@ public class Obj_GuiFusionResultPopup : GameElement
         this.parent2 = parent2;
         this.fused = fused;
         isVisible = true;
-        buttonHovered = false;
         pulse = 0f;
 
         CreateVisualSeeds();
@@ -81,35 +73,20 @@ public class Obj_GuiFusionResultPopup : GameElement
 
         visualNew = new Obj_Seed
         {
-            guiLayer = true,
-            persistent = true,
-            roomId = uint.MaxValue,
-            active = false,
-            dati = fused,
-            color = fused.color,
-            scale = 3.2f
+            guiLayer = true, persistent = true, roomId = uint.MaxValue,
+            active = false, dati = fused, color = fused.color, scale = 3.2f
         };
 
         visualP1 = new Obj_Seed
         {
-            guiLayer = true,
-            persistent = true,
-            roomId = uint.MaxValue,
-            active = false,
-            dati = parent1,
-            color = parent1.color,
-            scale = 1.3f
+            guiLayer = true, persistent = true, roomId = uint.MaxValue,
+            active = false, dati = parent1, color = parent1.color, scale = 1.3f
         };
 
         visualP2 = new Obj_Seed
         {
-            guiLayer = true,
-            persistent = true,
-            roomId = uint.MaxValue,
-            active = false,
-            dati = parent2,
-            color = parent2.color,
-            scale = 1.3f
+            guiLayer = true, persistent = true, roomId = uint.MaxValue,
+            active = false, dati = parent2, color = parent2.color, scale = 1.3f
         };
     }
 
@@ -127,67 +104,42 @@ public class Obj_GuiFusionResultPopup : GameElement
 
         pulse += Time.GetFrameTime() * 3f;
 
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-
-        var btn = GetButtonRect();
-        buttonHovered = mx >= btn.X && mx <= btn.X + btn.Width
-                     && my >= btn.Y && my <= btn.Y + btn.Height;
-
         if (Input.IsKeyPressed(KeyboardKey.Escape)
          || Input.IsKeyPressed(KeyboardKey.Enter)
          || Input.IsKeyPressed(KeyboardKey.Space))
         {
             Hide();
-            return;
         }
-
-        if (Input.IsMouseButtonPressed(MouseButton.Left) && buttonHovered)
-        {
-            Hide();
-        }
-    }
-
-    private (int x, int y) GetPanelOrigin()
-    {
-        return ((sw - PANEL_W) / 2, (sh - PANEL_H) / 2);
-    }
-
-    private Rectangle GetButtonRect()
-    {
-        var (px, py) = GetPanelOrigin();
-        int btnW = 130;
-        int btnH = 26;
-        int btnX = px + (PANEL_W - btnW) / 2;
-        int btnY = py + PANEL_H - btnH - 10;
-        return new Rectangle(btnX, btnY, btnW, btnH);
     }
 
     public override void Draw()
     {
         if (!isVisible) return;
 
-        // Overlay
-        Graphics.DrawRectangle(0, 0, sw, sh, overlay);
+        Hud.Overlay(overlay);
 
-        var (px, py) = GetPanelOrigin();
+        var (px, py) = ((sw - PANEL_W) / 2, (sh - PANEL_H) / 2);
 
-        // Pannello
-        Graphics.DrawRectangleRounded(new Rectangle(px, py, PANEL_W, PANEL_H), 0.08f, 10, panelBg);
-        Graphics.DrawRectangleRoundedLines(new Rectangle(px, py, PANEL_W, PANEL_H), 0.08f, 10, 2, panelBorder);
+        Hud.Panel(px, py, PANEL_W, PANEL_H, new Hud.PanelOptions
+        {
+            Bg = panelBg, Border = panelBorder, Roundness = 0.08f
+        });
 
-        // Header
-        Graphics.DrawRectangleRounded(new Rectangle(px, py, PANEL_W, 24), 0.25f, 8, headerBg);
-        string title = "FUSIONE COMPLETATA!";
-        int titleW = GuiTheme.MeasureText(title, 14);
-        GuiTheme.DrawText(title, px + (PANEL_W - titleW) / 2, py + 6, 14, headerText);
+        Hud.Panel(px, py, PANEL_W, 24, new Hud.PanelOptions
+        {
+            Bg = headerBg, Roundness = 0.25f, BorderThickness = 0
+        });
+
+        Hud.Label(px, py + 6, PANEL_W, "FUSIONE COMPLETATA!", new Hud.LabelOptions
+        {
+            FontSize = 14, Color = headerText, Align = TextAlign.Center
+        });
 
         // === Nuovo seme ===
         int iconCx = px + PANEL_W / 2;
         int iconCy = py + 66;
         Color rarityColor = SeedDefinitions.GetRarityColor(fused.rarity);
 
-        // Alone pulsante intorno al seme
         float glow = 0.5f + MathF.Sin(pulse) * 0.5f;
         for (int i = 3; i >= 0; i--)
         {
@@ -203,43 +155,49 @@ public class Obj_GuiFusionResultPopup : GameElement
             visualNew.Draw();
         }
 
-        // Nome
-        string name = SeedDefinitions.GetSeedName(fused.type);
-        int nameW = GuiTheme.MeasureText(name, 12);
-        GuiTheme.DrawText(name, px + (PANEL_W - nameW) / 2, py + 100, 12, textColor);
+        Hud.Label(px, py + 100, PANEL_W, SeedDefinitions.GetSeedName(fused.type), new Hud.LabelOptions
+        {
+            FontSize = 12, Color = textColor, Align = TextAlign.Center
+        });
 
-        // Rarita
-        string rar = SeedDefinitions.GetRarityName(fused.rarity);
-        int rarW = GuiTheme.MeasureText(rar);
-        GuiTheme.DrawText(rar, px + (PANEL_W - rarW) / 2, py + 116, 10, rarityColor);
+        Hud.Label(px, py + 116, PANEL_W, SeedDefinitions.GetRarityName(fused.rarity), new Hud.LabelOptions
+        {
+            FontSize = 10, Color = rarityColor, Align = TextAlign.Center
+        });
 
-        // Separatore
-        Graphics.DrawRectangle(px + 20, py + 136, PANEL_W - 40, 1, sectionDivider);
+        Hud.Divider(px + 20, py + 136, PANEL_W - 40, sectionDivider);
 
         // === Genitori ===
-        GuiTheme.DrawText("Fusione di:", px + 20, py + 142, 10, dimText);
+        Hud.Label(px + 20, py + 142, "Fusione di:", new Hud.LabelOptions
+        {
+            FontSize = 10, Color = dimText
+        });
 
         int parentColW = (PANEL_W - 40) / 2;
-        DrawParentCell(px + 20,                    py + 156, parentColW, parent1, visualP1);
-        DrawParentCell(px + 20 + parentColW,       py + 156, parentColW, parent2, visualP2);
+        DrawParentCell(px + 20, py + 156, parentColW, parent1, visualP1);
+        DrawParentCell(px + 20 + parentColW, py + 156, parentColW, parent2, visualP2);
 
-        // Separatore
-        Graphics.DrawRectangle(px + 20, py + 190, PANEL_W - 40, 1, sectionDivider);
+        Hud.Divider(px + 20, py + 190, PANEL_W - 40, sectionDivider);
 
         // === Statistiche confronto ===
-        GuiTheme.DrawText("Statistiche:", px + 20, py + 196, 10, dimText);
+        Hud.Label(px + 20, py + 196, "Statistiche:", new Hud.LabelOptions
+        {
+            FontSize = 10, Color = dimText
+        });
         DrawStatsComparison(px + 20, py + 210, PANEL_W - 40);
 
         // === Bottone ===
-        var btn = GetButtonRect();
-        Color bc = buttonHovered ? buttonHover : buttonColor;
-        Graphics.DrawRectangleRounded(btn, 0.3f, 8, bc);
-        Graphics.DrawRectangleRoundedLines(btn, 0.3f, 8, 2, panelBorder);
+        int btnW = 130;
+        int btnH = 26;
+        int btnX = px + (PANEL_W - btnW) / 2;
+        int btnY = py + PANEL_H - btnH - 10;
 
-        string btnText = "Fantastico!";
-        int btnTextW = GuiTheme.MeasureText(btnText, 12);
-        GuiTheme.DrawText(btnText, (int)btn.X + ((int)btn.Width - btnTextW) / 2,
-            (int)btn.Y + 7, 12, textColor);
+        Hud.Button(btnX, btnY, btnW, btnH, "Fantastico!", () => Hide(), new Hud.ButtonOptions
+        {
+            Bg = buttonColor, HoverBg = buttonHover,
+            Border = panelBorder, TextColor = textColor,
+            FontSize = 12, Roundness = 0.3f, BorderThickness = 2
+        });
     }
 
     private void DrawParentCell(int x, int y, int width, Seed seed, Obj_Seed visual)
@@ -255,7 +213,6 @@ public class Obj_GuiFusionResultPopup : GameElement
 
         int textX = x + 28;
         string name = SeedDefinitions.GetSeedName(seed.type);
-        // Tronca il nome se troppo lungo per la colonna
         int maxChars = Math.Max(5, (width - 30) / 6);
         if (name.Length > maxChars) name = name.Substring(0, maxChars - 1) + ".";
         GuiTheme.DrawText(name, textX, y + 2, 10, textColor);
@@ -322,7 +279,6 @@ public class Obj_GuiFusionResultPopup : GameElement
             string newStr = ((int)Math.Round(s.New)).ToString();
             GuiTheme.DrawText(newStr, x + labelW + parentBlockW + arrowW, ry + 2, 10, newColor);
 
-            // Barra con marker dei genitori sovrapposti
             int bY = ry + 3;
             Graphics.DrawRectangleRounded(new Rectangle(barX, bY, barW, barH), 0.5f, 4, barBg);
 
@@ -330,7 +286,6 @@ public class Obj_GuiFusionResultPopup : GameElement
             int fillW = Math.Max(1, (int)(barW * newRatio));
             Graphics.DrawRectangleRounded(new Rectangle(barX, bY, fillW, barH), 0.5f, 4, newColor);
 
-            // Tick sui valori genitori (sovrapposti)
             DrawParentTick(barX, bY, barW, barH, s.P1, s.Min, s.Max);
             DrawParentTick(barX, bY, barW, barH, s.P2, s.Min, s.Max);
         }

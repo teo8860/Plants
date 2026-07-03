@@ -29,9 +29,6 @@ public class Obj_GuiPiantaggio : GameElement
     private SeedSorter sorter = new SeedSorter { IncludeRarity = true };
     private Seed selectedSeedRef = null;
 
-    // Bottone "Pianta"
-    private bool buttonHovered = false;
-
     // Animazione caduta seme
     public bool isFalling = false;
     private float fallSemeY = 0f;
@@ -226,19 +223,7 @@ public class Obj_GuiPiantaggio : GameElement
         bool clicked = Input.IsMouseButtonPressed(MouseButton.Left) && !sortConsumed;
 
         if (seeds.Count == 0)
-        {
-            int cbtnW = 140;
-            int cbtnH = 28;
-            int cbtnX = (sw - cbtnW) / 2;
-            int cbtnY = sh / 2 + 15;
-
-            if (clicked && mx >= cbtnX && mx <= cbtnX + cbtnW && my >= cbtnY && my <= cbtnY + cbtnH)
-            {
-                Nascondi();
-                Game.room_compost.SetActiveRoom();
-            }
             return;
-        }
 
         // Scroll
         float wheelDelta = Input.GetMouseWheelMove();
@@ -282,27 +267,6 @@ public class Obj_GuiPiantaggio : GameElement
             }
         }
 
-        // Bottone "Pianta" (coordinate allineate con DrawSelectedInfo)
-        if (selectedIndex >= 0 && selectedIndex < seeds.Count)
-        {
-            int panelH = 160;
-            int panelY = sh - panelH - 5 - Obj_GuiBottomNavigation.BAR_HEIGHT;
-            int btnW = 120;
-            int btnH = 22;
-            int btnX = (sw - btnW) / 2;
-            int btnY = panelY + panelH - btnH - 4;
-
-            buttonHovered = mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH;
-
-            if (buttonHovered && clicked)
-            {
-                StartFallAnimation(seeds[selectedIndex]);
-            }
-        }
-        else
-        {
-            buttonHovered = false;
-        }
     }
 
     private void UpdateVisualPositions()
@@ -550,16 +514,14 @@ public class Obj_GuiPiantaggio : GameElement
         int cbtnX = (sw - cbtnW) / 2;
         int cbtnY = sh / 2 + 15;
 
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-        bool hoverCompost = mx >= cbtnX && mx <= cbtnX + cbtnW && my >= cbtnY && my <= cbtnY + cbtnH;
-
-        Color cbtnColor = hoverCompost ? buttonHoverColor : buttonColor;
-        Graphics.DrawRectangleRounded(new Rectangle(cbtnX, cbtnY, cbtnW, cbtnH), 0.3f, 8, cbtnColor);
-
-        string cbtnText = "Apri Pacchetti";
-        int cbtnTextW = GuiTheme.MeasureText(cbtnText, 12);
-        GuiTheme.DrawText(cbtnText, cbtnX + (cbtnW - cbtnTextW) / 2, cbtnY + 7, 12, bianco);
+        Hud.Button(cbtnX, cbtnY, cbtnW, cbtnH, "Apri Pacchetti", () => {
+            Nascondi();
+            Game.room_compost.SetActiveRoom();
+        }, new Hud.ButtonOptions {
+            Bg = buttonColor, HoverBg = buttonHoverColor,
+            TextColor = bianco, FontSize = 12, Roundness = 0.3f,
+            BorderThickness = 0
+        });
     }
 
     private void DrawGrid()
@@ -665,13 +627,11 @@ public class Obj_GuiPiantaggio : GameElement
         int panelX = 10;
         int panelW = sw - 20;
 
-        // Sfondo pannello info
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, panelW, panelH),
-            0.1f, 8, new Color(30, 35, 25, 235));
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX, panelY, panelW, panelH),
-            0.1f, 8, 1, new Color(80, 120, 80, 150));
+        Hud.Panel(panelX, panelY, panelW, panelH, new Hud.PanelOptions
+        {
+            Bg = new Color(30, 35, 25, 235), Border = new Color(80, 120, 80, 150),
+            Roundness = 0.1f, BorderThickness = 1
+        });
 
         // Nome del seme
         string nome = SeedDefinitions.GetSeedName(sel.type);
@@ -682,8 +642,7 @@ public class Obj_GuiPiantaggio : GameElement
         int rarW = GuiTheme.MeasureText(rarityName, 8);
         GuiTheme.DrawText(rarityName, (sw - rarW) / 2, panelY + 19, 8, rarityColor);
 
-        // Separatore
-        Graphics.DrawRectangle(panelX + 10, panelY + 30, panelW - 20, 1, new Color(80, 100, 80, 100));
+        Hud.Divider(panelX + 10, panelY + 30, panelW - 20, new Color(80, 100, 80, 100));
 
         // Statistiche compact (2 colonne)
         if (sel.stats != null)
@@ -694,19 +653,17 @@ public class Obj_GuiPiantaggio : GameElement
             SeedStatsDrawer.Draw(sel.stats, statsX, statsY, statsW, compact: true);
         }
 
-        // Bottone "Pianta"
         int btnW = 120;
         int btnH = 22;
         int btnX = (sw - btnW) / 2;
         int btnY = panelY + panelH - btnH - 4;
 
-        Color btnColor = buttonHovered ? buttonHoverColor : buttonColor;
-        Graphics.DrawRectangleRounded(new Rectangle(btnX, btnY, btnW, btnH), 0.3f, 8, btnColor);
-        Graphics.DrawRectangleRoundedLines(new Rectangle(btnX, btnY, btnW, btnH), 0.3f, 8, 2, verdeChiaro);
-
-        string btnText = "Pianta!";
-        int btnTextW = GuiTheme.MeasureText(btnText, 12);
-        GuiTheme.DrawText(btnText, btnX + (btnW - btnTextW) / 2, btnY + 5, 12, bianco);
+        Hud.Button(btnX, btnY, btnW, btnH, "Pianta!", () => StartFallAnimation(sel), new Hud.ButtonOptions
+        {
+            Bg = buttonColor, HoverBg = buttonHoverColor,
+            Border = verdeChiaro, TextColor = bianco,
+            FontSize = 12, Roundness = 0.3f, BorderThickness = 2
+        });
     }
 
     private void DrawFalling()

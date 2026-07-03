@@ -12,7 +12,6 @@ public class Obj_GuiRewardPopup : GameElement
 {
     private bool isVisible = false;
     private List<MailReward> rewards = new();
-    private bool closeHovered = false;
 
     private readonly Color overlayColor = new Color(0, 0, 0, 180);
     private readonly Color panelBg = new Color(40, 45, 35, 250);
@@ -69,20 +68,11 @@ public class Obj_GuiRewardPopup : GameElement
         if (!isVisible) return;
         InputGate.ConsumeMouse();
 
-        (int panelX, int panelY, int panelW, int panelH) = GetPanelRect();
-        int btnW = 90;
-        int btnH = 24;
-        int btnX = panelX + (panelW - btnW) / 2;
-        int btnY = panelY + panelH - btnH - 10;
-
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-
-        closeHovered = mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH;
-
         if (Input.IsMouseButtonPressed(MouseButton.Left))
         {
-            if (closeHovered) { Hide(); return; }
+            (int panelX, int panelY, int panelW, int panelH) = GetPanelRect();
+            int mx = Input.GetMouseX();
+            int my = Input.GetMouseY();
             bool inside = mx >= panelX && mx <= panelX + panelW &&
                           my >= panelY && my <= panelY + panelH;
             if (!inside) Hide();
@@ -103,21 +93,24 @@ public class Obj_GuiRewardPopup : GameElement
     {
         if (!isVisible) return;
 
-        Graphics.DrawRectangle(0, 0, sw, sh, overlayColor);
+        Hud.Overlay(overlayColor);
 
         (int panelX, int panelY, int panelW, int panelH) = GetPanelRect();
 
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, panelW, panelH), 0.1f, 8, panelBg);
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(panelX, panelY, panelW, panelH), 0.1f, 8, 2, panelBorder);
+        Hud.Panel(panelX, panelY, panelW, panelH, new Hud.PanelOptions
+        {
+            Bg = panelBg, Border = panelBorder, Roundness = 0.1f
+        });
 
-        Graphics.DrawRectangleRounded(
-            new Rectangle(panelX, panelY, panelW, 22), 0.25f, 8, headerBg);
+        Hud.Panel(panelX, panelY, panelW, 22, new Hud.PanelOptions
+        {
+            Bg = headerBg, Roundness = 0.25f, BorderThickness = 0
+        });
 
-        string title = "RICOMPENSE";
-        int titleW = GuiTheme.MeasureText(title, 14);
-        GuiTheme.DrawText(title, panelX + (panelW - titleW) / 2, panelY + 6, 14, textColor);
+        Hud.Label(panelX, panelY + 6, panelW, "RICOMPENSE", new Hud.LabelOptions
+        {
+            FontSize = 14, Color = textColor, Align = TextAlign.Center
+        });
 
         int rowH = 24;
         int rowY = panelY + 32;
@@ -126,13 +119,15 @@ public class Obj_GuiRewardPopup : GameElement
 
         foreach (MailReward reward in rewards)
         {
-            Graphics.DrawRectangleRounded(
-                new Rectangle(rowX, rowY, rowW, rowH), 0.3f, 6, rewardBg);
-            Graphics.DrawRectangleRoundedLines(
-                new Rectangle(rowX, rowY, rowW, rowH), 0.3f, 6, 1, rewardBorder);
+            Hud.Panel(rowX, rowY, rowW, rowH, new Hud.PanelOptions
+            {
+                Bg = rewardBg, Border = rewardBorder, Roundness = 0.3f, BorderThickness = 1
+            });
 
-            string label = MailSystem.FormatReward(reward);
-            GuiTheme.DrawText(label, rowX + 10, rowY + 7, 11, rewardTextColor);
+            Hud.Label(rowX + 10, rowY + 7, MailSystem.FormatReward(reward), new Hud.LabelOptions
+            {
+                FontSize = 11, Color = rewardTextColor
+            });
 
             rowY += rowH + 4;
         }
@@ -142,10 +137,11 @@ public class Obj_GuiRewardPopup : GameElement
         int btnX = panelX + (panelW - btnW) / 2;
         int btnY = panelY + panelH - btnH - 10;
 
-        Color bc = closeHovered ? buttonHoverColor : buttonColor;
-        Graphics.DrawRectangleRounded(new Rectangle(btnX, btnY, btnW, btnH), 0.3f, 8, bc);
-        string btnText = "Ottimo!";
-        int btnTextW = GuiTheme.MeasureText(btnText, 12);
-        GuiTheme.DrawText(btnText, btnX + (btnW - btnTextW) / 2, btnY + 6, 12, textColor);
+        Hud.Button(btnX, btnY, btnW, btnH, "Ottimo!", () => Hide(), new Hud.ButtonOptions
+        {
+            Bg = buttonColor, HoverBg = buttonHoverColor,
+            TextColor = textColor, FontSize = 12, Roundness = 0.3f,
+            BorderThickness = 0
+        });
     }
 }

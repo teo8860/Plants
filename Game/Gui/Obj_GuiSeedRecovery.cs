@@ -15,13 +15,6 @@ public class Obj_GuiSeedRecovery : GameElement
     private float animProgress = 0f;
     private float pulseTime = 0f;
 
-    // Hover pulsanti conferma
-    private bool confirmHovered = false;
-    private bool cancelHovered = false;
-
-    // Hover pulsante annulla countdown
-    private bool cancelCountdownHovered = false;
-
     // Colori
     private readonly Color panelBg = new Color(25, 28, 22, 245);
     private readonly Color panelBorder = new Color(100, 180, 100, 255);
@@ -62,74 +55,18 @@ public class Obj_GuiSeedRecovery : GameElement
         {
             animProgress = Math.Min(1f, animProgress + dt * 6f);
             if (animProgress > 0.9f)
-                HandleConfirmationInput();
+            {
+                InputGate.ConsumeMouse();
+                if (Input.IsKeyPressed(KeyboardKey.Escape))
+                    SeedRecoverySystem.IsConfirming = false;
+            }
         }
 
         if (SeedRecoverySystem.IsCountdown)
-        {
             SeedRecoverySystem.Update(dt);
-            HandleCountdownInput();
-        }
 
         if (SeedRecoverySystem.IsRewinding)
-        {
             SeedRecoverySystem.Update(dt);
-        }
-    }
-
-    private void HandleConfirmationInput()
-    {
-        InputGate.ConsumeMouse();
-
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-
-        int pw = Math.Min(260, sw - 30);
-        int ph = 150;
-        int px = (sw - pw) / 2;
-        int py = (sh - ph) / 2;
-
-        int btnW = 90;
-        int btnH = 26;
-        int btnY = py + ph - 40;
-        int confirmX = px + pw / 2 - btnW - 8;
-        int cancelX = px + pw / 2 + 8;
-
-        confirmHovered = mx >= confirmX && mx <= confirmX + btnW && my >= btnY && my <= btnY + btnH;
-        cancelHovered = mx >= cancelX && mx <= cancelX + btnW && my >= btnY && my <= btnY + btnH;
-
-        if (Input.IsMouseButtonPressed(MouseButton.Left))
-        {
-            if (confirmHovered)
-                SeedRecoverySystem.StartRecovery();
-            else if (cancelHovered)
-                SeedRecoverySystem.IsConfirming = false;
-        }
-
-        if (Input.IsKeyPressed(KeyboardKey.Escape))
-            SeedRecoverySystem.IsConfirming = false;
-    }
-
-    private void HandleCountdownInput()
-    {
-        int mx = Input.GetMouseX();
-        int my = Input.GetMouseY();
-
-        // Pulsante annulla nel banner countdown
-        int barW = sw - 30;
-        int barX = 15;
-        int barY = 8;
-        int btnW = 60;
-        int btnH = 16;
-        int btnX = barX + barW - btnW - 6;
-        int btnBY = barY + 6;
-
-        cancelCountdownHovered = mx >= btnX && mx <= btnX + btnW && my >= btnBY && my <= btnBY + btnH;
-
-        if (cancelCountdownHovered && Input.IsMouseButtonPressed(MouseButton.Left))
-        {
-            SeedRecoverySystem.CancelRecovery();
-        }
     }
 
     public override void Draw()
@@ -149,7 +86,7 @@ public class Obj_GuiSeedRecovery : GameElement
         if (animProgress < 0.05f) return;
 
         byte overlayA = (byte)(180 * animProgress);
-        Graphics.DrawRectangle(0, 0, sw, sh, new Color(0, 0, 0, overlayA));
+        Hud.Overlay(new Color(0, 0, 0, overlayA));
 
         float eased = EaseOutBack(animProgress);
         int pw = (int)(Math.Min(260, sw - 30) * eased);
@@ -159,21 +96,21 @@ public class Obj_GuiSeedRecovery : GameElement
 
         if (pw < 50) return;
 
-        Graphics.DrawRectangleRounded(
-            new Rectangle(px, py, pw, ph), 0.08f, 8, panelBg);
-        Graphics.DrawRectangleRoundedLines(
-            new Rectangle(px, py, pw, ph), 0.08f, 8, 2, panelBorder);
+        Hud.Panel(px, py, pw, ph, new Hud.PanelOptions
+        {
+            Bg = panelBg, Border = panelBorder, Roundness = 0.08f
+        });
 
         if (animProgress < 0.5f) return;
 
-        // Header
-        Graphics.DrawRectangleRounded(
-            new Rectangle(px + 6, py + 6, pw - 12, 35), 0.12f, 6, headerBg);
+        Hud.Panel(px + 6, py + 6, pw - 12, 35, new Hud.PanelOptions
+        {
+            Bg = headerBg, Roundness = 0.12f, BorderThickness = 0
+        });
         Graphics.DrawCircle(px + 22, py + 23, 7, new Color(180, 140, 60, 255));
         Graphics.DrawCircle(px + 22, py + 20, 5, new Color(200, 170, 80, 255));
         GuiTheme.DrawText("Recupero Seme", px + 38, py + 14, 13, new Color(220, 240, 200, 255));
 
-        // Testo
         string msg1 = "Vuoi recuperare il seme?";
         int msg1W = GuiTheme.MeasureText(msg1);
         GuiTheme.DrawText(msg1, px + (pw - msg1W) / 2, py + 50, 10, new Color(220, 220, 220, 255));
@@ -186,7 +123,6 @@ public class Obj_GuiSeedRecovery : GameElement
         int msg3W = GuiTheme.MeasureText(msg3, 8);
         GuiTheme.DrawText(msg3, px + (pw - msg3W) / 2, py + 77, 8, new Color(160, 200, 160, 255));
 
-        // Durata
         SeedRarity rarity = Seed.GetRarityFromType(Game.pianta.TipoSeme);
         float duration = SeedRecoverySystem.GetDuration(rarity);
         int mins = (int)(duration / 60);
@@ -195,26 +131,29 @@ public class Obj_GuiSeedRecovery : GameElement
         int durW = GuiTheme.MeasureText(durText);
         GuiTheme.DrawText(durText, px + (pw - durW) / 2, py + 95, 10, new Color(255, 220, 100, 255));
 
-        // Pulsanti
         int btnW = 90;
         int btnH = 26;
         int btnY = py + ph - 40;
         int confirmX = px + pw / 2 - btnW - 8;
         int cancelX = px + pw / 2 + 8;
 
-        Color confirmBg = confirmHovered ? greenBtnHover : greenBtn;
-        Graphics.DrawRectangleRounded(
-            new Rectangle(confirmX, btnY, btnW, btnH), 0.25f, 6, confirmBg);
-        string confLabel = "Conferma";
-        int confW = GuiTheme.MeasureText(confLabel, 11);
-        GuiTheme.DrawText(confLabel, confirmX + (btnW - confW) / 2, btnY + 7, 11, Color.White);
+        Hud.Button(confirmX, btnY, btnW, btnH, "Conferma",
+            () => SeedRecoverySystem.StartRecovery(),
+            new Hud.ButtonOptions
+            {
+                Bg = greenBtn, HoverBg = greenBtnHover,
+                TextColor = Color.White, FontSize = 11, Roundness = 0.25f,
+                BorderThickness = 0
+            });
 
-        Color cancelBg = cancelHovered ? redBtnHover : redBtn;
-        Graphics.DrawRectangleRounded(
-            new Rectangle(cancelX, btnY, btnW, btnH), 0.25f, 6, cancelBg);
-        string cancLabel = "Annulla";
-        int cancW = GuiTheme.MeasureText(cancLabel, 11);
-        GuiTheme.DrawText(cancLabel, cancelX + (btnW - cancW) / 2, btnY + 7, 11, Color.White);
+        Hud.Button(cancelX, btnY, btnW, btnH, "Annulla",
+            () => { SeedRecoverySystem.IsConfirming = false; },
+            new Hud.ButtonOptions
+            {
+                Bg = redBtn, HoverBg = redBtnHover,
+                TextColor = Color.White, FontSize = 11, Roundness = 0.25f,
+                BorderThickness = 0
+            });
     }
 
     // ========== COUNTDOWN DI SOPRAVVIVENZA ==========
@@ -227,18 +166,15 @@ public class Obj_GuiSeedRecovery : GameElement
         int barY = 8;
         int barW = sw - barMargin * 2;
 
-        // Sfondo
         Graphics.DrawRectangleRounded(
             new Rectangle(barX, barY, barW, barH), 0.2f, 6, countdownBg);
         Graphics.DrawRectangleRoundedLines(
             new Rectangle(barX, barY, barW, barH), 0.2f, 6, 2, countdownBorder);
 
-        // Barra progresso countdown
         float progress = SeedRecoverySystem.CountdownProgress;
         int fillW = (int)((barW - 8) * progress);
         if (fillW > 4)
         {
-            // Colore che vira dal giallo al verde man mano che il countdown avanza
             byte r = (byte)(200 - progress * 140);
             byte g = (byte)(180 + progress * 40);
             byte b = 60;
@@ -247,7 +183,6 @@ public class Obj_GuiSeedRecovery : GameElement
                 new Color(r, g, b, 255));
         }
 
-        // Timer rimanente (grande al centro)
         float remaining = SeedRecoverySystem.CountdownRemaining;
         int mins = (int)(remaining / 60);
         int secs = (int)(remaining % 60);
@@ -255,26 +190,25 @@ public class Obj_GuiSeedRecovery : GameElement
         int timeW = GuiTheme.MeasureText(timeText, 12);
         GuiTheme.DrawText(timeText, barX + (barW - timeW) / 2, barY + 4, 12, Color.White);
 
-        // Label
         string label = "Sopravvivi!";
         GuiTheme.DrawText(label, barX + 8, barY + 8, 9, new Color(255, 220, 100, 255));
 
-        // Pulsante annulla (piccolo, a destra)
         int btnW = 60;
         int btnH = 16;
         int btnX = barX + barW - btnW - 6;
         int btnBY = barY + 6;
 
-        Color btnBg = cancelCountdownHovered
-            ? new Color(180, 70, 70, 255)
-            : new Color(120, 50, 50, 200);
-        Graphics.DrawRectangleRounded(
-            new Rectangle(btnX, btnBY, btnW, btnH), 0.3f, 4, btnBg);
-        string cancText = "Annulla";
-        int cancW = GuiTheme.MeasureText(cancText, 8);
-        GuiTheme.DrawText(cancText, btnX + (btnW - cancW) / 2, btnBY + 3, 8, new Color(220, 200, 200, 255));
+        Hud.Button(btnX, btnBY, btnW, btnH, "Annulla",
+            () => SeedRecoverySystem.CancelRecovery(),
+            new Hud.ButtonOptions
+            {
+                Bg = new Color(120, 50, 50, 200),
+                HoverBg = new Color(180, 70, 70, 255),
+                TextColor = new Color(220, 200, 200, 255),
+                FontSize = 8, Roundness = 0.3f,
+                BorderThickness = 0
+            });
 
-        // Pulsa il bordo se il tempo sta scadendo (ultimi 30 secondi)
         if (remaining < 30f)
         {
             float pulse = (MathF.Sin(pulseTime * 6f) + 1f) * 0.5f;
@@ -300,7 +234,6 @@ public class Obj_GuiSeedRecovery : GameElement
         Graphics.DrawRectangleRoundedLines(
             new Rectangle(barX, barY, barW, barH), 0.2f, 6, 2, rewindBorder);
 
-        // Barra progresso rewind
         float progress = SeedRecoverySystem.RewindProgress;
         int fillW = (int)((barW - 8) * progress);
         if (fillW > 4)
@@ -315,7 +248,6 @@ public class Obj_GuiSeedRecovery : GameElement
                 new Rectangle(barX + 4, barY + 4, fillW, barH - 8), 0.15f, 4, fill);
         }
 
-        // Testo
         string label = "Recupero in corso...";
         GuiTheme.DrawText(label, barX + 8, barY + 8, 9, new Color(220, 240, 200, 255));
 
@@ -323,7 +255,6 @@ public class Obj_GuiSeedRecovery : GameElement
         int pctW = GuiTheme.MeasureText(pctText, 9);
         GuiTheme.DrawText(pctText, barX + barW - pctW - 8, barY + 8, 9, new Color(200, 200, 200, 255));
 
-        // Hint input bloccato
         float pulse2 = (MathF.Sin(pulseTime * 2f) + 1f) * 0.5f;
         byte hintA = (byte)(100 + pulse2 * 80);
         string hint = "Input bloccato";
